@@ -171,18 +171,6 @@ namespace converter
     }
   };
 
-  constexpr char defYMDfmt[] = "%F";  // string literal object with static storage duration
-  template<c_iostream IOSS, const char* _ymdFormat = defYMDfmt> // %F -> "%Y-%m-%d"
-  struct Format_StreamYMD
-  {
-    using stream_type = IOSS;
-    constexpr static const char* ymdFormat = _ymdFormat;
-
-    constexpr static inline
-    std::enable_if< std::is_same_v<IOSS::char_type,char>, void>
-    streamUpdate([[maybe_unused]] IOSS& ss) {}
-  };
-
 
 
   /*

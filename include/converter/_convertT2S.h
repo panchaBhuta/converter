@@ -31,9 +31,6 @@ namespace converter
   template <c_char CH, const char* usrLoc>
   using T2S_Format_StreamUserLocale = Format_StreamUserLocale<std::basic_ostringstream<CH>, usrLoc>;
 
-  template < const char* formatYMD = defYMDfmt > // %F -> "%Y-%m-%d"
-  using T2S_Format_StreamYMD = Format_StreamYMD<std::ostringstream, formatYMD>;
-
   template <typename, typename = void>
   struct is_formatOSS : std::false_type {};
 
@@ -50,16 +47,6 @@ namespace converter
   concept c_formatOSS = is_formatOSS<FMT>::value;
 
 
-  template <typename, typename = void>
-  struct is_formatYMDoss : std::false_type {};
-
-  template <typename FMT>
-  struct is_formatYMDoss< FMT,
-                          typename std::enable_if_t< std::is_same_v< typename FMT::stream_type, std::ostringstream>
-                                                                   >
-                        >
-            : is_formatYMDss<FMT>
-  {};
 
 
   template<c_floating_point T, int decimalPrecision = getDecimalPrecision<T>()>

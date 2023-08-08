@@ -37,7 +37,22 @@
 
 namespace converter
 {
+  constexpr char defYMDfmt[] = "%F";  // string literal object with static storage duration
+  template<c_iostream IOSS, const char* _ymdFormat = defYMDfmt> // %F -> "%Y-%m-%d"
+  struct Format_StreamYMD
+  {
+    using stream_type = IOSS;
+    constexpr static const char* ymdFormat = _ymdFormat;
+
+    constexpr static inline
+    std::enable_if_t< std::is_same_v<typename IOSS::char_type,char>, void>
+    streamUpdate([[maybe_unused]] IOSS& ss) {}
+  };
+
   // [=============================================================[ ConvertFromStr
+
+  template < const char* formatYMD = defYMDfmt > // %F -> "%Y-%m-%d"
+  using S2T_Format_StreamYMD = Format_StreamYMD<std::istringstream, formatYMD>;
 
   template<>
   struct S2T_DefaultFormat<std::chrono::year_month_day, void>
@@ -45,8 +60,21 @@ namespace converter
     using type = S2T_Format_StreamYMD< defYMDfmt >; // %F -> "%Y-%m-%d"
   };
 
+
+  template <typename, typename = void>
+  struct is_formatYMDiss : std::false_type {};
+
+  template <typename FMT>
+  struct is_formatYMDiss< FMT,
+                          typename std::enable_if_t< std::is_same_v<typename FMT::stream_type, std::istringstream>
+                                                   >
+                        >
+            : is_formatYMDss<FMT>
+  {};
+
   template <typename FMT>
   concept c_formatYMDiss = is_formatYMDiss<FMT>::value;
+
 
   /**
    * @brief     Specialized implementation handling string to 'year_month_day' conversion.
@@ -106,13 +134,16 @@ namespace converter
   #if   USE_CHRONO_FROMSTREAM
         return ymd;
   #elif USE_DATE_FROMSTREAM
-        return std::chrono::year_month_day{ int(ymd.year()), int(ymd.month()), int(ymd.day()) };
+        return std::chrono::year_month_day{ std::chrono::year(int(ymd.year())),
+                                            std::chrono::month(unsigned(ymd.month())),
+                                            std::chrono::day(unsigned(ymd.day())) };
   #endif
     }
 #else
-    ;
-    // Due to limitations of underlying libs, no definition is provided here.
-    // If needed, user might declare their own specific implementation of this method in their code base.
+    { 
+      // Due to limitations of underlying libs, no definition is provided here.
+      // If needed, user might declare their own specific implementation of this method in their code base.
+    }
 #endif
 
     /**
@@ -134,11 +165,25 @@ namespace converter
 
   // [=============================================================[ ConvertFromStr
 
+  template < const char* formatYMD = defYMDfmt > // %F -> "%Y-%m-%d"
+  using T2S_Format_StreamYMD = Format_StreamYMD<std::ostringstream, formatYMD>;
+
   template<>
   struct T2S_DefaultFormat<std::chrono::year_month_day, void>
   {
     using type = T2S_Format_StreamYMD< defYMDfmt >; // %F -> "%Y-%m-%d"
   };
+
+  template <typename, typename = void>
+  struct is_formatYMDoss : std::false_type {};
+
+  template <typename FMT>
+  struct is_formatYMDoss< FMT,
+                          typename std::enable_if_t< std::is_same_v< typename FMT::stream_type, std::ostringstream>
+                                                                   >
+                        >
+            : is_formatYMDss<FMT>
+  {};
 
   template <typename FMT>
   concept c_formatYMDoss = is_formatYMDoss<FMT>::value;
@@ -201,7 +246,9 @@ namespace converter
 
       // gcc and clang does not support the required 'chrono::to_stream' functionality as of writing this code
       // UNIX-like , macOS
-      date::year_month_day valDate{ int(val.year()), int(val.month()), int(val.day()) };
+      date::year_month_day valDate{ date::year(int(val.year())),
+                                    date::month(unsigned(val.month())),
+                                    date::day(unsigned(val.day())) };
       using CS = std::chrono::seconds;
       date::fields<CS> fds{valDate};
       date::to_stream(oss, fmt, fds, abbrev, offset_sec);
@@ -300,7 +347,7 @@ namespace converter
         std::ostringstream eoss;
         eoss << __CONVERTER_PREFERRED_PATH__ << " : ERROR : rapidcsv :: in function 'std::string _ConvertFromVal<std::chrono::year_month_date, T2S_FORMAT_YMD>::ToStr_args(const std::chrono::year_month_date& val)' ::: ";
         try {
-          eoss << "year{" << int(val.year()) << "}-month{" << int(val.month()) << "}-day{" << int(val.day()) << "}' : val.ok()=" << val.ok() << " format='" << fmt << "'";
+          eoss << "year{" << int(val.year()) << "}-month{" << unsigned(val.month()) << "}-day{" << unsigned(val.day()) << "}' : val.ok()=" << val.ok() << " format='" << fmt << "'";
         } catch (...) {} // do-nothing on error
         eoss << " ostringstream-conversion<" << dateClass << "> failed.";
         eoss << std::boolalpha << "   iss.fail() = " << oss.fail()

@@ -40,7 +40,7 @@ endmacro(add_unit_test)
 
 # Unit tests
 add_unit_test(testTemplateInstantiation)
-add_unit_test(test001)
+add_unit_test(testBasicTests)
 #[=========[
 
 add_unit_test(testViewYmd001)

@@ -20,15 +20,19 @@ int main()
   int rv = 0;
   try {
     conversionEqualCheck<short>(-10, "-10");
-    conversionEqualCheck<int>  (-10, "-10");
-    conversionEqualCheck<long> (-10, "-10");
-    conversionEqualCheck<long long>(-10, "-10");
+    conversionEqualCheck<int>  (-20, "-20");
+    conversionEqualCheck<long> (-30, "-30");
+    conversionEqualCheck<long long>(-40, "-40");
 
     conversionEqualCheck<unsigned short>(10, "10");
-    conversionEqualCheck<unsigned int>  (10, "10");
-    conversionEqualCheck<unsigned long> (10, "10");
-    conversionEqualCheck<unsigned long long>(10, "10");
+    conversionEqualCheck<unsigned int>  (20, "20");
+    conversionEqualCheck<unsigned long> (30, "30");
+    conversionEqualCheck<unsigned long long>(40, "40");
 
+    conversionEqualCheck<float>(-11, "-11");
+    conversionEqualCheck<double>  (-21, "-21");
+    conversionEqualCheck<float>(11, "11");
+    conversionEqualCheck<double>  (21, "21");
 
     conversionEqualCheck<bool>(true,  "1");
     conversionEqualCheck<bool>(false, "0");
@@ -41,6 +45,15 @@ int main()
     conversionEqualCheck<char8_t>('e',  "e");
     conversionEqualCheck<char16_t>('f',  "f");
     conversionEqualCheck<char32_t>('g',  "g");
+
+
+    conversionEqualCheck<std::chrono::year_month_day>(
+            std::chrono::year_month_day( std::chrono::year(2023),
+                                         std::chrono::month(8),
+                                         std::chrono::day(15)
+                                       ), "2023-08-15");
+
+    //conversionEqualCheck<std::chrono::year_month_day>(false, "0");
 
   } catch (const std::exception& ex) {
     std::cout << ex.what() << std::endl;

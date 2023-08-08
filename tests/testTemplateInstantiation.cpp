@@ -9,6 +9,13 @@
 #include "unittest.h"
 
 
+template<typename T>
+void checkForFunctionInstance()
+{
+  static_assert(std::is_same_v< decltype(&converter::ConvertFromStr<T>::ToVal), T(*)(const std::string&)>);
+  static_assert(std::is_same_v< decltype(&converter::ConvertFromVal<T>::ToStr), std::string(*)(const T&)>);
+}
+
 int main()
 {
   using T2S_Format_SDPfloat  =  converter::T2S_Format_StreamDecimalPrecision<float>;
@@ -53,9 +60,19 @@ int main()
                                                   >
                                       >::value);
 
+  static_assert(converter::is_formatYMDiss< converter::S2T_Format_StreamYMD< converter::defYMDfmt > >::value);
+  static_assert(converter::is_formatYMDoss< converter::T2S_Format_StreamYMD< converter::defYMDfmt > >::value);
+
+
   // check for default S2T_FORMAT types
+  static_assert(std::is_same_v<typename converter::S2T_DefaultFormat<short>::type, converter::S2T_Format_std_StoT>);
   static_assert(std::is_same_v<typename converter::S2T_DefaultFormat<int>::type, converter::S2T_Format_std_StoT>);
   static_assert(std::is_same_v<typename converter::S2T_DefaultFormat<long>::type, converter::S2T_Format_std_StoT>);
+  static_assert(std::is_same_v<typename converter::S2T_DefaultFormat<long long>::type, converter::S2T_Format_std_StoT>);
+  static_assert(std::is_same_v<typename converter::S2T_DefaultFormat<unsigned short>::type, converter::S2T_Format_std_StoT>);
+  static_assert(std::is_same_v<typename converter::S2T_DefaultFormat<unsigned int>::type, converter::S2T_Format_std_StoT>);
+  static_assert(std::is_same_v<typename converter::S2T_DefaultFormat<unsigned long>::type, converter::S2T_Format_std_StoT>);
+  static_assert(std::is_same_v<typename converter::S2T_DefaultFormat<unsigned long long>::type, converter::S2T_Format_std_StoT>);
   static_assert(std::is_same_v<typename converter::S2T_DefaultFormat<float>::type, converter::S2T_Format_std_StoT>);
   static_assert(std::is_same_v<typename converter::S2T_DefaultFormat<double>::type, converter::S2T_Format_std_StoT>);
   static_assert(std::is_same_v<typename converter::S2T_DefaultFormat<std::string>::type, converter::S2T_Format_WorkAround>);
@@ -70,8 +87,14 @@ int main()
   static_assert(std::is_same_v<typename converter::S2T_DefaultFormat<std::chrono::year_month_day>::type, converter::S2T_Format_StreamYMD< converter::defYMDfmt > >);
 
   // check for default T2S_FORMAT types
+  static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<short>::type, converter::T2S_Format_std_TtoS>);
   static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<int>::type, converter::T2S_Format_std_TtoS>);
   static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<long>::type, converter::T2S_Format_std_TtoS>);
+  static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<long long>::type, converter::T2S_Format_std_TtoS>);
+  static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<unsigned short>::type, converter::T2S_Format_std_TtoS>);
+  static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<unsigned int>::type, converter::T2S_Format_std_TtoS>);
+  static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<unsigned long>::type, converter::T2S_Format_std_TtoS>);
+  static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<unsigned long long>::type, converter::T2S_Format_std_TtoS>);
   static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<float>::type, T2S_Format_SDPfloat>);
   static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<double>::type, T2S_Format_SDPdouble>);
   static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<std::string>::type, converter::T2S_Format_WorkAround>);
@@ -85,8 +108,30 @@ int main()
   static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<bool>::type, converter::T2S_Format_WorkAround>);
   static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<std::chrono::year_month_day>::type, converter::T2S_Format_StreamYMD< converter::defYMDfmt > >);
 
-  static_assert(std::is_same_v< decltype(&converter::ConvertFromStr<int>::ToVal),    int(*)(const std::string&)>);
-  static_assert(std::is_same_v< decltype(&converter::ConvertFromVal<double>::ToStr), std::string(*)(const double&)>);
+
+  // check for function signature
+  checkForFunctionInstance<short>();
+  checkForFunctionInstance<int>();
+  checkForFunctionInstance<long>();
+  checkForFunctionInstance<long long>();
+  checkForFunctionInstance<unsigned short>();
+  checkForFunctionInstance<unsigned int>();
+  checkForFunctionInstance<unsigned long>();
+  checkForFunctionInstance<unsigned long long>();
+  checkForFunctionInstance<float>();
+  checkForFunctionInstance<double>();
+  checkForFunctionInstance<std::string>();
+  checkForFunctionInstance<char>();
+  checkForFunctionInstance<signed char>();
+  checkForFunctionInstance<unsigned char>();
+  checkForFunctionInstance<wchar_t>();
+  checkForFunctionInstance<char8_t>();
+  checkForFunctionInstance<char16_t>();
+  checkForFunctionInstance<char32_t>();
+  checkForFunctionInstance<bool>();
+  checkForFunctionInstance<std::chrono::year_month_day>();
+
+
 
   static_assert(std::is_same_v< decltype(&converter::ConvertFromStr<int, converter::S2T_Format_StreamAsIs<char> >::ToVal), int(*)(const std::string&)>);
   static_assert(std::is_same_v< decltype(&converter::ConvertFromVal<int, converter::T2S_Format_StreamAsIs<char> >::ToStr), std::string(*)(const int&)>);
@@ -94,12 +139,6 @@ int main()
   // this fails to compile as designed
   //static_assert(std::is_same_v< decltype(&converter::ConvertFromVal<double, converter::T2S_Format_std_TtoS>::ToStr), std::string(*)(const double&)>);
 
-
-  static_assert(std::is_same_v< decltype(&converter::ConvertFromStr<char>::ToVal),    char(*)(const std::string&)>);
-  static_assert(std::is_same_v< decltype(&converter::ConvertFromVal<char>::ToStr), std::string(*)(const char&)>);
-
-  static_assert(std::is_same_v< decltype(&converter::ConvertFromStr<wchar_t>::ToVal), wchar_t(*)(const std::string&)>);
-  static_assert(std::is_same_v< decltype(&converter::ConvertFromVal<wchar_t>::ToStr), std::string(*)(const wchar_t&)>);
 
   int rv = 0;
 

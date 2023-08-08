@@ -42,9 +42,6 @@ namespace converter
   template <c_char CH, const char* usrLoc>
   using S2T_Format_StreamUserLocale = Format_StreamUserLocale<std::basic_istringstream<CH>, usrLoc>;
 
-  template < const char* formatYMD = defYMDfmt > // %F -> "%Y-%m-%d"
-  using S2T_Format_StreamYMD = Format_StreamYMD<std::istringstream, formatYMD>;
-
 
   template <typename, typename = void>
   struct is_formatISS : std::false_type {};
@@ -61,16 +58,6 @@ namespace converter
   concept c_formatISS = is_formatISS<FMT>::value;
 
 
-  template <typename, typename = void>
-  struct is_formatYMDiss : std::false_type {};
-
-  template <typename FMT>
-  struct is_formatYMDiss< FMT,
-                          typename std::enable_if_t< std::is_same_v<typename FMT::stream_type, std::istringstream>
-                                                   >
-                        >
-            : is_formatYMDss<FMT>
-  {};
 
 
   template<typename T, typename = void >

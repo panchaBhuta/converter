@@ -10,6 +10,7 @@
 #include <iomanip>
 #include <string>
 #include <sstream>
+#include <chrono>
 
 #define COMMA ,
 
@@ -161,6 +162,19 @@ namespace unittest
       std::basic_string<T> ssVal(&val,1);
       std::string sVal(ssVal.begin(),ssVal.end());
       return sVal;
+    }
+  };
+
+  template<>
+  struct SScompatible<std::chrono::year_month_day> {
+    inline static std::string getVal(const std::chrono::year_month_day& val)
+    {
+      std::ostringstream oss;
+      oss << std::setfill('0') << std::setw(4) << static_cast<int>(val.year()) << "-";
+      oss << std::setfill('0') << std::setw(2) << static_cast<unsigned>(val.month()) << "-";
+      oss << std::setfill('0') << std::setw(2) << static_cast<unsigned>(val.day());
+
+      return oss.str();
     }
   };
 
