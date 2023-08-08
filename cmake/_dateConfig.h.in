@@ -1,0 +1,35 @@
+/*
+ * _dateConfig.h
+ *
+ * URL:      https://github.com/panchaBhuta/converter
+ * Version:  v1.0
+ *
+ * Copyright (c) 2023-2023 Gautam Dhar
+ * All rights reserved.
+ *
+ * converter is distributed under the BSD 3-Clause license, see LICENSE for details.
+ *
+ */
+
+
+/*
+ *  This config-file is used as std::chrono::from_stream() and
+ *  std::chrono::to_stream() is NOT fully supported across all OS's.
+ * 
+ *  Till then, the below macro-variables are used to use
+ *  "std::chrono" lib where possible(msvc -> from_stream),    OR 
+ *  "date" lib (ubuntu, macOS -> from_stream+to_stream)       OR
+ *  as last resort call an internal implementation
+ *  (msvc -> to_stream) which has limited formating support.
+ * 
+ *  Note there is no internal implementation provided yet for 'from_stream'
+ *  and will result in compilation error if a particular OS does not support both
+ *  "std::chrono" and "date" libs 'from_stream' functionality.
+ */
+#pragma once
+
+#cmakedefine01 USE_CHRONO_FROMSTREAM
+#cmakedefine01 USE_CHRONO_TOSTREAM
+
+#cmakedefine01 USE_DATE_FROMSTREAM
+#cmakedefine01 USE_DATE_TOSTREAM
