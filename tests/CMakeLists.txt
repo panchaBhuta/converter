@@ -8,13 +8,6 @@
 #
 
 
-# Ccache
-find_program(CCACHE_PROGRAM ccache)
-if(CCACHE_PROGRAM)
-  message(STATUS "Found ccache")
-  set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
-endif()
-
 # https://stackoverflow.com/questions/14446495/cmake-project-structure-with-unit-tests
 
 # Test macro add_perf_test
@@ -40,7 +33,8 @@ endmacro(add_unit_test)
 
 # Unit tests
 add_unit_test(testTemplateInstantiation)
-add_unit_test(testBasicTests)
+add_unit_test(testBasicConversions)
+add_unit_test(testFloatingPointNaN)
 #[=========[
 
 add_unit_test(testViewYmd001)

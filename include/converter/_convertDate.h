@@ -282,27 +282,27 @@ namespace converter
         switch(convSpecifier)
         {
           case 'Y' :
-            oss << std::setfill('0') << std::setw(4) << static_cast<int>(val.year()); break;
+            oss << std::setfill('0') << std::setw(4) << int(val.year()); break;
           case 'm':
-            oss << std::setfill('0') << std::setw(2) << static_cast<unsigned>(val.month()); break;
+            oss << std::setfill('0') << std::setw(2) << unsigned(val.month()); break;
           case 'd':
-            oss << std::setfill('0') << std::setw(2) << static_cast<unsigned>(val.day()); break;
+            oss << std::setfill('0') << std::setw(2) << unsigned(val.day()); break;
           case 'F': //  "%Y-%m-%d"
             write('Y'); oss << '-'; write('m'); oss << '-'; write('d'); break;
           case 'D': //  "%m/%d/%y"
             write('m'); oss << '/'; write('d'); oss << '/'; write('y'); break;
           case 'y' :
-            oss << std::setfill('0') << std::setw(2) << (static_cast<int>(val.year()) % 100); break;
+            oss << std::setfill('0') << std::setw(2) << (int(val.year()) % 100); break;
           case 'b' :
             try {
-              oss << monthShort.at(static_cast<unsigned>(val.month()));
+              oss << monthShort.at(unsigned(val.month()));
             } catch (std::out_of_range) {
               oss << '%' << convSpecifier;
             }
             break;
           case 'B' :
             try {
-              oss << monthLong.at(static_cast<unsigned>(val.month()));
+              oss << monthLong.at(unsigned(val.month()));
             } catch (std::out_of_range) {
               oss << '%' << convSpecifier;
             }

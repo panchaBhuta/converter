@@ -93,6 +93,7 @@ endif()
 if (CXXOPTS_BUILD_EXAMPLES)
     add_subdirectory(src)
 endif()
+#]======================]
 
 
 
@@ -100,6 +101,14 @@ endif()
 # Tests
 if(CONVERTER_BUILD_TESTS)
 
+# Ccache
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+  message(STATUS "Found ccache")
+  set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
+endif()
+
+#[======================[
   # Examples
   # Test macro add_example
   macro(add_example testname)
@@ -119,6 +128,6 @@ if(CONVERTER_BUILD_TESTS)
   add_example(ex008 examples/ex008.cpp)
   add_example(ex009 examples/ex009.cpp)
   add_example(exConv001 examples/exConv001.cpp)
+#]======================]
 
 endif()
-#]======================]

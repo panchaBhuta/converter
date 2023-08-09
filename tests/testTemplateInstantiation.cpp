@@ -20,27 +20,32 @@ int main()
 {
   using T2S_Format_SDPfloat  =  converter::T2S_Format_StreamDecimalPrecision<float>;
   using T2S_Format_SDPdouble =  converter::T2S_Format_StreamDecimalPrecision<double>;
+  using T2S_Format_SDPlongdouble =  converter::T2S_Format_StreamDecimalPrecision<long double>;
 
   static_assert(std::is_same_v<converter::S2T_Format_StreamUseClassicLocale<char>::stream_type, std::istringstream>);
   static_assert(std::is_same_v<converter::T2S_Format_StreamAsIs<char>::stream_type, std::ostringstream>);
   static_assert(std::is_same_v<T2S_Format_SDPfloat::stream_type, std::ostringstream>);
   static_assert(std::is_same_v<T2S_Format_SDPdouble::stream_type, std::ostringstream>);
+  static_assert(std::is_same_v<T2S_Format_SDPlongdouble::stream_type, std::ostringstream>);
 
   // checks for typename 'STREAM_FORMAT::stream_type' and static function 'STREAM_FORMAT::streamUpdate' with specific signature
   static_assert(converter::has_streamUpdate<converter::S2T_Format_StreamUseClassicLocale<char>>::value);
   static_assert(converter::has_streamUpdate<converter::T2S_Format_StreamAsIs<char>>::value);
   static_assert(converter::has_streamUpdate<T2S_Format_SDPfloat>::value);
   static_assert(converter::has_streamUpdate<T2S_Format_SDPdouble>::value);
+  static_assert(converter::has_streamUpdate<T2S_Format_SDPlongdouble>::value);
 
   static_assert(converter::is_formatSS<converter::S2T_Format_StreamUseClassicLocale<char> >::value);
   static_assert(converter::is_formatSS<converter::T2S_Format_StreamAsIs<char>>::value);
   static_assert(converter::is_formatSS<T2S_Format_SDPfloat>::value);
   static_assert(converter::is_formatSS<T2S_Format_SDPdouble>::value);
+  static_assert(converter::is_formatSS<T2S_Format_SDPlongdouble>::value);
 
   static_assert(converter::is_formatISS<converter::S2T_Format_StreamUseClassicLocale<char> >::value);
   static_assert(converter::is_formatOSS<converter::T2S_Format_StreamAsIs<char>>::value);
   static_assert(converter::is_formatOSS<T2S_Format_SDPfloat>::value);
   static_assert(converter::is_formatOSS<T2S_Format_SDPdouble>::value);
+  static_assert(converter::is_formatOSS<T2S_Format_SDPlongdouble>::value);
   static_assert(converter::is_formatOSS<typename converter::T2S_Format_floating_StreamCombine< float  > >::value);
   static_assert(converter::is_formatOSS<typename converter::T2S_Format_floating_StreamCombine< double > >::value);
   static_assert(converter::is_formatOSS<
@@ -56,6 +61,14 @@ int main()
                                                   <
                                                         double,
                                                         T2S_Format_SDPdouble,
+                                                        typename converter::T2S_Format_StreamUseClassicLocale<char>
+                                                  >
+                                      >::value);
+  static_assert(converter::is_formatOSS<
+                                        typename  converter::T2S_Format_floating_StreamCombine
+                                                  <
+                                                        long double,
+                                                        T2S_Format_SDPlongdouble,
                                                         typename converter::T2S_Format_StreamUseClassicLocale<char>
                                                   >
                                       >::value);
@@ -75,6 +88,7 @@ int main()
   static_assert(std::is_same_v<typename converter::S2T_DefaultFormat<unsigned long long>::type, converter::S2T_Format_std_StoT>);
   static_assert(std::is_same_v<typename converter::S2T_DefaultFormat<float>::type, converter::S2T_Format_std_StoT>);
   static_assert(std::is_same_v<typename converter::S2T_DefaultFormat<double>::type, converter::S2T_Format_std_StoT>);
+  static_assert(std::is_same_v<typename converter::S2T_DefaultFormat<long double>::type, converter::S2T_Format_std_StoT>);
   static_assert(std::is_same_v<typename converter::S2T_DefaultFormat<std::string>::type, converter::S2T_Format_WorkAround>);
   static_assert(std::is_same_v<typename converter::S2T_DefaultFormat<char>::type, converter::S2T_Format_WorkAround>);
   static_assert(std::is_same_v<typename converter::S2T_DefaultFormat<signed char>::type, converter::S2T_Format_WorkAround>);
@@ -97,6 +111,7 @@ int main()
   static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<unsigned long long>::type, converter::T2S_Format_std_TtoS>);
   static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<float>::type, T2S_Format_SDPfloat>);
   static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<double>::type, T2S_Format_SDPdouble>);
+  static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<long double>::type, T2S_Format_SDPlongdouble>);
   static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<std::string>::type, converter::T2S_Format_WorkAround>);
   static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<char>::type, converter::T2S_Format_WorkAround>);
   static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<signed char>::type, converter::T2S_Format_WorkAround>);
@@ -120,6 +135,7 @@ int main()
   checkForFunctionInstance<unsigned long long>();
   checkForFunctionInstance<float>();
   checkForFunctionInstance<double>();
+  checkForFunctionInstance<long double>();
   checkForFunctionInstance<std::string>();
   checkForFunctionInstance<char>();
   checkForFunctionInstance<signed char>();

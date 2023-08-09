@@ -358,7 +358,13 @@ namespace converter
     inline static T
     ToVal(const std::string& str)
     {
-      return ToVal_args(str);
+      std::size_t pos = 0;
+      T val = ToVal_args(str, &pos);
+      if(pos != str.length())
+      {
+        return std::numeric_limits<T>::signaling_NaN();
+      }
+      return val;
     }
   };
 

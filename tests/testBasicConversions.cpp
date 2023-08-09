@@ -29,10 +29,11 @@ int main()
     conversionEqualCheck<unsigned long> (30, "30");
     conversionEqualCheck<unsigned long long>(40, "40");
 
-    conversionEqualCheck<float>(-11, "-11");
-    conversionEqualCheck<double>  (-21, "-21");
-    conversionEqualCheck<float>(11, "11");
-    conversionEqualCheck<double>  (21, "21");
+    conversionEqualCheck<float> (-11, "-11");
+    conversionEqualCheck<double>(-21, "-21");
+    conversionEqualCheck<float> (11, "11");
+    conversionEqualCheck<double>(21, "21");
+    conversionEqualCheck<long double>(31, "31");
 
     conversionEqualCheck<bool>(true,  "1");
     conversionEqualCheck<bool>(false, "0");
@@ -51,9 +52,9 @@ int main()
             std::chrono::year_month_day( std::chrono::year(2023),
                                          std::chrono::month(8),
                                          std::chrono::day(15)
-                                       ), "2023-08-15");
+                                       ),
+            "2023-08-15");
 
-    //conversionEqualCheck<std::chrono::year_month_day>(false, "0");
 
   } catch (const std::exception& ex) {
     std::cout << ex.what() << std::endl;
