@@ -19,30 +19,149 @@
 namespace converter
 {
   // [=============================================================[ S2T_FORMAT
-  template <typename T, typename T2,
-            T (*StoT)( const std::string& str, std::size_t* pos, int base) >
-  inline T str2T( const std::string& str, std::size_t* pos = nullptr, int base = 10 )
+
+  // [[============[[ Error Handling
+  enum FailureS2Tprocess { THROW_ERROR = 0, SIGNAL_NAN = 1, QUIET_NAN = 2, VARIANT_NAN = 3 };
+
+  template<typename T, FailureS2Tprocess PROCESS_ERR>
+  struct OnError;
+
+  template<>
+  struct OnError<std::string, FailureS2Tprocess::THROW_ERROR>
   {
-    if constexpr( std::is_same_v<T, T2> ) {
-      return StoT(str, pos, base);
-    } else {
-      return static_cast<T>(StoT(str, pos, base));
+    using return_type = std::string;
+  };
+
+  template<c_NOT_string T>
+  struct OnError<T, FailureS2Tprocess::THROW_ERROR>
+  {
+    /**
+     * @brief   'type' definition returned by the convertor.
+     */
+    using return_type = T;
+
+    static constexpr const FailureS2Tprocess processErr = FailureS2Tprocess::THROW_ERROR;
+
+    inline static return_type handler(const std::string&, const auto& err) { throw err; }
+  };
+
+  template<c_signaling_NaN T>
+  struct OnError<T, FailureS2Tprocess::SIGNAL_NAN>
+  {
+    /**
+     * @brief   'type' definition returned by the convertor.
+     */
+    using return_type = T;
+
+    static constexpr const FailureS2Tprocess processErr = FailureS2Tprocess::SIGNAL_NAN;
+
+    inline static return_type handler(const std::string& , const auto&)
+    {
+      return std::numeric_limits<T>::signaling_NaN();
     }
-  }
+  };
 
-  struct S2T_Format_WorkAround {};
-  struct S2T_Format_std_StoT {};
-  
-  template <c_char CH>
-  using S2T_Format_StreamAsIs = Format_StreamAsIs<std::basic_istringstream<CH> >;
-  
-  template <c_char CH>
-  using S2T_Format_StreamUseClassicLocale = Format_StreamUseClassicLocale<std::basic_istringstream<CH> >;
-  
-  template <c_char CH, const char* usrLoc>
-  using S2T_Format_StreamUserLocale = Format_StreamUserLocale<std::basic_istringstream<CH>, usrLoc>;
+  template<c_quiet_NaN T>
+  struct OnError<T, FailureS2Tprocess::QUIET_NAN>
+  {
+    /**
+     * @brief   'type' definition returned by the convertor.
+     */
+    using return_type = T;
+
+    static constexpr const FailureS2Tprocess processErr = FailureS2Tprocess::QUIET_NAN;
+
+    inline static return_type handler(const std::string& , const auto&)
+    {
+      return std::numeric_limits<T>::quiet_NaN();
+    }
+  };
+
+  template<c_NOT_string T>
+  struct OnError<T, FailureS2Tprocess::VARIANT_NAN>
+  {
+    /**
+     * @brief   'type' definition returned by the convertor.
+     */
+    using return_type = std::variant<T, std::string>;
+
+    static constexpr const FailureS2Tprocess processErr = FailureS2Tprocess::VARIANT_NAN;
+
+    inline static return_type handler(const std::string& sVal, const auto& )
+    {
+      return return_type{ sVal };
+    }
+  };
+  // ]]============]] Error Handling
 
 
+
+  // [[============[[ Conversion formats
+  template<typename T, FailureS2Tprocess PROCESS_ERR>
+  struct S2T_Format_WorkAround : public OnError<T, PROCESS_ERR> {};
+
+  template<typename T, FailureS2Tprocess PROCESS_ERR>
+  struct S2T_Format_std_StoT : public OnError<T, PROCESS_ERR> {};
+
+  template <typename T, FailureS2Tprocess PROCESS_ERR, c_char CH>
+  struct S2T_Format_StreamAsIs : public Format_StreamAsIs<std::basic_istringstream<CH> >,
+                                 public OnError<T, PROCESS_ERR> {};
+
+  template <typename T, FailureS2Tprocess PROCESS_ERR, c_char CH>
+  struct S2T_Format_StreamUseClassicLocale : public Format_StreamUseClassicLocale<std::basic_istringstream<CH> >,
+                                             public OnError<T, PROCESS_ERR> {};
+
+    //  for e.g ->           constexpr char de_Loc[] = "de_DE"; 
+  template <typename T, FailureS2Tprocess PROCESS_ERR, c_char CH, const char* usrLoc>
+  struct S2T_Format_StreamUserLocale : public Format_StreamUserLocale<std::basic_istringstream<CH>, usrLoc>,
+                                       public OnError<T, PROCESS_ERR> {};
+  // ]]============]] Conversion formats
+
+
+  // [[============[[ type - Default Conversion format
+  template<typename T, typename = void >
+  struct S2T_DefaultFormat
+  {
+    using type = S2T_Format_StreamUseClassicLocale<T, FailureS2Tprocess::THROW_ERROR, char>;
+  };
+
+/*
+  template<c_integer_type T>
+  struct S2T_DefaultFormat< T >
+  {
+    using type = S2T_Format_std_StoT<T, FailureS2Tprocess::THROW_ERROR>;
+  };
+
+  template<c_floating_point T>
+  struct S2T_DefaultFormat< T >
+  {
+    using type = S2T_Format_std_StoT<T, FailureS2Tprocess::SIGNAL_NAN>;
+  };
+*/
+
+/*
+  template<c_char CH >
+  struct S2T_DefaultFormat<CH, void>
+  {
+    using type = S2T_Format_StreamUseClassicLocale<CH>;   //  refer below -> S2T_Format_WorkAround
+  };
+*/
+
+  template<typename T>
+  struct S2T_DefaultFormat< T,
+                            typename  std::enable_if_t< std::is_same_v<T, std::string> ||
+                                                        is_char<T>::value ||
+                                                        std::is_same_v<T, bool>
+                                                      >
+                          >
+  {
+    using type = S2T_Format_WorkAround<T, FailureS2Tprocess::THROW_ERROR>;
+  };
+  // ]]============]] type - Default Conversion format
+
+
+
+  // [[============[[ ISS -> istringstream :: concept
   template <typename, typename = void>
   struct is_formatISS : std::false_type {};
 
@@ -56,46 +175,11 @@ namespace converter
   {};
   template <typename FMT>
   concept c_formatISS = is_formatISS<FMT>::value;
+  // ]]============]] ISS -> istringstream :: concept
 
 
 
-
-  template<typename T, typename = void >
-  struct S2T_DefaultFormat
-  {
-    using type = S2T_Format_StreamUseClassicLocale<char>;
-  };
-
-  template<typename T>
-  struct S2T_DefaultFormat< T,
-                            typename  std::enable_if_t< is_integer_type<T>::value ||
-                                                        std::is_floating_point_v<T>
-                                                      >
-                          > 
-  {
-    using type = S2T_Format_std_StoT;
-  };
-
-/*
-  template<c_char CH >
-  struct S2T_DefaultFormat<CH, void>
-  {
-    using type = S2T_Format_StreamUseClassicLocale<CH>;
-  };
-*/
-
-  template<typename T>
-  struct S2T_DefaultFormat< T,
-                            typename  std::enable_if_t< std::is_same_v<T, std::string> ||
-                                                        is_char<T>::value ||
-                                                        std::is_same_v<T, bool>
-                                                      >
-                          >
-  {
-    using type = S2T_Format_WorkAround;
-  };
-
-
+  // [[============[[ S2T-converter :: concept
   template <typename, typename = void>
   struct is_S2Tconverter : std::false_type {};
 
@@ -114,23 +198,9 @@ namespace converter
 
   template <typename CFS>
   concept c_NOT_S2Tconverter = !is_S2Tconverter<CFS>::value;
+  // ]]============]] S2T-converter :: concept
 
 
-  template< typename T,
-            auto (*CONV_S2T)(const std::string&)
-          >
-  struct S2TwrapperFunction
-  {
-    using value_type  = T;
-    using return_type = typename std::invoke_result_t< decltype(CONV_S2T),
-                                                       const std::string& >;
-
-    inline static return_type
-    ToVal(const std::string& str)
-    {
-      return CONV_S2T(str);
-    }
-  };
 
   // ]=============================================================] S2T_FORMAT
 
@@ -168,14 +238,59 @@ namespace converter
   template<typename T, typename S2T_FORMAT = typename S2T_DefaultFormat<T>::type >
   struct ConvertFromStr;
 
+  template < typename                                        T, 
+             FailureS2Tprocess                               PROCESS_ERR,
+             std::derived_from< OnError<T, PROCESS_ERR > >   ERR_HANDLER
+           >
+  class _ConvertFromStr_POS
+  {
+    friend struct ConvertFromStr< T, ERR_HANDLER >;
+
+    /**
+     * @brief   Converts string holding a integer represenation to integer datatype.
+     * @param   str                 input string.
+     * @returns Numerical value if conversion succeeds.
+     *          Else throws error on conversion failure.
+     */
+    inline static ERR_HANDLER::return_type
+    _ToVal(const std::string& str)
+    {
+      try
+      {
+        std::size_t pos = 0;
+        T val = ConvertFromStr<T, ERR_HANDLER>::ToVal_args(str, &pos);
+
+        if(pos == str.length())
+        {
+          if constexpr( std::is_floating_point_v<T>  &&
+                        PROCESS_ERR == FailureS2Tprocess::VARIANT_NAN)
+          {
+            if(std::isnan(val))
+              return str;
+          }
+          return val;
+        }
+      } catch (const std::invalid_argument& err) {
+        return ERR_HANDLER::handler(str, err);
+      } catch (const std::out_of_range& err) {
+        return ERR_HANDLER::handler(str, err);
+      } catch (const std::exception& err) {
+        return ERR_HANDLER::handler(str, err);
+      }
+
+      static const std::invalid_argument err("String isn't a numeric-type. 'return_type _ConvertFromStr_POS<T, PROCESS_ERR, ERR_HANDLER>::_ToVal(const std::string& str)' :err[2]");
+      return ERR_HANDLER::handler(str, err);
+    }
+  };
+
   // https://eli.thegreenplace.net/2014/perfect-forwarding-and-universal-references-in-c/
   /**
    * @brief     Convertor class implementation for any (no-string)type's, FROM string; using 'std::istringstream'.
    * @tparam  T                     'type' converted to, from string data. (Not Applicable for 'string to string' conversion.)
    * @tparam  S2T_FORMAT            Class which encapsulates conversion parameters/directives such as using 'Locale'.
    */
-  template< c_NOT_string T, c_formatISS S2T_FORMAT >
-  struct ConvertFromStr<T, S2T_FORMAT>
+  template< c_NOT_string T, c_formatISS S2T_FORMAT_STREAM >
+  struct ConvertFromStr<T, S2T_FORMAT_STREAM>
   {
     /**
      * @brief   'type' definition being declared for.
@@ -184,7 +299,9 @@ namespace converter
     /**
      * @brief   'type' definition returned by the convertor.
      */
-    using return_type = T;
+    using return_type = S2T_FORMAT_STREAM::return_type;
+
+    static const int template_uid = 1;
 
     /**
      * @brief   Converts string holding a numerical value to numerical datatype representation.
@@ -192,11 +309,10 @@ namespace converter
      * @returns Numerical value if conversion succeeds.
      *          Else throws 'std::invalid_argument' on conversion failure.
      */
-    inline static T
+    inline static return_type
     ToVal(const std::string& str)
     {
-      using S2T_FORMAT_STREAM = S2T_FORMAT;
-      using stream_type = typename S2T_FORMAT::stream_type;
+      using stream_type = typename S2T_FORMAT_STREAM::stream_type;
 
       T val;
 
@@ -205,31 +321,38 @@ namespace converter
       stream_type iss( str );
       S2T_FORMAT_STREAM::streamUpdate(iss);
       iss >> val;
-      if( iss.fail() || iss.bad()) // || (!iss.eof()) )
+
+      if( iss.fail() || iss.bad() || (!iss.eof()) )
       {
-        std::ostringstream eoss;
-        eoss << __CONVERTER_PREFERRED_PATH__ << " : ERROR : rapidcsv :: in function 'T _ConvertFromStr<c_NOT_string T, c_formatISS S2T_FORMAT>::ToVal(const std::string& str)' ::: str='";
-        eoss << str;
-        try {
-          eoss << "' -> val='" << val;
-        } catch (...) {} // on error do-nothing.
-        eoss << "'  istringstream-conversion failed...";
-        eoss << std::boolalpha << "   iss.fail() = " << iss.fail()
-                               << " : iss.bad() = " << iss.bad()
-                               << " : iss.eof() = " << iss.eof() << std::endl;
-        throw std::invalid_argument(eoss.str());
+        static const std::invalid_argument err("Stream read failure. 'T ConvertFromStr<c_NOT_string T, c_formatISS S2T_FORMAT>::ToVal(const std::string& str)'");
+        return S2T_FORMAT_STREAM::handler(str, err);
       }
       return val;
     }
   };
- 
+
+
+
   /**
    * @brief     Convertor class implementation for integer types FROM string.
    * @tparam  T                     'integer-type' converted to, from string data.
    */
-  template <c_integer_type T>
-  struct ConvertFromStr<T, S2T_Format_std_StoT >
+  template <c_integer_type T, FailureS2Tprocess PROCESS_ERR>
+  struct ConvertFromStr<T, S2T_Format_std_StoT<T, PROCESS_ERR> >
   {
+  private:
+    template <typename T2,
+              T (*StoINT)( const std::string& str, std::size_t* pos, int base) >
+    inline T _str2INT( const std::string& str, std::size_t* pos = nullptr, int base = 10 )
+    {
+      if constexpr( std::is_same_v<T, T2> ) {
+        return StoINT(str, pos, base);
+      } else {
+        return static_cast<T>(StoINT(str, pos, base));
+      }
+    }
+
+  public:
     /**
      * @brief   'type' definition being declared for.
      */
@@ -237,7 +360,9 @@ namespace converter
     /**
      * @brief   'type' definition returned by the convertor.
      */
-    using return_type = T;
+    using return_type = S2T_Format_std_StoT<T, PROCESS_ERR >::return_type;
+
+    static const int template_uid = 2;
 
     // TODO unit tests
     /**
@@ -264,13 +389,13 @@ namespace converter
       if constexpr(std::is_signed_v<T>)
       {
         if constexpr( std::is_same_v<T,long long> ) {
-          return str2T<T, long long, &std::stoll>(str, pos, base);
+          return _str2INT<long long, &std::stoll>(str, pos, base);
         } else
         if constexpr( std::is_same_v<T,long> ) {
-          return str2T<T, long, &std::stol>(str, pos, base);
+          return _str2INT<long, &std::stol>(str, pos, base);
         } else
         if constexpr( std::is_same_v<T,int> ) {
-          return str2T<T, int, &std::stoi>(str, pos, base);
+          return _str2INT<int, &std::stoi>(str, pos, base);
         } else
         if constexpr( std::is_same_v<T,short> ) {
           // as std::stos(...) is not part of the standard. Hence just static_cast from s -> i
@@ -281,10 +406,10 @@ namespace converter
       } else
       if constexpr(std::is_unsigned_v<T>) {
         if constexpr( std::is_same_v<T,unsigned long long> ) {
-          return str2T<T, unsigned long long, &std::stoull>(str, pos, base);
+          return _str2INT<unsigned long long, &std::stoull>(str, pos, base);
         } else
         if constexpr( std::is_same_v<T,unsigned long> ) {
-          return str2T<T, unsigned long, &std::stoul>(str, pos, base);
+          return _str2INT<unsigned long, &std::stoul>(str, pos, base);
         } else
         if constexpr( std::is_same_v<T,unsigned> || std::is_same_v<T,unsigned short> ) {
           // as std::stou(...) is not part of the standard. Hence just static_cast from ul -> u
@@ -304,10 +429,10 @@ namespace converter
      * @returns Numerical value if conversion succeeds.
      *          Else throws error on conversion failure.
      */
-    inline static T
+    inline static return_type
     ToVal(const std::string& str)
     {
-      return ToVal_args(str);
+      return _ConvertFromStr_POS<T, PROCESS_ERR, S2T_Format_std_StoT<T, PROCESS_ERR> >::_ToVal(str);
     }
   };
 
@@ -315,8 +440,8 @@ namespace converter
    * @brief     Convertor class implementation for floating types from string.
    * @tparam  T                     'floating-type' converted to, from string data.
    */
-  template<c_floating_point T>
-  struct ConvertFromStr<T, S2T_Format_std_StoT >
+  template<c_floating_point T, FailureS2Tprocess PROCESS_ERR>
+  struct ConvertFromStr<T, S2T_Format_std_StoT<T, PROCESS_ERR> >
   {
     /**
      * @brief   'type' definition being declared for.
@@ -325,7 +450,9 @@ namespace converter
     /**
      * @brief   'type' definition returned by the convertor.
      */
-    using return_type = T;
+    using return_type = S2T_Format_std_StoT<T, PROCESS_ERR >::return_type;
+
+    static const int template_uid = 3;
 
     // TODO unit tests
     /**
@@ -355,16 +482,10 @@ namespace converter
      * @returns Numerical value if conversion succeeds.
      *          Else throws error on conversion failure.
      */
-    inline static T
+    inline static return_type
     ToVal(const std::string& str)
     {
-      std::size_t pos = 0;
-      T val = ToVal_args(str, &pos);
-      if(pos != str.length())
-      {
-        return std::numeric_limits<T>::signaling_NaN();
-      }
-      return val;
+      return _ConvertFromStr_POS<T, PROCESS_ERR, S2T_Format_std_StoT<T, PROCESS_ERR> >::_ToVal(str);
     }
   };
 
@@ -372,7 +493,7 @@ namespace converter
    * @brief     Specialized implementation handling string to string conversion.
    */
   template<>
-  struct ConvertFromStr<std::string, S2T_Format_WorkAround>
+  struct ConvertFromStr<std::string, S2T_Format_WorkAround<std::string, FailureS2Tprocess::THROW_ERROR> >
   {
     /**
      * @brief   'type' definition being declared for.
@@ -382,6 +503,8 @@ namespace converter
      * @brief   'type' definition returned by the convertor.
      */
     using return_type = std::string;
+
+    static const int template_uid = 4;
 
     /**
      * @brief   Converts string to string.
@@ -395,17 +518,19 @@ namespace converter
    * @brief     Specialized implementation handling string to char conversion.
    * @tparam  T                     'char-type' converted to, from string data.
    */
-  template<c_char T>
-  struct ConvertFromStr< T, S2T_Format_WorkAround >
+  template<c_char CH, FailureS2Tprocess PROCESS_ERR>
+  struct ConvertFromStr< CH, S2T_Format_WorkAround<CH, PROCESS_ERR> >
   {
     /**
      * @brief   'type' definition being declared for.
      */
-    using value_type  = T;
+    using value_type  = CH;
     /**
      * @brief   'type' definition returned by the convertor.
      */
-    using return_type = T;
+    using return_type = S2T_Format_WorkAround<CH, PROCESS_ERR>::return_type;
+
+    static const int template_uid = 5;
 
     // TODO unit tests
     /**
@@ -413,20 +538,19 @@ namespace converter
      * @param   str                 input string.
      * @returns char-type.
      */
-    inline static T
+    inline static return_type
     ToVal(const std::string& str)
     {
       if(str.length()>1)
       {
-        std::ostringstream eoss;
-        eoss << __CONVERTER_PREFERRED_PATH__ << " : ERROR : rapidcsv :: in function 'T _ConvertFromStr<c_char T,S2T_Format_WorkAround>::ToVal(const std::string& str)' ::: for T=char-type-(un)signed, str='";
-        eoss << str << "' which violates expected rule # ( str.length()==1 )";
-        throw std::invalid_argument(eoss.str());
+        static const std::invalid_argument err("String isn't a char-type. 'CH ConvertFromStr<c_char CH,S2T_Format_WorkAround>::ToVal(const std::string& str)'");
+        return S2T_Format_WorkAround<CH, PROCESS_ERR>::handler(str, err);
       }
-      if constexpr( std::is_same<T, std::string::value_type>::value ) {
+
+      if constexpr( std::is_same<CH, std::string::value_type>::value ) {
         return str[0];
       } else {
-        return static_cast<T>(str[0]);
+        return static_cast<CH>(str[0]);
       }
     }
   };
@@ -434,8 +558,8 @@ namespace converter
   /**
    * @brief     Specialized implementation handling string to bool conversion.
    */
-  template<>
-  struct ConvertFromStr<bool, S2T_Format_WorkAround>
+  template<FailureS2Tprocess PROCESS_ERR>
+  struct ConvertFromStr<bool, S2T_Format_WorkAround<bool, PROCESS_ERR> >
   {
     /**
      * @brief   'type' definition being declared for.
@@ -444,7 +568,9 @@ namespace converter
     /**
      * @brief   'type' definition returned by the convertor.
      */
-    using return_type = bool;
+    using return_type = S2T_Format_WorkAround<bool, PROCESS_ERR>::return_type;
+
+    static const int template_uid = 6;
 
     // TODO unit tests
     /**
@@ -452,18 +578,38 @@ namespace converter
      * @param   str                 input string.
      * @returns bool.
      */
-    inline static bool
+    inline static return_type
     ToVal(const std::string& str)
     {
       unsigned long val = std::stoul(str); //(str, pos, base);
       if(val > 1)
       {
-        std::ostringstream eoss;
-        eoss << __CONVERTER_PREFERRED_PATH__ << " : ERROR : rapidcsv :: in function 'T _ConvertFromStr<bool,S2T_Format_WorkAround>::ToVal(const std::string& str)' ::: str='";
-        eoss << str << "' which violates expected rule # ( val==0 || val==1 )";
-        throw std::invalid_argument(eoss.str());
+        static const std::invalid_argument err ("String isn't a bool. 'T _ConvertFromStr<bool,S2T_Format_WorkAround>::ToVal(const std::string& str)'");
+        return S2T_Format_WorkAround<bool, PROCESS_ERR>::handler(str, err);
       }
       return val;
+    }
+  };
+
+  // ]=============================================================] ConvertFromStr
+
+
+
+
+  // [=============================================================[ S2T conversion-type definition
+  template< typename T,
+            auto (*CONV_S2T)(const std::string&)
+          >
+  struct S2TwrapperFunction
+  {
+    using value_type  = T;
+    using return_type = typename std::invoke_result_t< decltype(CONV_S2T),
+                                                       const std::string& >;
+
+    inline static return_type
+    ToVal(const std::string& str)
+    {
+      return CONV_S2T(str);
     }
   };
 
@@ -522,5 +668,5 @@ namespace converter
   template< auto (*CONV_S2T)(const std::string&) >
   using f_S2Tconv_c = typename f_S2Tconv<CONV_S2T>::conv_type;
 
-  // ]=============================================================] ConvertFromStr
+  // ]=============================================================] S2T conversion-types definition
 }

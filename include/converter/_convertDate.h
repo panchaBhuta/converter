@@ -13,6 +13,7 @@
 
 #pragma once
 
+#include <chrono>
 
 #include <converter/_common.h>
 #include <converter/_convertS2T.h>
@@ -37,6 +38,7 @@
 
 namespace converter
 {
+  // [=============================================================[ COMMON_FORMAT
   constexpr char defYMDfmt[] = "%F";  // string literal object with static storage duration
   template<c_iostream IOSS, const char* _ymdFormat = defYMDfmt> // %F -> "%Y-%m-%d"
   struct Format_StreamYMD
@@ -48,19 +50,29 @@ namespace converter
     std::enable_if_t< std::is_same_v<typename IOSS::char_type,char>, void>
     streamUpdate([[maybe_unused]] IOSS& ss) {}
   };
+  // ]=============================================================] COMMON_FORMAT
 
-  // [=============================================================[ ConvertFromStr
 
-  template < const char* formatYMD = defYMDfmt > // %F -> "%Y-%m-%d"
-  using S2T_Format_StreamYMD = Format_StreamYMD<std::istringstream, formatYMD>;
+  // [=============================================================[ S2T_FORMAT
+  // [[============[[ Conversion formats
+  template < const char* formatYMD = defYMDfmt, // %F -> "%Y-%m-%d"
+             FailureS2Tprocess PROCESS_ERR = FailureS2Tprocess::THROW_ERROR >
+  struct S2T_Format_StreamYMD : public Format_StreamYMD<std::istringstream, formatYMD>,
+                                public OnError<std::chrono::year_month_day, PROCESS_ERR> {};
+  // ]]============]] Conversion formats
 
+
+  // [[============[[ type - Default Conversion format
   template<>
   struct S2T_DefaultFormat<std::chrono::year_month_day, void>
   {
-    using type = S2T_Format_StreamYMD< defYMDfmt >; // %F -> "%Y-%m-%d"
+    using type = S2T_Format_StreamYMD< defYMDfmt, FailureS2Tprocess::THROW_ERROR>; // %F -> "%Y-%m-%d"
   };
+  // ]]============]] type - Default Conversion format
 
 
+
+  // [[============[[ ISS -> istringstream :: concept
   template <typename, typename = void>
   struct is_formatYMDiss : std::false_type {};
 
@@ -71,11 +83,15 @@ namespace converter
                         >
             : is_formatYMDss<FMT>
   {};
-
   template <typename FMT>
   concept c_formatYMDiss = is_formatYMDiss<FMT>::value;
+  // ]]============]] ISS -> istringstream :: concept
+
+  // ]=============================================================] S2T_FORMAT
 
 
+
+  // [=============================================================[ ConvertFromStr
   /**
    * @brief     Specialized implementation handling string to 'year_month_day' conversion.
    * @tparam  S2T_FORMAT_YMD        Class which encapsulates conversion parameters/logic such as 'Locale' specific for 'year_month_day'.
@@ -90,7 +106,9 @@ namespace converter
     /**
      * @brief   'type' definition returned by the convertor.
      */
-    using return_type = std::chrono::year_month_day;
+    using return_type = S2T_FORMAT_YMD::return_type; //std::chrono::year_month_day;
+
+    static const int template_uid = 10000;
 
     // TODO unit tests
     /**
@@ -101,7 +119,7 @@ namespace converter
      * @param   offset              if not null, pointer to an object that will hold the offset from UTC corresponding to the %z specifier 
      * @returns 'year_month_day'.
      */
-    inline static std::chrono::year_month_day
+    inline static return_type
     ToVal_args(  const std::string& str,
                  const std::string::value_type* fmt,
                  std::string* abbrev  = nullptr,
@@ -120,15 +138,10 @@ namespace converter
       std::istringstream iss(str);
       S2T_FORMAT_YMD::streamUpdate(iss);
       _dateLib::from_stream(iss, fmt, ymd, abbrev, offset);
-      if (iss.fail() || iss.bad() ) // || !iss.eof())
+      if (iss.fail() || iss.bad()) // || (!iss.eof()))
       {
-        std::ostringstream eoss;
-        eoss << __CONVERTER_PREFERRED_PATH__ << " : ERROR : rapidcsv :: in function 'std::chrono::year_month_day _ConvertFromStr<std::chrono::year_month_day, S2T_FORMAT_YMD>::ToVal_args(const std::string& str)' ::: str='";
-        eoss << str << "'  istringstream-conversion<" << dateClass << "> failed...";
-        eoss << std::boolalpha << "   iss.fail() = " << iss.fail()
-                               << " : iss.bad() = " << iss.bad()
-                               << " : iss.eof() = " << iss.eof() << std::endl;
-        throw std::invalid_argument(eoss.str());
+        static const std::string errMsg("std::chrono::year_month_day _ConvertFromStr<std::chrono::year_month_day, S2T_FORMAT_YMD>::ToVal_args(const std::string& str)");
+        return S2T_FORMAT_YMD::handler(str, errMsg);
       }
 
   #if   USE_CHRONO_FROMSTREAM
@@ -151,10 +164,15 @@ namespace converter
      * @param   str                 input string.
      * @returns 'year_month_day'.
      */
-    inline static std::chrono::year_month_day
+    inline static return_type //std::chrono::year_month_day
     ToVal(const std::string& str)
     {
-      return ToVal_args( str, S2T_FORMAT_YMD::ymdFormat); // %F -> "%Y-%m-%d"
+      try {
+       return ToVal_args( str, S2T_FORMAT_YMD::ymdFormat); // %F -> "%Y-%m-%d"
+      } catch (const std::exception& err) {
+        //static const std::string errMsg("std::chrono::year_month_day _ConvertFromStr<std::chrono::year_month_day, S2T_FORMAT_YMD>::ToVal(const std::string& str)");
+        return S2T_FORMAT_YMD::handler(str, err.what());
+      }
     }
   };
 
@@ -163,17 +181,26 @@ namespace converter
 
 
 
-  // [=============================================================[ ConvertFromStr
 
+  // [=============================================================[ T2S_FORMAT
+
+  // [[============[[ Conversion formats
   template < const char* formatYMD = defYMDfmt > // %F -> "%Y-%m-%d"
   using T2S_Format_StreamYMD = Format_StreamYMD<std::ostringstream, formatYMD>;
+  // ]]============]] Conversion formats
 
+
+  // [[============[[ type - Default Conversion format
   template<>
   struct T2S_DefaultFormat<std::chrono::year_month_day, void>
   {
     using type = T2S_Format_StreamYMD< defYMDfmt >; // %F -> "%Y-%m-%d"
   };
+  // ]]============]] type - Default Conversion format
 
+
+
+  // [[============[[ OSS -> ostringstream :: concept
   template <typename, typename = void>
   struct is_formatYMDoss : std::false_type {};
 
@@ -184,10 +211,17 @@ namespace converter
                         >
             : is_formatYMDss<FMT>
   {};
-
   template <typename FMT>
   concept c_formatYMDoss = is_formatYMDoss<FMT>::value;
+  // ]]============]] OSS -> ostringstream :: concept
 
+  // ]=============================================================] T2S_FORMAT
+
+
+
+
+
+  // [=============================================================[ ConvertFromVal
   /**
    * @brief     Specialized implementation handling 'year_month_day' to string conversion.
    * @tparam  T2S_FORMAT_YMD        Class which encapsulates conversion parameters/directives such as 'Locale' specific for 'year_month_day'.
@@ -203,6 +237,8 @@ namespace converter
      * @brief   'type' definition expected by the convertor.
      */
     using input_type = std::chrono::year_month_day;
+
+    static const int template_uid = -10000;
 
     /**
      * @brief   Converts variable holding 'year_month_day' value to string. The string has the format "%F" -> "%Y-%m-%d"
@@ -359,5 +395,5 @@ namespace converter
     }
   };
 
-  // ]=============================================================] ConvertFromStr
+  // ]=============================================================] ConvertFromVal
 }

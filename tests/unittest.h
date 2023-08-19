@@ -34,7 +34,7 @@
       std::stringstream ss;                                                                   \
       ss << unittest::detail::FileName(__FILE__) << ":" << std::to_string(__LINE__);          \
       ss << " ExpectException failed: unexpected exception '" << typeid(ex).name();           \
-      ss << "' thrown." << std::endl;                                                         \
+      ss << "' thrown.  errMsg: " << ex.what() << std::endl;                                  \
       throw std::runtime_error(ss.str());                                                     \
     }                                                                                         \
                                                                                               \

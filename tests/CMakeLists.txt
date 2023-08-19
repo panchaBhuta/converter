@@ -32,11 +32,11 @@ macro(add_unit_test testname)
 endmacro(add_unit_test)
 
 # Unit tests
-add_unit_test(testTemplateInstantiation)
+add_unit_test(testDefaultTemplateInstantiation)
+add_unit_test(testAllTemplateInstantiation)
 add_unit_test(testBasicConversions)
 add_unit_test(testFloatingPointNaN)
 #[=========[
-
 add_unit_test(testViewYmd001)
 add_unit_test(testViewYmd003)
 add_unit_test(testViewYmd005)

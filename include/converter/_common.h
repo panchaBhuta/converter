@@ -22,6 +22,8 @@
 namespace converter
 {
   // [=============================================================[   common helpers
+  // [=========[  concept :  char-types
+  //  refer https://www.codeproject.com/Articles/5348002/A-History-of-C-and-Cplusplus-Character-Data-Types
   template <typename T>
   concept c_canBsigned_char = ( std::is_same_v<T, char> ||
                                 std::is_same_v<T, wchar_t> );
@@ -41,12 +43,23 @@ namespace converter
   template <typename T>
   concept c_signed_char = is_signed_char<T>::value;
 
-  template <typename T>
+  template <typename T, typename = void>
   struct is_unsigned_char { static constexpr bool value = false; };
   template <>
   struct is_unsigned_char<unsigned char> { static constexpr bool value = true; };
+  // [==[ char8_t : corner case
+       /*
+        *  C++20 introduces a new character type specifically for UTF-8 encoded character data: char8_t.
+        *  It has the same size and sign as unsigned char but is distinct from it.
+        * 
+        *  The upcoming C standard (probably C23) includes a proposal for char8_t, which is a typedef to unsigned char.
+        */
   template <>
-  struct is_unsigned_char<char8_t> { static constexpr bool value = true; };
+  struct is_unsigned_char<  char8_t,
+                            std::enable_if_t<!std::is_same_v<unsigned char, char8_t>>
+                         >
+  { static constexpr bool value = true; };
+  // ]==] char8_t : corner case
   template <>
   struct is_unsigned_char<char16_t> { static constexpr bool value = true; };
   template <>
@@ -68,6 +81,34 @@ namespace converter
   template <typename T>
   concept c_char = is_char<T>::value;
 
+/*
+  ?? not used yet. but  as a place holder for future use if required. ??
+
+  // Plain char, signed char, and unsigned char are three distinct types.
+  // A char, a signed char, and an unsigned char occupy the same amount of storage and have the
+  // same alignment requirements (basic.types); that is, they have the same object representation.
+  template<c_char T>
+  struct is_basicChar { static constexpr bool value = false; };
+
+  template<>
+  struct is_basicChar<char> { static constexpr bool value = true; };
+
+  template<>
+  struct is_basicChar<signed char> { static constexpr bool value = true; };
+
+  template<>
+  struct is_basicChar<unsigned char> { static constexpr bool value = true; };
+
+  template <c_char T>
+  concept c_basicChar = is_basicChar<T>::value;
+
+  template <c_char T>
+  concept c_NOT_basicChar = (!is_basicChar<T>::value);
+*/
+  // ]=========]  concept :  char-types
+
+
+  // [=========[  concept : integer-types 
   // std::integral is true for 'bool' and 'char'.
   // Conversion for 'bool' and 'char' is different from other 'integral-s'.
   // Hence need for a 'concept' to segregate from 'bool' and 'char'
@@ -83,13 +124,40 @@ namespace converter
 
   //template <typename T>
   //concept c_std_integral = is_integral_v<T>;
+  // ]=========]  concept : integer-types
 
+
+  // [=========[  concept : floating_point-types 
   // Going with the flow, and just wrapping up floating_point
   template<typename T>
   concept c_floating_point = std::is_floating_point_v<T>;
+  // ]=========]  concept : floating_point-types
 
+
+  /*
+   * Refer : https://stackoverflow.com/questions/18118408/what-is-the-difference-between-quiet-nan-and-signaling-nan
+   * 
+   * Generally, the purpose of a signaling NaN (sNaN) is for debugging. For example, floating-point objects might be
+   * initialized to sNaN. Then, if the program fails to one of them a value before using it, an exception will occur
+   * when the program uses the sNaN in an arithmetic operation. A program will not produce an sNaN inadvertently;
+   * no normal operations produce sNaNs. They are only created specifically for the purpose of having a signaling NaN,
+   * not as the result of any arithmetic.
+   */
   template<typename T>
   concept c_signaling_NaN = std::numeric_limits<T>::has_signaling_NaN;
+
+  /*
+   * Refer : https://stackoverflow.com/questions/18118408/what-is-the-difference-between-quiet-nan-and-signaling-nan
+   * 
+   * In contrast, quiet NaN are for more normal programming. They can be produced by normal operations when there is no
+   * numerical result (e.g., taking the square root of a negative number when the result must be real). Their purpose
+   * is generally to allow arithmetic to proceed somewhat normally. E.g., you might have a huge array of numbers,
+   * some of which represent special cases that cannot be handled normally. You can call a complicated function to
+   * process this array, and it could operate on the array with usual arithmetic, ignoring NaNs. After it ends,
+   * you would separate the special cases for more work.
+   */
+  template<typename T>
+  concept c_quiet_NaN = std::numeric_limits<T>::has_quiet_NaN;
 
   template<typename T>
   concept c_number_type = std::is_arithmetic_v<T> && (!is_char<T>::value);

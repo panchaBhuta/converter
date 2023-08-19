@@ -13,6 +13,7 @@
 
 #pragma once
 
+#include <exception>
 #include <functional>
 #include <filesystem>
 #include <iostream>
@@ -28,9 +29,6 @@
 #include <variant>
 #include <locale>
 #include <stdexcept>
-#include <tuple>
-#include <chrono>
-
 
 #define CONVERTER__VERSION_MAJOR 1
 #define CONVERTER__VERSION_MINOR 0
@@ -64,7 +62,8 @@
 #include <converter/_convertT2S.h>
 #include <converter/_convertDate.h>
 #include <converter/_convertTuple.h>
-#include <converter/_convertNaN.h>
+#include <converter/_convertC2T.h>
+#include <converter/_convertT2C.h>
 
 
 namespace converter

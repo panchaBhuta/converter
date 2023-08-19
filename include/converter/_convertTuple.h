@@ -13,6 +13,8 @@
 
 #pragma once
 
+#include <tuple>
+
 #include <converter/_common.h>
 #include <converter/_convertS2T.h>
 #include <converter/_convertT2S.h>

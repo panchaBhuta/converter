@@ -19,8 +19,11 @@
 namespace converter
 {
   // [=============================================================[ T2S_FORMAT
+
+  // [[============[[ Conversion formats
   struct T2S_Format_WorkAround {};
   struct T2S_Format_std_TtoS {};
+
 
   template <c_char CH>
   using T2S_Format_StreamAsIs = Format_StreamAsIs< std::basic_ostringstream<CH> >;
@@ -30,23 +33,6 @@ namespace converter
 
   template <c_char CH, const char* usrLoc>
   using T2S_Format_StreamUserLocale = Format_StreamUserLocale<std::basic_ostringstream<CH>, usrLoc>;
-
-  template <typename, typename = void>
-  struct is_formatOSS : std::false_type {};
-
-  template <typename FMT>  // FMT -> expected define types :: 'stream_type'
-  struct is_formatOSS<  FMT,
-                        typename std::enable_if_t< std::is_same_v< typename FMT::stream_type,
-                                                                   std::basic_ostringstream<typename FMT::stream_type::char_type>
-                                                                 >
-                                                 >
-                     >
-            : is_formatSS<FMT>
-  {};
-  template <typename FMT>
-  concept c_formatOSS = is_formatOSS<FMT>::value;
-
-
 
 
   template<c_floating_point T, int decimalPrecision = getDecimalPrecision<T>()>
@@ -59,7 +45,7 @@ namespace converter
       //oss << std::defaultfloat << std::setprecision(decimalPrecision);
       oss << std::setprecision(decimalPrecision);
       /*
-       * NOTE : S2T_Format_StreamDecimalPrecision is not needed as
+       * NOTE : T2S_Format_StreamDecimalPrecision is not needed as
        *        it doesn't seem to have any effect as per code
        *        
        * long double pi2;
@@ -76,18 +62,24 @@ namespace converter
        */
     }
   };
+  template<c_floating_point T, int decimalPrecision>
+  struct     T2S_Format_StreamDecimalPrecision< std::variant<T , std::string>, decimalPrecision >
+    : public T2S_Format_StreamDecimalPrecision< T, decimalPrecision > {};
+  // ]]============]] Conversion formats
 
-  template<c_floating_point T,
-           c_formatOSS FORMAT_1 = T2S_Format_StreamDecimalPrecision<T> ,
-           c_formatOSS FORMAT_2 = T2S_Format_StreamUseClassicLocale<char> >
-  using T2S_Format_floating_StreamCombine = Format_StreamCombineFormat<
-                                              std::ostringstream,
-                                              FORMAT_1, FORMAT_2>;
 
+  // [[============[[ type - Default Conversion format
   template<typename T, typename = void >
   struct T2S_DefaultFormat
   {
     using type = T2S_Format_StreamUseClassicLocale<char>;
+  };
+
+/*
+  template<c_integer_type T>
+  struct T2S_DefaultFormat<T, void >
+  {
+    using type = T2S_Format_std_TtoS;
   };
 
   template<c_floating_point T>
@@ -95,12 +87,7 @@ namespace converter
   {
     using type = T2S_Format_StreamDecimalPrecision<T>;
   };
-
-  template<c_integer_type T>
-  struct T2S_DefaultFormat<T, void >
-  {
-    using type = T2S_Format_std_TtoS;
-  };
+*/
 
 /*
   template<c_char CH>
@@ -120,7 +107,37 @@ namespace converter
   {
     using type = T2S_Format_WorkAround;
   };
+  // ]]============]] type - Default Conversion format
 
+
+
+  // [[============[[ OSS -> ostringstream :: concept
+  template <typename, typename = void>
+  struct is_formatOSS : std::false_type {};
+
+  template <typename FMT>  // FMT -> expected define types :: 'stream_type'
+  struct is_formatOSS<  FMT,
+                        typename std::enable_if_t< std::is_same_v< typename FMT::stream_type,
+                                                                   std::basic_ostringstream<typename FMT::stream_type::char_type>
+                                                                 >
+                                                 >
+                     >
+            : is_formatSS<FMT>
+  {};
+  template <typename FMT>
+  concept c_formatOSS = is_formatOSS<FMT>::value;
+  // ]]============]] OSS -> ostringstream :: concept
+
+  template<c_floating_point T,
+           c_formatOSS FORMAT_1 = T2S_Format_StreamDecimalPrecision<T> ,
+           c_formatOSS FORMAT_2 = T2S_Format_StreamUseClassicLocale<char> >
+  using T2S_Format_floating_StreamCombine = Format_StreamCombineFormat<
+                                                          std::ostringstream,
+                                                          FORMAT_1, FORMAT_2>;
+
+
+
+  // [[============[[ T2S-converter :: concept
   template <typename, typename = void>
   struct is_T2Sconverter : std::false_type {};
 
@@ -139,23 +156,9 @@ namespace converter
 
   template <typename CFV>
   concept c_NOT_T2Sconverter = !is_T2Sconverter<CFV>::value;
+  // ]]============]] T2S-converter :: concept
 
 
-  template< typename T, typename TI,
-            std::string (*CONV_T2S)(const TI&)
-          >
-  struct T2SwrapperFunction
-  {
-    using value_type = T;
-    using input_type = TI;
-
-    //inline static std::string
-    inline static typename std::enable_if_t< (!std::is_same_v<std::string, TI>),std::string>
-    ToStr(const input_type& val)
-    {
-      return CONV_T2S(val);
-    }
-  };
 
   // ]=============================================================] T2S_FORMAT
 
@@ -179,8 +182,8 @@ namespace converter
    * @tparam  T                     'type' converted from, to string data. (Not Applicable for string to string conversion)
    * @tparam  T2S_FORMAT            Class which encapsulates conversion parameters/directives such as 'Locale'.
    */
-  template<c_NOT_string T, c_formatOSS T2S_FORMAT >
-  struct ConvertFromVal<T,T2S_FORMAT>
+  template<c_NOT_string T, c_formatOSS T2S_FORMAT_STREAM >
+  struct ConvertFromVal<T,T2S_FORMAT_STREAM>
   {
     /**
      * @brief   'type' definition being declared for.
@@ -191,6 +194,8 @@ namespace converter
      */
     using input_type = T;
 
+    static const int template_uid = -1;
+
     /**
      * @brief   Converts numerical datatype from string holding a numerical value.
      * @param   val                 input numerical value.
@@ -200,16 +205,16 @@ namespace converter
     inline static std::string
     ToStr(const T& val)
     {
-      using T2S_FORMAT_STREAM = T2S_FORMAT;
-      using stream_type = typename T2S_FORMAT::stream_type;
+      using stream_type = typename T2S_FORMAT_STREAM::stream_type;
 
       stream_type oss;
       T2S_FORMAT_STREAM::streamUpdate(oss);
       oss << val;
       if (oss.fail() || oss.bad()) // || oss.eof())
       {
+        /*
         std::ostringstream eoss;
-        eoss << __CONVERTER_PREFERRED_PATH__ << " : ERROR : rapidcsv :: in function 'std::string _ConvertFromVal<c_NOT_string T, c_formatOSS T2S_FORMAT>::ToStr(const T& val)' ::: ";
+        eoss << __CONVERTER_PREFERRED_PATH__ << " : ERROR : rapidcsv :: in function 'std::string ConvertFromVal<c_NOT_string T, c_formatOSS T2S_FORMAT>::ToStr(const T& val)' ::: ";
         try {
           eoss << "val='" << val << "'";
         } catch (...) {} // on error do-nothing.
@@ -218,6 +223,8 @@ namespace converter
                                << " : iss.bad() = " << oss.bad()
                                << " : iss.eof() = " << oss.eof() << std::endl;
         throw std::invalid_argument(eoss.str());
+        */
+        throw std::invalid_argument("Invalid argument. 'std::string ConvertFromVal<c_NOT_string T, c_formatOSS T2S_FORMAT>::ToStr(const T& val)'");
       }
       return oss.str();
     }
@@ -239,6 +246,8 @@ namespace converter
      * @brief   'type' definition expected by the convertor.
      */
     using input_type = T;
+
+    static const int template_uid = -2;
 
     /**
      * @brief   Converts integer datatype to string.
@@ -266,6 +275,8 @@ namespace converter
      * @brief   'type' definition expected by the convertor.
      */
     using input_type = T;
+
+    static const int template_uid = -3;
 
     inline static
 #ifdef ENABLE_STD_TtoS
@@ -319,6 +330,8 @@ namespace converter
      */
     using input_type = std::string;
 
+    static const int template_uid = -4;
+
     /**
      * @brief   Converts string to string.
      * @param   val                 input string.
@@ -343,6 +356,8 @@ namespace converter
      */
     using input_type = T;
 
+    static const int template_uid = -5;
+
     // TODO unit tests
     /**
      * @brief   Converts char value to string.
@@ -357,6 +372,7 @@ namespace converter
       return std::string(ssVal.begin(),ssVal.end());
     }
   };
+
 
   /**
    * @brief     Specialized implementation handling bool to string conversion.
@@ -373,6 +389,8 @@ namespace converter
      */
     using input_type = bool;
 
+    static const int template_uid = -6;
+
     // TODO unit tests
     /**
      * @brief   Converts bool value to string.
@@ -386,9 +404,62 @@ namespace converter
   };
 
 
+  template< c_NOT_string T, typename T2S_FORMAT >
+  struct ConvertFromVal<std::variant<T, std::string>, T2S_FORMAT>
+  {
+    /**
+     * @brief   'type' definition being declared for.
+     */
+    using value_type = T;
+    /**
+     * @brief   'type' definition expected by the convertor.
+     *           Here it's a variant of T or std::string.
+     */
+    using input_type = std::variant<T, std::string>;
+
+    static constexpr const char* const compositeTemplate_uid = "variant_userDefinedFormat";
+
+    // TODO unit tests
+    /**
+     * @brief   Converts variant<T, string> value to string.
+     *          If input variant has T then 'T->S' conversion is applied,
+     *          else variant's underlying string value is returned.
+     * @param   val                 input variant<T,string> value.
+     * @returns string.
+     */
+    inline static std::string ToStr(const input_type& val)
+    {
+      if(val.index()==0)
+      {
+        return ConvertFromVal<T,T2S_FORMAT>::ToStr(std::get<T>(val));
+      } else {
+        return std::get<std::string>(val);
+      }
+    }
+  };
+  // ]=============================================================] ConvertFromVal
+
+
+  // [=============================================================[ T2S conversion-type definition
+  template< typename T, typename TI,
+            std::string (*CONV_T2S)(const TI&)
+          >
+  struct T2SwrapperFunction
+  {
+    using value_type = T;
+    using input_type = TI;
+
+    //inline static std::string
+    inline static typename std::enable_if_t< (!std::is_same_v<std::string, TI>),std::string>
+    ToStr(const input_type& val)
+    {
+      return CONV_T2S(val);
+    }
+  };
+
   // refer : https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0127r1.html
   /**
-   * @brief   convert a function with signature 'auto (*CONV_S2T)(const std::string&)'
+   * @brief   convert a function with signature 'std::string (*CONV_T2S)(const T_V&)'
    *          to a converter type that satisfies concept 'c_T2Sconverter'.
    * @tparam  CONV_T2S                   a function with signature 'std::string (*CONV_T2S)(const T_V&)'.
    *                                     T_V represents either numeric type 'T' or 'variant std::variant<T, std::string>'
@@ -457,6 +528,5 @@ namespace converter
   template< typename T_C >
   using t_T2Sconv_c = typename t_T2Sconv< T_C >::conv_type;
 
-  // ]=============================================================] ConvertFromVal
-
+  // ]=============================================================] T2S conversion-type definition
 }
