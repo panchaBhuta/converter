@@ -36,6 +36,7 @@ add_unit_test(testDefaultTemplateInstantiation)
 add_unit_test(testAllTemplateInstantiation)
 add_unit_test(testBasicConversions)
 add_unit_test(testFloatingPointNaN)
+add_unit_test(testIntegerNaN)
 #[=========[
 add_unit_test(testViewYmd001)
 add_unit_test(testViewYmd003)

@@ -1,4 +1,4 @@
-// test if template instantiation is happening as expected
+// test if all possible template instantiation is happening as expected
 
 
 #include <cmath>
@@ -159,6 +159,7 @@ void __Format_std_StoT__Process2()
   static_assert(std::is_same_v< decltype(&converter::ConvertFromStr<T, S2T_FORMAT_MACRO2(S2T_Format_std_StoT,VARIANT_NAN)>::ToVal),
                                 t_vNaN (*)(const std::string&)>);
 
+  // T2S_Format_std_TtoS is applicable when T is integer-type , but not applicable for float-type
   static_assert(std::is_same_v< decltype(&converter::ConvertFromVal<T, converter::T2S_Format_std_TtoS>::ToStr),
                                 std::string(*)(const T&)>);
   static_assert(std::is_same_v< decltype(&converter::ConvertFromVal<t_vNaN, converter::T2S_Format_std_TtoS>::ToStr),
@@ -291,6 +292,12 @@ void checkFunctionInstance_Float()
                                   std::string(*)(const T&)>);
     static_assert(std::is_same_v< decltype(&converter::ConvertFromVal<t_vNaN, converter::T2S_Format_floating_StreamCombine<T>>::ToStr),
                                   std::string(*)(const t_vNaN&)>);
+#ifdef ENABLE_STD_TtoS
+    static_assert(std::is_same_v< decltype(&converter::ConvertFromVal<T, converter::T2S_Format_std_TtoS>::ToStr),
+                                  std::string(*)(const T&)>);
+    static_assert(std::is_same_v< decltype(&converter::ConvertFromVal<t_vNaN, converter::T2S_Format_std_TtoS>::ToStr),
+                                  std::string(*)(const t_vNaN&)>);
+#endif
   }
 
   __Format_StreamAsIs__Process4<T>();

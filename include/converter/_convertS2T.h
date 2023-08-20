@@ -343,7 +343,7 @@ namespace converter
   private:
     template <typename T2,
               T (*StoINT)( const std::string& str, std::size_t* pos, int base) >
-    inline T _str2INT( const std::string& str, std::size_t* pos = nullptr, int base = 10 )
+    inline static T _str2INT( const std::string& str, std::size_t* pos = nullptr, int base = 10 )
     {
       if constexpr( std::is_same_v<T, T2> ) {
         return StoINT(str, pos, base);

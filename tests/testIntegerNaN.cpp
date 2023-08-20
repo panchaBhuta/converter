@@ -1,5 +1,5 @@
 
-// test NaN conversion exceptionss for floating-point-types
+// test NaN conversion exceptionss for integer-types
 
 
 #include <iostream>
@@ -29,12 +29,10 @@ using _ConvT2S_OSS = converter::ConvertFromVal<T, converter::T2S_Format_StreamUs
 
 
 template <typename T>
-void conversion_String2FloatingPoint_FailureCheck(const std::string& vStr)
+void conversion_String2Integer_FailureCheck(const std::string& vStr)
 {
   {
     ExpectException(_ConvS2T_CtoT<T COMMA converter::FailureS2Tprocess::THROW_ERROR>::ToVal(vStr), std::invalid_argument);
-    unittest::ExpectTrue(std::isnan(_ConvS2T_CtoT<T COMMA converter::FailureS2Tprocess::QUIET_NAN>::ToVal(vStr)));
-    unittest::ExpectTrue(std::isnan(_ConvS2T_CtoT<T COMMA converter::FailureS2Tprocess::SIGNAL_NAN>::ToVal(vStr)));
 
     typename converter::OnError<T, converter::FailureS2Tprocess::VARIANT_NAN>::return_type varT = 
       _ConvS2T_CtoT<T , converter::FailureS2Tprocess::VARIANT_NAN>::ToVal(vStr);
@@ -44,9 +42,6 @@ void conversion_String2FloatingPoint_FailureCheck(const std::string& vStr)
 
   {
     ExpectException(_ConvS2T_StoT<T COMMA converter::FailureS2Tprocess::THROW_ERROR>::ToVal(vStr), std::invalid_argument);
-    unittest::ExpectTrue(std::isnan(_ConvS2T_StoT<T COMMA converter::FailureS2Tprocess::QUIET_NAN>::ToVal(vStr)));
-    unittest::ExpectTrue(std::isnan(_ConvS2T_StoT<T COMMA converter::FailureS2Tprocess::SIGNAL_NAN>::ToVal(vStr)));
-
     typename converter::OnError<T, converter::FailureS2Tprocess::VARIANT_NAN>::return_type varT = 
       _ConvS2T_StoT<T , converter::FailureS2Tprocess::VARIANT_NAN>::ToVal(vStr);
     unittest::ExpectTrue(varT.index() == 1);
@@ -55,8 +50,6 @@ void conversion_String2FloatingPoint_FailureCheck(const std::string& vStr)
 
   {
     ExpectException(_ConvS2T_ISS<T COMMA converter::FailureS2Tprocess::THROW_ERROR>::ToVal(vStr), std::invalid_argument);
-    unittest::ExpectTrue(std::isnan(_ConvS2T_ISS<T COMMA converter::FailureS2Tprocess::QUIET_NAN>::ToVal(vStr)));
-    unittest::ExpectTrue(std::isnan(_ConvS2T_ISS<T COMMA converter::FailureS2Tprocess::SIGNAL_NAN>::ToVal(vStr)));
 
     typename converter::OnError<T, converter::FailureS2Tprocess::VARIANT_NAN>::return_type varT = 
       _ConvS2T_ISS<T , converter::FailureS2Tprocess::VARIANT_NAN>::ToVal(vStr);
@@ -66,11 +59,9 @@ void conversion_String2FloatingPoint_FailureCheck(const std::string& vStr)
 }
 
 template <typename T>
-void conversion_FloatingPointNAN2String_FailureCheck(const std::string& vStr)
+void conversion_IntegerNAN2String_FailureCheck(const std::string& vStr)
 {
   {
-    unittest::ExpectEqual(std::string, _ConvT2S_TtoC<T>::ToStr(std::numeric_limits<T>::quiet_NaN()), "nan");
-    unittest::ExpectEqual(std::string, _ConvT2S_TtoC<T>::ToStr(std::numeric_limits<T>::signaling_NaN()), "nan");
     unittest::ExpectEqual(std::string, converter::ConvertFromVal< std::variant<T COMMA std::string> COMMA
                                                                   converter::T2S_Format_std_TtoC
                                                     >::ToStr(std::variant<T COMMA std::string>{vStr}),
@@ -82,23 +73,6 @@ void conversion_FloatingPointNAN2String_FailureCheck(const std::string& vStr)
   }
 
   {
-    unittest::ExpectEqual(std::string, _ConvT2S_TtoS<T>::ToStr(std::numeric_limits<T>::quiet_NaN()), "nan");
-    unittest::ExpectEqual(std::string, _ConvT2S_TtoS<T>::ToStr(std::numeric_limits<T>::signaling_NaN()), "nan");
-    unittest::ExpectEqual(std::string, converter::ConvertFromVal< std::variant<T COMMA std::string> COMMA
-                                                                  converter::T2S_Format_StreamDecimalPrecision<T>
-                                                    >::ToStr(std::variant<T COMMA std::string>{vStr}),
-                                       vStr);
-#ifdef ENABLE_STD_TtoS
-    unittest::ExpectEqual(std::string, converter::ConvertFromVal< std::variant<T COMMA std::string> COMMA
-                                                                  converter::T2S_Format_std_TtoS
-                                                    >::ToStr(std::variant<T COMMA std::string>{vStr}),
-                                       vStr);
-#endif
-  }
-
-  {
-    unittest::ExpectEqual(std::string, _ConvT2S_OSS<T>::ToStr(std::numeric_limits<T>::quiet_NaN()), "nan");
-    unittest::ExpectEqual(std::string, _ConvT2S_OSS<T>::ToStr(std::numeric_limits<T>::signaling_NaN()), "nan");
     unittest::ExpectEqual(std::string, converter::ConvertFromVal< std::variant<T COMMA std::string> COMMA
                                                                   converter::T2S_Format_StreamUseClassicLocale<char>
                                                     >::ToStr(std::variant<T COMMA std::string>{vStr}),
@@ -115,26 +89,29 @@ int main()
 {
   int rv = 0;
   try {
-    // [========[  String to FloatingPoint-NaN
-    conversion_String2FloatingPoint_FailureCheck<float>("rc");
-    conversion_String2FloatingPoint_FailureCheck<double>("ab");
-    conversion_String2FloatingPoint_FailureCheck<long double>("xy");
+    // [========[  String to Integer-NaN
+    conversion_String2Integer_FailureCheck<short>("rc");
+    conversion_String2Integer_FailureCheck<int>("ab");
+    conversion_String2Integer_FailureCheck<long>("xy");
+    conversion_String2Integer_FailureCheck<long long>("xy");
 
-    conversion_String2FloatingPoint_FailureCheck<float>("1.2x1");
-    conversion_String2FloatingPoint_FailureCheck<double>("2.3.4");
-    conversion_String2FloatingPoint_FailureCheck<long double>("3r.422123445");
-    // ]========]  String to FloatingPoint-NaN
+    conversion_String2Integer_FailureCheck<short>("1.2x1");
+    conversion_String2Integer_FailureCheck<int>("2.3.4");
+    conversion_String2Integer_FailureCheck<long>("3r.422123445");
+    conversion_String2Integer_FailureCheck<long long>("3r.422123445");
+    // ]========]  String to Integer-NaN
 
+    // [========[  Integer-NaN to String
+    conversion_IntegerNAN2String_FailureCheck<short>("rc");
+    conversion_IntegerNAN2String_FailureCheck<int>("ab");
+    conversion_IntegerNAN2String_FailureCheck<long>("xy");
+    conversion_IntegerNAN2String_FailureCheck<long long>("xy");
 
-    // [========[  FloatingPoint-NaN to String
-    conversion_FloatingPointNAN2String_FailureCheck<float>("rc");
-    conversion_FloatingPointNAN2String_FailureCheck<double>("ab");
-    conversion_FloatingPointNAN2String_FailureCheck<long double>("xy");
-
-    conversion_FloatingPointNAN2String_FailureCheck<float>("1.2x1");
-    conversion_FloatingPointNAN2String_FailureCheck<double>("2.3.4");
-    conversion_FloatingPointNAN2String_FailureCheck<long double>("3r.422123445");
-    // ]========]  FloatingPoint-NaN to String
+    conversion_IntegerNAN2String_FailureCheck<short>("1.2x1");
+    conversion_IntegerNAN2String_FailureCheck<int>("2.3.4");
+    conversion_IntegerNAN2String_FailureCheck<long>("3r.422123445");
+    conversion_IntegerNAN2String_FailureCheck<long long>("3r.422123445");
+    // ]========]  Integer-NaN to String
   } catch (const std::exception& ex) {
     std::cout << "Test Failed : err-msg : " << ex.what() << std::endl;
     rv = 1;

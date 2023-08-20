@@ -31,6 +31,8 @@ int main()
 
     conversionEqualCheck<float> (-11, "-11");
     conversionEqualCheck<double>(-21, "-21");
+    conversionEqualCheck<long double>(-31, "-31");
+
     conversionEqualCheck<float> (11, "11");
     conversionEqualCheck<double>(21, "21");
     conversionEqualCheck<long double>(31, "31");
