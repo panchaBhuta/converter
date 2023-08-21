@@ -1,5 +1,5 @@
 
-// test NaN conversion exceptionss for integer-types
+// test NaN conversion exceptions for integer-types
 
 
 #include <iostream>

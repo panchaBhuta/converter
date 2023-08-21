@@ -1,5 +1,5 @@
 
-// test NaN conversion exceptionss for floating-point-types
+// test NaN conversion exceptions for floating-point-types
 
 
 #include <iostream>

@@ -214,7 +214,7 @@ namespace converter
   {
     using stream_type = IOSS;
 
-    constexpr static inline void streamUpdate([[maybe_unused]] IOSS& ss) {}
+    constexpr static inline void streamUpdate(IOSS&) {}
   };
 
   template<c_iostream IOSS>

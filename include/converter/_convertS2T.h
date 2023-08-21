@@ -167,8 +167,9 @@ namespace converter
 
   template <typename FMT>  // FMT -> expected defined types :: 'stream_type'
   struct is_formatISS<  FMT,
-                        typename std::enable_if_t< std::is_same_v<typename FMT::stream_type,
-                                                                  std::basic_istringstream<typename FMT::stream_type::char_type> >
+                        typename std::enable_if_t< std::is_same_v< typename FMT::stream_type,
+                                                                   std::basic_istringstream<typename FMT::stream_type::char_type>
+                                                                 >
                                                  >
                      >
             : is_formatSS<FMT>
@@ -236,7 +237,41 @@ namespace converter
    *                                Optional argument, default's to 'S2T_DefaultFormat<T>::type'.
    */
   template<typename T, typename S2T_FORMAT = typename S2T_DefaultFormat<T>::type >
-  struct ConvertFromStr;
+  struct ConvertFromStr
+  {
+    static constexpr float template_uid = 0.1f;
+
+    /*
+     *  This template instance should get initialized.
+     *  In case it does taht would mean something going wrong,
+     *  and the static function 'instanceEvaluater()' will
+     *  help in figuring out the problem.
+     */
+    static void instanceEvaluater()
+    {
+      static_assert(std::is_same_v< S2T_FORMAT::return_type, T >);
+      S2T_FORMAT::handler("dummyValue", std::exception() );
+
+      if constexpr(has_streamUpdate<S2T_FORMAT>::value)
+      {
+        static_assert(converter::is_iostream<typename S2T_FORMAT::stream_type>::value);
+        static_assert(converter::is_formatSS<S2T_FORMAT>::value);
+        //std::cout << "typename S2T_FORMAT::stream_type =" << typeid(typename S2T_FORMAT::stream_type).name() << std::endl;
+        //std::cout << "std::basic_istringstream<typename S2T_FORMAT::stream_type::char_type> =" << typeid(std::basic_ostringstream<typename S2T_FORMAT::stream_type::char_type>).name() << std::endl;
+
+        static_assert(!std::is_same_v< typename S2T_FORMAT::stream_type,
+                                      std::basic_ostringstream<typename S2T_FORMAT::stream_type::char_type>
+                                    >);  // on error here, means 'istringstream' should be passed instead of 'ostringstream'
+        static_assert(std::is_same_v< typename S2T_FORMAT::stream_type,
+                                      std::basic_istringstream<typename S2T_FORMAT::stream_type::char_type>
+                                    >);
+        static_assert(converter::is_formatISS<S2T_FORMAT>::value);
+        std::cout << "is istringstream type" << std::endl;
+      } else {
+        std::cout << "is NOT istringstream type" << std::endl;
+      }
+    }
+  };
 
   template < typename                                        T, 
              FailureS2Tprocess                               PROCESS_ERR,
