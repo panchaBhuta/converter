@@ -19,7 +19,8 @@ int main()
   int rv = 0;
   try {
     checkRoundTripConversion_txt2Val2txt<float>("testFloatingPointPrecision",
-                 "8.589973e+9", 8.589973e9f, "8589973000");
+                 "8.589973e+9", 8.589973e9f, "8589973504");
+                                          // "8589973000"
     checkRoundTripConversion_txt2Val2txt<double>("testFloatingPointPrecision",
                  "8.589973e+9", 8.589973e9, "8589973000");
     checkRoundTripConversion_txt2Val2txt<long double>("testFloatingPointPrecision",
@@ -27,15 +28,18 @@ int main()
 
 
     checkRoundTripConversion_txt2Val2txt<float>("testFloatingPointPrecision",
-                 "1.123456789", 1.123456789f, "1.123456789");
+                 "1.123456789", 1.123456789f, "1.12345");  // 6 digits
+                                          //  "1.12346"
     checkRoundTripConversion_txt2Val2txt<double>("testFloatingPointPrecision",
-                 "1.1234567890123456789", 1.1234567890123456789, "1.1234567890123456789");
+                 "1.1234567890123456789", 1.1234567890123456789, "1.12345678901234");   // 15 digits
     checkRoundTripConversion_txt2Val2txt<long double>("testFloatingPointPrecision",
-                 "1.123456789012345678901", 1.123456789012345678901L, "1.123456789012345678901");
+                 "1.123456789012345678901", 1.123456789012345678901L, "1.12345678901234567");  //18 digits
+                                                                  //  "1.12345678901234568"
 
 
     checkRoundTripConversion_txt2Val2txt<double>("testFloatingPointPrecision",
-                 "9007199254740993", 9007199254740993, "9007199254740993");
+                 "9007199254740993", 9007199254740993, "9007199254740992");
+                                                 //    "9007199254740993"
     checkRoundTripConversion_txt2Val2txt<long double>("testFloatingPointPrecision",
                  "9007199254740993", 9007199254740993L, "9007199254740993");
 

@@ -1,2 +1,4 @@
-_dateConfig.h
-build*
+*.swp
+.vscode/
+
+build*/

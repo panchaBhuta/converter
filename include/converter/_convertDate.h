@@ -140,8 +140,10 @@ namespace converter
       _dateLib::from_stream(iss, fmt, ymd, abbrev, offset);
       if (iss.fail() || iss.bad()) // || (!iss.eof()))
       {
-        static const std::string errMsg("std::chrono::year_month_day _ConvertFromStr<std::chrono::year_month_day, S2T_FORMAT_YMD>::ToVal_args(const std::string& str)");
-        return S2T_FORMAT_YMD::handler(str, errMsg);
+        static const std::string errMsg("Invalid date-string received in 'std::chrono::year_month_day converter::_ConvertFromStr<std::chrono::year_month_day, S2T_FORMAT_YMD>::ToVal_args(const std::string& str)'");
+        std::cerr << errMsg << " : string-txt='" << str << "' : format='" << fmt << "'" << std::endl;
+        static const std::invalid_argument err(errMsg);
+        return S2T_FORMAT_YMD::handler(str, err);
       }
 
   #if   USE_CHRONO_FROMSTREAM
@@ -169,9 +171,11 @@ namespace converter
     {
       try {
        return ToVal_args( str, S2T_FORMAT_YMD::ymdFormat); // %F -> "%Y-%m-%d"
+      } catch (const std::invalid_argument& err) {
+        return S2T_FORMAT_YMD::handler(str, err);
       } catch (const std::exception& err) {
         //static const std::string errMsg("std::chrono::year_month_day _ConvertFromStr<std::chrono::year_month_day, S2T_FORMAT_YMD>::ToVal(const std::string& str)");
-        return S2T_FORMAT_YMD::handler(str, err.what());
+        return S2T_FORMAT_YMD::handler(str, err);
       }
     }
   };
@@ -380,8 +384,9 @@ namespace converter
 
       if (oss.fail() || oss.bad()) // || oss.eof())
       {
+        static const std::string func("std::string _ConvertFromVal<std::chrono::year_month_date, T2S_FORMAT_YMD>::ToStr_args(const std::chrono::year_month_date& val)");
         std::ostringstream eoss;
-        eoss << __CONVERTER_PREFERRED_PATH__ << " : ERROR : rapidcsv :: in function 'std::string _ConvertFromVal<std::chrono::year_month_date, T2S_FORMAT_YMD>::ToStr_args(const std::chrono::year_month_date& val)' ::: ";
+        eoss << __CONVERTER_PREFERRED_PATH__ << " : ERROR : rapidcsv :: in function '" << func << "' ::: ";
         try {
           eoss << "year{" << int(val.year()) << "}-month{" << unsigned(val.month()) << "}-day{" << unsigned(val.day()) << "}' : val.ok()=" << val.ok() << " format='" << fmt << "'";
         } catch (...) {} // do-nothing on error
@@ -389,7 +394,8 @@ namespace converter
         eoss << std::boolalpha << "   iss.fail() = " << oss.fail()
                                << " : iss.bad() = " << oss.bad()
                                << " : iss.eof() = " << oss.eof() << std::endl;
-        throw std::invalid_argument(eoss.str());
+        std::cerr << eoss.str() << std::endl; 
+        throw std::invalid_argument(func);
       }
       return oss.str();
     }

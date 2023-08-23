@@ -177,15 +177,13 @@ namespace converter
   template<typename T, typename T2S_FORMAT = typename T2S_DefaultFormat<T>::type >
   struct ConvertFromVal
   {
-    static constexpr float template_uid = -0.1f;
-
     /*
      *  This template instance should get initialized.
      *  In case it does taht would mean something going wrong,
      *  and the static function 'instanceEvaluater()' will
      *  help in figuring out the problem.
      */
-    static void instanceEvaluater()
+    static float instanceEvaluater()
     {
       if constexpr(has_streamUpdate<T2S_FORMAT>::value)
       {
@@ -196,17 +194,20 @@ namespace converter
 
         static_assert(!std::is_same_v< typename T2S_FORMAT::stream_type,
                                       std::basic_istringstream<typename T2S_FORMAT::stream_type::char_type>
-                                    >);  // on error here, means 'ostringstream' should be passed instead of 'istringstream'
+                                    >);  // ERROR :: invalid template param for FORMATTING -> 'ostringstream' should be passed instead of 'istringstream'
         static_assert(std::is_same_v< typename T2S_FORMAT::stream_type,
                                       std::basic_ostringstream<typename T2S_FORMAT::stream_type::char_type>
                                     >);
         static_assert(converter::is_formatOSS<T2S_FORMAT>::value);
         
-        std::cout << "is ostringstream type" << std::endl;
+        std::cout << "WARNING : Formater is ostringstream type" << std::endl;
       } else {
-        std::cout << "is NOT ostringstream type" << std::endl;
+        std::cout << "WARNING : Formater is NOT ostringstream type" << std::endl;
       }
+      return -0.1f;
     }
+
+    static constexpr float template_uid = instanceEvaluater();
   };
 
 
