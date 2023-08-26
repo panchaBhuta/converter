@@ -2,3 +2,5 @@
 .vscode/
 
 build*/
+
+_dateConfig.h
