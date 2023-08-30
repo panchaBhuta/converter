@@ -47,8 +47,8 @@ int main()
 {
   int rv = 0;
 
-  float uid1 = ConvertFromStr_loc<float>::template_uid;
-  float uid2 = ConvertFromVal_loc<float>::template_uid;
+  float uid1 = ConvertFromStr_loc<float>::template_uid;  // compilation failure as intended
+  float uid2 = ConvertFromVal_loc<float>::template_uid;  // compilation failure as intended
   //ConvertFromStr_loc<float>::instanceEvaluater();
 
 

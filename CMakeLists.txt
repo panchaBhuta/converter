@@ -40,7 +40,7 @@ endif()
 option(CONVERTER_BUILD_EXAMPLES "Set to ON to build examples" ${CONVERTER_STANDALONE_PROJECT})
 option(CONVERTER_BUILD_TESTS "Set to ON to build tests" ${CONVERTER_STANDALONE_PROJECT})
 option(CONVERTER_ENABLE_INSTALL "Generate the install target" ${CONVERTER_STANDALONE_PROJECT})
-#option(CONVERTER_ENABLE_WARNINGS "Add warnings to CMAKE_CXX_FLAGS" ${CONVERTER_STANDALONE_PROJECT})
+option(CONVERTER_ENABLE_WARNINGS "Add warnings to CMAKE_CXX_FLAGS" ${CONVERTER_STANDALONE_PROJECT})
 #option(CONVERTER_USE_UNICODE_HELP "Use ICU Unicode library" OFF)
 
 if (CONVERTER_STANDALONE_PROJECT)
@@ -59,7 +59,7 @@ converter_check_chrono_stream_functionality()
 check_cxx_compiler_flag_macro_prefix_map()
 
 #if (CONVERTER_ENABLE_WARNINGS)
-converter_enable_warnings()
+    converter_enable_warnings()
 #endif()
 
 converter_build()
@@ -83,6 +83,13 @@ message(STATUS "Build tests: ${CONVERTER_BUILD_TESTS}")
 if(CONVERTER_BUILD_TESTS)
     enable_testing()
     include(CTest)
+    # Ccache
+    find_program(CCACHE_PROGRAM ccache)
+    if(CCACHE_PROGRAM)
+        message(STATUS "Found ccache")
+        set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
+    endif()
+
     add_subdirectory(tests)
 endif()
 
@@ -90,44 +97,7 @@ endif()
 
 #[======================[
 # Build examples when requested by the user
-if (CXXOPTS_BUILD_EXAMPLES)
-    add_subdirectory(src)
+if (CONVERTER_BUILD_EXAMPLES)
+    add_subdirectory(examples)
 endif()
 #]======================]
-
-
-
-
-# Tests
-if(CONVERTER_BUILD_TESTS)
-
-# Ccache
-find_program(CCACHE_PROGRAM ccache)
-if(CCACHE_PROGRAM)
-  message(STATUS "Found ccache")
-  set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
-endif()
-
-#[======================[
-  # Examples
-  # Test macro add_example
-  macro(add_example testname)
-    if(CMAKE_BUILD_TYPE MATCHES "Debug")
-      add_executable(${testname} examples/${testname}.cpp)
-      target_link_libraries(${testname} PUBLIC converter ${DATELIB})
-    endif()
-  endmacro(add_example)
-
-  add_example(ex001 examples/ex001.cpp)
-  add_example(ex002 examples/ex002.cpp)
-  add_example(ex003 examples/ex003.cpp)
-  add_example(ex004 examples/ex004.cpp)
-  add_example(ex005 examples/ex005.cpp)
-  add_example(ex006 examples/ex006.cpp)
-  add_example(ex007 examples/ex007.cpp)
-  add_example(ex008 examples/ex008.cpp)
-  add_example(ex009 examples/ex009.cpp)
-  add_example(exConv001 examples/exConv001.cpp)
-#]======================]
-
-endif()

@@ -194,6 +194,7 @@ macro(converter_check_chrono_stream_functionality)
     endif()
 endmacro()
 
+
 # Check if compiler supports '-fmacro-prefix-map=old=new'  option
 # refer ::: https://fossies.org/linux/bareos/core/CMakeLists.txt
 macro(check_cxx_compiler_flag_macro_prefix_map)
@@ -265,7 +266,7 @@ macro(converter_build)
     endif()
 
     #[==================================================================================[
-    add_subdirectory(include)  ??? is it needed ; if so then with include/coverter
+    add_subdirectory(include)  ??? is it needed ; if so then with include/converter
     # NOT needed, as target_include_directories() can be called here, instead of
     # being called from include/CMakeLists.txt (refer cxxopts which which does this)
     #]==================================================================================]
@@ -282,7 +283,7 @@ macro(converter_build)
         # BUILD_INTERFACE: Content of ... when the property is exported using export(), or when the
         # target is used by another target in the same buildsystem. Expands to the empty string otherwise.
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>  #  /converter/_dateConfig.h
         # https://cmake.org/cmake/help/v3.27/manual/cmake-packages.7.html#creating-relocatable-packages
         # INSTALL_INTERFACE: Content of ... when the property is exported using install(EXPORT), and empty otherwise.
         $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>)
@@ -464,4 +465,8 @@ function(converter_install_logic)
 
     # https://cmake.org/cmake/help/v3.27/command/export.html#exporting-packages
     #export(PACKAGE <PackageName>) ????? not needed for now as this deals with package-registry
+
+
+    # Uninstall
+    add_custom_target(uninstall COMMAND "${CMAKE_COMMAND}" -E remove "${CMAKE_INSTALL_PREFIX}/include/converter")
 endfunction()

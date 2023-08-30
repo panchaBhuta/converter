@@ -2,7 +2,7 @@
  * _convertS2T.h
  *
  * URL:      https://github.com/panchaBhuta/converter
- * Version:  v1.0
+ * Version:  v1.1
  *
  * Copyright (c) 2023-2023 Gautam Dhar
  * All rights reserved.
@@ -314,7 +314,10 @@ namespace converter
         return ERR_HANDLER::handler(str, err);
       }
 
-      static const std::invalid_argument err("String isn't a numeric-type. 'return_type _ConvertFromStr_POS<T, PROCESS_ERR, ERR_HANDLER>::_ToVal(const std::string& str)' :err[2]");
+      static const std::string errMsg("String isn't a numeric-type. 'return_type _ConvertFromStr_POS<T, PROCESS_ERR, ERR_HANDLER>::_ToVal(const std::string& str)'");
+      std::cerr << errMsg << std::endl;
+      std::cerr << "string-conversion-failure for value '" << str << "'" << std::endl;
+      static const std::invalid_argument err(errMsg);
       return ERR_HANDLER::handler(str, err);
     }
   };
@@ -328,6 +331,17 @@ namespace converter
   template< c_NOT_string T, c_formatISS S2T_FORMAT_STREAM >
   struct ConvertFromStr<T, S2T_FORMAT_STREAM>
   {
+  private:
+    inline static bool _checkStreamFailure(const S2T_FORMAT_STREAM::stream_type& iss)
+    {
+      if constexpr (is_char<T>::value)
+        return ( iss.fail() || iss.bad() );  // for char-type, !iss.eof() check doesn't work as expected
+      else
+        return ( iss.fail() || iss.bad() || (!iss.eof()) );
+    }
+
+  public:
+
     /**
      * @brief   'type' definition being declared for.
      */
@@ -358,9 +372,13 @@ namespace converter
       S2T_FORMAT_STREAM::streamUpdate(iss);
       iss >> val;
 
-      if( iss.fail() || iss.bad() || (!iss.eof()) )
+      if( _checkStreamFailure(iss) )
       {
-        static const std::invalid_argument err("Stream read failure. 'T ConvertFromStr<c_NOT_string T, c_formatISS S2T_FORMAT>::ToVal(const std::string& str)'");
+        static const std::string errMsg("Stream read failure. 'T ConvertFromStr<c_NOT_string T, c_formatISS S2T_FORMAT>::ToVal(const std::string& str)'");
+        std::cerr << errMsg << std::endl;
+        std::cerr << "input-string-stream-failure for value '" << str << "'" << std::endl;
+        std::cerr << std::boolalpha << "iss.fail()=" << iss.fail() << "  iss.bad()=" << iss.bad() << "  iss.eof()=" << iss.eof() << std::endl;
+        static const std::invalid_argument err(errMsg);
         return S2T_FORMAT_STREAM::handler(str, err);
       }
       return val;
@@ -579,7 +597,10 @@ namespace converter
     {
       if(str.length()>1)
       {
-        static const std::invalid_argument err("String isn't a char-type. 'CH ConvertFromStr<c_char CH,S2T_Format_WorkAround>::ToVal(const std::string& str)'");
+        static const std::string errMsg("String isn't a char-type. 'CH ConvertFromStr<c_char CH,S2T_Format_WorkAround>::ToVal(const std::string& str)'");
+        static const std::invalid_argument err(errMsg);
+        std::cerr << errMsg << std::endl;
+        std::cerr << "string2charT-conversion-failure for value '" << str << "'" << std::endl;
         return S2T_Format_WorkAround<CH, PROCESS_ERR>::handler(str, err);
       }
 
@@ -620,7 +641,10 @@ namespace converter
       unsigned long val = std::stoul(str); //(str, pos, base);
       if(val > 1)
       {
-        static const std::invalid_argument err ("String isn't a bool. 'T _ConvertFromStr<bool,S2T_Format_WorkAround>::ToVal(const std::string& str)'");
+        static const std::string errMsg("String isn't a bool. 'T _ConvertFromStr<bool,S2T_Format_WorkAround>::ToVal(const std::string& str)'");
+        static const std::invalid_argument err(errMsg);
+        std::cerr << errMsg << std::endl;
+        std::cerr << "string2bool-conversion-failure for value '" << str << "'" << std::endl;
         return S2T_Format_WorkAround<bool, PROCESS_ERR>::handler(str, err);
       }
       return val;

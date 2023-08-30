@@ -52,6 +52,13 @@ template<converter::c_floating_point T>
 using ConvertFromVal_loc = converter::ConvertFromVal<T, combine_deLocal_oss<T> >;
 
 
+template<typename T>
+using convertS2T_stream =
+    converter::ConvertFromStr<T,
+                              converter::S2T_Format_StreamAsIs<T,
+                                                               converter::FailureS2Tprocess::THROW_ERROR,
+                                                               char>
+                             >;
 
 
 
@@ -111,6 +118,10 @@ int main()
     checkRoundTripConversion_txt2Val2txt<double, ConvertFromStr_loc<double>, ConvertFromVal_loc<double>>("testFloatingPointPrecision",
                  "4,3123412e-38", 4.3123412E-38, "4,31234119999999", std::numeric_limits<double>::digits10, ',');
                                               // "4,3123412e-38"
+
+
+    unittest::ExpectEqual(char, convertS2T_stream<char>::ToVal("C"), 'C');
+
   } catch (const std::exception& ex) {
     std::cout << "Test Failed : err-msg : " << ex.what() << std::endl;
     rv = 1;

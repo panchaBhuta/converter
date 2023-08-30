@@ -10,15 +10,6 @@
 
 # https://stackoverflow.com/questions/14446495/cmake-project-structure-with-unit-tests
 
-# Test macro add_perf_test
-macro(add_perf_test testname)
-  if(CMAKE_BUILD_TYPE MATCHES "Release")
-    FILE(GLOB sources ${testname}*.cpp)
-    add_executable(${testname} ${sources})
-    add_test(NAME ${testname} COMMAND "${PROJECT_BINARY_DIR}/tests/${testname}")
-    target_link_libraries(${testname} PUBLIC converter)
-  endif()
-endmacro(add_perf_test)
 
 # Test macro add_unit_test
 macro(add_unit_test testname)
@@ -30,6 +21,27 @@ macro(add_unit_test testname)
     target_link_libraries(${testname} PUBLIC converter)
   endif()
 endmacro(add_unit_test)
+
+# Test macro add_perf_test
+macro(add_perf_test testname)
+  if(CMAKE_BUILD_TYPE MATCHES "Release")
+    FILE(GLOB sources ${testname}*.cpp)
+    add_executable(${testname} ${sources})
+    add_test(NAME ${testname} COMMAND "${PROJECT_BINARY_DIR}/tests/${testname}")
+    target_link_libraries(${testname} PUBLIC converter)
+  endif()
+endmacro(add_perf_test)
+
+
+# Test macro add_example
+macro(add_example testname)
+  if(CMAKE_BUILD_TYPE MATCHES "Debug")
+    add_executable(${testname} examples/${testname}.cpp)
+    target_link_libraries(${testname} PUBLIC converter ${DATELIB})
+  endif()
+endmacro(add_example)
+
+
 
 # Unit tests
 add_unit_test(testDefaultTemplateInstantiation)
@@ -45,12 +57,10 @@ add_unit_test(testUserDefinedConverter_locale)
 add_unit_test(testDateConversions)
 #add_unit_test(testInvalidComposition)
 
-#[=========[
-add_unit_test(testViewYmd001)
-add_unit_test(testViewYmd003)
-add_unit_test(testViewYmd005)
 
+
+#[======================[
 # perf tests
 add_perf_test(ptest001)
 add_perf_test(ptest002)
-#]=========]
+#]======================]
