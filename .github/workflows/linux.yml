@@ -1,0 +1,59 @@
+name: Linux
+
+on:
+  push:
+    branches: [ master, main ]
+    paths-ignore:
+      - 'docs/**'
+    tags-ignore:
+      - v*
+  pull_request:
+    branches: [ master, main ]
+    paths-ignore:
+      - 'docs/**'
+    tags-ignore:
+      - v*
+  workflow_dispatch:
+
+#env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  #BUILD_TYPE: Release
+
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build-ubuntu:
+    name: Build Ubuntu
+    strategy:
+      matrix:
+        # https://github.com/actions/runner-images#available-images
+        # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software
+        os: [ ubuntu-20.04, ubuntu-22.04 ]
+        compiler: [ g++-9, g++-10, g++-11, clang++ ]
+    runs-on: ${{matrix.os}}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+      - name: Deploy Test-Dependencies
+        run: ./make.sh deps
+      - name: Configure CMake [Debug]
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
+      - name: Build [Debug]
+        run: cmake --build "${{github.workspace}}/build-debug" --config Debug -j
+      - name: Test [Debug]
+        working-directory: ${{github.workspace}}/build-debug
+        run: ctest -C Debug --output-on-failure -j
+      - name: Install [Debug]
+        run: cmake --install "${{github.workspace}}/build-debug" --config Debug
+      - name: Configure CMake [Release]
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
+      - name: Build [Release]
+        run: cmake --build "${{github.workspace}}/build-release" --config Release -j
+      - name: Test [Release]
+        working-directory: ${{github.workspace}}/build-release
+        run: ctest -C Release --verbose
+      - name: Install [Release]
+        run: cmake --install "${{github.workspace}}/build-release" --config Release

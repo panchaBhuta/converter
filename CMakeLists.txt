@@ -32,16 +32,16 @@ include(GNUInstallDirs)
 
 # Determine whether this is a standalone project or included by other projects
 set(CONVERTER_STANDALONE_PROJECT OFF)
-if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     set(CONVERTER_STANDALONE_PROJECT ON)
 endif()
 
 # Establish the project options
-option(CONVERTER_BUILD_EXAMPLES "Set to ON to build examples" ${CONVERTER_STANDALONE_PROJECT})
-option(CONVERTER_BUILD_TESTS "Set to ON to build tests" ${CONVERTER_STANDALONE_PROJECT})
-option(CONVERTER_ENABLE_INSTALL "Generate the install target" ${CONVERTER_STANDALONE_PROJECT})
-option(CONVERTER_ENABLE_WARNINGS "Add warnings to CMAKE_CXX_FLAGS" ${CONVERTER_STANDALONE_PROJECT})
-#option(CONVERTER_USE_UNICODE_HELP "Use ICU Unicode library" OFF)
+option(CONVERTER_BUILD_EXAMPLES "Set to ON to build examples"        ${CONVERTER_STANDALONE_PROJECT})
+option(CONVERTER_BUILD_TESTS "Set to ON to build tests"              ${CONVERTER_STANDALONE_PROJECT})
+option(CONVERTER_ENABLE_INSTALL "Generate the install target"        ${CONVERTER_STANDALONE_PROJECT})
+option(CONVERTER_ENABLE_WARNINGS "Add warnings to CMAKE_CXX_FLAGS"   ${CONVERTER_STANDALONE_PROJECT})
+#option(CONVERTER_USE_UNICODE_HELP "Use ICU Unicode library"         OFF)
 
 if (CONVERTER_STANDALONE_PROJECT)
     converter_set_cxx_standard()

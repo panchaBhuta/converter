@@ -334,7 +334,8 @@ function(converter_install_logic)
     write_basic_package_version_file(
         ${version_config}
         VERSION       ${VERSION}
-        COMPATIBILITY AnyNewerVersion
+        #COMPATIBILITY AnyNewerVersion
+        COMPATIBILITY SameMajorVersion
         ${OPTIONAL_ARCH_INDEPENDENT})
     #[==================================================================================[
     # configure_package_config_file() should be used instead of the plain configure_file()
@@ -347,17 +348,13 @@ function(converter_install_logic)
         ${PackagingTemplatesDir}/converter-config.cmake.in
         ${project_config}
         INSTALL_DESTINATION ${CONVERTER_CMAKE_DIR})
-    # https://cmake.org/cmake/help/v3.27/command/export.html#command:export
-    # Export targets or packages for outside projects to use them
-    # directly from the current project's build tree, without installation.
-    export(TARGETS converter
-        NAMESPACE  upSt_converter::
-        FILE       ${PROJECT_BINARY_DIR}/${targets_export_name}.cmake)
 
     # Install version, config and target files.
     install(
         FILES       ${project_config} ${version_config}
         DESTINATION ${CONVERTER_CMAKE_DIR})
+
+
 
     # Add source to a target ( target_source -> cmake v3.23 )
     # File set(s) are defined here.
@@ -410,7 +407,7 @@ function(converter_install_logic)
     #]==================================================================================]
     install(EXPORT    ${targets_export_name}
         DESTINATION   ${CONVERTER_CMAKE_DIR}
-        NAMESPACE     upStr_converter::)
+        NAMESPACE     converter::)
     #[==================================================================================[
     export(EXPORT ${targets_export_name} ....)  not needed to be called, reason as per below.
     # https://cmake.org/cmake/help/v3.27/command/export.html#exporting-targets-matching-install-export
@@ -427,6 +424,14 @@ function(converter_install_logic)
     install(TARGETS         converter
         CONFIGURATIONS      Release
         RUNTIME DESTINATION Release/bin)
+
+
+    # https://cmake.org/cmake/help/v3.27/command/export.html#command:export
+    # Export targets or packages for outside projects to use them
+    # directly from the current project's build tree, without installation.
+    export(TARGETS converter
+        NAMESPACE  converter::
+        FILE       ${PROJECT_BINARY_DIR}/${targets_export_name}.cmake)
 
     set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
     set(CPACK_PACKAGE_VENDOR "converter developers")

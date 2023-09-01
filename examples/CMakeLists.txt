@@ -1,10 +1,10 @@
 #
-# URL:      https://github.com/panchaBhuta/rapidcsv
+# URL:      https://github.com/panchaBhuta/converter
 #
 # Copyright (c) 2023-2023 Gautam Dhar
 # All rights reserved.
 #
-# rapidcsv is distributed under the BSD 3-Clause license, see LICENSE for details.
+# converter is distributed under the BSD 3-Clause license, see LICENSE for details.
 #
 
 
