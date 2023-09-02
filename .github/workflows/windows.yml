@@ -28,6 +28,7 @@ jobs:
   build-windows:
     name: Build Windows
     strategy:
+      fail-fast: false
       matrix:
         os: [windows-2019, windows-2022]
     runs-on: ${{matrix.os}}

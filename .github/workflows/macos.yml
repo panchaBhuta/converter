@@ -28,6 +28,7 @@ jobs:
   build-macos:
     name: Build MacOS
     strategy:
+      fail-fast: false
       matrix:
         os: [ macos-11, macos-12 ]
     runs-on: ${{matrix.os}}
