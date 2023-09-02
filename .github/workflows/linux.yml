@@ -31,7 +31,7 @@ jobs:
       fail-fast: false
       matrix:
         # https://github.com/actions/runner-images#available-images
-        # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources  (os-labels : windows-2022)
+        # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources  (os-labels : ubuntu-22.04)
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software
         os: [ ubuntu-20.04, ubuntu-22.04 ]
         compiler: [ g++-9, g++-10, g++-11, clang++ ]
@@ -58,4 +58,4 @@ jobs:
         working-directory: ${{github.workspace}}/build-release
         run: ctest -C Release --verbose
       - name: Install [Release]
-        run: cmake --install "${{github.workspace}}/build-release" --config Release
+        run: sudo cmake --install "${{github.workspace}}/build-release" --config Release

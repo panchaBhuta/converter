@@ -247,7 +247,7 @@ namespace converter
      */
     static float instanceEvaluater()
     {
-      static_assert(std::is_same_v< S2T_FORMAT::return_type, T >);
+      static_assert(std::is_same_v< typename S2T_FORMAT::return_type, T >);
       S2T_FORMAT::handler("dummyValue", std::exception() );
 
       if constexpr(has_streamUpdate<S2T_FORMAT>::value)
@@ -288,7 +288,7 @@ namespace converter
      * @returns Numerical value if conversion succeeds.
      *          Else throws error on conversion failure.
      */
-    inline static ERR_HANDLER::return_type
+    inline static typename ERR_HANDLER::return_type
     _ToVal(const std::string& str)
     {
       try
@@ -332,7 +332,7 @@ namespace converter
   struct ConvertFromStr<T, S2T_FORMAT_STREAM>
   {
   private:
-    inline static bool _checkStreamFailure(const S2T_FORMAT_STREAM::stream_type& iss)
+    inline static bool _checkStreamFailure(const typename S2T_FORMAT_STREAM::stream_type& iss)
     {
       if constexpr (is_char<T>::value)
         return ( iss.fail() || iss.bad() );  // for char-type, !iss.eof() check doesn't work as expected
@@ -349,7 +349,7 @@ namespace converter
     /**
      * @brief   'type' definition returned by the convertor.
      */
-    using return_type = S2T_FORMAT_STREAM::return_type;
+    using return_type = typename S2T_FORMAT_STREAM::return_type;
 
     static const int template_uid = 1;
 
@@ -414,7 +414,7 @@ namespace converter
     /**
      * @brief   'type' definition returned by the convertor.
      */
-    using return_type = S2T_Format_std_StoT<T, PROCESS_ERR >::return_type;
+    using return_type = typename S2T_Format_std_StoT<T, PROCESS_ERR >::return_type;
 
     static const int template_uid = 2;
 
@@ -504,7 +504,7 @@ namespace converter
     /**
      * @brief   'type' definition returned by the convertor.
      */
-    using return_type = S2T_Format_std_StoT<T, PROCESS_ERR >::return_type;
+    using return_type = typename S2T_Format_std_StoT<T, PROCESS_ERR >::return_type;
 
     static const int template_uid = 3;
 
@@ -582,7 +582,7 @@ namespace converter
     /**
      * @brief   'type' definition returned by the convertor.
      */
-    using return_type = S2T_Format_WorkAround<CH, PROCESS_ERR>::return_type;
+    using return_type = typename S2T_Format_WorkAround<CH, PROCESS_ERR>::return_type;
 
     static const int template_uid = 5;
 
@@ -625,7 +625,7 @@ namespace converter
     /**
      * @brief   'type' definition returned by the convertor.
      */
-    using return_type = S2T_Format_WorkAround<bool, PROCESS_ERR>::return_type;
+    using return_type = typename S2T_Format_WorkAround<bool, PROCESS_ERR>::return_type;
 
     static const int template_uid = 6;
 

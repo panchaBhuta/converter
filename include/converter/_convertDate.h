@@ -106,7 +106,7 @@ namespace converter
     /**
      * @brief   'type' definition returned by the convertor.
      */
-    using return_type = S2T_FORMAT_YMD::return_type; //std::chrono::year_month_day;
+    using return_type = typename S2T_FORMAT_YMD::return_type; //std::chrono::year_month_day;
 
     static const int template_uid = 10000;
 

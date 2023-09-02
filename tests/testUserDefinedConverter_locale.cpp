@@ -102,8 +102,8 @@ int main()
 
 
     checkRoundTripConversion_txt2Val2txt<double, ConvertFromStr_loc<double>, ConvertFromVal_loc<double>>("testFloatingPointPrecision",
-                 "9007199254740993", 9007199254740993, "9.007.199.254.740.992", std::numeric_limits<double>::digits10, ',');
-                                                 //    "9.007.199.254.740.993"
+                 "9007199254740993", 9007199254740993.0, "9.007.199.254.740.992", std::numeric_limits<double>::digits10, ',');
+                                                   //    "9.007.199.254.740.993"
     checkRoundTripConversion_txt2Val2txt<long double, ConvertFromStr_loc<long double>, ConvertFromVal_loc<long double>>("testFloatingPointPrecision",
                  "9007199254740993", 9007199254740993L, "9.007.199.254.740.993", std::numeric_limits<long double>::digits10, ',');
 

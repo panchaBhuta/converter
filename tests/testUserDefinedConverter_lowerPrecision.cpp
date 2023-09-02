@@ -54,7 +54,7 @@ int main()
                  "3.123456789012345678901", 3.123456789012345678901L, "3.1234567890123457", getLowerDecimalPrecision<long double>());  // 17 digits
 
     checkRoundTripConversion_txt2Val2txt<double, converter::ConvertFromStr<double>, ConvertFromVal_lDP<double>>("testFloatingPointPrecision",
-                 "9007199254740993", 9007199254740993, "9007199254740993", getLowerDecimalPrecision<double>());
+                 "9007199254740993", 9007199254740993.0, "9007199254740993", getLowerDecimalPrecision<double>());
     checkRoundTripConversion_txt2Val2txt<long double, converter::ConvertFromStr<long double>, ConvertFromVal_lDP<long double>>("testFloatingPointPrecision",
                  "9007199254740993", 9007199254740993L, "9007199254740993", getLowerDecimalPrecision<long double>());
 

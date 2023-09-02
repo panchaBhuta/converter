@@ -22,7 +22,7 @@ on:
 
 defaults:
   run:
-    shell: bash
+    shell: cmd
 
 jobs:
   build-windows:
@@ -30,7 +30,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # https://github.com/actions/runner-images#available-images
+        # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources  (os-labels : windows-2022)
+        # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software
         os: [windows-2019, windows-2022]
+        # https://cmake.org/cmake/help/latest/manual/cmake.1.html#cmdoption-cmake-T
+        # CMake compiler option doesn't work for Visual Studio project :: https://youtrack.jetbrains.com/issue/CPP-17314
+        toolset_compiler: [ default, ClangCl ]
     runs-on: ${{matrix.os}}
     steps:
       - name: Add msbuild to PATH
@@ -38,7 +44,14 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v3
       - name: Configure CMake [Debug]
-        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug  #  -T "ClangCl"
+        # https://hungvu.tech/advanced-github-actions-conditional-workflow
+        # https://samanpavel.medium.com/github-actions-conditional-job-execution-e6aa363d2867
+        # https://docs.github.com/en/actions/learn-github-actions/expressions
+        # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idif
+        if: matrix.toolset_compiler == 'default'
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug
+        if: matrix.toolset_compiler != 'default'
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug  -T "${{matrix.toolset_compiler}}"
       - name: Build [Debug]
         run: cmake --build "${{github.workspace}}/build-debug" --config Debug -j   -- /m /nologo /verbosity:quiet
       - name: Test [Debug]
@@ -47,7 +60,10 @@ jobs:
       - name: Install [Debug]
         run: cmake --install "${{github.workspace}}/build-debug" --config Debug
       - name: Configure CMake [Release]
-        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release  #  -T "ClangCl"
+        if: matrix.toolset_compiler == 'default'
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release
+        if: matrix.toolset_compiler != 'default'
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release  -T "${{matrix.toolset_compiler}}"
       - name: Build [Release]
         run: cmake --build "${{github.workspace}}/build-release" --config Release -j   -- /m /nologo /verbosity:quiet
       - name: Test [Release]

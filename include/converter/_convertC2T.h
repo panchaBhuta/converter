@@ -102,7 +102,7 @@ namespace converter
     /**
      * @brief   'type' definition returned by the convertor.
      */
-    using return_type = S2T_Format_std_CtoT<T, PROCESS_ERR >::return_type;
+    using return_type = typename S2T_Format_std_CtoT<T, PROCESS_ERR >::return_type;
 
     static const int template_uid = 102;
 
@@ -138,7 +138,7 @@ namespace converter
     /**
      * @brief   'type' definition returned by the convertor.
      */
-    using return_type = S2T_Format_std_CtoT<T, PROCESS_ERR >::return_type;
+    using return_type = typename S2T_Format_std_CtoT<T, PROCESS_ERR >::return_type;
 
     static const int template_uid = 103;
 
