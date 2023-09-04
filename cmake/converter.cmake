@@ -58,6 +58,7 @@ macro(converter_set_cxx_standard)
     if (CONVERTER_CXX_STANDARD)
         set(CMAKE_CXX_STANDARD ${CONVERTER_CXX_STANDARD})
     else()
+        #  --std=gnu++2a
         set(CMAKE_CXX_STANDARD 20)
     endif()
 
@@ -67,47 +68,53 @@ endmacro()
 
 #    Check if chrono-lib stream conversion is supported
 macro(converter_check_chrono_stream_functionality)
-    try_compile(USE_CHRONO_FROMSTREAM
-                SOURCE_FROM_FILE   checkChrono_fromStream.cpp
-                                   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/checkChrono_fromStream.cpp"
+    # Platform check variables
+    # https://cmake.org/cmake/help/latest/variable/CMAKE_HOST_SYSTEM_NAME.html#variable:CMAKE_HOST_SYSTEM_NAME
+    # https://gitlab.kitware.com/cmake/community/-/wikis/doc/tutorials/How-To-Write-Platform-Checks#platform-variables
+    # https://gitlab.kitware.com/cmake/community/-/wikis/doc/tutorials/How-To-Write-Platform-Checks#cmake-system
+    set(linux_host "$<CMAKE_HOST_SYSTEM_NAME:Linux>")
+    set(linux_host_with_gcc_like_cxx "$<AND:${linux_host},${gcc_like_cxx}>")
+    set(linux_host_with_gcc_cxx "$<AND:${linux_host},${gcc_cxx}>")
+
+    try_compile(COMPILE_RESULT_CHRONO_FROMSTREAM
+                SOURCE_FROM_FILE    checkChrono_fromStream.cpp
+                                    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/checkChrono_fromStream.cpp"
+                CMAKE_FLAGS "$<${linux_host_with_gcc_like_cxx}:--std=gnu++2a>"
+                CMAKE_FLAGS "$<${linux_host_with_gcc_cxx}:-fconcepts>"
                 #CMAKE_FLAGS  "--std=gnu++2a -fconcepts"
-                COMPILE_DEFINITIONS "-DUSE_CHRONO_FROMSTREAM=1"
+                COMPILE_DEFINITIONS "-DUSE_DATELIB_FROMSTREAM=${_e_USE_DEFAULT_FEATURE_}"
                 CXX_STANDARD "${CMAKE_CXX_STANDARD}"
                 CXX_STANDARD_REQUIRED True)
 
-    if(USE_CHRONO_FROMSTREAM)
-        # msvc
-        message(STATUS "checkChrono_fromStream[std::chrono::from_stream] ++SUCCESS++")
-        message(STATUS "checkChrono_fromStream[date::from_stream] __SKIPPED__")
-        set(USE_CHRONO_FROMSTREAM 1)
-        set(USE_DATE_FROMSTREAM   0)
-    else()
-        message(STATUS "checkChrono_fromStream[std::chrono::from_stream] --FAILED--")
-        set(USE_CHRONO_FROMSTREAM 0)
-        set(USE_DATE_FROMSTREAM   1)
-    endif()
-
-    try_compile(USE_CHRONO_TOSTREAM
-                SOURCE_FROM_FILE  checkChrono_toStream.cpp
-                                  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/checkChrono_toStream.cpp"
-                #CMAKE_FLAGS  "--std=gnu++2a -fconcepts"
-                COMPILE_DEFINITIONS "-DUSE_CHRONO_TOSTREAM=1"
-                CXX_STANDARD "${CMAKE_CXX_STANDARD}"
-                CXX_STANDARD_REQUIRED True)
-
-    if(USE_CHRONO_TOSTREAM)
+    if(COMPILE_RESULT_CHRONO_FROMSTREAM)
         # for future reference, when <chrono> supports full functionality
-        message(STATUS "checkChrono_toStream[std::chrono::to_stream] ++SUCCESS++")
-        message(STATUS "checkChrono_toStream[date::to_stream] __SKIPPED__")
-        set(USE_CHRONO_TOSTREAM 1)
-        set(USE_DATE_TOSTREAM   0)
+        message(STATUS "checkChrono_fromStream[std::chrono::from_stream()] ++SUCCESS++")
+        message(STATUS "checkChrono_fromStream[date::from_stream()] __SKIPPED__")
+        set(USE_DATELIB_TOSTREAM   ${_e_USE_DEFAULT_FEATURE_})
     else()
-        message(STATUS "checkChrono_toStream[std::chrono::to_stream] --FAILED--")
-        set(USE_CHRONO_TOSTREAM 0)
-        set(USE_DATE_TOSTREAM   1)
+        message(STATUS "checkChrono_fromStream[std::chrono::from_stream()] --FAILED--")
     endif()
 
-    if(USE_CHRONO_FROMSTREAM   AND   USE_CHRONO_TOSTREAM)
+    try_compile(COMPILE_RESULT_CHRONO_TOSTREAM
+                SOURCE_FROM_FILE    checkChrono_toStream.cpp
+                                    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/checkChrono_toStream.cpp"
+                CMAKE_FLAGS "$<${linux_host_with_gcc_like_cxx}:--std=gnu++2a>"
+                CMAKE_FLAGS "$<${linux_host_with_gcc_cxx}:-fconcepts>"
+                #CMAKE_FLAGS  "--std=gnu++2a -fconcepts"
+                COMPILE_DEFINITIONS "-DUSE_DATELIB_TOSTREAM=${_e_USE_DEFAULT_FEATURE_}"
+                CXX_STANDARD "${CMAKE_CXX_STANDARD}"
+                CXX_STANDARD_REQUIRED True)
+
+    if(COMPILE_RESULT_CHRONO_TOSTREAM)
+        # for future reference, when <chrono> supports full functionality
+        message(STATUS "checkChrono_toStream[std::chrono::to_stream()] ++SUCCESS++")
+        message(STATUS "checkChrono_toStream[date::to_stream()] __SKIPPED__")
+        set(USE_DATELIB_TOSTREAM   ${_e_USE_DEFAULT_FEATURE_})
+    else()
+        message(STATUS "checkChrono_toStream[std::chrono::to_stream()] --FAILED--")
+    endif()
+
+    if(COMPILE_RESULT_CHRONO_FROMSTREAM   AND   COMPILE_RESULT_CHRONO_TOSTREAM)
         message(STATUS "Using DATE_TIME-lib : <chrono>")
     else()
         set(DATELIB "date")  # local-variable
@@ -130,70 +137,105 @@ macro(converter_check_chrono_stream_functionality)
         endif()
         #]==================]
 
-        if(NOT USE_CHRONO_FROMSTREAM)
-            try_compile(USE_DATE_FROMSTREAM
-                        SOURCE_FROM_FILE   checkChrono_fromStream.cpp
-                                           "${CMAKE_CURRENT_SOURCE_DIR}/cmake/checkChrono_fromStream.cpp"
+        if(NOT COMPILE_RESULT_CHRONO_FROMSTREAM)
+            try_compile(COMPILE_RESULT_DATE_FROMSTREAM
+                        SOURCE_FROM_FILE    checkChrono_fromStream.cpp
+                                            "${CMAKE_CURRENT_SOURCE_DIR}/cmake/checkChrono_fromStream.cpp"
+                        CMAKE_FLAGS "$<${linux_host_with_gcc_like_cxx}:--std=gnu++2a>"
+                        CMAKE_FLAGS "$<${linux_host_with_gcc_cxx}:-fconcepts>"
                         #CMAKE_FLAGS  "--std=gnu++2a -fconcepts"
                         #CMAKE_FLAGS  "-DINCLUDE_DIRECTORIES=${${DATELIB}_SOURCE_DIR}"
                         CMAKE_FLAGS  "-DINCLUDE_DIRECTORIES=${CMAKE_BINARY_DIR}/_deps/date-src/include/"
                                     #"-DLINK_DIRECTORIES=${${DATELIB}_BINARY_DIR}"
-                        COMPILE_DEFINITIONS "-DUSE_CHRONO_FROMSTREAM=0"
+                        COMPILE_DEFINITIONS "-DUSE_DATELIB_FROMSTREAM=${_e_USE_WORKAROUND_1_}"
                         CXX_STANDARD "${CMAKE_CXX_STANDARD}"
                         CXX_STANDARD_REQUIRED True)
 
-            if(USE_DATE_FROMSTREAM)
+            if(COMPILE_RESULT_DATE_FROMSTREAM)
                 # ubuntu, mac - clang
-                message(STATUS "checkChrono_fromStream[date::from_stream] ++SUCCESS++")
-                set(USE_DATE_FROMSTREAM   1)
+                message(STATUS "checkChrono_fromStream[date::from_stream()] ++SUCCESS++")
+                set(USE_DATELIB_FROMSTREAM   ${_e_USE_WORKAROUND_1_})
             else()
-                message(STATUS "checkChrono_fromStream[date::from_stream] --FAILED--")
-                set(USE_DATE_FROMSTREAM   0)
+                message(STATUS "checkChrono_fromStream[date::from_stream()] --FAILED--   #   DISABLED_FEATURE")
+                set(USE_DATELIB_FROMSTREAM   ${_e_DISABLED_FEATURE_})
+                message(STATUS "WARNING: Due to limitations of underlying libs, no definition is provided here. If needed, user might declare their own specific implementation of this method in their code base.")
             endif()
         endif()
 
-        if(NOT USE_CHRONO_TOSTREAM)
-            try_compile(USE_DATE_TOSTREAM
-                        SOURCE_FROM_FILE  checkChrono_toStream.cpp
-                                          "${CMAKE_CURRENT_SOURCE_DIR}/cmake/checkChrono_toStream.cpp"
+        if(NOT COMPILE_RESULT_CHRONO_TOSTREAM)
+            try_compile(COMPILE_RESULT_DATE_TOSTREAM
+                        SOURCE_FROM_FILE    checkChrono_toStream.cpp
+                                            "${CMAKE_CURRENT_SOURCE_DIR}/cmake/checkChrono_toStream.cpp"
+                        CMAKE_FLAGS "$<${linux_host_with_gcc_like_cxx}:--std=gnu++2a>"
+                        CMAKE_FLAGS "$<${linux_host_with_gcc_cxx}:-fconcepts>"
                         #CMAKE_FLAGS  "--std=gnu++2a -fconcepts"
                         CMAKE_FLAGS  "-DINCLUDE_DIRECTORIES=${CMAKE_BINARY_DIR}/_deps/date-src/include/"
-                        COMPILE_DEFINITIONS "-DUSE_CHRONO_TOSTREAM=0"
+                        COMPILE_DEFINITIONS "-DUSE_DATELIB_TOSTREAM=${_e_USE_WORKAROUND_1_}"
                         CXX_STANDARD "${CMAKE_CXX_STANDARD}"
                         CXX_STANDARD_REQUIRED True)
 
-            if(USE_DATE_TOSTREAM)
+            if(COMPILE_RESULT_DATE_TOSTREAM)
                 # ubuntu, mac - clang
-                message(STATUS "checkChrono_toStream[date::to_stream] ++SUCCESS++")
-                set(USE_DATE_TOSTREAM   1)
+                message(STATUS "checkChrono_toStream[date::to_stream()] ++SUCCESS++")
+                set(USE_DATELIB_TOSTREAM   ${_e_USE_WORKAROUND_1_})
             else()
                 # msvc
-                message(STATUS "checkChrono_toStream[date::to_stream] --FAILED--")
-                set(USE_DATE_TOSTREAM   0)
+                message(STATUS "checkChrono_toStream[date::to_stream()] --FAILED--   #  USING internal implementation")
+                set(USE_DATELIB_TOSTREAM   ${_e_USE_WORKAROUND_2_})
+                message(STATUS "WARNING: Due to limitations of underlying libs. The conversion here handles a limited sub-set of format specifiers.")
             endif()
         endif()
 
-        if(USE_DATE_FROMSTREAM   OR   USE_DATE_TOSTREAM)
+        if(COMPILE_RESULT_DATE_FROMSTREAM   OR   COMPILE_RESULT_DATE_TOSTREAM)
             message(STATUS "Using DATE_TIME-lib : <date/date.h>")
         else()
             unset(DATELIB PARENT_SCOPE)
+            message(STATUS "DATE conversion not supported by either 'std::chrono::*_stream()' OR 'date::*_stream()'")
         endif()
-    endif()
-
-    add_compile_definitions(USE_CHRONO_FROMSTREAM=${USE_CHRONO_FROMSTREAM})
-    add_compile_definitions(USE_CHRONO_TOSTREAM=${USE_CHRONO_TOSTREAM})
-    add_compile_definitions(USE_DATE_FROMSTREAM=${USE_DATE_FROMSTREAM})
-    add_compile_definitions(USE_DATE_TOSTREAM=${USE_DATE_TOSTREAM})
-
-    if((NOT USE_CHRONO_FROMSTREAM)   AND   (NOT USE_DATE_FROMSTREAM))
-        message(STATUS "WARNING: Due to limitations of underlying libs, no definition is provided here. If needed, user might declare their own specific implementation of this method in their code base.")
-    endif()
-
-    if((NOT USE_CHRONO_TOSTREAM)   AND   (NOT USE_DATE_TOSTREAM))
-        message(STATUS "WARNING: Due to limitations of underlying libs. The conversion here handles a limited sub-set of format specifiers.")
     endif()
 endmacro()
 
+
+macro(converter_check_clang_string_workaround)
+    set(USE_CLANG_STRING_WORKAROUND  ${_e_USE_DEFAULT_FEATURE_})
+    if(clang_like_cxx)
+        try_compile(COMPILE_RESULT_CLANG_STRING_DEFAULT
+                    SOURCE_FROM_FILE    check_clang_string.cpp
+                                        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/check_clang_string.cpp"
+                    CMAKE_FLAGS "$<${linux_host_with_gcc_like_cxx}:--std=gnu++2a>"
+                    CMAKE_FLAGS "$<${linux_host_with_gcc_cxx}:-fconcepts>"
+                    #CMAKE_FLAGS  "--std=gnu++2a -fconcepts"
+                    COMPILE_DEFINITIONS "-DUSE_CLANG_STRING_WORKAROUND=${_e_USE_DEFAULT_FEATURE_}"
+                    CXX_STANDARD "${CMAKE_CXX_STANDARD}"
+                    CXX_STANDARD_REQUIRED True)
+
+        if(COMPILE_RESULT_CLANG_STRING_DEFAULT)
+            message(STATUS "check_clang_string :: default mode ++SUCCESS++")
+            message(STATUS "check_clang_string :: workaround   __SKIPPED__")
+            set(USE_CLANG_STRING_WORKAROUND   ${_e_USE_DEFAULT_FEATURE_})
+        else()
+            message(STATUS "check_clang_string :: default mode --FAILED--")
+
+            try_compile(COMPILE_RESULT_CLANG_STRING_WORKAROUND
+                        SOURCE_FROM_FILE    check_clang_string.cpp
+                                            "${CMAKE_CURRENT_SOURCE_DIR}/cmake/check_clang_string.cpp"
+                        CMAKE_FLAGS "$<${linux_host_with_gcc_like_cxx}:--std=gnu++2a>"
+                        CMAKE_FLAGS "$<${linux_host_with_gcc_cxx}:-fconcepts>"
+                        #CMAKE_FLAGS  "--std=gnu++2a -fconcepts"
+                        COMPILE_DEFINITIONS "-DUSE_CLANG_STRING_WORKAROUND=${_e_USE_WORKAROUND_1_}"
+                        CXX_STANDARD "${CMAKE_CXX_STANDARD}"
+                        CXX_STANDARD_REQUIRED True)
+
+            if(COMPILE_RESULT_CLANG_STRING_WORKAROUND)
+                message(STATUS "check_clang_string :: workaround ++SUCCESS++")
+                set(USE_CLANG_STRING_WORKAROUND   ${_e_USE_WORKAROUND_1_})
+            else()
+                message(STATUS "check_clang_string :: workaround --FAILED--")
+                set(USE_CLANG_STRING_WORKAROUND   ${_e_DISABLED_FEATURE_})
+            endif()
+        endif()
+    endif()    
+endmacro()
 
 # Check if compiler supports '-fmacro-prefix-map=old=new'  option
 # refer ::: https://fossies.org/linux/bareos/core/CMakeLists.txt
@@ -222,19 +264,15 @@ endmacro()
 
 # Helper function to enable warnings
 macro(converter_enable_warnings)
-    # https://cmake.org/cmake/help/v3.27/guide/tutorial/Adding%20Generator%20Expressions.html#cmakelists-txt-target-compile-options-genex
-    set(gcc_like_cxx "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang,GNU,LCC>")
-    set(msvc_cxx "$<COMPILE_LANG_AND_ID:CXX,MSVC>")
-
     set(gcc_warnings "-g;-Wall;-Wextra;-Wpedantic;-Wshadow;-Wpointer-arith")
     set(gcc_warnings "${gcc_warnings};-Wcast-qual;-Wno-missing-braces;-Wswitch-default;-Wcast-align;-Winit-self")
     set(gcc_warnings "${gcc_warnings};-Wunreachable-code;-Wundef;-Wuninitialized;-Wold-style-cast;-Wwrite-strings")
     set(gcc_warnings "${gcc_warnings};-Wsign-conversion;-Weffc++")
 
     # https://cmake.org/cmake/help/v3.27/manual/cmake-generator-expressions.7.html
-    set(is_gnu "$<CXX_COMPILER_ID:GNU>")
+    #set(is_gnu "$<CXX_COMPILER_ID:GNU>")
     set(v5_or_later "$<VERSION_GREATER_EQUAL:$<CXX_COMPILER_VERSION>,5>")
-    set(is_gnu_v5_or_later "$<AND:${is_gnu},${v5_or_later}>")
+    set(gcc_cxx_v5_or_later "$<AND:${gcc_cxx},${v5_or_later}>")
     #[==================================================================================[
     # we only want these warning flags to be used during builds.
     # Consumers of our installed project should not inherit our warning flags.
@@ -242,7 +280,7 @@ macro(converter_enable_warnings)
     #]==================================================================================]
     target_compile_options(converter INTERFACE
         "$<${gcc_like_cxx}:$<BUILD_INTERFACE:${gcc_warnings}>>"
-        "$<${is_gnu_v5_or_later}:$<BUILD_INTERFACE:-Wsuggest-override>>"
+        "$<${gcc_cxx_v5_or_later}:$<BUILD_INTERFACE:-Wsuggest-override>>"
         "$<${msvc_cxx}:$<BUILD_INTERFACE:-W4>>")
         #add_compile_options("/utf-8")  for msvc  -> check in cxxopts.cmake
 endmacro()
@@ -250,8 +288,8 @@ endmacro()
 # Helper function to configure, include, compile, link, build
 macro(converter_build)
     configure_file(
-        ${CMAKE_CURRENT_SOURCE_DIR}/cmake/_dateConfig.h.in
-        ${CMAKE_CURRENT_BINARY_DIR}/include/converter/_dateConfig.h)
+        ${CMAKE_CURRENT_SOURCE_DIR}/cmake/_workaroundConfig.h.in
+        ${CMAKE_CURRENT_BINARY_DIR}/include/converter/_workaroundConfig.h)
 
     # Build type
     set(DEFAULT_BUILD_TYPE "Release")
@@ -287,14 +325,42 @@ macro(converter_build)
         # https://cmake.org/cmake/help/v3.27/manual/cmake-packages.7.html#creating-relocatable-packages
         # INSTALL_INTERFACE: Content of ... when the property is exported using install(EXPORT), and empty otherwise.
         $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>)
+    # refer https://cmake.org/cmake/help/latest/manual/cmake-generator-expressions.7.html#introduction
+    target_include_directories(converter INTERFACE
+        "$<${CMAKE_HOST_UNIX}:/opt/include/$<CXX_COMPILER_ID>>")
+
     target_compile_definitions(converter INTERFACE
         $<$<CONFIG:Debug>:DEBUG_BUILD>
         $<$<CONFIG:Release>:RELEASE_BUILD>)
+    #[==================================================================================[
+    # refer https://cmake.org/cmake/help/v3.27/manual/cmake-generator-expressions.7.html#genex:COMPILE_LANG_AND_ID
+    # This specifies the use of different compile definitions based on both the compiler id and compilation language.
+    # This example will have a COMPILING_CXX_WITH_CLANG compile definition when Clang is the CXX compiler, and
+    # COMPILING_CXX_WITH_INTEL when Intel is the CXX compiler.
+    target_compile_definitions(converter INTERFACE
+                $<$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang>:COMPILING_CXX_WITH_CLANG>
+                $<$<COMPILE_LANG_AND_ID:CXX,Intel>:COMPILING_CXX_WITH_INTEL>)
+    #]==================================================================================]
+
     target_compile_features(converter INTERFACE
         cxx_constexpr
         cxx_variadic_templates
         cxx_long_long_type)
 
+    #[==================================================================================[
+    #add_compile_options("--std=gnu++2a")
+    #set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lstdc++") # -lc++abi")
+
+    add_library(libCXX_Clang STATIC IMPORTED GLOBAL)
+
+    # refer https://cmake.org/cmake/help/latest/manual/cmake-generator-expressions.7.html#genex:LINK_LANG_AND_ID
+    # This specifies the use of different link libraries based on both the compiler id and link language.
+    # This example will have target libCXX_Clang as link dependency when Clang or AppleClang is the CXX linker,
+    # and libCXX_Intel when Intel is the CXX linker.
+    target_link_libraries(converter INTERFACE
+                $<$<LINK_LANG_AND_ID:CXX,Clang,AppleClang>:libCXX_Clang>
+                $<$<LINK_LANG_AND_ID:CXX,Intel>:libCXX_Intel>)
+    #]==================================================================================]
     if(DATELIB)
         message(STATUS "'converter' linking to '${DATELIB}'")
         target_link_libraries(converter INTERFACE ${DATELIB})
@@ -366,7 +432,7 @@ function(converter_install_logic)
         PRIVATE
         FILE_SET   converter_autoheader
         TYPE       HEADERS
-        FILES      ${CMAKE_CURRENT_BINARY_DIR}/include/converter/_dateConfig.h)
+        FILES      ${CMAKE_CURRENT_BINARY_DIR}/include/converter/_workaroundConfig.h)
     #[==================================================================================[
     https://cmake.org/cmake/help/v3.27/command/install.html#targets
     # Install the header files and export the target

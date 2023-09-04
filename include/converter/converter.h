@@ -2,7 +2,7 @@
  * converter.h
  *
  * URL:      https://github.com/panchaBhuta/converter
- * Version:  v1.1
+ * Version:  v1.2
  *
  * Copyright (c) 2023-2023 Gautam Dhar
  * All rights reserved.
@@ -31,7 +31,7 @@
 #include <stdexcept>
 
 #define CONVERTER__VERSION_MAJOR 1
-#define CONVERTER__VERSION_MINOR 1
+#define CONVERTER__VERSION_MINOR 2
 #define CONVERTER__VERSION_PATCH 0
 
 
@@ -56,7 +56,7 @@
 // to handle windows back-slash path seperator
 #define __CONVERTER_PREFERRED_PATH__    std::filesystem::path(__CONVERTER_FILE__).make_preferred().string()
 
-
+#include <converter/_workaroundConfig.h>
 #include <converter/_common.h>
 #include <converter/_convertS2T.h>
 #include <converter/_convertT2S.h>

@@ -1,0 +1,59 @@
+/*
+ * _workaroundConfig.h
+ *
+ * URL:      https://github.com/panchaBhuta/converter
+ * Version:  v1.2
+ *
+ * Copyright (c) 2023-2023 Gautam Dhar
+ * All rights reserved.
+ *
+ * converter is distributed under the BSD 3-Clause license, see LICENSE for details.
+ *
+ */
+
+#pragma once
+
+// #cmake-define01 DISABLED_FEATURE    :: -1 declared in cmake , becomes 1 on .h file
+#define _e_DISABLED_FEATURE_  -1
+#cmakedefine01 _e_USE_DEFAULT_FEATURE_
+#cmakedefine01 _e_USE_WORKAROUND_1_
+#cmakedefine01 _e_USE_WORKAROUND_2_
+
+
+/*
+ *  Date conversion typically uses std::chrono::from_stream() and
+ *  std::chrono::to_stream(), which as of writing this code
+ *  is NOT fully supported across all OS's.
+ * 
+ *  Till then, USE_DATELIB_FROMSTREAM and USE_DATELIB_TOSTREAM
+ *  macro-variables are used to switch 
+ *  "std::chrono" lib where possible(msvc -> from_stream),    OR 
+ *  "date" lib (ubuntu, macOS -> from_stream+to_stream)       OR
+ *  as last resort calls an internal implementation 
+ *  (msvc -> to_stream), which has limited formating support.
+ * 
+ *  Note there is no internal implementation provided yet for 'from_stream'
+ *  and will result in compilation error if a particular OS does not support both
+ *  "std::chrono::from_stream()" and "date::from_stream()" functionality.
+ * 
+ *  DISABLED_FEATURE     ->   compilation error on use.
+ *  USE_DEFAULT_FEATURE  ->   std::chrono::*_stream()
+ *  USE_WORKAROUND_1     ->   date::*_stream()
+ *  USE_WORKAROUND_2     ->   to_stream()   ::: internal implementation, which has limited formating support.
+ *                            from_stream() ::: not implemented.
+ */
+#cmakedefine01  USE_DATELIB_FROMSTREAM
+#cmakedefine01  USE_DATELIB_TOSTREAM
+
+
+/*
+ * Failure to compile std::u16string from libstdc++ 12.1 in c++20 mode #55560 
+ * https://github.com/llvm/llvm-project/issues/55560
+ */
+#cmakedefine01  USE_CLANG_STRING_WORKAROUND
+#if USE_CLANG_STRING_WORKAROUND == _e_USE_WORKAROUND_1_
+  #include <string>
+  [[maybe_unused]]static std::u8string  clang_string_workaround(const  char8_t* a, const  char8_t* b) { return {a, b}; }
+  [[maybe_unused]]static std::u16string clang_string_workaround(const char16_t* a, const char16_t* b) { return {a, b}; }
+  [[maybe_unused]]static std::u32string clang_string_workaround(const char32_t* a, const char32_t* b) { return {a, b}; }
+#endif

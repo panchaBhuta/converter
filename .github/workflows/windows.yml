@@ -23,6 +23,7 @@ on:
 defaults:
   run:
     shell: cmd
+    #shell: bash
 
 jobs:
   build-windows:
@@ -71,5 +72,8 @@ jobs:
         run: ctest -C Release --verbose
       - name: Install [Release]
         run: cmake --install "${{github.workspace}}/build-release" --config Release
+      - name: Check Work-Arounds
+        shell: bash
+        run: grep define "${{github.workspace}}/build-release/include/converter/_workaroundConfig.h" | grep -v -e "^//" -e " _e_"
 
 

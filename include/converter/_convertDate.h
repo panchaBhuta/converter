@@ -2,7 +2,7 @@
  * _convertDate.h
  *
  * URL:      https://github.com/panchaBhuta/converter
- * Version:  v1.0
+ * Version:  v1.2
  *
  * Copyright (c) 2023-2023 Gautam Dhar
  * All rights reserved.
@@ -19,20 +19,18 @@
 #include <converter/_convertS2T.h>
 #include <converter/_convertT2S.h>
 
-#include <converter/_dateConfig.h>
+#include <converter/_workaroundConfig.h>
 
 
-#if USE_DATE_FROMSTREAM  ||  USE_DATE_TOSTREAM
+#if  USE_DATELIB_FROMSTREAM == 1  ||  USE_DATELIB_TOSTREAM == 1
   #include <date/date.h>
 #endif
 
-#if  USE_CHRONO_TOSTREAM 
+#if    USE_DATELIB_TOSTREAM == 0
   //#include <string_view>
   //#include <format>
   #include <cstring>
-#endif
-
-#if   USE_CHRONO_TOSTREAM  &&  USE_DATE_TOSTREAM
+#elif  USE_DATELIB_TOSTREAM == 2
   #include <array>
 #endif
 
@@ -124,12 +122,12 @@ namespace converter
                  const std::string::value_type* fmt,
                  std::string* abbrev  = nullptr,
                  std::chrono::minutes* offset = nullptr)
-#if   USE_CHRONO_FROMSTREAM  ||  USE_DATE_FROMSTREAM
+#if   USE_DATELIB_FROMSTREAM != _e_DISABLED_FEATURE_
     {
-  #if   USE_CHRONO_FROMSTREAM
+  #if   USE_DATELIB_FROMSTREAM  ==  _e_USE_DEFAULT_FEATURE_
       namespace _dateLib = std::chrono;
       const std::string dateClass = "std::chrono::year_month_day";
-  #elif USE_DATE_FROMSTREAM
+  #elif USE_DATELIB_FROMSTREAM  ==  _e_USE_WORKAROUND_1_
       namespace _dateLib = date;
       const std::string dateClass = "date::year_month_day";
   #endif
@@ -146,9 +144,9 @@ namespace converter
         return S2T_FORMAT_YMD::handler(str, err);
       }
 
-  #if   USE_CHRONO_FROMSTREAM
+  #if   USE_DATELIB_FROMSTREAM  ==  _e_USE_DEFAULT_FEATURE_
         return ymd;
-  #elif USE_DATE_FROMSTREAM
+  #elif USE_DATELIB_FROMSTREAM  ==  _e_USE_WORKAROUND_1_
         return std::chrono::year_month_day{ std::chrono::year(int(ymd.year())),
                                             std::chrono::month(unsigned(ymd.month())),
                                             std::chrono::day(unsigned(ymd.day())) };
@@ -157,7 +155,8 @@ namespace converter
 #else
     { 
       // Due to limitations of underlying libs, no definition is provided here.
-      // If needed, user might declare their own specific implementation of this method in their code base.
+      // If needed, user might declare their own specialized implementation of this method,
+      // using user defined S2T_FORMAT_YMD type.
     }
 #endif
 
@@ -273,7 +272,7 @@ namespace converter
       std::ostringstream oss;
       T2S_FORMAT_YMD::streamUpdate(oss);
 
-#if   USE_CHRONO_TOSTREAM
+#if   USE_DATELIB_TOSTREAM  ==  _e_USE_DEFAULT_FEATURE_
       const std::string dateClass = "std::chrono::year_month_day";
 
       // As of writing this code, no compiler supports chrono::to_stream() yet.
@@ -281,7 +280,7 @@ namespace converter
       // refer https://omegaup.com/docs/cpp/en/cpp/chrono/local_t/to_stream.html
       // no OS in particular
       std::chrono::to_stream(oss, fmt, val, abbrev, offset_sec); // does not compile
-#elif USE_DATE_TOSTREAM
+#elif USE_DATELIB_TOSTREAM  ==  _e_USE_WORKAROUND_1_
       const std::string dateClass = "date::year_month_day";
 
       // gcc and clang does not support the required 'chrono::to_stream' functionality as of writing this code
@@ -292,7 +291,7 @@ namespace converter
       using CS = std::chrono::seconds;
       date::fields<CS> fds{valDate};
       date::to_stream(oss, fmt, fds, abbrev, offset_sec);
-#else
+#elif USE_DATELIB_TOSTREAM  ==  _e_USE_WORKAROUND_2_
 
       // msvc supports only std::chrono::from_stream and not std::chrono::to_stream.
       // date-lib is not compatible with msvc (min/max macro clash), therefore

@@ -21,6 +21,30 @@ set(PROJECT_HOMEPAGE_URL "https://github.com/panchaBhuta/converter")
 # Get the version of the library
 converter_getversion(VERSION)
 
+#[==================================================================================[
+# https://cmake.org/cmake/help/v3.27/guide/tutorial/Adding%20Generator%20Expressions.html#cmakelists-txt-target-compile-options-genex
+#
+# refer https://cmake.org/cmake/help/v3.27/manual/cmake-generator-expressions.7.html#genex:COMPILE_LANG_AND_ID
+# when the language used for compilation unit matches language and CMake's compiler id of the language compiler
+# matches any one of the comma-separated entries in compiler_ids, otherwise 0.
+#
+# Compiler identification string : Possible values
+# https://cmake.org/cmake/help/latest/variable/CMAKE_LANG_COMPILER_ID.html
+#
+#]==================================================================================]
+set(clang_cxx "$<COMPILE_LANG_AND_ID:CXX,Clang>")
+set(clang_like_cxx "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang>")
+set(gcc_cxx "$<COMPILE_LANG_AND_ID:CXX,GNU>")
+set(gcc_like_cxx "$<OR:$<COMPILE_LANG_AND_ID:CXX,GNU,LCC>,${clang_like_cxx}>")
+set(msvc_cxx "$<COMPILE_LANG_AND_ID:CXX,MSVC>")
+
+set(_e_DISABLED_FEATURE_      -1)
+set(_e_USE_DEFAULT_FEATURE_    0)
+set(_e_USE_WORKAROUND_1_       1)
+set(_e_USE_WORKAROUND_2_       2)
+
+
+
 project(converter
         VERSION "${VERSION}"
         DESCRIPTION "${PROJECT_DESCRIPTION}"
@@ -55,6 +79,7 @@ add_library(converter INTERFACE)
 add_library(converter::converter ALIAS converter)
 
 converter_check_chrono_stream_functionality()
+converter_check_clang_string_workaround()
 
 check_cxx_compiler_flag_macro_prefix_map()
 

@@ -38,8 +38,8 @@ int main()
 
 
     checkRoundTripConversion_txt2Val2txt<double>("testFloatingPointPrecision",
-                 "9007199254740993", 9007199254740993, "9007199254740992");
-                                                 //    "9007199254740993"
+                 "9007199254740993", 9007199254740993.0, "9007199254740992");
+                                                   //    "9007199254740993"
     checkRoundTripConversion_txt2Val2txt<long double>("testFloatingPointPrecision",
                  "9007199254740993", 9007199254740993L, "9007199254740993");
 

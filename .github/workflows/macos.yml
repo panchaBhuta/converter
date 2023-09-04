@@ -34,12 +34,16 @@ jobs:
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources  (os-labels : macos-12)
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software
         os: [ macos-11, macos-12 ]
+        compiler: [ default, clang++ ]  # default = 
     runs-on: ${{matrix.os}}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
       - name: Configure CMake [Debug]
+        if: matrix.compiler == 'default'
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+        if: matrix.compiler != 'default'
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
       - name: Show compile commands [Debug]
         run: cat build-debug/compile_commands.json
       - name: Build [Debug]
@@ -50,7 +54,10 @@ jobs:
       - name: Install [Debug]
         run: cmake --install "${{github.workspace}}/build-debug" --config Debug
       - name: Configure CMake [Release]
+        if: matrix.compiler == 'default'
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+        if: matrix.compiler != 'default'
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
       - name: Show compile commands [Release]
         run: cat build-release/compile_commands.json
       - name: Build [Release]
@@ -60,3 +67,5 @@ jobs:
         run: ctest -C Release --verbose
       - name: Install [Release]
         run: cmake --install "${{github.workspace}}/build-release" --config Release
+      - name: Check Work-Arounds
+        run: grep define "${{github.workspace}}/build-release/include/converter/_workaroundConfig.h" | grep -v -e "^//" -e " _e_"

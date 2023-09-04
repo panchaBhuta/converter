@@ -2,12 +2,12 @@
 #include <string>
 #include <cassert>
 
-//  ./manualBuild.sh cmake checkChrono_fromStream -DUSE_CHRONO_FROMSTREAM=1
+//  ./manualBuild.sh cmake checkChrono_fromStream -DUSE_DATELIB_FROMSTREAM=0
 
-#if  USE_CHRONO_FROMSTREAM == 1
+#if    USE_DATELIB_FROMSTREAM == 0
   #include <chrono>
   namespace datelib = std::chrono;
-#else
+#elif  USE_DATELIB_FROMSTREAM == 1
   #include <date/date.h>
   namespace datelib = date;
 #endif

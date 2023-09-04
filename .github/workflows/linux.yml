@@ -33,8 +33,10 @@ jobs:
         # https://github.com/actions/runner-images#available-images
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources  (os-labels : ubuntu-22.04)
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software
-        os: [ ubuntu-20.04, ubuntu-22.04 ]
-        compiler: [ g++-9, g++-10, g++-11, clang++ ]
+        # os: [ ubuntu-20.04, ubuntu-22.04 ] compiles with 'g++-11', which is not available in 'ubuntu-20.04'
+        os: [ ubuntu-22.04 ]
+        #compiler: [ g++-9, g++-10, g++-11, clang++ ]
+        compiler: [ default, g++-12, clang++ ]  # default = g++11
     runs-on: ${{matrix.os}}
     steps:
       - name: Checkout Repo
@@ -42,15 +44,19 @@ jobs:
       - name: Deploy Test-Dependencies
         run: ./make.sh deps
       - name: Configure CMake [Debug]
+        if: matrix.compiler == 'default'
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug
+        if: matrix.compiler != 'default'
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
       - name: Build [Debug]
         run: cmake --build "${{github.workspace}}/build-debug" --config Debug -j
       - name: Test [Debug]
         working-directory: ${{github.workspace}}/build-debug
         run: ctest -C Debug --output-on-failure -j
-      - name: Install [Debug]
-        run: cmake --install "${{github.workspace}}/build-debug" --config Debug
       - name: Configure CMake [Release]
+        if: matrix.compiler == 'default'
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release
+        if: matrix.compiler != 'default'
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
       - name: Build [Release]
         run: cmake --build "${{github.workspace}}/build-release" --config Release -j
@@ -59,3 +65,5 @@ jobs:
         run: ctest -C Release --verbose
       - name: Install [Release]
         run: sudo cmake --install "${{github.workspace}}/build-release" --config Release
+      - name: Check Work-Arounds
+        run: grep define "${{github.workspace}}/build-release/include/converter/_workaroundConfig.h" | grep -v -e "^//" -e " _e_"
