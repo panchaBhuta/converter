@@ -327,7 +327,7 @@ macro(converter_build)
         $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>)
     # refer https://cmake.org/cmake/help/latest/manual/cmake-generator-expressions.7.html#introduction
     target_include_directories(converter INTERFACE
-        "$<${CMAKE_HOST_UNIX}:/opt/include/$<CXX_COMPILER_ID>>")
+        "$<$<BOOL:${CMAKE_HOST_UNIX}>:/opt/include/$<CXX_COMPILER_ID>>")
 
     target_compile_definitions(converter INTERFACE
         $<$<CONFIG:Debug>:DEBUG_BUILD>
