@@ -17,6 +17,7 @@
 #include <iterator>
 #include <stdexcept>
 #include <system_error>
+#include <string>
 	
 
 #include <converter/_common.h>

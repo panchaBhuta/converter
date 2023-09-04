@@ -16,7 +16,9 @@
 #include <charconv>
 #include <iterator>
 #include <stdexcept>
-	
+#include <array>
+#include <string>
+
 
 #include <converter/_common.h>
 

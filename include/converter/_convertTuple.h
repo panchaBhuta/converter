@@ -14,6 +14,8 @@
 #pragma once
 
 #include <tuple>
+#include <string>
+#include <vector>
 
 #include <converter/_common.h>
 #include <converter/_convertS2T.h>

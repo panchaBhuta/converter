@@ -34,7 +34,8 @@ jobs:
         # https://github.com/actions/runner-images#available-images
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources  (os-labels : windows-2022)
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software
-        os: [windows-2019, windows-2022]
+        #os: [windows-2019, windows-2022] windows-2019 not supported
+        os: [windows-2022]
         # https://cmake.org/cmake/help/latest/manual/cmake.1.html#cmdoption-cmake-T
         # CMake compiler option doesn't work for Visual Studio project :: https://youtrack.jetbrains.com/issue/CPP-17314
         toolset_compiler: [ default, ClangCl ]
