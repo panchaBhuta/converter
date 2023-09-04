@@ -39,9 +39,10 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
-      - name: Configure CMake [Debug]
+      - name: Configure CMake (compiler=default) [Debug]
         if: matrix.compiler == 'default'
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+      - name: Configure CMake (compiler=NOT-default) [Debug]
         if: matrix.compiler != 'default'
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
       - name: Show compile commands [Debug]
@@ -53,8 +54,9 @@ jobs:
         run: ctest -C Debug --output-on-failure -j
       - name: Install [Debug]
         run: cmake --install "${{github.workspace}}/build-debug" --config Debug
-      - name: Configure CMake [Release]
+      - name: Configure CMake (compiler=default) [Release]
         if: matrix.compiler == 'default'
+      - name: Configure CMake (compiler=NOT-default) [Release]
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
         if: matrix.compiler != 'default'
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
