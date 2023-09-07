@@ -38,34 +38,42 @@ int main()
 {
   int rv = 0;
   try {
-    checkRoundTripConversion_txt2Val2txt<float, converter::ConvertFromStr<float>, ConvertFromVal_lDP<float>>("testFloatingPointPrecision",
+    checkRoundTripConversion_txt2Val2txt<float, converter::ConvertFromStr<float>, ConvertFromVal_lDP<float>>("testUserDefinedConverter_lowerPrecision",
                  "8.589973e+9", 8.589973e9f, "8.59e+09", getLowerDecimalPrecision<float>());
-    checkRoundTripConversion_txt2Val2txt<double, converter::ConvertFromStr<double>, ConvertFromVal_lDP<double>>("testFloatingPointPrecision",
+    checkRoundTripConversion_txt2Val2txt<double, converter::ConvertFromStr<double>, ConvertFromVal_lDP<double>>("testUserDefinedConverter_lowerPrecision",
                  "8.589973e+9", 8.589973e9, "8589973000", getLowerDecimalPrecision<double>());
-    checkRoundTripConversion_txt2Val2txt<long double, converter::ConvertFromStr<long double>, ConvertFromVal_lDP<long double>>("testFloatingPointPrecision",
+    checkRoundTripConversion_txt2Val2txt<long double, converter::ConvertFromStr<long double>, ConvertFromVal_lDP<long double>>("testUserDefinedConverter_lowerPrecision",
                  "8.589973e+9", 8.589973e9L, "8589973000", getLowerDecimalPrecision<long double>());
 
 
-    checkRoundTripConversion_txt2Val2txt<float, converter::ConvertFromStr<float>, ConvertFromVal_lDP<float>>("testFloatingPointPrecision",
+    checkRoundTripConversion_txt2Val2txt<float, converter::ConvertFromStr<float>, ConvertFromVal_lDP<float>>("testUserDefinedConverter_lowerPrecision",
                  "1.123456789", 1.123456789f, "1.1235", getLowerDecimalPrecision<float>());   // 5 digits
-    checkRoundTripConversion_txt2Val2txt<double, converter::ConvertFromStr<double>, ConvertFromVal_lDP<double>>("testFloatingPointPrecision",
+    checkRoundTripConversion_txt2Val2txt<double, converter::ConvertFromStr<double>, ConvertFromVal_lDP<double>>("testUserDefinedConverter_lowerPrecision",
                  "2.1234567890123456789", 2.1234567890123456789, "2.1234567890123", getLowerDecimalPrecision<double>());  // 14 digits
-    checkRoundTripConversion_txt2Val2txt<long double, converter::ConvertFromStr<long double>, ConvertFromVal_lDP<long double>>("testFloatingPointPrecision",
+    checkRoundTripConversion_txt2Val2txt<long double, converter::ConvertFromStr<long double>, ConvertFromVal_lDP<long double>>("testUserDefinedConverter_lowerPrecision",
                  "3.123456789012345678901", 3.123456789012345678901L, "3.1234567890123457", getLowerDecimalPrecision<long double>());  // 17 digits
 
-    checkRoundTripConversion_txt2Val2txt<double, converter::ConvertFromStr<double>, ConvertFromVal_lDP<double>>("testFloatingPointPrecision",
+    checkRoundTripConversion_txt2Val2txt<double, converter::ConvertFromStr<double>, ConvertFromVal_lDP<double>>("testUserDefinedConverter_lowerPrecision",
                  "9007199254740993", 9007199254740993.0, "9.007199254741e+15", getLowerDecimalPrecision<double>());
-    checkRoundTripConversion_txt2Val2txt<long double, converter::ConvertFromStr<long double>, ConvertFromVal_lDP<long double>>("testFloatingPointPrecision",
-                 "9007199254740993", 9007199254740993L, "9007199254740993", getLowerDecimalPrecision<long double>());
+    unsigned indexOS = 0;
+// https://web.archive.org/web/20191012035921/http://nadeausoftware.com/articles/2012/01/c_c_tip_how_use_compiler_predefined_macros_detect_operating_system
+#if defined(WIN64) || defined(_WIN64) || defined(__WIN64) || defined(__WIN64__)
+    indexOS = 1;
+#endif
+    std::string expected_longDouble_9007199254740993[] = { "9007199254740993",
+                                                           "9.007199254741e+15" // Windows
+                                                         };
+    checkRoundTripConversion_txt2Val2txt<long double, converter::ConvertFromStr<long double>, ConvertFromVal_lDP<long double>>("testUserDefinedConverter_lowerPrecision",
+                 "9007199254740993", 9007199254740993L, expected_longDouble_9007199254740993[indexOS], getLowerDecimalPrecision<long double>());
 
 
-    checkRoundTripConversion_txt2Val2txt<float, converter::ConvertFromStr<float>, ConvertFromVal_lDP<float>>("testFloatingPointPrecision",
+    checkRoundTripConversion_txt2Val2txt<float, converter::ConvertFromStr<float>, ConvertFromVal_lDP<float>>("testUserDefinedConverter_lowerPrecision",
                  "3.3123", 3.3123f, "3.3123", getLowerDecimalPrecision<float>());
-    checkRoundTripConversion_txt2Val2txt<float, converter::ConvertFromStr<float>, ConvertFromVal_lDP<float>>("testFloatingPointPrecision",
+    checkRoundTripConversion_txt2Val2txt<float, converter::ConvertFromStr<float>, ConvertFromVal_lDP<float>>("testUserDefinedConverter_lowerPrecision",
                  "3.3123412e+38", 3.3123412E38f, "3.3123412e+38", getLowerDecimalPrecision<float>());
-    checkRoundTripConversion_txt2Val2txt<float, converter::ConvertFromStr<float>, ConvertFromVal_lDP<float>>("testFloatingPointPrecision",
+    checkRoundTripConversion_txt2Val2txt<float, converter::ConvertFromStr<float>, ConvertFromVal_lDP<float>>("testUserDefinedConverter_lowerPrecision",
                  "3.3123412e-38", 3.3123412E-38f, "3.3123412e-38", getLowerDecimalPrecision<float>());
-    checkRoundTripConversion_txt2Val2txt<double, converter::ConvertFromStr<double>, ConvertFromVal_lDP<double>>("testFloatingPointPrecision",
+    checkRoundTripConversion_txt2Val2txt<double, converter::ConvertFromStr<double>, ConvertFromVal_lDP<double>>("testUserDefinedConverter_lowerPrecision",
                  "3.3123412e-38", 3.3123412E-38, "3.3123412e-38", getLowerDecimalPrecision<double>());
 
   } catch (const std::exception& ex) {

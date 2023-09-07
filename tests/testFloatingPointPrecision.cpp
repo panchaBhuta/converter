@@ -40,15 +40,8 @@ int main()
     checkRoundTripConversion_txt2Val2txt<double>("testFloatingPointPrecision",
                  "9007199254740993", 9007199254740993.0, "9007199254740992");
                                                    //    "9007199254740993"
-    unsigned indexOS = 0;
-#if defined(_WIN64) || defined(_WIN32)
-    indexOS = 1;
-#endif
-    std::string expected_longDouble_9007199254740993[] = { "9007199254740993",
-                                                           "9007199254740992" // Windows
-                                                         };
     checkRoundTripConversion_txt2Val2txt<long double>("testFloatingPointPrecision",
-                 "9007199254740993", 9007199254740993L, expected_longDouble_9007199254740993[indexOS]);
+                 "9007199254740993", 9007199254740993L, "9007199254740993");
 
 
     checkRoundTripConversion_txt2Val2txt<float>("testFloatingPointPrecision",
