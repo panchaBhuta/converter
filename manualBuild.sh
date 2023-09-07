@@ -13,8 +13,6 @@
 #]=============================]    find which standards my GCC compiler supports?
 
 
-USE_CHRONO=0
-USE_DATE=1
 
 echo "################### g++ compiler ##########################"
   mkdir -p ./build-tmp/gpp
@@ -23,7 +21,6 @@ echo "################### g++ compiler ##########################"
                          -Wcast-qual -Wno-missing-braces -Wswitch-default -Wcast-align \
                          -Wunreachable-code -Wundef -Wuninitialized -Wold-style-cast \
                          -Wsign-conversion -Weffc++ \
-     -DUSE_CHRONO_FROMSTREAM=${USE_CHRONO} -DUSE_CHRONO_TOSTREAM=${USE_CHRONO} -DUSE_DATE_FROMSTREAM=${USE_DATE} -DUSE_DATE_TOSTREAM=${USE_DATE} \
      -DUSE_MACROPREFIXMAP=1 -fmacro-prefix-map="$(pwd)/"= ${3} \
      --std=gnu++2a -fconcepts \
      -I "$(pwd)/include" -I "$(pwd)/build-debug/_deps/date-src/include/" -I "$(pwd)/build-debug/include/" \
@@ -38,7 +35,6 @@ echo "################### gcc compiler ##########################"
                          -Wcast-qual -Wno-missing-braces -Wswitch-default -Wcast-align \
                          -Wunreachable-code -Wundef -Wuninitialized -Wold-style-cast \
                          -Wsign-conversion -Weffc++ \
-     -DUSE_CHRONO_FROMSTREAM=${USE_CHRONO} -DUSE_CHRONO_TOSTREAM=${USE_CHRONO} -DUSE_DATE_FROMSTREAM=${USE_DATE} -DUSE_DATE_TOSTREAM=${USE_DATE} \
      -DUSE_MACROPREFIXMAP=1 -fmacro-prefix-map="$(pwd)/"= ${3} \
     --std=gnu++2a -fconcepts \
      -I "$(pwd)/include" -I "$(pwd)/build-debug/_deps/date-src/include/" -I "$(pwd)/build-debug/include/" \
@@ -53,7 +49,6 @@ echo "################### clang compiler ##########################"
                              -Wcast-qual -Wno-missing-braces -Wswitch-default -Wcast-align \
                              -Wunreachable-code -Wundef -Wuninitialized -Wold-style-cast \
                              -Wsign-conversion -Weffc++ \
-     -DUSE_CHRONO_FROMSTREAM=${USE_CHRONO} -DUSE_CHRONO_TOSTREAM=${USE_CHRONO} -DUSE_DATE_FROMSTREAM=${USE_DATE} -DUSE_DATE_TOSTREAM=${USE_DATE} \
      -DUSE_MACROPREFIXMAP=1 -fmacro-prefix-map="$(pwd)/"= ${3} \
      --std=gnu++2a \
      -I "$(pwd)/include" -I "$(pwd)/build-debug/_deps/date-src/include/" -I "$(pwd)/build-debug/include/" \

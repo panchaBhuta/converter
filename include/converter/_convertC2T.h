@@ -39,11 +39,13 @@ namespace converter
     using type = S2T_Format_std_CtoT<T, FailureS2Tprocess::THROW_ERROR>;
   };
 
+#if USE_FLOATINGPOINT_FROM_CHARS_1  ==  _e_ENABLE_FEATURE_
   template<c_floating_point T>
   struct S2T_DefaultFormat< T >
   {
     using type = S2T_Format_std_CtoT<T, FailureS2Tprocess::SIGNAL_NAN>;
   };
+#endif
   // ]]============]] type - Default Conversion format
   // ]=============================================================] S2T_FORMAT
 

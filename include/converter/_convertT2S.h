@@ -81,13 +81,15 @@ namespace converter
   {
     using type = T2S_Format_std_TtoS;
   };
+*/
 
+#if USE_FLOATINGPOINT_TO_CHARS_1  ==  _e_DISABLE_FEATURE_
   template<c_floating_point T>
   struct T2S_DefaultFormat<T, void >
   {
     using type = T2S_Format_StreamDecimalPrecision<T>;
   };
-*/
+#endif
 
 /*
   template<c_char CH>

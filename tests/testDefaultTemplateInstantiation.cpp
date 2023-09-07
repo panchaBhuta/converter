@@ -13,6 +13,7 @@ void checkDefaultFormatInstance_Integer()
 {
   static_assert(std::is_same_v<typename converter::S2T_DefaultFormat<T>::type,
                                         converter::S2T_Format_std_CtoT<T, converter::FailureS2Tprocess::THROW_ERROR>>);
+
   static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<T>::type,
                                         converter::T2S_Format_std_TtoC>);
 }
@@ -20,11 +21,22 @@ void checkDefaultFormatInstance_Integer()
 template<typename T>
 void checkDefaultFormatInstance_Float()
 {
+#if   USE_FLOATINGPOINT_FROM_CHARS_1  ==  _e_ENABLE_FEATURE_
   static_assert(std::is_same_v<typename converter::S2T_DefaultFormat<T>::type,
                                         converter::S2T_Format_std_CtoT<T, converter::FailureS2Tprocess::SIGNAL_NAN>>);
+#else
+  static_assert(std::is_same_v<typename converter::S2T_DefaultFormat<T>::type,
+                                        converter::S2T_Format_std_StoT<T, converter::FailureS2Tprocess::SIGNAL_NAN>>);
+#endif
+
+#if   USE_FLOATINGPOINT_TO_CHARS_1  ==  _e_ENABLE_FEATURE_
   static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<T>::type,
                                         converter::T2S_Format_std_TtoC>);
-                                        //converter::T2S_Format_StreamDecimalPrecision<T>>); -> instead of converter::T2S_Format_std_TtoS
+#else
+  static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<T>::type,
+                                        converter::T2S_Format_StreamDecimalPrecision<T>>);
+                                        // instead of converter::T2S_Format_std_TtoS
+#endif
 }
 
 template<typename T>
@@ -57,6 +69,19 @@ void checkDefaultFunctionInstance()
   static_assert(std::is_same_v< decltype(&converter::ConvertFromStr<T>::ToVal), T(*)(const std::string&)>);
   static_assert(std::is_same_v< decltype(&converter::ConvertFromVal<T>::ToStr), std::string(*)(const T&)>);
 }
+
+#if   USE_FLOATINGPOINT_FROM_CHARS_1  ==  _e_ENABLE_FEATURE_
+  static constexpr const int fp_S2T_uid = 103;
+#else
+  static constexpr const int fp_S2T_uid = 3;
+#endif
+
+#if   USE_FLOATINGPOINT_TO_CHARS_1  ==  _e_ENABLE_FEATURE_
+  static constexpr const int fp_T2S_uid = -103;
+#else
+  static constexpr const int fp_T2S_uid = -1;
+#endif
+
 
 int main()
 {
@@ -152,9 +177,9 @@ int main()
   checkDefaultFunctionInstance<unsigned int,102>();      // 2
   checkDefaultFunctionInstance<unsigned long,102>();     // 2
   checkDefaultFunctionInstance<unsigned long long,102>();// 2
-  checkDefaultFunctionInstance<float,103>();    // 3,-1
-  checkDefaultFunctionInstance<double,103>();   // 3,-1
-  checkDefaultFunctionInstance<long double,103>();  // 3,-1
+  checkDefaultFunctionInstance<float,fp_S2T_uid,fp_T2S_uid>();    // (103 | 3) , (-103 | -1)
+  checkDefaultFunctionInstance<double,fp_S2T_uid,fp_T2S_uid>();   // (103 | 3) , (-103 | -1)
+  checkDefaultFunctionInstance<long double,fp_S2T_uid,fp_T2S_uid>();  // (103 | 3) , (-103 | -1)
   checkDefaultFunctionInstance<std::string,4>();
   checkDefaultFunctionInstance<char,5>();
   checkDefaultFunctionInstance<signed char,5>();

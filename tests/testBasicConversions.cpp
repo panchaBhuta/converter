@@ -46,7 +46,7 @@ int main()
     conversionEqualCheck<signed char>('b', "b");
     conversionEqualCheck<unsigned char>('c', "c");
     conversionEqualCheck<wchar_t>('d',  "d");
-#if USE_CLANG_STRING_WORKAROUND != _e_DISABLED_FEATURE_
+#if USE_CLANG_STRING_WORKS_1 == _e_ENABLE_FEATURE_ || USE_CLANG_STRING_WORKAROUND_2 == _e_ENABLE_FEATURE_
     conversionEqualCheck<char8_t>('e',  "e");
     conversionEqualCheck<char16_t>('f',  "f");
     conversionEqualCheck<char32_t>('g',  "g");

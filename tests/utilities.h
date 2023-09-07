@@ -14,7 +14,7 @@
 
 template<typename T,
          typename TConvertFromStr = converter::ConvertFromStr<T>,
-        typename TConvertFromVal = converter::ConvertFromVal<T> >
+         typename TConvertFromVal = converter::ConvertFromVal<T> >
 void checkRoundTripConversion_txt2Val2txt( const std::string& testID,
             const std::string& strInput,
             const T& valExpected, const std::string& strRoundtripExpected,
@@ -41,17 +41,13 @@ void checkRoundTripConversion_txt2Val2txt( const std::string& testID,
         unittest::ExpectEqual(std::string, subStrRdTpExp, subStrRdTpAct);
         return;
       }
-    } else {
-      if(nRdTpAct == std::string::npos)
-      {
-        unittest::ExpectEqual(std::string, strRoundtripExpected, strRoundtripActual);
-        return;
-      }
     }
 
     std::ostringstream ossConv;
+    //ossConv << "valConv{without-precision}=" << valConv << std::endl;
     ossConv << std::setprecision(std::numeric_limits<T>::digits10 + 5);
-    //oss << std::setprecision(LDBL_DIG + 5);
+    ////oss << std::setprecision(LDBL_DIG + 5);
+    //ossConv << "valConv{with-precision}=" << valConv << std::endl;
     ossConv << valConv;
 
     std::cout << std::setprecision(LDBL_DIG + 5) << std::boolalpha;
@@ -59,6 +55,8 @@ void checkRoundTripConversion_txt2Val2txt( const std::string& testID,
     std::cout << "      input-text{" << strInput      << "} -> valConv{" << ossConv.str() << "}" << std::endl;
     std::cout << "         valConv{" << ossConv.str() << "} -> roundtrip-text{" << strRoundtripActual << "}" << std::endl;
     std::cout << "  roundtrip-text{" << strRoundtripActual << "} !=  roundtrip-expected-text{" << strRoundtripExpected << "} ?  is FALSE" << std::endl << std::endl;
+
+    unittest::ExpectEqual(std::string, strRoundtripExpected, strRoundtripActual);
   }
 }
 

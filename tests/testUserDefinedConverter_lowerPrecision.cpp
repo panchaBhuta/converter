@@ -39,7 +39,7 @@ int main()
   int rv = 0;
   try {
     checkRoundTripConversion_txt2Val2txt<float, converter::ConvertFromStr<float>, ConvertFromVal_lDP<float>>("testFloatingPointPrecision",
-                 "8.589973e+9", 8.589973e9f, "8589973000", getLowerDecimalPrecision<float>());
+                 "8.589973e+9", 8.589973e9f, "8.59e+09", getLowerDecimalPrecision<float>());
     checkRoundTripConversion_txt2Val2txt<double, converter::ConvertFromStr<double>, ConvertFromVal_lDP<double>>("testFloatingPointPrecision",
                  "8.589973e+9", 8.589973e9, "8589973000", getLowerDecimalPrecision<double>());
     checkRoundTripConversion_txt2Val2txt<long double, converter::ConvertFromStr<long double>, ConvertFromVal_lDP<long double>>("testFloatingPointPrecision",
@@ -54,7 +54,7 @@ int main()
                  "3.123456789012345678901", 3.123456789012345678901L, "3.1234567890123457", getLowerDecimalPrecision<long double>());  // 17 digits
 
     checkRoundTripConversion_txt2Val2txt<double, converter::ConvertFromStr<double>, ConvertFromVal_lDP<double>>("testFloatingPointPrecision",
-                 "9007199254740993", 9007199254740993.0, "9007199254740993", getLowerDecimalPrecision<double>());
+                 "9007199254740993", 9007199254740993.0, "9.007199254741e+15", getLowerDecimalPrecision<double>());
     checkRoundTripConversion_txt2Val2txt<long double, converter::ConvertFromStr<long double>, ConvertFromVal_lDP<long double>>("testFloatingPointPrecision",
                  "9007199254740993", 9007199254740993L, "9007199254740993", getLowerDecimalPrecision<long double>());
 

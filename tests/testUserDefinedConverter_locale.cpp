@@ -86,7 +86,8 @@ int main()
 
   try {
     checkRoundTripConversion_txt2Val2txt<float, ConvertFromStr_loc<float>, ConvertFromVal_loc<float>>("testFloatingPointPrecision",
-                 "8,589973e+9", 8.589973e9f, "8.589.973.000", std::numeric_limits<float>::digits10, ',');
+                 "8,589973e+9", 8.589973e9f, "8,5899735e+09", std::numeric_limits<float>::digits10, ',');
+                                          // "8,589973e+9"
     checkRoundTripConversion_txt2Val2txt<double, ConvertFromStr_loc<double>, ConvertFromVal_loc<double>>("testFloatingPointPrecision",
                  "8,589973e+9", 8.589973e9, "8.589.973.000", std::numeric_limits<double>::digits10, ',');
     checkRoundTripConversion_txt2Val2txt<long double, ConvertFromStr_loc<long double>, ConvertFromVal_loc<long double>>("testFloatingPointPrecision",

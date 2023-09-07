@@ -13,11 +13,8 @@
 
 #pragma once
 
-// #cmake-define01 DISABLED_FEATURE    :: -1 declared in cmake , becomes 1 on .h file
-#define _e_DISABLED_FEATURE_  -1
-#cmakedefine01 _e_USE_DEFAULT_FEATURE_
-#cmakedefine01 _e_USE_WORKAROUND_1_
-#cmakedefine01 _e_USE_WORKAROUND_2_
+#cmakedefine01 _e_ENABLE_FEATURE_
+#cmakedefine01 _e_DISABLE_FEATURE_
 
 
 /*
@@ -35,25 +32,34 @@
  *  Note there is no internal implementation provided yet for 'from_stream'
  *  and will result in compilation error if a particular OS does not support both
  *  "std::chrono::from_stream()" and "date::from_stream()" functionality.
- * 
- *  DISABLED_FEATURE     ->   compilation error on use.
- *  USE_DEFAULT_FEATURE  ->   std::chrono::*_stream()
- *  USE_WORKAROUND_1     ->   date::*_stream()
- *  USE_WORKAROUND_2     ->   to_stream()   ::: internal implementation, which has limited formating support.
- *                            from_stream() ::: not implemented.
  */
-#cmakedefine01  USE_DATELIB_FROMSTREAM
-#cmakedefine01  USE_DATELIB_TOSTREAM
+#cmakedefine01  USE_CHRONO_FROMSTREAM_1
+#cmakedefine01  USE_DATE_FROMSTREAM_2
+#cmakedefine01  USE_JUGAAD_FROMSTREAM_3
+
+#cmakedefine01  USE_CHRONO_TOSTREAM_1
+#cmakedefine01  USE_DATE_TOSTREAM_2
+#cmakedefine01  USE_JUGAAD_TOSTREAM_3
 
 
 /*
  * Failure to compile std::u16string from libstdc++ 12.1 in c++20 mode #55560 
  * https://github.com/llvm/llvm-project/issues/55560
  */
-#cmakedefine01  USE_CLANG_STRING_WORKAROUND
-#if USE_CLANG_STRING_WORKAROUND == _e_USE_WORKAROUND_1_
+#cmakedefine01  USE_CLANG_STRING_WORKS_1
+#cmakedefine01  USE_CLANG_STRING_WORKAROUND_2
+#if USE_CLANG_STRING_WORKAROUND_2 == _e_ENABLE_FEATURE_
   #include <string>
   [[maybe_unused]]static std::u8string  clang_string_workaround(const  char8_t* a, const  char8_t* b) { return {a, b}; }
   [[maybe_unused]]static std::u16string clang_string_workaround(const char16_t* a, const char16_t* b) { return {a, b}; }
   [[maybe_unused]]static std::u32string clang_string_workaround(const char32_t* a, const char32_t* b) { return {a, b}; }
 #endif
+
+
+/*
+ * floating-point conversion by "Elementary string conversions*" is not supported by all OSes.
+ * refer "Elementary string conversions*" in the below link
+ * https://en.cppreference.com/w/cpp/compiler_support/17#C.2B.2B17_library_features
+ */
+#cmakedefine01  USE_FLOATINGPOINT_FROM_CHARS_1
+#cmakedefine01  USE_FLOATINGPOINT_TO_CHARS_1

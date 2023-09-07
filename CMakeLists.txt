@@ -38,10 +38,8 @@ set(gcc_cxx "$<COMPILE_LANG_AND_ID:CXX,GNU>")
 set(gcc_like_cxx "$<OR:$<COMPILE_LANG_AND_ID:CXX,GNU,LCC>,${clang_like_cxx}>")
 set(msvc_cxx "$<COMPILE_LANG_AND_ID:CXX,MSVC>")
 
-set(_e_DISABLED_FEATURE_      -1)
-set(_e_USE_DEFAULT_FEATURE_    0)
-set(_e_USE_WORKAROUND_1_       1)
-set(_e_USE_WORKAROUND_2_       2)
+set(_e_DISABLE_FEATURE_    0)
+set(_e_ENABLE_FEATURE_     1)
 
 
 
@@ -80,6 +78,7 @@ add_library(converter::converter ALIAS converter)
 
 converter_check_chrono_stream_functionality()
 converter_check_clang_string_workaround()
+check_floatingPoint_elementaryStringConversions()
 
 check_cxx_compiler_flag_macro_prefix_map()
 
