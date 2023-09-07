@@ -131,7 +131,9 @@ macro(converter_check_chrono_stream_functionality)
 
     if(COMPILE_RESULT_CHRONO_FROMSTREAM   OR   COMPILE_RESULT_CHRONO_TOSTREAM)
         message(STATUS "Using DATE_TIME-lib : <chrono>")
-    else()
+    endif()
+
+    if((NOT COMPILE_RESULT_CHRONO_FROMSTREAM)   OR   (NOT COMPILE_RESULT_CHRONO_TOSTREAM))
         set(DATELIB "date")  # local-variable
         # https://stackoverflow.com/questions/29892929/variables-set-with-parent-scope-are-empty-in-the-corresponding-child-scope-why
         #set(DATELIB ${DATELIB} PARENT_SCOPE)  # global-variable

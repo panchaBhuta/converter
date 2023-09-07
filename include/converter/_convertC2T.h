@@ -131,6 +131,7 @@ namespace converter
     }
   };
 
+#if USE_FLOATINGPOINT_FROM_CHARS_1  ==  _e_ENABLE_FEATURE_
   template <c_floating_point T, FailureS2Tprocess PROCESS_ERR>
   struct ConvertFromStr<T, S2T_Format_std_CtoT<T, PROCESS_ERR> >
   {
@@ -166,5 +167,6 @@ namespace converter
       return _ConvertFromStr_POS<T, PROCESS_ERR, S2T_Format_std_CtoT<T, PROCESS_ERR> >::_ToVal(str);
     }
   };
+#endif
   // ]=============================================================] ConvertFromStr
 }

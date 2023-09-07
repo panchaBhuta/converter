@@ -38,7 +38,7 @@ jobs:
         os: [windows-2022]
         # https://cmake.org/cmake/help/latest/manual/cmake.1.html#cmdoption-cmake-T
         # CMake compiler option doesn't work for Visual Studio project :: https://youtrack.jetbrains.com/issue/CPP-17314
-        toolset_compiler: [ default, ClangCl ]
+        toolset_compiler: [ default, ClangCl ]  # default = MSVC 19 ;  ClangCL = Clang 16
     runs-on: ${{matrix.os}}
     steps:
       - name: Add msbuild to PATH

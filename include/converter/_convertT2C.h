@@ -115,6 +115,7 @@ namespace converter
     }
   };
 
+#if USE_FLOATINGPOINT_TO_CHARS_1  ==  _e_ENABLE_FEATURE_
   // for types refer :: https://en.cppreference.com/w/cpp/language/type
   /**
    * @brief     Convertor class implementation from integer types TO string.
@@ -159,6 +160,7 @@ namespace converter
       return _ConvertFromVal<T>::_ToStr_args(val, fmt, precision);
     }
   };
+#endif
 
   // ]=============================================================] ConvertFromVal
 }
