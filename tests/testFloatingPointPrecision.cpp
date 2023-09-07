@@ -40,8 +40,16 @@ int main()
     checkRoundTripConversion_txt2Val2txt<double>("testFloatingPointPrecision",
                  "9007199254740993", 9007199254740993.0, "9007199254740992");
                                                    //    "9007199254740993"
+    unsigned indexOS = 0;
+// https://web.archive.org/web/20191012035921/http://nadeausoftware.com/articles/2012/01/c_c_tip_how_use_compiler_predefined_macros_detect_operating_system
+#if defined(WIN64) || defined(_WIN64) || defined(__WIN64) || defined(__WIN64__)
+    indexOS = 1;
+#endif
+    std::string expected_longDouble_9007199254740993[] = { "9007199254740993",
+                                                           "9007199254740992" // Windows
+                                                         };
     checkRoundTripConversion_txt2Val2txt<long double>("testFloatingPointPrecision",
-                 "9007199254740993", 9007199254740993L, "9007199254740993");
+                 "9007199254740993", 9007199254740993L, expected_longDouble_9007199254740993[indexOS]);
 
 
     checkRoundTripConversion_txt2Val2txt<float>("testFloatingPointPrecision",

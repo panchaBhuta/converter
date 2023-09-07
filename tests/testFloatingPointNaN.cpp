@@ -9,8 +9,10 @@
 
 #include "unittest.h"
 
+#if USE_FLOATINGPOINT_FROM_CHARS_1  ==  _e_ENABLE_FEATURE_
 template <typename T, converter::FailureS2Tprocess EP>
 using _ConvS2T_CtoT = converter::ConvertFromStr<T, converter::S2T_Format_std_CtoT<T, EP>>;
+#endif
 
 template <typename T, converter::FailureS2Tprocess EP>
 using _ConvS2T_StoT = converter::ConvertFromStr<T, converter::S2T_Format_std_StoT<T, EP>>;
@@ -18,8 +20,10 @@ using _ConvS2T_StoT = converter::ConvertFromStr<T, converter::S2T_Format_std_Sto
 template <typename T, converter::FailureS2Tprocess EP>
 using _ConvS2T_ISS = converter::ConvertFromStr<T, converter::S2T_Format_StreamUseClassicLocale<T, EP, char>>;
 
+#if USE_FLOATINGPOINT_TO_CHARS_1  ==  _e_ENABLE_FEATURE_
 template <typename T>
 using _ConvT2S_TtoC = converter::ConvertFromVal<T, converter::T2S_Format_std_TtoC>;
+#endif
 
 template <typename T>
 using _ConvT2S_TtoS = converter::ConvertFromVal<T, converter::T2S_Format_StreamDecimalPrecision<T>>;
@@ -31,6 +35,7 @@ using _ConvT2S_OSS = converter::ConvertFromVal<T, converter::T2S_Format_StreamUs
 template <typename T>
 void conversion_String2FloatingPoint_FailureCheck(const std::string& vStr)
 {
+#if USE_FLOATINGPOINT_FROM_CHARS_1  ==  _e_ENABLE_FEATURE_
   {
     ExpectException(_ConvS2T_CtoT<T COMMA converter::FailureS2Tprocess::THROW_ERROR>::ToVal(vStr), std::invalid_argument);
     unittest::ExpectTrue(std::isnan(_ConvS2T_CtoT<T COMMA converter::FailureS2Tprocess::QUIET_NAN>::ToVal(vStr)));
@@ -41,6 +46,7 @@ void conversion_String2FloatingPoint_FailureCheck(const std::string& vStr)
     unittest::ExpectTrue(varT.index() == 1);
     unittest::ExpectEqual(std::string, std::get<std::string>(varT), vStr);
   }
+#endif
 
   {
     ExpectException(_ConvS2T_StoT<T COMMA converter::FailureS2Tprocess::THROW_ERROR>::ToVal(vStr), std::invalid_argument);
@@ -68,47 +74,53 @@ void conversion_String2FloatingPoint_FailureCheck(const std::string& vStr)
 template <typename T>
 void conversion_FloatingPointNAN2String_FailureCheck(const std::string& vStr)
 {
+#if USE_FLOATINGPOINT_TO_CHARS_1  ==  _e_ENABLE_FEATURE_
   {
     unittest::ExpectEqual(std::string, _ConvT2S_TtoC<T>::ToStr(std::numeric_limits<T>::quiet_NaN()), "nan");
-#if defined(_WIN64) || defined(_WIN32)
-    unittest::ExpectEqual(std::string, _ConvT2S_TtoC<T>::ToStr(std::numeric_limits<T>::signaling_NaN()), "nan(snan)");
-#else
+    std::cout << "1. _ConvT2S_TtoS<T>::ToStr(std::numeric_limits<T>::signaling_NaN()) = #" << 
+                  _ConvT2S_TtoS<T>::ToStr(std::numeric_limits<T>::signaling_NaN()) << "#" << std::endl;
+  #if defined(WIN64) || defined(_WIN64) || defined(__WIN64) || defined(__WIN64__)
+    unittest::ExpectEqual(std::string, _ConvT2S_TtoC<T>::ToStr(std::numeric_limits<T>::signaling_NaN()), "nan(sNan)");
+  #else
     unittest::ExpectEqual(std::string, _ConvT2S_TtoC<T>::ToStr(std::numeric_limits<T>::signaling_NaN()), "nan");
-#endif
+  #endif
     unittest::ExpectEqual(std::string, converter::ConvertFromVal< std::variant<T COMMA std::string> COMMA
                                                                   converter::T2S_Format_std_TtoC
                                                     >::ToStr(std::variant<T COMMA std::string>{vStr}),
                                        vStr);
   }
+#endif
 
   {
     unittest::ExpectEqual(std::string, _ConvT2S_TtoS<T>::ToStr(std::numeric_limits<T>::quiet_NaN()), "nan");
-    std::cout << "_ConvT2S_TtoS<T>::ToStr(std::numeric_limits<T>::signaling_NaN()) = #" << 
+    std::cout << "2. _ConvT2S_TtoS<T>::ToStr(std::numeric_limits<T>::signaling_NaN()) = #" << 
                   _ConvT2S_TtoS<T>::ToStr(std::numeric_limits<T>::signaling_NaN()) << "#" << std::endl;
-#if defined(WIN64) || defined(_WIN64) || defined(__WIN64) || defined(__WIN64__)
-    unittest::ExpectEqual(std::string, _ConvT2S_TtoS<T>::ToStr(std::numeric_limits<T>:: signaling_NaN()), "nan(snan)");
-#else
+  #if defined(WIN64) || defined(_WIN64) || defined(__WIN64) || defined(__WIN64__)
+    unittest::ExpectEqual(std::string, _ConvT2S_TtoS<T>::ToStr(std::numeric_limits<T>:: signaling_NaN()), "nan(snAn)");
+  #else
     unittest::ExpectEqual(std::string, _ConvT2S_TtoS<T>::ToStr(std:: numeric_limits<T>::signaling_NaN()), "nan");
-#endif
+  #endif
     unittest::ExpectEqual(std::string, converter::ConvertFromVal< std::variant<T COMMA std::string> COMMA
                                                                   converter::T2S_Format_StreamDecimalPrecision<T>
                                                     >::ToStr(std::variant<T COMMA std::string>{vStr}),
                                        vStr);
-#ifdef ENABLE_STD_TtoS
+  #ifdef ENABLE_STD_TtoS
     unittest::ExpectEqual(std::string, converter::ConvertFromVal< std::variant<T COMMA std::string> COMMA
                                                                   converter::T2S_Format_std_TtoS
                                                     >::ToStr(std::variant<T COMMA std::string>{vStr}),
                                        vStr);
-#endif
+  #endif
   }
 
   {
     unittest::ExpectEqual(std::string, _ConvT2S_OSS<T>::ToStr(std::numeric_limits<T>::quiet_NaN()), "nan");
-#if defined(_WIN64) || defined(_WIN32)
-    unittest::ExpectEqual(std::string, _ConvT2S_OSS<T>::ToStr(std::numeric_limits<T>::signaling_NaN()), "nan(snan)");
-#else
+    std::cout << "3. _ConvT2S_TtoS<T>::ToStr(std::numeric_limits<T>::signaling_NaN()) = #" << 
+                  _ConvT2S_TtoS<T>::ToStr(std::numeric_limits<T>::signaling_NaN()) << "#" << std::endl;
+  #if defined(WIN64) || defined(_WIN64) || defined(__WIN64) || defined(__WIN64__)
+    unittest::ExpectEqual(std::string, _ConvT2S_OSS<T>::ToStr(std::numeric_limits<T>::signaling_NaN()), "nan(snaN)");
+  #else
     unittest::ExpectEqual(std::string, _ConvT2S_OSS<T>::ToStr(std::numeric_limits<T>::signaling_NaN()), "nan");
-#endif
+  #endif
     unittest::ExpectEqual(std::string, converter::ConvertFromVal< std::variant<T COMMA std::string> COMMA
                                                                   converter::T2S_Format_StreamUseClassicLocale<char>
                                                     >::ToStr(std::variant<T COMMA std::string>{vStr}),
