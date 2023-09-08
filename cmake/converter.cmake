@@ -324,6 +324,10 @@ macro(check_floatingPoint_elementaryStringConversions)
         message(STATUS "check_floatingPoint_toChars ::  --FAILED--   workaround-enabled")
         set(USE_FLOATINGPOINT_TO_CHARS_1   ${_e_DISABLE_FEATURE_})
     endif()
+    #[===[  for testing purpose
+        set(USE_FLOATINGPOINT_FROM_CHARS_1   ${_e_DISABLE_FEATURE_})
+        set(USE_FLOATINGPOINT_TO_CHARS_1     ${_e_DISABLE_FEATURE_})
+    #]===]
 endmacro()
 
 

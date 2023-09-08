@@ -127,7 +127,7 @@ void __Format_WorkAround__Process2()
 }
 
 template<typename T>
-void __Format_std_CtoT__Process2()
+void __Format_std_CtoT__Process2() // needed for integer types
 {
   using t_vNaN = std::variant<T, std::string>;
   static_assert(std::is_same_v< decltype(&converter::ConvertFromStr<T, S2T_FORMAT_MACRO2(S2T_Format_std_CtoT,THROW_ERROR)>::ToVal),
@@ -140,6 +140,7 @@ void __Format_std_CtoT__Process2()
   static_assert(std::is_same_v< decltype(&converter::ConvertFromVal<t_vNaN, converter::T2S_Format_std_TtoC>::ToStr),
                                 std::string(*)(const t_vNaN&)>);
 }
+#if USE_FLOATINGPOINT_TO_CHARS_1  ==  _e_ENABLE_FEATURE_
 template<typename T>
 void __Format_std_CtoT__Process4()
 {
@@ -149,6 +150,7 @@ void __Format_std_CtoT__Process4()
   static_assert(std::is_same_v< decltype(&converter::ConvertFromStr<T, S2T_FORMAT_MACRO2(S2T_Format_std_CtoT,SIGNAL_NAN)>::ToVal),
                                 T(*)(const std::string&)>);
 }
+#endif
 
 template<typename T>
 void __Format_std_StoT__Process2()
@@ -271,7 +273,9 @@ void checkFunctionInstance_Float()
    *   FORMAT_TEMPLATE ->   T2S_Format_WorkAround, T2S_Format_std_TtoS
   **/
 
+#if USE_FLOATINGPOINT_TO_CHARS_1  ==  _e_ENABLE_FEATURE_
   __Format_std_CtoT__Process4<T>();
+#endif
 
   using t_vNaN = std::variant<T, std::string>;
   {

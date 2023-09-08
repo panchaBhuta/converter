@@ -88,6 +88,7 @@ namespace converter
   struct T2S_DefaultFormat<T, void >
   {
     using type = T2S_Format_StreamDecimalPrecision<T>;
+    //using type = T2S_Format_StreamDecimalPrecision<long double>;
   };
 #endif
 

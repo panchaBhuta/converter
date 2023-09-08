@@ -79,11 +79,7 @@ void conversion_FloatingPointNAN2String_FailureCheck(const std::string& vStr)
     unittest::ExpectEqual(std::string, _ConvT2S_TtoC<T>::ToStr(std::numeric_limits<T>::quiet_NaN()), "nan");
     std::cout << "1. _ConvT2S_TtoS<T>::ToStr(std::numeric_limits<T>::signaling_NaN()) = #" << 
                   _ConvT2S_TtoS<T>::ToStr(std::numeric_limits<T>::signaling_NaN()) << "#" << std::endl;
-  #if defined(WIN64) || defined(_WIN64) || defined(__WIN64) || defined(__WIN64__)
-    unittest::ExpectEqual(std::string, _ConvT2S_TtoC<T>::ToStr(std::numeric_limits<T>::signaling_NaN()), "nan(sNan)");
-  #else
-    unittest::ExpectEqual(std::string, _ConvT2S_TtoC<T>::ToStr(std::numeric_limits<T>::signaling_NaN()), "nan");
-  #endif
+    unittest::ExpectEqual(std::string, _ConvT2S_TtoC<T>::ToStr(std::numeric_limits<T>::signaling_NaN()), std::string("nan"));
     unittest::ExpectEqual(std::string, converter::ConvertFromVal< std::variant<T COMMA std::string> COMMA
                                                                   converter::T2S_Format_std_TtoC
                                                     >::ToStr(std::variant<T COMMA std::string>{vStr}),
@@ -95,11 +91,7 @@ void conversion_FloatingPointNAN2String_FailureCheck(const std::string& vStr)
     unittest::ExpectEqual(std::string, _ConvT2S_TtoS<T>::ToStr(std::numeric_limits<T>::quiet_NaN()), "nan");
     std::cout << "2. _ConvT2S_TtoS<T>::ToStr(std::numeric_limits<T>::signaling_NaN()) = #" << 
                   _ConvT2S_TtoS<T>::ToStr(std::numeric_limits<T>::signaling_NaN()) << "#" << std::endl;
-  #if defined(WIN64) || defined(_WIN64) || defined(__WIN64) || defined(__WIN64__)
-    unittest::ExpectEqual(std::string, _ConvT2S_TtoS<T>::ToStr(std::numeric_limits<T>:: signaling_NaN()), "nan(snAn)");
-  #else
-    unittest::ExpectEqual(std::string, _ConvT2S_TtoS<T>::ToStr(std:: numeric_limits<T>::signaling_NaN()), "nan");
-  #endif
+    unittest::ExpectEqual(std::string, _ConvT2S_TtoS<T>::ToStr(std:: numeric_limits<T>::signaling_NaN()), std::string("nan"));
     unittest::ExpectEqual(std::string, converter::ConvertFromVal< std::variant<T COMMA std::string> COMMA
                                                                   converter::T2S_Format_StreamDecimalPrecision<T>
                                                     >::ToStr(std::variant<T COMMA std::string>{vStr}),
@@ -116,11 +108,7 @@ void conversion_FloatingPointNAN2String_FailureCheck(const std::string& vStr)
     unittest::ExpectEqual(std::string, _ConvT2S_OSS<T>::ToStr(std::numeric_limits<T>::quiet_NaN()), "nan");
     std::cout << "3. _ConvT2S_TtoS<T>::ToStr(std::numeric_limits<T>::signaling_NaN()) = #" << 
                   _ConvT2S_TtoS<T>::ToStr(std::numeric_limits<T>::signaling_NaN()) << "#" << std::endl;
-  #if defined(WIN64) || defined(_WIN64) || defined(__WIN64) || defined(__WIN64__)
-    unittest::ExpectEqual(std::string, _ConvT2S_OSS<T>::ToStr(std::numeric_limits<T>::signaling_NaN()), "nan(snaN)");
-  #else
-    unittest::ExpectEqual(std::string, _ConvT2S_OSS<T>::ToStr(std::numeric_limits<T>::signaling_NaN()), "nan");
-  #endif
+    unittest::ExpectEqual(std::string, _ConvT2S_OSS<T>::ToStr(std::numeric_limits<T>::signaling_NaN()), std::string("nan"));
     unittest::ExpectEqual(std::string, converter::ConvertFromVal< std::variant<T COMMA std::string> COMMA
                                                                   converter::T2S_Format_StreamUseClassicLocale<char>
                                                     >::ToStr(std::variant<T COMMA std::string>{vStr}),

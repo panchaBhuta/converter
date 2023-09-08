@@ -35,6 +35,7 @@ void checkDefaultFormatInstance_Float()
 #else
   static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<T>::type,
                                         converter::T2S_Format_StreamDecimalPrecision<T>>);
+                                        //converter::T2S_Format_StreamDecimalPrecision<long double>>);
                                         // instead of converter::T2S_Format_std_TtoS
 #endif
 }
