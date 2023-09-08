@@ -241,6 +241,8 @@ namespace converter
           return std::chrono::year_month_day{ std::chrono::year(iY),
                                               std::chrono::month(iM),
                                               std::chrono::day(iD) };
+        } else {
+          std::cout << "iY=" << iY << ", iM=" << iM << ", iD=" << iD << std::endl;
         }
       }
   #endif
@@ -254,9 +256,9 @@ namespace converter
                                << " : iss.eof() = " << iss.eof() << std::endl;
         eoss << " dateComponenets "
                                << "   ymd.ok() = " << ymd.ok()
-                               << " : ymd.year().ok() = " << ymd.year().ok()
-                               << " : ymd.month().ok() = " << ymd.month().ok()
-                               << " : ymd.day().ok() = " << ymd.day().ok() << std::endl;
+                               << " : ymd.year(" << int(ymd.year()) << ").ok() = " << ymd.year().ok()
+                               << " : ymd.month(" << unsigned(ymd.month()) << ").ok() = " << ymd.month().ok()
+                               << " : ymd.day(" << unsigned(ymd.day()) << ").ok() = " << ymd.day().ok() << std::endl;
         std::cerr << eoss.str() << std::endl; 
       //if (iss.fail() || iss.bad()) // || (!iss.eof()))
       //{

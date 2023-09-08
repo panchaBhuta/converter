@@ -23,7 +23,7 @@ void checkRoundTripConversion_txt2Val2txt( const std::string& testID,
   T valConv = TConvertFromStr::ToVal(strInput);
   unittest::ExpectEqual(T, valExpected, valConv);
 
-  std::string strRoundtripActual = TConvertFromVal::ToStr(valConv);
+  const std::string strRoundtripActual = TConvertFromVal::ToStr(valConv);
 
   if(strRoundtripExpected.compare(strRoundtripActual)!=0)
   {

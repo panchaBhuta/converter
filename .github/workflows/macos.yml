@@ -53,7 +53,8 @@ jobs:
         run: cmake --build "${{github.workspace}}/build-debug" --config Debug -j
       - name: Test [Debug]
         working-directory: ${{github.workspace}}/build-debug
-        run: ctest -C Debug --output-on-failure -j
+        #run: ctest -C Debug --output-on-failure -j
+        run: ctest -C Debug --verbose
       - name: Install [Debug]
         run: cmake --install "${{github.workspace}}/build-debug" --config Debug
       - name: Configure CMake (compiler=default) [Release]

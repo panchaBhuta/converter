@@ -220,7 +220,7 @@ namespace converter
    * @tparam  T2S_FORMAT            Class which encapsulates conversion parameters/directives such as 'Locale'.
    */
   template<c_NOT_string T, c_formatOSS T2S_FORMAT_STREAM >
-  struct ConvertFromVal<T,T2S_FORMAT_STREAM>
+  struct ConvertFromVal<T, T2S_FORMAT_STREAM>
   {
     /**
      * @brief   'type' definition being declared for.
