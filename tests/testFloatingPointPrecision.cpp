@@ -72,20 +72,34 @@ int main()
                                                         // induces this variation.
     checkRoundTripConversion_txt2Val2txt<float>("testFloatingPointPrecision-8",
                  "3.3123", 3.3123f, expected_float_3d3123[indexOS]);
+
     std::string expected_float_3d3123412ep38[] = { "3.3123412e+38",
                                                    "3.31234119999999" }; // macOS does not support 'std::from_chars()' and
                                                                          // 'std::to_chars()'. The fall back functions
                                                                          // induces this variation.
     checkRoundTripConversion_txt2Val2txt<float>("testFloatingPointPrecision-9",
                  "3.3123412e+38", 3.3123412E38f, expected_float_3d3123412ep38[indexOS]);
+
     std::string expected_float_3d3123412en38[] = { "3.3123412e-38",
                                                    "3.31234119999999" }; // macOS does not support 'std::from_chars()' and
                                                                          // 'std::to_chars()'. The fall back functions
                                                                          // induces this variation.
     checkRoundTripConversion_txt2Val2txt<float>("testFloatingPointPrecision-10",
                  "3.3123412e-38", 3.3123412E-38f, expected_float_3d3123412en38[indexOS]);
-    checkRoundTripConversion_txt2Val2txt<double>("testFloatingPointPrecision",
-                 "3.3123412e-38", 3.3123412E-38, "3.3123412e-38");
+
+    std::string expected_double_4d3123412en38[] = { "4.3123412e-38",
+                                                    "4.31234119999999" }; // macOS does not support 'std::from_chars()' and
+                                                                          // 'std::to_chars()'. The fall back functions
+                                                                          // induces this variation.
+    checkRoundTripConversion_txt2Val2txt<double>("testFloatingPointPrecision-11",
+                 "4.3123412e-38", 4.3123412E-38, expected_double_4d3123412en38[indexOS]);
+
+    std::string expected_longdouble_5d3123412en38[] = { "5.3123412e-38",
+                                                        "5.31234119999999" }; // macOS does not support 'std::from_chars()' and
+                                                                              // 'std::to_chars()'. The fall back functions
+                                                                              // induces this variation.
+    checkRoundTripConversion_txt2Val2txt<long double>("testFloatingPointPrecision-12",
+                 "5.3123412e-38", 5.3123412E-38L, expected_longdouble_5d3123412en38[indexOS]);
 
   } catch (const std::exception& ex) {
     std::cout << "Test Failed : err-msg : " << ex.what() << std::endl;

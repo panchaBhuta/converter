@@ -138,7 +138,10 @@ namespace converter
       S2T_FORMAT_YMD::streamUpdate(iss);
       _dateLib::from_stream(iss, fmt, ymd, abbrev, offset);
 
-      if(ymd.ok())
+      if(
+            ymd.ok() ||
+            ( (!iss.fail()) && (!iss.bad()) ) // && (iss.eof()))
+        )
       {
   #if   USE_CHRONO_FROMSTREAM_1  ==  _e_ENABLE_FEATURE_
         return ymd;
@@ -149,14 +152,8 @@ namespace converter
   #endif
       }
 
-  #if   USE_CHRONO_FROMSTREAM_1  ==  _e_ENABLE_FEATURE_
-      if ( (!iss.fail()) && (!iss.bad())) // && (iss.eof()))
-      {
-        return ymd;
-      }
-  #elif USE_DATE_FROMSTREAM_2  ==  _e_ENABLE_FEATURE_
       /*
-       *  1900-02-29 is invalid date even though year, month and day individually could be valid.
+       *  '1900-02-29' or '2023-01-32' are invalid date even though year, month and day individually could be valid.
        *  In such a case we still create the invalid date from year, month, day; after a call from date::from_stream().
        *  A call to std::chrono::from_stream("1900-02-29") returns a 'date' value (i.e no error thrown),
        *  but ymd.ok() will be false.
@@ -182,10 +179,11 @@ namespace converter
         std::string fmtToken;
 
         bool hasYear = false, hasMonth = false, hasDay = false;
+        int i = 0;
         int iY=0;
         unsigned iM=0, iD=0;
         // refer ' Format string'  in https://en.cppreference.com/w/cpp/chrono/system_clock/from_stream
-        while(std::getline(ss, token, delimiter) && std::getline(ssFmt, fmtToken, delimiter))
+        while(std::getline(ss, token, delimiter) && std::getline(ssFmt, fmtToken, delimiter) && (i++) < 5)
         {
           if(token.empty()) continue;
 
@@ -242,10 +240,9 @@ namespace converter
                                               std::chrono::month(iM),
                                               std::chrono::day(iD) };
         } else {
-          std::cout << "iY=" << iY << ", iM=" << iM << ", iD=" << iD << std::endl;
+          std::cout << "workAround for string2date conversion-failed : iY=" << iY << ", iM=" << iM << ", iD=" << iD << std::endl;
         }
       }
-  #endif
 
         static const std::string func("std::chrono::year_month_day converter::ConvertFromStr<std::chrono::year_month_day, S2T_FORMAT_YMD>::ToVal_args(const std::string& str)");
         std::ostringstream eoss;

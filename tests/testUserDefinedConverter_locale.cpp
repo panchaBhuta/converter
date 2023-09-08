@@ -88,10 +88,16 @@ int main()
     checkRoundTripConversion_txt2Val2txt<float, ConvertFromStr_loc<float>, ConvertFromVal_loc<float>>("testUserDefinedConverter_locale-1",
                  "8,589973e+9", 8.589973e9f, "8,5899735e+09", std::numeric_limits<float>::digits10, ',');
                                           // "8,589973e+9"
+    unsigned indexOS = 0;
+#if defined(__APPLE__) && defined(__MACH__)
+    indexOS = 1;
+#endif
+    std::string expected_8589973ep9[] = { "8.589.973.000",
+                                          "8589973000" };
     checkRoundTripConversion_txt2Val2txt<double, ConvertFromStr_loc<double>, ConvertFromVal_loc<double>>("testUserDefinedConverter_locale-2",
-                 "8,589973e+9", 8.589973e9, "8.589.973.000", std::numeric_limits<double>::digits10, ',');
+                 "8,589973e+9", 8.589973e9, expected_8589973ep9[indexOS], std::numeric_limits<double>::digits10, ',');
     checkRoundTripConversion_txt2Val2txt<long double, ConvertFromStr_loc<long double>, ConvertFromVal_loc<long double>>("testUserDefinedConverter_locale-3",
-                 "8,589973e+9", 8.589973e9L, "8.589.973.000", std::numeric_limits<long double>::digits10, ',');
+                 "8,589973e+9", 8.589973e9L, expected_8589973ep9[indexOS], std::numeric_limits<long double>::digits10, ',');
 
 
     checkRoundTripConversion_txt2Val2txt<float, ConvertFromStr_loc<float>, ConvertFromVal_loc<float>>("testUserDefinedConverter_locale-4",
@@ -101,17 +107,28 @@ int main()
     checkRoundTripConversion_txt2Val2txt<long double, ConvertFromStr_loc<long double>, ConvertFromVal_loc<long double>>("testUserDefinedConverter_locale-6",
                  "3,123456789012345678901", 3.123456789012345678901L, "3,12345678901234567", std::numeric_limits<long double>::digits10, ',');
 
-
+#if defined(__APPLE__) && defined(__MACH__)
+    indexOS = 1;
+#else
+    indexOS = 0;
+#endif
+    std::string expected_double_9007199254740993[] = { "9.007.199.254.740.992", //    "9.007.199.254.740.993"
+                                                       "9007199254740992",      // MacOS
+                                                     };
     checkRoundTripConversion_txt2Val2txt<double, ConvertFromStr_loc<double>, ConvertFromVal_loc<double>>("testUserDefinedConverter_locale-7",
-                 "9007199254740993", 9007199254740993.0, "9.007.199.254.740.992", std::numeric_limits<double>::digits10, ',');
-                                                   //    "9.007.199.254.740.993"
-    unsigned indexOS = 0;
+                 "9007199254740993", 9007199254740993.0, expected_double_9007199254740993[indexOS], std::numeric_limits<double>::digits10, ',');
+
 // https://web.archive.org/web/20191012035921/http://nadeausoftware.com/articles/2012/01/c_c_tip_how_use_compiler_predefined_macros_detect_operating_system
 #if defined(WIN64) || defined(_WIN64) || defined(__WIN64) || defined(__WIN64__)
     indexOS = 1;
+#elif defined(__APPLE__) && defined(__MACH__)
+    indexOS = 2;
+#else
+    indexOS = 0;
 #endif
-    std::string expected_longDouble_9007199254740993[] = { "9.007.199.254.740.993",
-                                                           "9.007.199.254.740.992" // Windows
+    std::string expected_longDouble_9007199254740993[] = { "9.007.199.254.740.993", // Ubuntu
+                                                           "9.007.199.254.740.992", // Windows
+                                                           "9007199254740993",      // MacOS
                                                          };
     checkRoundTripConversion_txt2Val2txt<long double, ConvertFromStr_loc<long double>, ConvertFromVal_loc<long double>>("testUserDefinedConverter_locale-8",
                  "9007199254740993", 9007199254740993L, expected_longDouble_9007199254740993[indexOS], std::numeric_limits<long double>::digits10, ',');
