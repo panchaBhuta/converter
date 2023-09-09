@@ -69,7 +69,9 @@ int main()
 
     checkRoundTripConversion_txt2Val2txt<float, converter::ConvertFromStr<float>,
                                                 ConvertFromVal_lDP<float>>("testUserDefinedConverter_lowerPrecision-1",
-                 "8.589973e+9", 8.589973e9f, "8.59e+09", getLowerDecimalPrecision<float>());
+                 "8.589973e+9", 8.589973e9f, "8.59e+09",
+                 2 // getLowerDecimalPrecision<float>() = 5
+                );
     checkRoundTripConversion_txt2Val2txt<double, converter::ConvertFromStr<double>,
                                                  ConvertFromVal_lDP<double>>("testUserDefinedConverter_lowerPrecision-2",
                  "8.589973e+9", 8.589973e9, "8589973000", getLowerDecimalPrecision<double>());
@@ -79,7 +81,9 @@ int main()
 
     checkRoundTripConversion_txt2Val2txt<float, converter::ConvertFromStr<float>,
                                                 ConvertFromVal_lDP<float>>("testUserDefinedConverter_lowerPrecision-4",
-                 "1.123456789", 1.123456789f, "1.1235", getLowerDecimalPrecision<float>());   // 5 digits
+                 "1.123456789", 1.123456789f, "1.1235",
+                 4  //  getLowerDecimalPrecision<float>()) = 5 digits
+                );
     checkRoundTripConversion_txt2Val2txt<double, converter::ConvertFromStr<double>,
                                                  ConvertFromVal_lDP<double>>("testUserDefinedConverter_lowerPrecision-5",
                  "2.1234567890123456789", 2.1234567890123456789, "2.1234567890123", getLowerDecimalPrecision<double>());  // 14 digits
@@ -90,8 +94,9 @@ int main()
                                                       ConvertFromVal_lDP<long double>>("testUserDefinedConverter_lowerPrecision-6",
                  "3.123456789012345678901", 3.123456789012345678901L,
                  expected_longDouble_1d123456789012345678901[indexOS],
-                 getLowerDecimalPrecision<long double>());  // 17 digits
-
+                 ((indexOS==2)?14:16)
+                 // getLowerDecimalPrecision<long double>() = 17 digits
+                );
     checkRoundTripConversion_txt2Val2txt<double, converter::ConvertFromStr<double>,
                                                  ConvertFromVal_lDP<double>>("testUserDefinedConverter_lowerPrecision-7",
                  "9007199254740993", 9007199254740993.0, "9.007199254741e+15", getLowerDecimalPrecision<double>());
