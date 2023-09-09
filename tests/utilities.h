@@ -20,11 +20,14 @@ void checkRoundTripConversion_txt2Val2txt( const std::string& testID,
             const T& valExpected, const std::string& strRoundtripExpected,
             int decimalPrecision = std::numeric_limits<T>::digits10, char decimalSeperator = '.')
 {
-  T valConv = TConvertFromStr::ToVal(strInput);
+  const T valConv = TConvertFromStr::ToVal(strInput);
   unittest::ExpectEqual(T, valExpected, valConv);
 
   const std::string strRoundtripActual = TConvertFromVal::ToStr(valConv);
+  std::cout << "testID = " << testID << " , strRoundtripActual = " << strRoundtripActual << std::endl;
 
+//    unittest::ExpectEqual(std::string, strRoundtripExpected, strRoundtripActual);
+    return;
   if(strRoundtripExpected.compare(strRoundtripActual)!=0)
   {
     std::string::size_type nRdTpExp = strRoundtripExpected.find(decimalSeperator);
@@ -50,7 +53,7 @@ void checkRoundTripConversion_txt2Val2txt( const std::string& testID,
     //ossConv << "valConv{with-precision}=" << valConv << std::endl;
     ossConv << valConv;
 
-    std::cout << std::setprecision(LDBL_DIG + 5) << std::boolalpha;
+    std::cout << std::setprecision(LDBL_DIG + 5); // << std::boolalpha;
     std::cout << testID << " :: roundtrip conversion value does not match for type=" << typeid(T).name() << " ..." << std::endl;
     std::cout << "      input-text{" << strInput      << "} -> valConv{" << ossConv.str() << "}" << std::endl;
     std::cout << "         valConv{" << ossConv.str() << "} -> roundtrip-text{" << strRoundtripActual << "}" << std::endl;

@@ -79,8 +79,10 @@ void conversion_FloatingPointNAN2String_FailureCheck(const std::string& vStr)
   {
     unittest::ExpectEqual(std::string, _ConvT2S_TtoC<T>::ToStr(std::numeric_limits<T>::quiet_NaN()), "nan");
   #if defined(WIN64) || defined(_WIN64) || defined(__WIN64) || defined(__WIN64__)
-    std::cout << "1. _ConvT2S_TtoC<T=" << typeid(T).name() << ">::ToStr(std::numeric_limits<T>::signaling_NaN()) = #" <<
-                  _ConvT2S_TtoC<T>::ToStr(std::numeric_limits<T>::signaling_NaN()) << "#  ; vStr=" << vStr << std::endl;
+    //std::cout << "1. _ConvT2S_TtoC<T=" << typeid(T).name() << ">::ToStr(std::numeric_limits<T>::signaling_NaN()) = #" <<
+    //              _ConvT2S_TtoC<T>::ToStr(std::numeric_limits<T>::signaling_NaN()) << "#  ; vStr=" << vStr << std::endl;
+    //  arbitarially prints 'nan' or 'nan(snan)'
+    unittest::ExpectEqual(std::string, _ConvT2S_TtoC<T>::ToStr(std::numeric_limits<T>::signaling_NaN()).substr(0,3), std::string("nan"));
   #else
     unittest::ExpectEqual(std::string, _ConvT2S_TtoC<T>::ToStr(std::numeric_limits<T>::signaling_NaN()), std::string("nan"));
   #endif
@@ -94,8 +96,9 @@ void conversion_FloatingPointNAN2String_FailureCheck(const std::string& vStr)
   {
     unittest::ExpectEqual(std::string, _ConvT2S_TtoS<T>::ToStr(std::numeric_limits<T>::quiet_NaN()), "nan");
   #if defined(WIN64) || defined(_WIN64) || defined(__WIN64) || defined(__WIN64__)
-    std::cout << "2. _ConvT2S_TtoS<T" << typeid(T).name() << ">::ToStr(std::numeric_limits<T>::signaling_NaN()) = #" <<
-                  _ConvT2S_TtoS<T>::ToStr(std::numeric_limits<T>::signaling_NaN()) << "#  ; vStr=" << vStr << std::endl;
+    //std::cout << "2. _ConvT2S_TtoS<T" << typeid(T).name() << ">::ToStr(std::numeric_limits<T>::signaling_NaN()) = #" <<
+    //              _ConvT2S_TtoS<T>::ToStr(std::numeric_limits<T>::signaling_NaN()) << "#  ; vStr=" << vStr << std::endl;
+    unittest::ExpectEqual(std::string, _ConvT2S_TtoC<T>::ToStr(std::numeric_limits<T>::signaling_NaN()).substr(0,3), std::string("nan"));
   #else
     unittest::ExpectEqual(std::string, _ConvT2S_TtoS<T>::ToStr(std:: numeric_limits<T>::signaling_NaN()), std::string("nan"));
   #endif
@@ -114,8 +117,9 @@ void conversion_FloatingPointNAN2String_FailureCheck(const std::string& vStr)
   {
     unittest::ExpectEqual(std::string, _ConvT2S_OSS<T>::ToStr(std::numeric_limits<T>::quiet_NaN()), "nan");
   #if defined(WIN64) || defined(_WIN64) || defined(__WIN64) || defined(__WIN64__)
-    std::cout << "3. _ConvT2S_OSS<T" << typeid(T).name() << ">::ToStr(std::numeric_limits<T>::signaling_NaN()) = #" <<
-                  _ConvT2S_OSS<T>::ToStr(std::numeric_limits<T>::signaling_NaN()) << "#  ; vStr=" << vStr << std::endl;
+    //std::cout << "3. _ConvT2S_OSS<T" << typeid(T).name() << ">::ToStr(std::numeric_limits<T>::signaling_NaN()) = #" <<
+    //              _ConvT2S_OSS<T>::ToStr(std::numeric_limits<T>::signaling_NaN()) << "#  ; vStr=" << vStr << std::endl;
+    unittest::ExpectEqual(std::string, _ConvT2S_TtoC<T>::ToStr(std::numeric_limits<T>::signaling_NaN()).substr(0,3), std::string("nan"));
   #else
     unittest::ExpectEqual(std::string, _ConvT2S_OSS<T>::ToStr(std::numeric_limits<T>::signaling_NaN()), std::string("nan"));
   #endif
