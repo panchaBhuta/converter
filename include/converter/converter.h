@@ -56,6 +56,15 @@
 // to handle windows back-slash path seperator
 #define __CONVERTER_PREFERRED_PATH__    std::filesystem::path(__CONVERTER_FILE__).make_preferred().string()
 
+
+#ifdef ENABLE_CONVERTER_MESSAGE_LOG
+#define CONVERTER_MESSAGE_LOG(aMessage) { std::cout << aMessage << ", in " << __CONVERTER_PREFERRED_PATH__ << ":" << __LINE__ << std::endl; }
+#else
+#define CONVERTER_MESSAGE_LOG(aMessage)
+#endif
+
+
+
 #include <converter/_workaroundConfig.h>
 #include <converter/_common.h>
 #include <converter/_convertS2T.h>

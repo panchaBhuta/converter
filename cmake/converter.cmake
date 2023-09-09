@@ -67,7 +67,7 @@ endmacro()
 
 
 #    Check if chrono-lib stream conversion is supported
-macro(converter_check_chrono_stream_functionality)
+macro(check_chrono_stream_functionality)
     set(USE_CHRONO_FROMSTREAM_1 ${_e_ENABLE_FEATURE_})
     set(USE_DATE_FROMSTREAM_2   ${_e_DISABLE_FEATURE_})
     set(USE_JUGAAD_FROMSTREAM_3 ${_e_DISABLE_FEATURE_})
@@ -238,7 +238,7 @@ endmacro()
 
 # Failure to compile std::u16string from libstdc++ 12.1 in c++20 mode #55560 
 # https://github.com/llvm/llvm-project/issues/55560
-macro(converter_check_clang_string_workaround)
+macro(check_clang_string_workaround)
     set(USE_CLANG_STRING_WORKS_1       ${_e_ENABLE_FEATURE_})
     set(USE_CLANG_STRING_WORKAROUND_2  ${_e_DISABLE_FEATURE_})
     if(clang_like_cxx)
@@ -396,6 +396,8 @@ macro(converter_build)
     else()
         message(STATUS "Using build type '${CMAKE_BUILD_TYPE}'.")
     endif()
+
+    option(ENABLE_CONVERTER_MESSAGE_LOG  "Set to ON for debugging logs"   "$<CONFIG:Debug>")
 
     #[==================================================================================[
     add_subdirectory(include)  ??? is it needed ; if so then with include/converter

@@ -26,14 +26,13 @@
 
 
 // string literal object with static storage duration
-constexpr char de_Loc[] = "de_DE"; // uses comma (,) as decimal separator
+constexpr char de_Loc[] = "de_DE.UTF-8"; // uses comma (,) as decimal separator
 
 template<typename T>
 using deLocal_iss = converter::S2T_Format_StreamUserLocale<T, converter::FailureS2Tprocess::THROW_ERROR, char, de_Loc>;
 
 template<converter::c_floating_point T>
 using ConvertFromStr_loc = converter::ConvertFromStr<T, deLocal_iss<T> >;
-
 
 
 
@@ -62,8 +61,28 @@ using convertS2T_stream =
 
 
 
+
+template<converter::c_floating_point T>
+void checkConversionTemplateInstances()
+{
+/*
+  static_assert(std::is_same_v<typename converter::S2T_DefaultFormat<T>::type,
+                                        converter::S2T_Format_std_StoT<T, converter::FailureS2Tprocess::SIGNAL_NAN>>);
+  static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<T>::type,
+                                        converter::T2S_Format_StreamDecimalPrecision<T>>);
+*/
+  static_assert(ConvertFromStr_loc<T>::template_uid ==  1);
+  static_assert(ConvertFromVal_loc<T>::template_uid == -1);
+}
+
+
 int main()
 {
+  checkConversionTemplateInstances<float>();
+  checkConversionTemplateInstances<double>();
+  checkConversionTemplateInstances<long double>();
+  static_assert(convertS2T_stream<char>::template_uid ==  1);
+
   int rv = 0;
 
   //std::cout << "ConvertFromStr_loc<float>::template_uid=" << ConvertFromStr_loc<float>::template_uid << std::endl;

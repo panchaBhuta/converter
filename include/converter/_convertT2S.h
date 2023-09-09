@@ -192,8 +192,10 @@ namespace converter
       {
         static_assert(converter::is_iostream<typename T2S_FORMAT::stream_type>::value);
         static_assert(converter::is_formatSS<T2S_FORMAT>::value);
-        //std::cout << "typename T2S_FORMAT::stream_type =" << typeid(typename T2S_FORMAT::stream_type).name() << std::endl;
-        //std::cout << "std::basic_ostringstream<typename T2S_FORMAT::stream_type::char_type> =" << typeid(std::basic_ostringstream<typename T2S_FORMAT::stream_type::char_type>).name() << std::endl;
+        //std::cout << "typename T2S_FORMAT::stream_type = "
+        //          << typeid(typename T2S_FORMAT::stream_type).name() << std::endl;
+        //std::cout << "std::basic_ostringstream<typename T2S_FORMAT::stream_type::char_type> = "
+        //          << typeid(std::basic_ostringstream<typename T2S_FORMAT::stream_type::char_type>).name() << std::endl;
 
         static_assert(!std::is_same_v< typename T2S_FORMAT::stream_type,
                                       std::basic_istringstream<typename T2S_FORMAT::stream_type::char_type>
@@ -249,19 +251,19 @@ namespace converter
       oss << val;
       if (oss.fail() || oss.bad()) // || oss.eof())
       {
-        /*
+        static const std::string funcName = 
+          "'std::string ConvertFromVal<c_NOT_string T, c_formatOSS T2S_FORMAT>::ToStr(const T& val)'";
+
         std::ostringstream eoss;
-        eoss << __CONVERTER_PREFERRED_PATH__ << " : ERROR : rapidcsv :: in function 'std::string ConvertFromVal<c_NOT_string T, c_formatOSS T2S_FORMAT>::ToStr(const T& val)' ::: ";
         try {
           eoss << "val='" << val << "'";
         } catch (...) {} // on error do-nothing.
         eoss << " ostringstream-conversion failed.";
         eoss << std::boolalpha << "   iss.fail() = " << oss.fail()
                                << " : iss.bad() = " << oss.bad()
-                               << " : iss.eof() = " << oss.eof() << std::endl;
-        throw std::invalid_argument(eoss.str());
-        */
-        throw std::invalid_argument("Invalid argument. 'std::string ConvertFromVal<c_NOT_string T, c_formatOSS T2S_FORMAT>::ToStr(const T& val)'");
+                               << " : iss.eof() = " << oss.eof();
+        CONVERTER_MESSAGE_LOG("ERROR : rapidcsv :: in function " << funcName << " ::: " << eoss.str());
+        throw std::invalid_argument("Invalid argument. "+funcName);
       }
       return oss.str();
     }

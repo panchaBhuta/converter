@@ -140,7 +140,15 @@ namespace converter
 
       if(
             ymd.ok() ||
-            ( (!iss.fail()) && (!iss.bad()) ) // && (iss.eof()))
+            ( (!iss.fail()) && (!iss.bad()) )
+      /*
+       *  '29-02-1900' are invalid date even though year, month and day individually could be valid.
+       *  In such a case we still create the invalid date from year, month, day; after a call from date::from_stream().
+       *  A call to std::chrono::from_stream('29-02-1900') returns a 'date' value (i.e no error thrown),
+       *  but ymd.ok() will be false.
+       *  Therefore, in order to keep the behvaiour same, we a create std::chrono::year_month_day value,
+       *  with invalid params and return that value.
+       */
         )
       {
   #if   USE_CHRONO_FROMSTREAM_1  ==  _e_ENABLE_FEATURE_
@@ -153,12 +161,7 @@ namespace converter
       }
 
       /*
-       *  '1900-02-29' or '2023-01-32' are invalid date even though year, month and day individually could be valid.
-       *  In such a case we still create the invalid date from year, month, day; after a call from date::from_stream().
-       *  A call to std::chrono::from_stream("1900-02-29") returns a 'date' value (i.e no error thrown),
-       *  but ymd.ok() will be false.
-       *  Therefore, in order to keep the behvaiour same, we a create std::chrono::year_month_day value,
-       *  when in '_e_USE_WORKAROUND_1_' with invalid params.
+       *  '29-02-1900' [date::from_stream()] or '2023-01-32' [from both libs] are invalid dates and streamstring fails.
        */
       std::string fmtStr(fmt);
       if(std::strcmp(fmt, defYMDfmt)==0) {
@@ -240,13 +243,13 @@ namespace converter
                                               std::chrono::month(iM),
                                               std::chrono::day(iD) };
         } else {
-          std::cout << "workAround for string2date conversion-failed : iY=" << iY << ", iM=" << iM << ", iD=" << iD << std::endl;
+          CONVERTER_MESSAGE_LOG("workAround for string2date conversion-failed : iY=" << iY << ", iM=" << iM << ", iD=" << iD);
         }
       }
 
         static const std::string func("std::chrono::year_month_day converter::ConvertFromStr<std::chrono::year_month_day, S2T_FORMAT_YMD>::ToVal_args(const std::string& str)");
         std::ostringstream eoss;
-        eoss << __CONVERTER_PREFERRED_PATH__ << " : ERROR : rapidcsv :: in function '" << func << "' ::: strYMD='" << str <<"' format='" << fmt << "'" << std::endl;
+        eoss << "ERROR : rapidcsv :: in function '" << func << "' ::: strYMD='" << str <<"' format='" << fmt << "'" << std::endl;
         eoss << "istringstream-conversion<" << dateClass << "> failed.";
         eoss << std::boolalpha << "   iss.fail() = " << iss.fail()
                                << " : iss.bad() = " << iss.bad()
@@ -255,12 +258,12 @@ namespace converter
                                << "   ymd.ok() = " << ymd.ok()
                                << " : ymd.year(" << int(ymd.year()) << ").ok() = " << ymd.year().ok()
                                << " : ymd.month(" << unsigned(ymd.month()) << ").ok() = " << ymd.month().ok()
-                               << " : ymd.day(" << unsigned(ymd.day()) << ").ok() = " << ymd.day().ok() << std::endl;
-        std::cerr << eoss.str() << std::endl; 
+                               << " : ymd.day(" << unsigned(ymd.day()) << ").ok() = " << ymd.day().ok();
+        CONVERTER_MESSAGE_LOG(<< eoss.str()); 
       //if (iss.fail() || iss.bad()) // || (!iss.eof()))
       //{
         static const std::string errMsg("Invalid date-string received in '"+func+"'");
-        std::cerr << errMsg << " : string-txt='" << str << "' : format='" << fmt << "'" << std::endl;
+        CONVERTER_MESSAGE_LOG(errMsg << " : string-txt='" << str << "' : format='" << fmt << "'");
         static const std::invalid_argument err(errMsg);
         return S2T_FORMAT_YMD::handler(str, err);
       //}
@@ -351,10 +354,10 @@ namespace converter
       }
       static const std::string func("std::chrono::year_month_day converter::ConvertFromStr<std::chrono::year_month_day, S2T_FORMAT_YMD>::ToVal_args(const std::string& str)");
       std::ostringstream eoss;
-      eoss << __CONVERTER_PREFERRED_PATH__ << " : ERROR : rapidcsv :: in function '" << func << "' ::: strYMD='" << str <<"' format='" << fmt << "'" << std::endl;
+      eoss << "ERROR : rapidcsv :: in function '" << func << "' ::: strYMD='" << str <<"' format='" << fmt << "'" << std::endl;
       eoss << "istringstream-conversion<" << dateClass << "> failed.";
       static const std::string errMsg("Invalid date-string received in '"+func+"'");
-      std::cerr << errMsg << " : string-txt='" << str << "' : format='" << fmt << "'" << std::endl;
+      CONVERTER_MESSAGE_LOG(errMsg << " : string-txt='" << str << "' : format='" << fmt << "'");
       static const std::invalid_argument err(errMsg);
       return S2T_FORMAT_YMD::handler(str, err);
     }
@@ -611,7 +614,7 @@ namespace converter
       {
         static const std::string func("std::string ConvertFromVal<std::chrono::year_month_date, T2S_FORMAT_YMD>::ToStr_args(const std::chrono::year_month_date& val)");
         std::ostringstream eoss;
-        eoss << __CONVERTER_PREFERRED_PATH__ << " : ERROR : rapidcsv :: in function '" << func << "' ::: ";
+        eoss << "ERROR : rapidcsv :: in function '" << func << "' ::: ";
         try {
           eoss << "year{" << int(val.year()) << "}-month{" << unsigned(val.month()) << "}-day{" 
           << unsigned(val.day()) << "}' : val.ok()=" << val.ok() << " format='" << fmt << "'  resultString='"
@@ -620,8 +623,8 @@ namespace converter
         eoss << "ostringstream-conversion<" << dateClass << "> failed.";
         eoss << std::boolalpha << "   iss.fail() = " << oss.fail()
                                << " : iss.bad() = " << oss.bad()
-                               << " : iss.eof() = " << oss.eof() << std::endl;
-        std::cerr << eoss.str() << std::endl; 
+                               << " : iss.eof() = " << oss.eof();
+        CONVERTER_MESSAGE_LOG(eoss.str()); 
         static const std::string errMsg("error in date-conversion in '"+func+"'");
         throw std::invalid_argument(errMsg);
       }

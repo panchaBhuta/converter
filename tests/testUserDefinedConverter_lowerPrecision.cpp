@@ -31,11 +31,27 @@ using ConvertFromVal_lDP = converter::ConvertFromVal<T, T2S_Format_ldp<T> >;
 
 
 
+template<converter::c_floating_point T>
+void checkConversionTemplateInstances()
+{
+/*
+  static_assert(std::is_same_v<typename converter::S2T_DefaultFormat<T>::type,
+                                        converter::S2T_Format_std_StoT<T, converter::FailureS2Tprocess::SIGNAL_NAN>>);
+  static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<T>::type,
+                                        converter::T2S_Format_StreamDecimalPrecision<T>>);
+  static_assert(ConvertFromStr_loc<T>::template_uid ==  1);
+*/
+  static_assert(ConvertFromVal_lDP<T>::template_uid == -1);
+}
 
 
 
 int main()
 {
+  checkConversionTemplateInstances<float>();
+  checkConversionTemplateInstances<double>();
+  checkConversionTemplateInstances<long double>();
+
   int rv = 0;
   try {
 

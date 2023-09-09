@@ -256,12 +256,14 @@ namespace converter
       {
         static_assert(converter::is_iostream<typename S2T_FORMAT::stream_type>::value);
         static_assert(converter::is_formatSS<S2T_FORMAT>::value);
-        //std::cout << "typename S2T_FORMAT::stream_type =" << typeid(typename S2T_FORMAT::stream_type).name() << std::endl;
-        //std::cout << "std::basic_istringstream<typename S2T_FORMAT::stream_type::char_type> =" << typeid(std::basic_ostringstream<typename S2T_FORMAT::stream_type::char_type>).name() << std::endl;
+        //std::cout << "typename S2T_FORMAT::stream_type = "
+        //          << typeid(typename S2T_FORMAT::stream_type).name() << std::endl;
+        //std::cout << "std::basic_istringstream<typename S2T_FORMAT::stream_type::char_type> = "
+        //          << typeid(std::basic_ostringstream<typename S2T_FORMAT::stream_type::char_type>).name() << std::endl;
 
         static_assert(!std::is_same_v< typename S2T_FORMAT::stream_type,
-                                      std::basic_ostringstream<typename S2T_FORMAT::stream_type::char_type>
-                                    >);  // ERROR :: invalid template param for FORMATTING -> 'istringstream' should be passed instead of 'ostringstream'
+                                       std::basic_ostringstream<typename S2T_FORMAT::stream_type::char_type>
+                                     >);  // ERROR :: invalid template param for FORMATTING -> 'istringstream' should be passed instead of 'ostringstream'
         static_assert(std::is_same_v< typename S2T_FORMAT::stream_type,
                                       std::basic_istringstream<typename S2T_FORMAT::stream_type::char_type>
                                     >);
@@ -317,8 +319,7 @@ namespace converter
       }
 
       static const std::string errMsg("String isn't a numeric-type. 'return_type _ConvertFromStr_POS<T, PROCESS_ERR, ERR_HANDLER>::_ToVal(const std::string& str)'");
-      std::cerr << errMsg << std::endl;
-      std::cerr << "string-conversion-failure for value '" << str << "'" << std::endl;
+      CONVERTER_MESSAGE_LOG( errMsg << std::endl << "string-conversion-failure for value '" << str << "'" );
       static const std::invalid_argument err(errMsg);
       return ERR_HANDLER::handler(str, err);
     }
@@ -377,9 +378,8 @@ namespace converter
       if( _checkStreamFailure(iss) )
       {
         static const std::string errMsg("Stream read failure. 'T ConvertFromStr<c_NOT_string T, c_formatISS S2T_FORMAT>::ToVal(const std::string& str)'");
-        std::cerr << errMsg << std::endl;
-        std::cerr << "input-string-stream-failure for value '" << str << "'" << std::endl;
-        std::cerr << std::boolalpha << "iss.fail()=" << iss.fail() << "  iss.bad()=" << iss.bad() << "  iss.eof()=" << iss.eof() << std::endl;
+        CONVERTER_MESSAGE_LOG(errMsg << std::endl << "input-string-stream-failure for value '" << str << "'");
+        CONVERTER_MESSAGE_LOG(std::boolalpha << "iss.fail()=" << iss.fail() << "  iss.bad()=" << iss.bad() << "  iss.eof()=" << iss.eof());
         static const std::invalid_argument err(errMsg);
         return S2T_FORMAT_STREAM::handler(str, err);
       }
@@ -432,7 +432,6 @@ namespace converter
     inline static T
     ToVal_args(const std::string& str, std::size_t* pos = nullptr, int base = 10)
     {
-      //std::cout << "_ConvertFromStr<T,S2T_Format_std_StoT>::ToVal(str,...)" << std::endl;
       /*
        * Size of int and short are implementation defined.
        * int and short are 2 bytes on 16 compilers.
@@ -601,8 +600,7 @@ namespace converter
       {
         static const std::string errMsg("String isn't a char-type. 'CH ConvertFromStr<c_char CH,S2T_Format_WorkAround>::ToVal(const std::string& str)'");
         static const std::invalid_argument err(errMsg);
-        std::cerr << errMsg << std::endl;
-        std::cerr << "string2charT-conversion-failure for value '" << str << "'" << std::endl;
+        CONVERTER_MESSAGE_LOG( errMsg << std::endl << "string2charT-conversion-failure for value '" << str << "'");
         return S2T_Format_WorkAround<CH, PROCESS_ERR>::handler(str, err);
       }
 
@@ -645,8 +643,7 @@ namespace converter
       {
         static const std::string errMsg("String isn't a bool. 'T _ConvertFromStr<bool,S2T_Format_WorkAround>::ToVal(const std::string& str)'");
         static const std::invalid_argument err(errMsg);
-        std::cerr << errMsg << std::endl;
-        std::cerr << "string2bool-conversion-failure for value '" << str << "'" << std::endl;
+        CONVERTER_MESSAGE_LOG( errMsg << std::endl << "string2bool-conversion-failure for value '" << str << "'" );
         return S2T_Format_WorkAround<bool, PROCESS_ERR>::handler(str, err);
       }
       return val;

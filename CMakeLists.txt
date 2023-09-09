@@ -76,8 +76,8 @@ message("The systems's path separator is '${_path_separator}'")
 add_library(converter INTERFACE)
 add_library(converter::converter ALIAS converter)
 
-converter_check_chrono_stream_functionality()
-converter_check_clang_string_workaround()
+check_chrono_stream_functionality()
+check_clang_string_workaround()
 check_floatingPoint_elementaryStringConversions()
 
 check_cxx_compiler_flag_macro_prefix_map()

@@ -14,43 +14,60 @@
   refer   https://en.cppreference.com/w/cpp/types/numeric_limits/digits10
 */
 
-int main()
-{
-  int rv = 0;
-  try {
-
 // https://web.archive.org/web/20191012035921/http://nadeausoftware.com/articles/2012/01/c_c_tip_how_use_compiler_predefined_macros_detect_operating_system
 #if defined(WIN64) || defined(_WIN64) || defined(__WIN64) || defined(__WIN64__)
-    static_assert(std::is_same_v<typename converter::S2T_DefaultFormat<T>::type,
-                                          converter::S2T_Format_std_CtoT<T, converter::FailureS2Tprocess::SIGNAL_NAN>>);
-    static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<T>::type,
-                                          converter::T2S_Format_std_TtoC>);
-    static_assert(converter::ConvertFromStr<T>::template_uid ==  103);
-    static_assert(converter::ConvertFromVal<T>::template_uid == -103);
+template<converter::c_floating_point T>
+void checkConversionTemplateInstances()
+{
+  static_assert(std::is_same_v<typename converter::S2T_DefaultFormat<T>::type,
+                                        converter::S2T_Format_std_CtoT<T, converter::FailureS2Tprocess::SIGNAL_NAN>>);
+  static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<T>::type,
+                                        converter::T2S_Format_std_TtoC>);
+  static_assert(converter::ConvertFromStr<T>::template_uid ==  103);
+  static_assert(converter::ConvertFromVal<T>::template_uid == -103);
+}
 
-    const unsigned indexOS = 2;
+const unsigned indexOS = 2;
 #elif defined(__APPLE__) && defined(__MACH__)
+template<converter::c_floating_point T>
+void checkConversionTemplateInstances()
+{
     static_assert(std::is_same_v<typename converter::S2T_DefaultFormat<T>::type,
                                           converter::S2T_Format_std_StoT<T, converter::FailureS2Tprocess::SIGNAL_NAN>>);
     static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<T>::type,
                                           converter::T2S_Format_StreamDecimalPrecision<T>>);
     static_assert(converter::ConvertFromStr<T>::template_uid ==  3);
     static_assert(converter::ConvertFromVal<T>::template_uid == -1);
+}
 
     // macOS does not support 'std::from_chars()' and
     // 'std::to_chars()'. The fall back functions
     // induces variations in results when compared to other OS's.
-    const unsigned indexOS = 1;
+const unsigned indexOS = 1;
 #else  // ubuntu and other OS's
+template<converter::c_floating_point T>
+void checkConversionTemplateInstances()
+{
     static_assert(std::is_same_v<typename converter::S2T_DefaultFormat<T>::type,
                                           converter::S2T_Format_std_CtoT<T, converter::FailureS2Tprocess::SIGNAL_NAN>>);
     static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<T>::type,
                                           converter::T2S_Format_std_TtoC>);
     static_assert(converter::ConvertFromStr<T>::template_uid ==  103);
     static_assert(converter::ConvertFromVal<T>::template_uid == -103);
+}
 
-    const unsigned indexOS = 0;
+const unsigned indexOS = 0;
 #endif
+
+
+int main()
+{
+  checkConversionTemplateInstances<float>();
+  checkConversionTemplateInstances<double>();
+  checkConversionTemplateInstances<long double>();
+
+  int rv = 0;
+  try {
 
     std::string expected_float_8d589973ep9[] = { "8589973504",
                                                  "8.5899735e+09",  // macOS
@@ -79,11 +96,12 @@ int main()
                                                                   "1.1234567890123457" };  // Windows
     checkRoundTripConversion_txt2Val2txt<long double>("testFloatingPointPrecision-6",
                  "1.123456789012345678901", 1.123456789012345678901L,
-                 expected_longDouble_1d1234567890123456789[indexOS]);  //18 digits
+                 expected_longDouble_1d123456789012345678901[indexOS]);  //18 digits
 
 
     checkRoundTripConversion_txt2Val2txt<double>("testFloatingPointPrecision-7",
-                 "9007199254740993", 9007199254740993.0, "9007199254740992");    //    "9007199254740993"
+                 "9007199254740993", 9007199254740993.0, "9007199254740992");
+                                                   //    "9007199254740993"
     std::string expected_longDouble_9007199254740993[] = { "9007199254740993",
                                                            "9007199254740993",
                                                            "9007199254740992" }; // Windows
