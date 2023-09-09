@@ -63,8 +63,6 @@ jobs:
       - name: Configure CMake (compiler=NOT-default) [Release]
         if: matrix.compiler != 'default'
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
-      - name: Show compile commands [Release]
-        run: cat build-release/compile_commands.json
       - name: Build [Release]
         run: cmake --build "${{github.workspace}}/build-release" --config Release -j
       - name: Test [Release]

@@ -25,6 +25,10 @@ void checkRoundTripConversion_txt2Val2txt( const std::string& testID,
 
   const std::string strRoundtripActual = TConvertFromVal::ToStr(valConv);
   std::cout << "testID = " << testID << " , strRoundtripActual = " << strRoundtripActual << std::endl;
+  if(strRoundtripExpected.compare(strRoundtripActual)!=0)
+  {
+    std::cout << "   mismatch strRoundtripActual=" << strRoundtripActual << std::endl;
+  }
 
 //    unittest::ExpectEqual(std::string, strRoundtripExpected, strRoundtripActual);
     return;

@@ -82,6 +82,10 @@ if [[ "${DEPS}" == "1" ]]; then
         if [[ "${?}" != "0" ]]; then
           sudo locale-gen "de_DE.UTF-8" || exiterr "deps failed (${DISTRO}), exiting."
         fi
+        locale -a | grep -qi "de_DE"
+        if [[ "${?}" != "0" ]]; then
+          sudo locale-gen "de_DE" || exiterr "deps failed (${DISTRO}), exiting."
+        fi
       fi
     else
       exiterr "deps failed (unsupported linux distro ${DISTRO}), exiting."

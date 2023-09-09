@@ -38,19 +38,18 @@ int main()
 {
   int rv = 0;
   try {
-/*
+
 // https://web.archive.org/web/20191012035921/http://nadeausoftware.com/articles/2012/01/c_c_tip_how_use_compiler_predefined_macros_detect_operating_system
 #if defined(WIN64) || defined(_WIN64) || defined(__WIN64) || defined(__WIN64__)
     const unsigned indexOS = 2;
 #elif defined(__APPLE__) && defined(__MACH__)
     // macOS does not support 'std::from_chars()' and
     // 'std::to_chars()'. The fall back functions
-    // induces this variation.
+    // induces variations in results compared to other OS's.
     const unsigned indexOS = 1;
 #else  // ubuntu and other OS's
-*/
     const unsigned indexOS = 0;
-//#endif
+#endif
 
     checkRoundTripConversion_txt2Val2txt<float, converter::ConvertFromStr<float>,
                                                 ConvertFromVal_lDP<float>>("testUserDefinedConverter_lowerPrecision-1",
@@ -68,20 +67,27 @@ int main()
     checkRoundTripConversion_txt2Val2txt<double, converter::ConvertFromStr<double>,
                                                  ConvertFromVal_lDP<double>>("testUserDefinedConverter_lowerPrecision-5",
                  "2.1234567890123456789", 2.1234567890123456789, "2.1234567890123", getLowerDecimalPrecision<double>());  // 14 digits
+    std::string expected_longDouble_1d123456789012345678901[] = { "3.1234567890123457",
+                                                                  "3.1234567890123457",
+                                                                  "3.1234567890123" };  // Windows
     checkRoundTripConversion_txt2Val2txt<long double, converter::ConvertFromStr<long double>,
                                                       ConvertFromVal_lDP<long double>>("testUserDefinedConverter_lowerPrecision-6",
-                 "3.123456789012345678901", 3.123456789012345678901L, "3.1234567890123457", getLowerDecimalPrecision<long double>());  // 17 digits
+                 "3.123456789012345678901", 3.123456789012345678901L,
+                 expected_longDouble_1d123456789012345678901[indexOS],
+                 getLowerDecimalPrecision<long double>());  // 17 digits
 
     checkRoundTripConversion_txt2Val2txt<double, converter::ConvertFromStr<double>,
                                                  ConvertFromVal_lDP<double>>("testUserDefinedConverter_lowerPrecision-7",
                  "9007199254740993", 9007199254740993.0, "9.007199254741e+15", getLowerDecimalPrecision<double>());
 
     std::string expected_longDouble_9007199254740993[] = { "9007199254740993",
-                                                           "9.007199254741e+15" // Windows
-                                                         };
+                                                           "9007199254740993",
+                                                           "9.007199254741e+15" }; // Windows
     checkRoundTripConversion_txt2Val2txt<long double, converter::ConvertFromStr<long double>,
                                                       ConvertFromVal_lDP<long double>>("testUserDefinedConverter_lowerPrecision-8",
-                 "9007199254740993", 9007199254740993L, expected_longDouble_9007199254740993[indexOS], getLowerDecimalPrecision<long double>());
+                 "9007199254740993", 9007199254740993L,
+                 expected_longDouble_9007199254740993[indexOS],
+                 getLowerDecimalPrecision<long double>());
 
 
     checkRoundTripConversion_txt2Val2txt<float, converter::ConvertFromStr<float>,
