@@ -78,13 +78,13 @@ if [[ "${DEPS}" == "1" ]]; then
     if [[ "${DISTRO}" == "Ubuntu" ]]; then
       if [[ "${GITHUB_ACTIONS}" == "true" ]]; then
         # ensure de_DE locale is present when running CI tests
-        locale -a | grep -qi "de_DE.utf8"
-        if [[ "${?}" != "0" ]]; then
-          sudo locale-gen "de_DE.UTF-8" || exiterr "deps failed (${DISTRO}), exiting."
-        fi
         locale -a | grep -qi "de_DE"
         if [[ "${?}" != "0" ]]; then
           sudo locale-gen "de_DE" || exiterr "deps failed (${DISTRO}), exiting."
+        fi
+        locale -a | grep -qi "de_DE.utf8"
+        if [[ "${?}" != "0" ]]; then
+          sudo locale-gen "de_DE.UTF-8" || exiterr "deps failed (${DISTRO}), exiting."
         fi
       fi
     else

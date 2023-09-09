@@ -92,7 +92,7 @@ int main()
 #elif defined(__APPLE__) && defined(__MACH__)
     // macOS does not support 'std::from_chars()' and
     // 'std::to_chars()'. The fall back functions
-    // induces variations in results compared to other OS's.
+    // induces variations in results when compared to other OS's.
     const unsigned indexOS = 1;
 #else  // ubuntu and other OS's
     const unsigned indexOS = 0;
@@ -115,23 +115,26 @@ int main()
                  "1,123456789", 1.123456789f, "1,12345684", std::numeric_limits<float>::digits10, ',');
     checkRoundTripConversion_txt2Val2txt<double, ConvertFromStr_loc<double>, ConvertFromVal_loc<double>>("testUserDefinedConverter_locale-5",
                  "2,1234567890123456789", 2.1234567890123456789, "2,12345678901234569", std::numeric_limits<double>::digits10, ',');
-    std::string expected_longDouble_1d123456789012345678901[] = { "3,12345678901234567889",
+    std::string expected_longDouble_3d123456789012345678901[] = { "3,12345678901234567889",
                                                                   "3,12345678901234567889",
                                                                   "3,12345678901234569" };  // Windows
     checkRoundTripConversion_txt2Val2txt<long double, ConvertFromStr_loc<long double>, ConvertFromVal_loc<long double>>("testUserDefinedConverter_locale-6",
-                 "3,123456789012345678901", 3.123456789012345678901L, "3,12345678901234567889", std::numeric_limits<long double>::digits10, ',');
+                 "3,123456789012345678901", 3.123456789012345678901L,
+                 expected_longDouble_3d123456789012345678901[indexOS], std::numeric_limits<long double>::digits10, ',');
 
     std::string expected_double_9007199254740993[] = { "9.007.199.254.740.992", //    "9.007.199.254.740.993"
                                                        "9007199254740992",      // MacOS
                                                        "9.007.199.254.740.992", };// Windows
     checkRoundTripConversion_txt2Val2txt<double, ConvertFromStr_loc<double>, ConvertFromVal_loc<double>>("testUserDefinedConverter_locale-7",
-                 "9007199254740993", 9007199254740993.0, expected_double_9007199254740993[indexOS], std::numeric_limits<double>::digits10, ',');
+                 "9007199254740993", 9007199254740993.0,
+                 expected_double_9007199254740993[indexOS], std::numeric_limits<double>::digits10, ',');
 
     std::string expected_longDouble_9007199254740993[] = { "9.007.199.254.740.993", // Ubuntu
                                                            "9007199254740993",      // MacOS
                                                            "9.007.199.254.740.992", };// Windows
     checkRoundTripConversion_txt2Val2txt<long double, ConvertFromStr_loc<long double>, ConvertFromVal_loc<long double>>("testUserDefinedConverter_locale-8",
-                 "9007199254740993", 9007199254740993L, expected_longDouble_9007199254740993[indexOS], std::numeric_limits<long double>::digits10, ',');
+                 "9007199254740993", 9007199254740993L,
+                 expected_longDouble_9007199254740993[indexOS], std::numeric_limits<long double>::digits10, ',');
 
 
     checkRoundTripConversion_txt2Val2txt<float, ConvertFromStr_loc<float>, ConvertFromVal_loc<float>>("testUserDefinedConverter_locale-9",

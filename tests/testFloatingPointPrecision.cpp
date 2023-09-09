@@ -21,18 +21,39 @@ int main()
 
 // https://web.archive.org/web/20191012035921/http://nadeausoftware.com/articles/2012/01/c_c_tip_how_use_compiler_predefined_macros_detect_operating_system
 #if defined(WIN64) || defined(_WIN64) || defined(__WIN64) || defined(__WIN64__)
+    static_assert(std::is_same_v<typename converter::S2T_DefaultFormat<T>::type,
+                                          converter::S2T_Format_std_CtoT<T, converter::FailureS2Tprocess::SIGNAL_NAN>>);
+    static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<T>::type,
+                                          converter::T2S_Format_std_TtoC>);
+    static_assert(converter::ConvertFromStr<T>::template_uid ==  103);
+    static_assert(converter::ConvertFromVal<T>::template_uid == -103);
+
     const unsigned indexOS = 2;
 #elif defined(__APPLE__) && defined(__MACH__)
+    static_assert(std::is_same_v<typename converter::S2T_DefaultFormat<T>::type,
+                                          converter::S2T_Format_std_StoT<T, converter::FailureS2Tprocess::SIGNAL_NAN>>);
+    static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<T>::type,
+                                          converter::T2S_Format_StreamDecimalPrecision<T>>);
+    static_assert(converter::ConvertFromStr<T>::template_uid ==  3);
+    static_assert(converter::ConvertFromVal<T>::template_uid == -1);
+
     // macOS does not support 'std::from_chars()' and
     // 'std::to_chars()'. The fall back functions
-    // induces variations in results compared to other OS's.
+    // induces variations in results when compared to other OS's.
     const unsigned indexOS = 1;
 #else  // ubuntu and other OS's
+    static_assert(std::is_same_v<typename converter::S2T_DefaultFormat<T>::type,
+                                          converter::S2T_Format_std_CtoT<T, converter::FailureS2Tprocess::SIGNAL_NAN>>);
+    static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<T>::type,
+                                          converter::T2S_Format_std_TtoC>);
+    static_assert(converter::ConvertFromStr<T>::template_uid ==  103);
+    static_assert(converter::ConvertFromVal<T>::template_uid == -103);
+
     const unsigned indexOS = 0;
 #endif
 
     std::string expected_float_8d589973ep9[] = { "8589973504",
-                                                 "8.58997299e+09",  // macOS
+                                                 "8.5899735e+09",  // macOS
                                                  "8589973504", };
     checkRoundTripConversion_txt2Val2txt<float>("testFloatingPointPrecision-1",
                  "8.589973e+9", 8.589973e9f, expected_float_8d589973ep9[indexOS]);
@@ -47,18 +68,22 @@ int main()
                                                  "1.1234568" };
     checkRoundTripConversion_txt2Val2txt<float>("testFloatingPointPrecision-4",
                  "1.123456789", 1.123456789f, expected_float_1d123456789[indexOS]);  // 6 digits
+    std::string expected_double_1d1234567890123456789[] = { "1.1234567890123457",
+                                                            "1.12345678901234569",   // macOS
+                                                            "1.1234567890123457" };
     checkRoundTripConversion_txt2Val2txt<double>("testFloatingPointPrecision-5",
-                 "1.1234567890123456789", 1.1234567890123456789, "1.1234567890123457");   // 15 digits
+                 "1.1234567890123456789", 1.1234567890123456789,
+                 expected_double_1d1234567890123456789[indexOS]);   // 15 digits
     std::string expected_longDouble_1d123456789012345678901[] = { "1.1234567890123456789",
-                                                                  "1.1234567890123456789",
+                                                                  "1.12345678901234567889",
                                                                   "1.1234567890123457" };  // Windows
     checkRoundTripConversion_txt2Val2txt<long double>("testFloatingPointPrecision-6",
-                 "1.123456789012345678901", 1.123456789012345678901L, "1.1234567890123456789");  //18 digits
+                 "1.123456789012345678901", 1.123456789012345678901L,
+                 expected_longDouble_1d1234567890123456789[indexOS]);  //18 digits
 
 
     checkRoundTripConversion_txt2Val2txt<double>("testFloatingPointPrecision-7",
-                 "9007199254740993", 9007199254740993.0, "9007199254740992");
-                                                   //    "9007199254740993"
+                 "9007199254740993", 9007199254740993.0, "9007199254740992");    //    "9007199254740993"
     std::string expected_longDouble_9007199254740993[] = { "9007199254740993",
                                                            "9007199254740993",
                                                            "9007199254740992" }; // Windows

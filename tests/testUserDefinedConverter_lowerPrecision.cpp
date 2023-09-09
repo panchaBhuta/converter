@@ -45,7 +45,7 @@ int main()
 #elif defined(__APPLE__) && defined(__MACH__)
     // macOS does not support 'std::from_chars()' and
     // 'std::to_chars()'. The fall back functions
-    // induces variations in results compared to other OS's.
+    // induces variations in results when compared to other OS's.
     const unsigned indexOS = 1;
 #else  // ubuntu and other OS's
     const unsigned indexOS = 0;
