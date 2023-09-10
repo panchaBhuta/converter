@@ -52,6 +52,28 @@ void checkRoundTripConversion_txt2Val2txt( const std::string& testID,
         std::string significantDigits_actual = _strRoundtripActual.substr(0, static_cast<size_t>(decimalPrecision)+1); // +1 for decimal-character
 
         unittest::ExpectEqual(std::string, significantDigits_input, significantDigits_actual);
+
+        std::istringstream iss_input(_strInput);
+        std::string exponentInputStr;
+        if(std::getline(iss_input, exponentInputStr, 'e') &&
+           std::getline(iss_input, exponentInputStr, 'e'))  // getline() called twice since 2nd token is exponent
+        {
+          int inputExponent;
+          std::istringstream expInput_iss(exponentInputStr);
+          expInput_iss >> inputExponent;
+
+          std::istringstream iss_actual(_strRoundtripActual);
+          std::string exponentActualStr;
+          if(std::getline(iss_actual, exponentActualStr, 'e') &&
+             std::getline(iss_actual, exponentActualStr, 'e'))  // getline() called twice since 2nd token is exponent
+          {
+            int actualExponent;
+            std::istringstream expActual_iss(exponentInputStr);
+            expActual_iss >> actualExponent;
+
+            unittest::ExpectEqual(int, inputExponent, actualExponent);
+          }
+        }
         return;
       }
     } else if(decSep_input == std::string::npos  && decSep_actual == std::string::npos) {

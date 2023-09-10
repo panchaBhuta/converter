@@ -113,7 +113,8 @@ int main()
                                             "3.31229997",  // macOS
                                             "3.3123", };
     checkRoundTripConversion_txt2Val2txt<float>("testFloatingPointPrecision-9",
-                 "3.3123", 3.3123f, expected_float_3d3123[indexOS]);
+                 "3.3123", 3.3123f, expected_float_3d3123[indexOS],
+                 ((indexOS==1)?4:std::numeric_limits<float>::digits10) ); // macOS
 
     checkRoundTripConversion_txt2Val2txt<float>("testFloatingPointPrecision-10",
                  "3.3123412e+38", 3.3123412E38f, "3.3123412e+38");
