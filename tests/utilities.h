@@ -28,6 +28,7 @@ void checkRoundTripConversion_txt2Val2txt( const std::string& testID,
   const std::string strRoundtripActual = TConvertFromVal::ToStr(valConv);
   std::cout << "testID = " << testID << " , strInput = " << strInput << std::endl;
   unittest::ExpectEqual(std::string, strRoundtripExpected, strRoundtripActual);
+
   if(strInput.compare(strRoundtripActual)!=0)
   {
     std::string _strInput(strInput);
@@ -42,6 +43,7 @@ void checkRoundTripConversion_txt2Val2txt( const std::string& testID,
     std::string::size_type decSep_actual = _strRoundtripActual.find(decimalSeperator);
     if(decSep_input != std::string::npos  && decSep_actual != std::string::npos)
     {
+      std::cout << "fraction check" << std::endl;
       // both input and round-trip-string have decimal seperator
       // for e.g.: '3.3123412e+38'
       if(decSep_input == decSep_actual)
@@ -51,6 +53,7 @@ void checkRoundTripConversion_txt2Val2txt( const std::string& testID,
         std::string significantDigits_input = _strInput.substr(0, static_cast<size_t>(decimalPrecision)+1); // +1 for decimal-character
         std::string significantDigits_actual = _strRoundtripActual.substr(0, static_cast<size_t>(decimalPrecision)+1); // +1 for decimal-character
 
+        std::cout << "significant digits check" << std::endl;
         unittest::ExpectEqual(std::string, significantDigits_input, significantDigits_actual);
 
         std::istringstream iss_input(_strInput);
@@ -71,12 +74,21 @@ void checkRoundTripConversion_txt2Val2txt( const std::string& testID,
             std::istringstream expActual_iss(exponentInputStr);
             expActual_iss >> actualExponent;
 
+            std::cout << "exponent check" << std::endl;
             unittest::ExpectEqual(int, inputExponent, actualExponent);
+          } else {
+            std::cout << "no exponent component on converted string : _strRoundtripActual=" << _strRoundtripActual << std::endl;
           }
+        } else {
+          std::cout << "no exponent component on input string : _strInput=" << _strInput << std::endl;
         }
         return;
+      } else {
+        std::cout << "decimal position mismatch between _strInput=" << _strInput
+                  << " and _strRoundtripActual=" << _strRoundtripActual << std::endl;
       }
     } else if(decSep_input == std::string::npos  && decSep_actual == std::string::npos) {
+      std::cout << "integer significant-digits check" << std::endl;
       // both input and round-trip-string have decimal seperator
       // for e.g.: '8589973000'
       std::string significantDigits_input = _strInput.substr(0, static_cast<size_t>(decimalPrecision));

@@ -129,13 +129,15 @@ int main()
                                                     "4.31234119999999987e-38",  // macOS
                                                     "4.3123412e-38", };
     checkRoundTripConversion_txt2Val2txt<double>("testFloatingPointPrecision-12",
-                 "4.3123412e-38", 4.3123412E-38, expected_double_4d3123412en38[indexOS]);
+                 "4.3123412e-38", 4.3123412E-38, expected_double_4d3123412en38[indexOS],
+                 ((indexOS==1)?7:std::numeric_limits<double>::digits10) ); // macOS
 
     std::string expected_longdouble_5d3123412en38[] = { "5.3123412e-38",
                                                         "5.3123412000000000001e-38", // macOS
                                                         "5.3123412e-38", };
     checkRoundTripConversion_txt2Val2txt<long double>("testFloatingPointPrecision-13",
-                 "5.3123412e-38", 5.3123412E-38L, expected_longdouble_5d3123412en38[indexOS]);
+                 "5.3123412e-38", 5.3123412E-38L, expected_longdouble_5d3123412en38[indexOS],
+                 ((indexOS==1)?8:std::numeric_limits<long double>::digits10) ); // macOS
 
   } catch (const std::exception& ex) {
     std::cout << "Test Failed : err-msg : " << ex.what() << std::endl;
