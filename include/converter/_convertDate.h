@@ -132,6 +132,7 @@ namespace converter
       namespace _dateLib = date;
       const std::string dateClass = "date::year_month_day";
   #endif
+      CONVERTER_DEBUG_LOG(dateClass << " for string2date input : str=" << str);
 
       _dateLib::year_month_day ymd;
       std::istringstream iss(str);
@@ -151,6 +152,8 @@ namespace converter
        */
         )
       {
+        CONVERTER_DEBUG_LOG(dateClass << " for string2date conversion-succeded : iY=" << (int(ymd.year())) \
+                                      << ", iM=" << (unsigned(ymd.month())) << ", iD=" << (unsigned(ymd.day())));
   #if   USE_CHRONO_FROMSTREAM_1  ==  _e_ENABLE_FEATURE_
         return ymd;
   #elif USE_DATE_FROMSTREAM_2  ==  _e_ENABLE_FEATURE_
@@ -175,7 +178,7 @@ namespace converter
          && ( !std::isalnum(fmtStr.at(lastDelimiterIdx-1), std::locale::classic())
             ) )
       {
-        const char delimiter = fmtStr.at(lastDelimiterIdx-1);
+        const char delimiter = fmtStr.at(lastDelimiterIdx-1);  // char before '%' i.e fmtStr = "%Y-%m-%d" it would be '-'
         std::istringstream ss(str);
         std::istringstream ssFmt(fmtStr);
         std::string token;
@@ -239,31 +242,32 @@ namespace converter
         }
         if(hasDay && hasMonth && hasYear )
         {
+          CONVERTER_DEBUG_LOG("jugaad for string2date conversion-succeded : iY=" << iY << ", iM=" << iM << ", iD=" << iD);
           return std::chrono::year_month_day{ std::chrono::year(iY),
                                               std::chrono::month(iM),
                                               std::chrono::day(iD) };
         } else {
-          CONVERTER_MESSAGE_LOG("workAround for string2date conversion-failed : iY=" << iY << ", iM=" << iM << ", iD=" << iD);
+          CONVERTER_DEBUG_LOG("jugaad for string2date conversion-failed : iY=" << iY << ", iM=" << iM << ", iD=" << iD);
         }
       }
 
         static const std::string func("std::chrono::year_month_day converter::ConvertFromStr<std::chrono::year_month_day, S2T_FORMAT_YMD>::ToVal_args(const std::string& str)");
-  #ifdef ENABLE_CONVERTER_MESSAGE_LOG
-        CONVERTER_MESSAGE_LOG("ERROR : rapidcsv :: in function '" << func << "' ::: strYMD='" << str <<"' format='" << fmt << "'");
-        CONVERTER_MESSAGE_LOG("istringstream-conversion<" << dateClass << "> failed." \
-                 std::boolalpha << "   iss.fail() = " << iss.fail()                   \
-                               << " : iss.bad() = " << iss.bad()                      \
+  #ifdef ENABLE_CONVERTER_DEBUG_LOG
+        CONVERTER_DEBUG_LOG("ERROR : rapidcsv :: in function '" << func << "' ::: strYMD='" << str <<"' format='" << fmt << "'");
+        CONVERTER_DEBUG_LOG("istringstream-conversion<" << dateClass << "> failed."    \
+             << std::boolalpha << "   iss.fail() = " << iss.fail()                     \
+                               << " : iss.bad() = " << iss.bad()                       \
                                << " : iss.eof() = " << iss.eof());
-        CONVERTER_MESSAGE_LOG(" dateComponenets "                                                                       \
-                               << "   ymd.ok() = " << ymd.ok()                                                          \
-                               << " : ymd.year(" << int(ymd.year()) << ").ok() = " << ymd.year().ok()                   \
-                               << " : ymd.month(" << unsigned(ymd.month()) << ").ok() = " << ymd.month().ok()           \
+        CONVERTER_DEBUG_LOG(" dateComponents "                                                                   \
+                               << "   ymd.ok() = " << ymd.ok()                                                   \
+                               << " : ymd.year(" << int(ymd.year()) << ").ok() = " << ymd.year().ok()            \
+                               << " : ymd.month(" << unsigned(ymd.month()) << ").ok() = " << ymd.month().ok()    \
                                << " : ymd.day(" << unsigned(ymd.day()) << ").ok() = " << ymd.day().ok());
   #endif
       //if (iss.fail() || iss.bad()) // || (!iss.eof()))
       //{
         static const std::string errMsg("Invalid date-string received in '"+func+"'");
-        CONVERTER_MESSAGE_LOG(errMsg << " : string-txt='" << str << "' : format='" << fmt << "'");
+        CONVERTER_DEBUG_LOG(errMsg << " : string-txt='" << str << "' : format='" << fmt << "'");
         static const std::invalid_argument err(errMsg);
         return S2T_FORMAT_YMD::handler(str, err);
       //}
@@ -271,6 +275,8 @@ namespace converter
 #else
     {
       const std::string dateClass = "workaround_datelib::from_stream";
+      CONVERTER_DEBUG_LOG(dateClass << " for string2date input : str=" << str);
+
       static const std::map<std::string, unsigned> monthsIndex = {
         {"jan",  1}, {"january", 1},
         {"feb",  2}, {"february", 1},
@@ -347,18 +353,19 @@ namespace converter
         }
         if(hasDay && hasMonth && hasYear )
         {
+          CONVERTER_DEBUG_LOG(dateClass << " for string2date conversion-succeded : iY=" << iY << ", iM=" << iM << ", iD=" << iD);
           return std::chrono::year_month_day{ std::chrono::year(iY),
                                               std::chrono::month(iM),
                                               std::chrono::day(iD) };
         }
       }
       static const std::string func("std::chrono::year_month_day converter::ConvertFromStr<std::chrono::year_month_day, S2T_FORMAT_YMD>::ToVal_args(const std::string& str)");
-  #ifdef ENABLE_CONVERTER_MESSAGE_LOG
-      CONVERTER_MESSAGE_LOG("ERROR : rapidcsv :: in function '" << func << "' ::: strYMD='" << str <<"' format='" << fmt << "'");
-      CONVERTER_MESSAGE_LOG("istringstream-conversion<" << dateClass << "> failed.");
+  #ifdef ENABLE_CONVERTER_DEBUG_LOG
+      CONVERTER_DEBUG_LOG("ERROR : rapidcsv :: in function '" << func << "' ::: strYMD='" << str <<"' format='" << fmt << "'");
+      CONVERTER_DEBUG_LOG("istringstream-conversion<" << dateClass << "> failed.");
   #endif
       static const std::string errMsg("Invalid date-string received in '"+func+"'");
-      CONVERTER_MESSAGE_LOG(errMsg << " : string-txt='" << str << "' : format='" << fmt << "'");
+      CONVERTER_DEBUG_LOG(errMsg << " : string-txt='" << str << "' : format='" << fmt << "'");
       static const std::invalid_argument err(errMsg);
       return S2T_FORMAT_YMD::handler(str, err);
     }
@@ -563,9 +570,10 @@ namespace converter
     {
       std::ostringstream oss;
       T2S_FORMAT_YMD::streamUpdate(oss);
-
 #if   USE_CHRONO_TOSTREAM_1  ==  _e_ENABLE_FEATURE_
       const std::string dateClass = "std::chrono::year_month_day";
+      CONVERTER_DEBUG_LOG(dateClass << " for date2string input : YMD Y=" << (int(val.year())) \
+                << "  M=" << (unsigned(val.month())) << "  D=" << (unsigned(val.day())) );
 
       // As of writing this code, no compiler supports chrono::to_stream() yet.
       // This code here is for future reference once compiler starts supporting.
@@ -574,6 +582,8 @@ namespace converter
       std::chrono::to_stream(oss, fmt, val, abbrev, offset_sec); // does not compile
 #elif USE_DATE_TOSTREAM_2  ==  _e_ENABLE_FEATURE_
       const std::string dateClass = "date::year_month_day";
+      CONVERTER_DEBUG_LOG(dateClass << " for date2string input : YMD Y=" << (int(val.year())) \
+                << "  M=" << (unsigned(val.month())) << "  D=" << (unsigned(val.day())) );
 
       // gcc and clang does not support the required 'chrono::to_stream' functionality as of writing this code
       // UNIX-like , macOS
@@ -591,11 +601,14 @@ namespace converter
         _jugaad( val, fmt, oss2);
         if (!(oss2.fail() || oss2.bad())) // || oss.eof())
         {
+          CONVERTER_DEBUG_LOG(dateClass << ":_jugaad for date2string output : str=" << oss2.str());
           return oss2.str();
         }
       }
 #elif USE_JUGAAD_TOSTREAM_3  ==  _e_ENABLE_FEATURE_
       const std::string dateClass = "workaround_datelib::to_stream";
+      CONVERTER_DEBUG_LOG(dateClass << " for date2string input : YMD Y=" << (int(val.year())) \
+                << "  M=" << (unsigned(val.month())) << "  D=" << (unsigned(val.day())) );
 
       // msvc supports only std::chrono::from_stream and not std::chrono::to_stream.
       // date-lib is not compatible with msvc (min/max macro clash), therefore
@@ -614,7 +627,7 @@ namespace converter
       if (oss.fail() || oss.bad()) // || oss.eof())
       {
         static const std::string func("std::string ConvertFromVal<std::chrono::year_month_date, T2S_FORMAT_YMD>::ToStr_args(const std::chrono::year_month_date& val)");
-  #ifdef ENABLE_CONVERTER_MESSAGE_LOG
+  #ifdef ENABLE_CONVERTER_DEBUG_LOG
         std::ostringstream eoss;
         eoss << "ERROR : rapidcsv :: in function '" << func << "' ::: ";
         try {
@@ -626,11 +639,12 @@ namespace converter
         eoss << std::boolalpha << "   iss.fail() = " << oss.fail()
                                << " : iss.bad() = " << oss.bad()
                                << " : iss.eof() = " << oss.eof();
-        CONVERTER_MESSAGE_LOG(eoss.str());
+        CONVERTER_DEBUG_LOG(eoss.str());
   #endif
         static const std::string errMsg("error in date-conversion in '"+func+"'");
         throw std::invalid_argument(errMsg);
       }
+      CONVERTER_DEBUG_LOG(dateClass << " for date2string output : str=" << oss.str());
       return oss.str();
     }
   };

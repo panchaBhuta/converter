@@ -57,10 +57,10 @@
 #define __CONVERTER_PREFERRED_PATH__    std::filesystem::path(__CONVERTER_FILE__).make_preferred().string()
 
 
-#ifdef ENABLE_CONVERTER_MESSAGE_LOG
-#define CONVERTER_MESSAGE_LOG(aMessage) { std::cout << aMessage << ", in " << __CONVERTER_PREFERRED_PATH__ << ":" << __LINE__ << std::endl; }
+#ifdef ENABLE_CONVERTER_DEBUG_LOG
+#define CONVERTER_DEBUG_LOG(aMessage) { std::cout << aMessage << " :: file:" << __CONVERTER_PREFERRED_PATH__ << ":" << __LINE__ << std::endl; }
 #else
-#define CONVERTER_MESSAGE_LOG(aMessage)
+#define CONVERTER_DEBUG_LOG(aMessage)
 #endif
 
 

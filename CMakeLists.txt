@@ -53,10 +53,7 @@ project(converter
 include(GNUInstallDirs)
 
 # Determine whether this is a standalone project or included by other projects
-set(CONVERTER_STANDALONE_PROJECT OFF)
-if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
-    set(CONVERTER_STANDALONE_PROJECT ON)
-endif()
+set(CONVERTER_STANDALONE_PROJECT   $<STREQUAL:"${CMAKE_SOURCE_DIR}","${PROJECT_SOURCE_DIR}">)
 
 # Establish the project options
 option(CONVERTER_BUILD_EXAMPLES "Set to ON to build examples"        ${CONVERTER_STANDALONE_PROJECT})

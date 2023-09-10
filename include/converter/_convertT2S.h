@@ -254,7 +254,7 @@ namespace converter
         static const std::string funcName = 
           "'std::string ConvertFromVal<c_NOT_string T, c_formatOSS T2S_FORMAT>::ToStr(const T& val)'";
 
-  #ifdef ENABLE_CONVERTER_MESSAGE_LOG
+  #ifdef ENABLE_CONVERTER_DEBUG_LOG
         std::ostringstream eoss;
         try {
           eoss << "val='" << val << "'";
@@ -263,7 +263,7 @@ namespace converter
         eoss << std::boolalpha << "   iss.fail() = " << oss.fail()
                                << " : iss.bad() = " << oss.bad()
                                << " : iss.eof() = " << oss.eof();
-        CONVERTER_MESSAGE_LOG("ERROR : rapidcsv :: in function " << funcName << " ::: " << eoss.str());
+        CONVERTER_DEBUG_LOG("ERROR : rapidcsv :: in function " << funcName << " ::: " << eoss.str());
   #endif
         throw std::invalid_argument("Invalid argument. "+funcName);
       }

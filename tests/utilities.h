@@ -1,6 +1,5 @@
 #include <iostream>
 #include <cmath>
-#include <typeinfo>
 #include <algorithm>
 
 #include "unittest.h"
@@ -58,31 +57,42 @@ void checkRoundTripConversion_txt2Val2txt( const std::string& testID,
 
         std::istringstream iss_input(_strInput);
         std::string exponentInputStr;
+        bool inputHasExponent = false;
+        int inputExponent;
         if(std::getline(iss_input, exponentInputStr, 'e') &&
            std::getline(iss_input, exponentInputStr, 'e'))  // getline() called twice since 2nd token is exponent
         {
-          int inputExponent;
+          inputHasExponent = true;
           std::istringstream expInput_iss(exponentInputStr);
           expInput_iss >> inputExponent;
+        }
 
-          std::istringstream iss_actual(_strRoundtripActual);
-          std::string exponentActualStr;
-          if(std::getline(iss_actual, exponentActualStr, 'e') &&
-             std::getline(iss_actual, exponentActualStr, 'e'))  // getline() called twice since 2nd token is exponent
+        std::istringstream iss_actual(_strRoundtripActual);
+        std::string exponentActualStr;
+        bool actualHasExponent = false;
+        int actualExponent;
+        if(std::getline(iss_actual, exponentActualStr, 'e') &&
+           std::getline(iss_actual, exponentActualStr, 'e'))  // getline() called twice since 2nd token is exponent
+        {
+          actualHasExponent = true;
+          std::istringstream expActual_iss(exponentInputStr);
+          expActual_iss >> actualExponent;
+        }
+
+        if(inputHasExponent == actualHasExponent)
+        {
+          if(inputHasExponent)
           {
-            int actualExponent;
-            std::istringstream expActual_iss(exponentInputStr);
-            expActual_iss >> actualExponent;
-
             std::cout << "exponent check" << std::endl;
             unittest::ExpectEqual(int, inputExponent, actualExponent);
           } else {
-            std::cout << "no exponent component on converted string : _strRoundtripActual=" << _strRoundtripActual << std::endl;
+            std::cout << "no exponent component on input and converted string" << std::endl;
           }
+          return;
         } else {
-          std::cout << "no exponent component on input string : _strInput=" << _strInput << std::endl;
+          std::cout << "exponent component mismatch: _strInput=" << _strInput << std::endl;
+          std::cout << "exponent component mismatch: _strRoundtripActual=" << _strRoundtripActual << std::endl;
         }
-        return;
       } else {
         std::cout << "decimal position mismatch between _strInput=" << _strInput
                   << " and _strRoundtripActual=" << _strRoundtripActual << std::endl;
@@ -106,7 +116,7 @@ void checkRoundTripConversion_txt2Val2txt( const std::string& testID,
     ossConv << valConv;
 
     std::cout << std::setprecision(LDBL_DIG + 5); // << std::boolalpha;
-    std::cout << testID << " :: roundtrip conversion value does not match for type=" << typeid(T).name() << " ..." << std::endl;
+    std::cout << testID << " :: roundtrip conversion value does not match for type=" << GET_TYPENAME(T) << " ..." << std::endl;
     std::cout << "      input-text{" << strInput      << "} -> valConv{" << ossConv.str() << "}" << std::endl;
     std::cout << "         valConv{" << ossConv.str() << "} -> roundtrip-text{" << strRoundtripActual << "}" << std::endl;
     std::cout << "      input-text{" << strInput << "} != roundtrip-text{" << strRoundtripActual << "}" << std::endl;

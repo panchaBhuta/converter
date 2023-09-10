@@ -340,7 +340,8 @@ macro(check_cxx_compiler_flag_macro_prefix_map)
                            )
     if(cxx_compiler_macro_prefix_map)
         message(STATUS "compiler option '-fmacro-prefix-map=old=new' SUPPORTED")
-        add_compile_definitions(USE_MACROPREFIXMAP=1)
+        target_compile_definitions(converter INTERFACE
+                                        USE_MACROPREFIXMAP=1)
 
         set(CMAKE_CXX_FLAGS
             "${CMAKE_CXX_FLAGS} -fmacro-prefix-map=${CMAKE_CURRENT_SOURCE_DIR}${_path_separator}="
@@ -348,11 +349,13 @@ macro(check_cxx_compiler_flag_macro_prefix_map)
     else()
         # as of writing this code, clang does not support option '-fmacro-prefix-map=...'
         message(STATUS "compiler option '-fmacro-prefix-map=old=new' NOT SUPPORTED")
-        add_compile_definitions(USE_MACROPREFIXMAP=0)
+        target_compile_definitions(converter INTERFACE
+                                        USE_MACROPREFIXMAP=0)
 
         # https://stackoverflow.com/questions/8487986/file-macro-shows-full-path/40947954#40947954
         string(LENGTH "${CMAKE_CURRENT_SOURCE_DIR}/" CONVERTER_SOURCE_PATH_SIZE)
-        add_compile_definitions(CONVERTER_SOURCE_PATH_SIZE=${CONVERTER_SOURCE_PATH_SIZE})
+        target_compile_definitions(converter INTERFACE
+                                        CONVERTER_SOURCE_PATH_SIZE=${CONVERTER_SOURCE_PATH_SIZE})
     endif()
 endmacro()
 
@@ -376,7 +379,7 @@ macro(converter_enable_warnings)
         "$<${gcc_like_cxx}:$<BUILD_INTERFACE:${gcc_warnings}>>"
         "$<${gcc_cxx_v5_or_later}:$<BUILD_INTERFACE:-Wsuggest-override>>"
         "$<${msvc_cxx}:$<BUILD_INTERFACE:-W4>>")
-        #add_compile_options("/utf-8")  for msvc  -> check in cxxopts.cmake
+    #add_compile_options("/utf-8")  for msvc  -> check in cxxopts.cmake
 endmacro()
 
 # Helper function to configure, include, compile, link, build
@@ -397,7 +400,7 @@ macro(converter_build)
         message(STATUS "Using build type '${CMAKE_BUILD_TYPE}'.")
     endif()
 
-    option(ENABLE_CONVERTER_MESSAGE_LOG  "Set to ON for debugging logs"   "$<CONFIG:Debug>")
+    option(ENABLE_CONVERTER_DEBUG_LOG  "Set to ON for debugging logs"   $<CONFIG:Debug>)
 
     #[==================================================================================[
     add_subdirectory(include)  ??? is it needed ; if so then with include/converter
@@ -427,7 +430,8 @@ macro(converter_build)
 
     target_compile_definitions(converter INTERFACE
         $<$<CONFIG:Debug>:DEBUG_BUILD>
-        $<$<CONFIG:Release>:RELEASE_BUILD>)
+        $<$<CONFIG:Release>:RELEASE_BUILD>
+        $<$<BOOL:"${ENABLE_CONVERTER_DEBUG_LOG}">:ENABLE_CONVERTER_DEBUG_LOG>)
     #[==================================================================================[
     # refer https://cmake.org/cmake/help/v3.27/manual/cmake-generator-expressions.7.html#genex:COMPILE_LANG_AND_ID
     # This specifies the use of different compile definitions based on both the compiler id and compilation language.

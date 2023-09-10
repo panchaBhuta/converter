@@ -11,6 +11,7 @@
 template <typename T>
 void conversionEqualCheck(const T& val, const std::string& vStr)
 {
+  std::cout << "######  date-conversion testing for date=" << vStr << std::endl;
   unittest::ExpectEqual(T,           converter::ConvertFromStr<T>::ToVal(vStr), val);
   unittest::ExpectEqual(std::string, converter::ConvertFromVal<T>::ToStr(val), vStr);
 }
@@ -40,6 +41,7 @@ int main()
                                        ),
             "2000-02-29"); // leap year (every 400 years)
  
+    std::cout << "######  date-conversion testing for date=[1900-02-29]" << std::endl;
     std::chrono::year_month_day invalidDate1( std::chrono::year(1900),
                                               std::chrono::month(2),
                                               std::chrono::day(29) );  // NOT leap year (every 100 years)
@@ -60,7 +62,12 @@ int main()
     unittest::ExpectEqual(int, int(invalidConversionDate1.year()), 1900);
     unittest::ExpectEqual(unsigned, unsigned(invalidConversionDate1.month()), 2);
     unittest::ExpectEqual(unsigned, unsigned(invalidConversionDate1.day()), 29);
- 
+    unittest::ExpectEqual(std::string,
+                          converter::ConvertFromVal<std::chrono::year_month_day>::ToStr(invalidDate1),
+                          "1900-02-29");  // NOT leap year (every 100 years)
+
+
+    std::cout << "######  date-conversion testing for date=[2023-1-32]" << std::endl;
     std::chrono::year_month_day invalidDate2( std::chrono::year(2023),
                                               std::chrono::month(1),
                                               std::chrono::day(32) );  // invalid date
@@ -81,11 +88,6 @@ int main()
     unittest::ExpectEqual(int, int(invalidConversionDate2.year()), 2023);
     unittest::ExpectEqual(unsigned, unsigned(invalidConversionDate2.month()), 1);
     unittest::ExpectEqual(unsigned, unsigned(invalidConversionDate2.day()), 32);
-
-    unittest::ExpectEqual(std::string,
-                          converter::ConvertFromVal<std::chrono::year_month_day>::ToStr(invalidDate1),
-                          "1900-02-29");  // NOT leap year (every 100 years)
-
     unittest::ExpectEqual(std::string,
                           converter::ConvertFromVal<std::chrono::year_month_day>::ToStr(invalidDate2),
                           "2023-01-32");  // NOT leap year (every 100 years)
