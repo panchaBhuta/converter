@@ -44,8 +44,7 @@ jobs:
         uses: microsoft/setup-msbuild@v1.3.1
       - name: Checkout Repo
         uses: actions/checkout@v3
-      - run:
-        cmake --version
+      - run: cmake --version
       - name: Configure CMake (compiler=default) [Debug]
         # https://hungvu.tech/advanced-github-actions-conditional-workflow
         # https://samanpavel.medium.com/github-actions-conditional-job-execution-e6aa363d2867
