@@ -19,6 +19,7 @@ macro(add_unit_test testname)
     add_executable(${testname} ${sources})
     add_test(NAME ${testname} COMMAND "${PROJECT_BINARY_DIR}/tests/${testname}")
     target_link_libraries(${testname} PUBLIC converter)
+    set_target_properties(${testname} PROPERTIES  LINKER_LANGUAGE CXX)
   endif()
 endmacro(add_unit_test)
 
@@ -36,8 +37,8 @@ endmacro(add_perf_test)
 # Test macro add_example
 macro(add_example testname)
   if(CMAKE_BUILD_TYPE MATCHES "Debug")
-    add_executable(${testname} examples/${testname}.cpp)
-    target_link_libraries(${testname} PUBLIC converter ${DATELIB})
+    add_executable(${testname} ../examples/${testname}.cpp)
+    target_link_libraries(${testname} PUBLIC converter)
   endif()
 endmacro(add_example)
 
@@ -55,8 +56,8 @@ add_unit_test(testUserDefinedConverter_lowerPrecision)
 add_unit_test(testUserDefinedConverter_locale)
 
 add_unit_test(testDateConversions)
-#add_unit_test(testInvalidComposition)
 add_unit_test(testTupleConversions)
+#add_unit_test(testInvalidComposition)
 
 
 

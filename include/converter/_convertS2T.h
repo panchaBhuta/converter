@@ -576,7 +576,8 @@ namespace converter
 
   /**
    * @brief     Specialized implementation handling string to char conversion.
-   * @tparam  T                     'char-type' converted to, from string data.
+   * @tparam  CH                     'char-type' converted to, from string data.
+   * @tparam  PROCESS_ERR            enum variable of type FailureS2Tprocess.
    */
   template<c_char CH, FailureS2Tprocess PROCESS_ERR>
   struct ConvertFromStr< CH, S2T_Format_WorkAround<CH, PROCESS_ERR> >
@@ -619,6 +620,7 @@ namespace converter
 
   /**
    * @brief     Specialized implementation handling string to bool conversion.
+   * @tparam  PROCESS_ERR             'char-type' converted to, from string data.
    */
   template<FailureS2Tprocess PROCESS_ERR>
   struct ConvertFromStr<bool, S2T_Format_WorkAround<bool, PROCESS_ERR> >

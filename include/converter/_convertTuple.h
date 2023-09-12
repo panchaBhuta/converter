@@ -165,7 +165,8 @@ namespace converter
                   (tupleArgs = t_S2Tconv_c<T_C>::ToVal(token)) :
                   (tupleArgs = typename t_S2Tconv_c<T_C>::return_type())
             ),
-          ...);
+            ...
+          );
         }, theTuple
       );
       return theTuple;
