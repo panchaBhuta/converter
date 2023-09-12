@@ -27,7 +27,15 @@ namespace converter
 {
   // [=============================================================[ S2T_FORMAT
 
-  // [===========[ workarounds in case std::apply() doesn't work as expected for a given compiler(MSVC)
+  // [===========[ workarounds in case std::apply() doesn't work as expected for a given compiler
+  /**
+   * @brief   populate a tuple from a vector of string.
+   * @tparam  IDX                 The tuple/vector index being processed by the template instance.
+   * @tparam  S2Tconv             converter types that satisfies concept 'c_S2Tconverter'.
+   * @param   dataVec             vector of string, having string representation of numeric values.
+   * @param   colIdx              start id of dataVec in case vector starts with the column-name.
+   * @param   dataTuple           values stored in the tuple after performing string-to-value conversion.
+   */
   template <size_t IDX, c_S2Tconverter ... S2Tconv>
   inline static void getTupleElements(const std::vector<std::string>& dataVec,
                                       const size_t colIdx,
@@ -73,6 +81,14 @@ namespace converter
   // [=============================================================[ ConvertFromVal
 
   // [===========[ workarounds in case std::apply() doesn't work as expected for a given compiler(MSVC)
+  /**
+   * @brief   populate a vector of string from a tuple.
+   * @tparam  IDX                 The tuple/vector index being processed by the template instance.
+   * @tparam  T2Sconv             converter types that satisfies concept 'c_T2Sconverter'.
+   * @param   dataTuple           values stored in the tuple after performing string-to-value conversion.
+   * @param   colIdx              start id of dataVec in case vector starts with the column-name.
+   * @param   dataVec             vector of string, having string representation of numeric values.
+   */
   template <size_t IDX,c_T2Sconverter ... T2Sconv>
   inline static void setTupleElements(const std::tuple<typename T2Sconv::input_type ...>& dataTuple,
                                       const size_t colIdx,
@@ -113,6 +129,51 @@ namespace converter
 
   /**
    * @brief   Convertor class implementation for tuple type, with underlying elements(of different types)
+   *          individually converted from string.
+   * @tparam  T_C                   T can be data-type such as int, double etc ;     xOR
+   *                                C -> Conversion class statisfying concept 'c_S2Tconverter'.
+   */
+  template< typename ... T_C >
+  struct ConvertFromString
+  {
+    /**
+     * @brief   'type' definition returned by the convertor.
+     */
+    using return_type = typename std::tuple<typename t_S2Tconv_c<T_C>::return_type ...>;
+
+    // TODO unit test
+    /**
+     * @brief   Converts comma-seperated string to a 'tuple'.
+     *          The input string has the format "ele0,ele1,ele2...".
+     *          Each element of the tuple is converted to string using 't_S2Tconv<T_C>::ToVal(...)'
+     * @param   theTuple                 input tuple.
+     * @param   seperator                char seperator between elements.
+     * @returns string.
+     */
+    inline static return_type
+    ToVal(std::string const& strTuple, char seperator = ',')
+    {
+      return_type theTuple;
+      std::istringstream ss(strTuple);
+      std::string token;
+      std::apply
+      (
+        [&ss,seperator,&token] (typename t_S2Tconv_c<T_C>::return_type &... tupleArgs)
+        {
+          (
+            ( (std::getline(ss, token, seperator)) ?
+                  (tupleArgs = t_S2Tconv_c<T_C>::ToVal(token)) :
+                  (tupleArgs = typename t_S2Tconv_c<T_C>::return_type())
+            ),
+          ...);
+        }, theTuple
+      );
+      return theTuple;
+    }
+  };
+
+  /**
+   * @brief   Convertor class implementation for tuple type, with underlying elements(of different types)
    *          individually converted to string.
    * @tparam  T_C                   T can be data-type such as int, double etc ;     xOR
    *                                C -> Conversion class statisfying concept 'c_T2Sconverter'.
@@ -123,24 +184,23 @@ namespace converter
     // TODO unit test
     /**
      * @brief   Converts variable holding 'tuple' value to string.
-     *          The output string has the format "[ ele0, ele1, ele2 ...]".
+     *          The output string has the format "ele0,ele1,ele2...".
      *          Each element of the tuple is converted to string using 't_T2Sconv<T_C>::ToStr(...)'
      * @param   theTuple                 input tuple.
+     * @param   seperator                char seperator between elements.
      * @returns string.
      */
     inline static std::string
-    ToStr(std::tuple<typename t_T2Sconv_c<T_C>::input_type ...> const& theTuple)
+    ToStr(std::tuple<typename t_T2Sconv_c<T_C>::input_type ...> const& theTuple, char seperator = ',')
     {
       std::stringstream ss;
       std::apply
       (
-        [&ss] (typename t_T2Sconv_c<T_C>::input_type const&... tupleArgs)
+        [&ss,&seperator] (typename t_T2Sconv_c<T_C>::input_type const&... tupleArgs)
         {
-          ss << '[';
           std::size_t n{0};
-          ((ss << t_T2Sconv_c<T_C>::ToStr(tupleArgs) << (++n != sizeof...(T_C) ? ", " : "")), ...);
-          //((ss << tupleArgs << (++n != sizeof...(T_C) ? ", " : "")), ...);
-          ss << ']';
+          ((ss << t_T2Sconv_c<T_C>::ToStr(tupleArgs) << (++n != sizeof...(T_C) ? &seperator : "")), ...);
+          //((ss << tupleArgs << (++n != sizeof...(T_C) ? "," : "")), ...);
         }, theTuple
       );
       return ss.str();

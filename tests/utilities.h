@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cmath>
+#include <typeinfo>
 #include <algorithm>
 
 #include "unittest.h"
@@ -9,8 +10,17 @@
 
 #pragma once
 
+template<typename T>
+inline std::string getTypeName();
 
-#define GET_TYPENAME(T) #T
+template<>
+inline std::string getTypeName<float>() { return "float"; }
+template<>
+inline std::string getTypeName<double>() { return "double"; }
+template<>
+inline std::string getTypeName<long double>() { return "long_double"; }
+
+#define GETTYPENAME(T) getTypeName<T>(#T)
 
 template<typename T,
          typename TConvertFromStr = converter::ConvertFromStr<T>,
@@ -106,7 +116,7 @@ void checkRoundTripConversion_txt2Val2txt( const std::string& testID,
 
       unittest::ExpectEqual(std::string, significantDigits_input, significantDigits_actual);
       return;
-    } 
+    }
 
     std::ostringstream ossConv;
     //ossConv << "valConv{without-precision}=" << valConv << std::endl;
@@ -116,7 +126,7 @@ void checkRoundTripConversion_txt2Val2txt( const std::string& testID,
     ossConv << valConv;
 
     std::cout << std::setprecision(LDBL_DIG + 5); // << std::boolalpha;
-    std::cout << testID << " :: roundtrip conversion value does not match for type=" << GET_TYPENAME(T) << " ..." << std::endl;
+    std::cout << testID << " :: roundtrip conversion value does not match for type=" << getTypeName<T>() << " ..." << std::endl;
     std::cout << "      input-text{" << strInput      << "} -> valConv{" << ossConv.str() << "}" << std::endl;
     std::cout << "         valConv{" << ossConv.str() << "} -> roundtrip-text{" << strRoundtripActual << "}" << std::endl;
     std::cout << "      input-text{" << strInput << "} != roundtrip-text{" << strRoundtripActual << "}" << std::endl;

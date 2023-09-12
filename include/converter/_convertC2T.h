@@ -52,11 +52,17 @@ namespace converter
 
   // [=============================================================[ ConvertFromStr
  
+  /*
+   * This a helper internal class, not meant to be called by upstream users.
+  */
   template <typename T, FailureS2Tprocess PROCESS_ERR>
   class _ConvertFromStr_POS_Cargs
   {
     friend struct converter::ConvertFromStr< T, S2T_Format_std_CtoT<T, PROCESS_ERR> >;
 
+    /*
+     * Function wrapper to query if the complete input string was read during conversion.
+     */
     inline static T
     _ToVal_args(const std::string& str, std::size_t* pos, auto format_args)
     {
@@ -93,7 +99,8 @@ namespace converter
 
   /**
    * @brief     Convertor class implementation for integer types FROM string.
-   * @tparam  T                     'numeric-type' converted to, from string data.
+   *            This conversion is achieved using 'std::from_chars'.
+   * @tparam  T                     'integer-type' converted to, from string data.
    */
   template <c_integer_type T, FailureS2Tprocess PROCESS_ERR>
   struct ConvertFromStr<T, S2T_Format_std_CtoT<T, PROCESS_ERR> >
@@ -114,7 +121,7 @@ namespace converter
      * @brief   Converts string holding a integer represenation to integer datatype.
      * @param   str                 input string.
      * @param   pos                 address of an integer to store the number of characters processed.
-     * @param   base                the number base.
+     * @param   base                integer base to use: a value between 2 and 36 (inclusive). 
      * @returns Numerical value if conversion succeeds.
      *          Else throws error on conversion failure.
      */
@@ -124,6 +131,12 @@ namespace converter
       return _ConvertFromStr_POS_Cargs<T, PROCESS_ERR>::_ToVal_args(str, pos, base);
     }
   
+    /**
+     * @brief   Converts string holding a integer represenation to integer datatype.
+     * @param   str                 input string.
+     * @returns Numerical value if conversion succeeds.
+     *          Else throws error on conversion failure.
+     */
     inline static return_type
     ToVal(const std::string& str)
     {
@@ -132,6 +145,11 @@ namespace converter
   };
 
 #if USE_FLOATINGPOINT_FROM_CHARS_1  ==  _e_ENABLE_FEATURE_
+  /**
+   * @brief     Convertor class implementation for floating-point types FROM string.
+   *            This conversion is achieved using 'std::from_chars'.
+   * @tparam  T                     'floating-point-type' converted to, from string data.
+   */
   template <c_floating_point T, FailureS2Tprocess PROCESS_ERR>
   struct ConvertFromStr<T, S2T_Format_std_CtoT<T, PROCESS_ERR> >
   {
@@ -150,7 +168,7 @@ namespace converter
      * @brief   Converts string holding a integer represenation to integer datatype.
      * @param   str                 input string.
      * @param   pos                 address of an integer to store the number of characters processed.
-     * @param   base                the number base.
+     * @param   fmt                 floating-point formatting to use, a bitmask of type std::chars_format.
      * @returns Numerical value if conversion succeeds.
      *          Else throws error on conversion failure.
      */
@@ -161,6 +179,12 @@ namespace converter
       return _ConvertFromStr_POS_Cargs<T, PROCESS_ERR>::_ToVal_args(str, pos, fmt);
     }
   
+    /**
+     * @brief   Converts string holding a floating-number represenation to floating datatype.
+     * @param   str                 input string.
+     * @returns Numerical value if conversion succeeds.
+     *          Else throws error on conversion failure.
+     */
     inline static return_type
     ToVal(const std::string& str)
     {

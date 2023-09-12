@@ -172,19 +172,19 @@ namespace converter
 
   // https://stackoverflow.com/questions/68058640/using-concepts-to-select-class-template-specialization?rq=3
   /**
-   * @brief     Class declaration for any types, TO string using 'std::ostringstream'.
+   * @brief     Class declaration for any types, TO string.
    * @tparam  T                     'type' converted from, to string data.
-   * @tparam  T2S_FORMAT            Class which encapsulates conversion parameters/directives such as 'Locale'.
+   * @tparam  T2S_FORMAT            Class which encapsulates conversion parameters/directives such as using 'Locale'.
    *                                Optional argument, default's to 'T2S_DefaultFormat<T>::type'.
    */
   template<typename T, typename T2S_FORMAT = typename T2S_DefaultFormat<T>::type >
   struct ConvertFromVal
   {
     /*
-     *  This template instance should get initialized.
-     *  In case it does taht would mean something going wrong,
-     *  and the static function 'instanceEvaluater()' will
-     *  help in figuring out the problem.
+     *  Normally, this template instance should not get initialized.
+     *  In case it does that would mean template parameters passed
+     *  are not as expected. The static function 'instanceEvaluater()'
+     *  will help in figuring out the problem.
      */
     static float instanceEvaluater()
     {
@@ -219,7 +219,7 @@ namespace converter
   /**
    * @brief     Convertor class implementation for any types, TO string; using 'std::ostringstream'.
    * @tparam  T                     'type' converted from, to string data. (Not Applicable for string to string conversion)
-   * @tparam  T2S_FORMAT            Class which encapsulates conversion parameters/directives such as 'Locale'.
+   * @tparam  T2S_FORMAT_STREAM      Class which encapsulates conversion parameters/directives such as using 'Locale'.
    */
   template<c_NOT_string T, c_formatOSS T2S_FORMAT_STREAM >
   struct ConvertFromVal<T, T2S_FORMAT_STREAM>
@@ -236,9 +236,9 @@ namespace converter
     static const int template_uid = -1;
 
     /**
-     * @brief   Converts numerical datatype from string holding a numerical value.
-     * @param   val                 input numerical value.
-     * @returns Output string if conversion succeeds.
+     * @brief   Converts numerical datatype from string holding a possibly-numerical value.
+     * @param   val                 input possibly-numerical value.
+     * @returns Output string if conversion succeeds. This type is any type that's supported by 'std::ostringstream'.
      *          Else throws 'std::invalid_argument' on conversion failure.
      */
     inline static std::string
@@ -274,17 +274,18 @@ namespace converter
   // for types refer :: https://en.cppreference.com/w/cpp/language/type
   /**
    * @brief     Convertor class implementation from integer types TO string.
+   *            This conversion is achieved using 'std::to_string'.
    * @tparam  T                     'type' converted from, to string data.
    */
   template<c_integer_type T>
   struct ConvertFromVal<T, T2S_Format_std_TtoS >
   {
     /**
-     * @brief   'type' definition being declared for.
+     * @brief   'integer type' definition being declared for.
      */
     using value_type = T;
     /**
-     * @brief   'type' definition expected by the convertor.
+     * @brief   'integer type' definition expected by the convertor.
      */
     using input_type = T;
 
@@ -309,11 +310,11 @@ namespace converter
   struct ConvertFromVal<T, T2S_Format_std_TtoS >
   {
     /**
-     * @brief   'type' definition being declared for.
+     * @brief   'floating-point type' definition being declared for.
      */
     using value_type = T;
     /**
-     * @brief   'type' definition expected by the convertor.
+     * @brief   'floating-point type' definition expected by the convertor.
      */
     using input_type = T;
 

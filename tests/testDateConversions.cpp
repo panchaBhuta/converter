@@ -1,5 +1,5 @@
 
-// test default conversions for inbuilt-types
+// test conversions for 'Date'
 
 
 #include <iostream>

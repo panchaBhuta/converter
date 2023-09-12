@@ -54,10 +54,16 @@ namespace converter
 
   // [=============================================================[ ConvertFromVal
 
+  /*
+   * This a helper internal class, not meant to be called by upstream users.
+  */
   template<typename T>
   struct _ConvertFromVal
   {
   protected:
+    /*
+     * Function wrapper to query if the conversion was succes after calling 'std::to_chars'.
+     */
     inline static std::string
     _ToStr_args(const T& val, auto... format_args)
     {
@@ -79,6 +85,7 @@ namespace converter
   // for types refer :: https://en.cppreference.com/w/cpp/language/type
   /**
    * @brief     Convertor class implementation from integer types TO string.
+   *            This conversion is achieved using 'std::to_chars'.
    * @tparam  T                     'type' converted from, to string data.
    */
   template<c_integer_type T>
@@ -86,11 +93,11 @@ namespace converter
         : protected  _ConvertFromVal<T>
   {
     /**
-     * @brief   'type' definition being declared for.
+     * @brief   'integr type' definition being declared for.
      */
     using value_type = T;
     /**
-     * @brief   'type' definition expected by the convertor.
+     * @brief   'integer type' definition expected by the convertor.
      */
     using input_type = T;
 
@@ -102,13 +109,20 @@ namespace converter
      * @returns string holding a integer represenation.
      *          Else throws error on conversion failure.
      */
-    inline static typename std::string
+    inline static std::string
     ToStr( const T& val)
     {
       return ToStr_args(val);
     }
 
-    inline static typename std::string
+    /**
+     * @brief   Converts integer datatype to string.
+     * @param   val                 numerical value.
+     * @param   base                integer base to use: a value between 2 and 36 (inclusive). 
+     * @returns string holding a integer represenation.
+     *          Else throws error on conversion failure.
+     */
+    inline static std::string
     ToStr_args( const T& val, int base = 10)
     {
       return _ConvertFromVal<T>::_ToStr_args(val, base);
@@ -118,43 +132,59 @@ namespace converter
 #if USE_FLOATINGPOINT_TO_CHARS_1  ==  _e_ENABLE_FEATURE_
   // for types refer :: https://en.cppreference.com/w/cpp/language/type
   /**
-   * @brief     Convertor class implementation from integer types TO string.
-   * @tparam  T                     'type' converted from, to string data.
+   * @brief     Convertor class implementation from floating-point types TO string.
+   *            This conversion is achieved using 'std::to_chars'.
+   * @tparam  T                     'floating-point type' converted from, to string data.
    */
   template<c_floating_point T>
   struct ConvertFromVal<T, T2S_Format_std_TtoC >
         : public  _ConvertFromVal<T>
   {
     /**
-     * @brief   'type' definition being declared for.
+     * @brief   'floating-point type' definition being declared for.
      */
     using value_type = T;
     /**
-     * @brief   'type' definition expected by the convertor.
+     * @brief   'floating-point type' definition expected by the convertor.
      */
     using input_type = T;
 
     static const int template_uid = -103;
 
     /**
-     * @brief   Converts integer datatype to string.
+     * @brief   Converts floating-point datatype to string.
      * @param   val                 numerical value.
-     * @returns string holding a integer represenation.
+     * @returns string holding a floating-point represenation.
      *          Else throws error on conversion failure.
      */
-    inline static typename std::string
+    inline static std::string
     ToStr( const T& val)
     {
       return _ConvertFromVal<T>::_ToStr_args(val);
     }
 
-    inline static typename std::string
+    /**
+     * @brief   Converts floating-point datatype to string.
+     * @param   val                 numerical value.
+     * @param   fmt                 floating-point formatting to use, a bitmask of type std::chars_format
+     * @returns string holding a floating-point represenation.
+     *          Else throws error on conversion failure.
+     */
+    inline static std::string
     ToStr_args( const T& val, std::chars_format fmt)
     {
       return _ConvertFromVal<T>::_ToStr_args(val, fmt);
     }
 
-    inline static typename std::string
+    /**
+     * @brief   Converts floating-point datatype to string.
+     * @param   val                 numerical value.
+     * @param   fmt                 floating-point formatting to use, a bitmask of type std::chars_format
+     * @param   precision           floating-point precision to use
+     * @returns string holding a floating-point represenation.
+     *          Else throws error on conversion failure.
+     */
+    inline static std::string
     ToStr_args( const T& val, std::chars_format fmt, int precision)
     {
       return _ConvertFromVal<T>::_ToStr_args(val, fmt, precision);

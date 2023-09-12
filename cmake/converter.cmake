@@ -330,31 +330,35 @@ macro(check_floatingPoint_elementaryStringConversions)
     #]===]
 endmacro()
 
-
-# Check if compiler supports '-fmacro-prefix-map=old=new'  option
-# refer ::: https://fossies.org/linux/bareos/core/CMakeLists.txt
-macro(check_cxx_compiler_flag_macro_prefix_map)
+#[===========[
+  Check if compiler supports '-fmacro-prefix-map=old=new'  option
+  refer ::: https://fossies.org/linux/bareos/core/CMakeLists.txt
+  also refer the links  below ...
+  https://reproducible-builds.org/docs/build-path/
+  https://blog.conan.io/2019/09/02/Deterministic-builds-with-C-C++.html
+  https://gcc.gnu.org/onlinedocs/gcc/Debugging-Options.html#index-fdebug-prefix-map
+  https://gcc.gnu.org/onlinedocs/gcc/Preprocessor-Options.html#index-fmacro-prefix-map
+  https://gcc.gnu.org/onlinedocs/gcc/Overall-Options.html#index-ffile-prefix-map
+#]===========]
+macro(check_cxx_compiler_flag_file_prefix_map)
     include(CheckCXXCompilerFlag)
-    check_cxx_compiler_flag(-fmacro-prefix-map=${CMAKE_CURRENT_SOURCE_DIR}=.
-                            cxx_compiler_macro_prefix_map
+    check_cxx_compiler_flag(-ffile-prefix-map=${CMAKE_CURRENT_SOURCE_DIR}=.
+                            cxx_compiler_file_prefix_map
                            )
-    if(cxx_compiler_macro_prefix_map)
-        message(STATUS "compiler option '-fmacro-prefix-map=old=new' SUPPORTED")
+    if(cxx_compiler_file_prefix_map)
+        message(STATUS "compiler option '-ffile-prefix-map=old=new' SUPPORTED")
         target_compile_definitions(converter INTERFACE
                                         USE_MACROPREFIXMAP=1)
 
-        set(CMAKE_CXX_FLAGS
-            "${CMAKE_CXX_FLAGS} -fmacro-prefix-map=${CMAKE_CURRENT_SOURCE_DIR}${_path_separator}="
-           )
+        target_compile_options(converter INTERFACE
+            "-ffile-prefix-map=${CMAKE_CURRENT_SOURCE_DIR}${_path_separator}=")
     else()
-        # as of writing this code, clang does not support option '-fmacro-prefix-map=...'
-        message(STATUS "compiler option '-fmacro-prefix-map=old=new' NOT SUPPORTED")
-        target_compile_definitions(converter INTERFACE
-                                        USE_MACROPREFIXMAP=0)
-
-        # https://stackoverflow.com/questions/8487986/file-macro-shows-full-path/40947954#40947954
+        # as of writing this code, clang does not support option '-ffile-prefix-map=...'
+        message(STATUS "compiler option '-ffile-prefix-map=old=new' NOT SUPPORTED")
         string(LENGTH "${CMAKE_CURRENT_SOURCE_DIR}/" CONVERTER_SOURCE_PATH_SIZE)
         target_compile_definitions(converter INTERFACE
+                                        USE_MACROPREFIXMAP=0
+        # https://stackoverflow.com/questions/8487986/file-macro-shows-full-path/40947954#40947954
                                         CONVERTER_SOURCE_PATH_SIZE=${CONVERTER_SOURCE_PATH_SIZE})
     endif()
 endmacro()

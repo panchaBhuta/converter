@@ -242,10 +242,10 @@ namespace converter
   struct ConvertFromStr
   {
     /*
-     *  This template instance should get initialized.
-     *  In case it does taht would mean something going wrong,
-     *  and the static function 'instanceEvaluater()' will
-     *  help in figuring out the problem.
+     *  Normally, this template instance should not get initialized.
+     *  In case it does that would mean template parameters passed
+     *  are not as expected. The static function 'instanceEvaluater()'
+     *  will help in figuring out the problem.
      */
     static float instanceEvaluater()
     {
@@ -278,6 +278,9 @@ namespace converter
     static constexpr float template_uid = instanceEvaluater();
   };
 
+  /*
+   * This a helper internal class, not meant to be called by upstream users.
+  */
   template < typename                                        T, 
              FailureS2Tprocess                               PROCESS_ERR,
              std::derived_from< OnError<T, PROCESS_ERR > >   ERR_HANDLER
@@ -286,11 +289,8 @@ namespace converter
   {
     friend struct ConvertFromStr< T, ERR_HANDLER >;
 
-    /**
-     * @brief   Converts string holding a integer represenation to integer datatype.
-     * @param   str                 input string.
-     * @returns Numerical value if conversion succeeds.
-     *          Else throws error on conversion failure.
+    /*
+     * Function wrapper to query if the complete input string was read during conversion.
      */
     inline static typename ERR_HANDLER::return_type
     _ToVal(const std::string& str)
@@ -327,9 +327,9 @@ namespace converter
 
   // https://eli.thegreenplace.net/2014/perfect-forwarding-and-universal-references-in-c/
   /**
-   * @brief     Convertor class implementation for any (no-string)type's, FROM string; using 'std::istringstream'.
+   * @brief     Convertor class implementation for any (non-string)type's, FROM input-string; using 'std::istringstream'.
    * @tparam  T                     'type' converted to, from string data. (Not Applicable for 'string to string' conversion.)
-   * @tparam  S2T_FORMAT            Class which encapsulates conversion parameters/directives such as using 'Locale'.
+   * @tparam  S2T_FORMAT_STREAM     Class which encapsulates conversion parameters/directives such as using 'Locale'.
    */
   template< c_NOT_string T, c_formatISS S2T_FORMAT_STREAM >
   struct ConvertFromStr<T, S2T_FORMAT_STREAM>
@@ -351,15 +351,16 @@ namespace converter
     using value_type  = T;
     /**
      * @brief   'type' definition returned by the convertor.
+     *           Can be 'T' or 'variant<T,string>' type.
      */
     using return_type = typename S2T_FORMAT_STREAM::return_type;
 
     static const int template_uid = 1;
 
     /**
-     * @brief   Converts string holding a numerical value to numerical datatype representation.
+     * @brief   Converts string holding a possibly-numerical value to numerical datatype representation.
      * @param   str                 input string.
-     * @returns Numerical value if conversion succeeds.
+     * @returns type value if conversion succeeds. This type is any type that's supported by 'std::istringstream'.
      *          Else throws 'std::invalid_argument' on conversion failure.
      */
     inline static return_type
@@ -391,6 +392,8 @@ namespace converter
 
   /**
    * @brief     Convertor class implementation for integer types FROM string.
+   *            This conversion is achieved using either of 'std::stoi' or 'std::stol',
+   *            and similar std-functions based on type 'T'.
    * @tparam  T                     'integer-type' converted to, from string data.
    */
   template <c_integer_type T, FailureS2Tprocess PROCESS_ERR>
@@ -425,7 +428,7 @@ namespace converter
      * @brief   Converts string holding a integer represenation to integer datatype.
      * @param   str                 input string.
      * @param   pos                 address of an integer to store the number of characters processed.
-     * @param   base                the number base.
+     * @param   base                integer base to use: a value between 2 and 36 (inclusive). 
      * @returns Numerical value if conversion succeeds.
      *          Else throws error on conversion failure.
      */
@@ -435,7 +438,7 @@ namespace converter
       /*
        * Size of int and short are implementation defined.
        * int and short are 2 bytes on 16 compilers.
-       * One 32 bit compilers, int is 4 bytes, while short remains 16 bits. 
+       * On 32 bit compilers, int is 4 bytes, while short remains 16 bits. 
        *
        * check for byte sizes of each integral type here ...
        * https://cplusplus.com/forum/general/140825/
@@ -493,6 +496,8 @@ namespace converter
 
   /**
    * @brief     Convertor class implementation for floating types from string.
+   *            This conversion is achieved using either of 'std::stof' or 'std::stod',
+   *            or 'std::stdold' based on type 'T'.
    * @tparam  T                     'floating-type' converted to, from string data.
    */
   template<c_floating_point T, FailureS2Tprocess PROCESS_ERR>
@@ -641,7 +646,7 @@ namespace converter
       unsigned long val = std::stoul(str); //(str, pos, base);
       if(val > 1)
       {
-        static const std::string errMsg("String isn't a bool. 'T _ConvertFromStr<bool,S2T_Format_WorkAround>::ToVal(const std::string& str)'");
+        static const std::string errMsg("String isn't a bool. 'T ConvertFromStr<bool,S2T_Format_WorkAround>::ToVal(const std::string& str)'");
         static const std::invalid_argument err(errMsg);
         CONVERTER_DEBUG_LOG( errMsg << std::endl << "string2bool-conversion-failure for value '" << str << "'" );
         return S2T_Format_WorkAround<bool, PROCESS_ERR>::handler(str, err);

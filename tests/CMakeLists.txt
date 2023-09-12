@@ -56,6 +56,7 @@ add_unit_test(testUserDefinedConverter_locale)
 
 add_unit_test(testDateConversions)
 #add_unit_test(testInvalidComposition)
+add_unit_test(testTupleConversions)
 
 
 

@@ -28,6 +28,19 @@ template <typename T>
 using _ConvT2S_OSS = converter::ConvertFromVal<T, converter::T2S_Format_StreamUseClassicLocale<char>>;
 
 
+template<converter::c_integer_type T>
+void checkConversionTemplateInstances()
+{
+  static_assert(std::is_same_v<typename converter::S2T_DefaultFormat<T>::type,
+                                        converter::S2T_Format_std_CtoT<T, converter::FailureS2Tprocess::THROW_ERROR>>);
+
+  static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<T>::type,
+                                        converter::T2S_Format_std_TtoC>);
+
+  static_assert(converter::ConvertFromStr<T>::template_uid ==  102);
+  static_assert(converter::ConvertFromVal<T>::template_uid == -102);
+}
+
 template <typename T>
 void conversion_String2Integer_FailureCheck(const std::string& vStr)
 {
@@ -87,6 +100,15 @@ void conversion_IntegerNAN2String_FailureCheck(const std::string& vStr)
 
 int main()
 {
+  checkConversionTemplateInstances<short>();
+  checkConversionTemplateInstances<int>();
+  checkConversionTemplateInstances<long>();
+  checkConversionTemplateInstances<long long>();
+  checkConversionTemplateInstances<unsigned short>();
+  checkConversionTemplateInstances<unsigned int>();
+  checkConversionTemplateInstances<unsigned long>();
+  checkConversionTemplateInstances<unsigned long long>();
+
   int rv = 0;
   try {
     // [========[  String to Integer-NaN

@@ -77,6 +77,9 @@
 
 namespace converter
 {
+  /**
+   * @brief     Class representing Version number of the project.
+  */
   static constexpr struct {
     uint8_t major, minor, patch;
   } version = {

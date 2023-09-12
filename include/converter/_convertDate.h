@@ -112,8 +112,8 @@ namespace converter
     // TODO unit tests
     /**
      * @brief   Converts string holding 'year_month_day' value. The string has the format "%F" -> "%Y-%m-%d"
-     * @param   str                 input string.
-     * @param   fmt                 a format string
+     * @param   str                 input string representing date.
+     * @param   fmt                 a format string of date-string.
      * @param   abbrev              if not null, pointer to an object that will hold the time zone abbreviation or name corresponding to the %Z specifier
      * @param   offset              if not null, pointer to an object that will hold the offset from UTC corresponding to the %z specifier 
      * @returns 'year_month_day'.
@@ -377,7 +377,7 @@ namespace converter
 
     /**
      * @brief   Converts string holding 'year_month_day' value. The string has the format "%F" -> "%Y-%m-%d"
-     * @param   str                 input string.
+     * @param   str                 input string representing date.
      * @returns 'year_month_day'.
      */
     inline static return_type //std::chrono::year_month_day
@@ -557,7 +557,7 @@ namespace converter
     /**
      * @brief   Converts variable holding 'year_month_day' value to string. The string has the format "%F" -> "%Y-%m-%d"
      * @param   val                 input 'year_month_day'.
-     * @param   fmt                 a format string
+     * @param   fmt                 a format string specifying the output string format.
      * @param   abbrev              if not null, pointer to an object that will hold the time zone abbreviation or name corresponding to the %Z specifier
      * @param   offset_sec          if not null, pointer to an object that will hold the offset from UTC corresponding to the %z specifier 
      * @returns string.

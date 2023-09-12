@@ -77,7 +77,7 @@ check_chrono_stream_functionality()
 check_clang_string_workaround()
 check_floatingPoint_elementaryStringConversions()
 
-check_cxx_compiler_flag_macro_prefix_map()
+check_cxx_compiler_flag_file_prefix_map()
 
 #if (CONVERTER_ENABLE_WARNINGS)
     converter_enable_warnings()
