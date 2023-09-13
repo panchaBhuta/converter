@@ -620,7 +620,7 @@ namespace converter
 
   /**
    * @brief     Specialized implementation handling string to bool conversion.
-   * @tparam  PROCESS_ERR             'char-type' converted to, from string data.
+   * @tparam  PROCESS_ERR             enum variable of type FailureS2Tprocess.
    */
   template<FailureS2Tprocess PROCESS_ERR>
   struct ConvertFromStr<bool, S2T_Format_WorkAround<bool, PROCESS_ERR> >

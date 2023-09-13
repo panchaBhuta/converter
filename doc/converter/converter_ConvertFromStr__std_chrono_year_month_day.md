@@ -8,7 +8,7 @@ struct ConvertFromStr< std::chrono::year_month_day, S2T_FORMAT_YMD>
 Specialized implementation handling string to 'year_month_day' conversion.  
 
 **Template Parameters**
-- `S2T_FORMAT_YMD`     type satisfying concept 'c_formatYMDiss'.
+- `S2T_FORMAT_YMD`     formatter-type satisfying concept 'c_formatYMDiss'.
 
 ---
 
@@ -29,8 +29,8 @@ Converts string holding 'year_month_day' value. The string has the format '%F' -
 ```c++
 static return_type ToVal_args (const std::string & str,
                                const std::string::value_type * fmt,
-                               [[maybe_unused]]std::string * abbrev = nullptr,
-                               [[maybe_unused]]std::chrono::minutes * offset = nullptr)
+                               [[maybe_unused]] std::string * abbrev = nullptr,
+                               [[maybe_unused]] std::chrono::minutes * offset = nullptr)
 ```
 Converts string holding 'year_month_day' value. The string has the format '%F' -> '%Y-%m-%d'. 
 

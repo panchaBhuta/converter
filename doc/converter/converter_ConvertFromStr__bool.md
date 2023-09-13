@@ -8,7 +8,7 @@ struct ConvertFromStr<bool, S2T_Format_WorkAround<bool, PROCESS_ERR> >
 Specialized implementation handling string to bool conversion.  
 
 **Template Parameters**
-- `PROCESS_ERR`     enum FailureS2Tprocess.
+- `PROCESS_ERR`        enum variable of type FailureS2Tprocess.
 
 
 ---

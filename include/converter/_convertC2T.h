@@ -101,6 +101,7 @@ namespace converter
    * @brief     Convertor class implementation for integer types FROM string.
    *            This conversion is achieved using 'std::from_chars'.
    * @tparam  T                     'integer-type' converted to, from string data.
+   * @tparam  PROCESS_ERR            enum variable of type FailureS2Tprocess.
    */
   template <c_integer_type T, FailureS2Tprocess PROCESS_ERR>
   struct ConvertFromStr<T, S2T_Format_std_CtoT<T, PROCESS_ERR> >
@@ -149,6 +150,7 @@ namespace converter
    * @brief     Convertor class implementation for floating-point types FROM string.
    *            This conversion is achieved using 'std::from_chars'.
    * @tparam  T                     'floating-point-type' converted to, from string data.
+   * @tparam  PROCESS_ERR           enum variable of type FailureS2Tprocess.
    */
   template <c_floating_point T, FailureS2Tprocess PROCESS_ERR>
   struct ConvertFromStr<T, S2T_Format_std_CtoT<T, PROCESS_ERR> >
@@ -165,7 +167,7 @@ namespace converter
     static const int template_uid = 103;
 
     /**
-     * @brief   Converts string holding a integer represenation to integer datatype.
+     * @brief   Converts string holding a floating-number represenation to floating datatype.
      * @param   str                 input string.
      * @param   pos                 address of an integer to store the number of characters processed.
      * @param   fmt                 floating-point formatting to use, a bitmask of type std::chars_format.

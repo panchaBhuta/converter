@@ -121,8 +121,8 @@ namespace converter
     inline static return_type
     ToVal_args(  const std::string& str,
                  const std::string::value_type* fmt,
-                 [[maybe_unused]]std::string* abbrev  = nullptr,
-                 [[maybe_unused]]std::chrono::minutes* offset = nullptr)
+                 [[maybe_unused]] std::string* abbrev  = nullptr,
+                 [[maybe_unused]] std::chrono::minutes* offset = nullptr)
 #if   USE_JUGAAD_FROMSTREAM_3  !=  _e_ENABLE_FEATURE_
     {
   #if   USE_CHRONO_FROMSTREAM_1  ==  _e_ENABLE_FEATURE_
