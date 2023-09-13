@@ -39,13 +39,13 @@ echo "################### gcc compiler ##########################"
     --std=gnu++2a -fconcepts \
      -I "$(pwd)/include" -I "$(pwd)/build-debug/_deps/date-src/include/" -I "$(pwd)/build-debug/include/" \
      -o ./build-tmp/gcc/${2}  "$(pwd)/${1}/${2}.cpp" \
-     -lstdc++
+     -lstdc++ -lm
 
 
 echo "################### clang compiler ##########################"
   mkdir -p ./build-tmp/clang
   rm -f ./build-tmp/clang/${2}
-  clang++ --verbose -g -Wall -Wextra -Wpedantic -Wshadow -Wpointer-arith \
+  /usr/bin/clang++ --verbose -g -Wall -Wextra -Wpedantic -Wshadow -Wpointer-arith \
                              -Wcast-qual -Wno-missing-braces -Wswitch-default -Wcast-align \
                              -Wunreachable-code -Wundef -Wuninitialized -Wold-style-cast \
                              -Wsign-conversion -Weffc++ \

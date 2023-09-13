@@ -136,6 +136,22 @@ namespace converter
   template< typename ... T_C >
   struct ConvertFromString
   {
+  private:
+    template <typename _TC>
+    inline static typename t_S2Tconv_c<_TC>::return_type
+    _getTokenConvert(std::istringstream& ss, char seperator)
+    {
+      std::string token;
+
+      if(std::getline(ss, token, seperator))
+      {
+        //std::cout << "token=" << token <<std::endl;
+        return t_S2Tconv_c<_TC>::ToVal(token);
+      }
+
+      return typename t_S2Tconv_c<_TC>::return_type();
+    }
+  public:
     /**
      * @brief   'type' definition returned by the convertor.
      */
@@ -155,18 +171,11 @@ namespace converter
     {
       return_type theTuple;
       std::istringstream ss(strTuple);
-      std::string token;
       std::apply
       (
-        [&ss,seperator,&token] (typename t_S2Tconv_c<T_C>::return_type &... tupleArgs)
+        [&ss,seperator] (typename t_S2Tconv_c<T_C>::return_type &... tupleArgs) -> void
         {
-          (
-            ( (std::getline(ss, token, seperator)) ?
-                  (tupleArgs = t_S2Tconv_c<T_C>::ToVal(token)) :
-                  (tupleArgs = typename t_S2Tconv_c<T_C>::return_type())
-            ),
-            ...
-          );
+          (( tupleArgs = _getTokenConvert<T_C>(ss, seperator)), ...);
         }, theTuple
       );
       return theTuple;
@@ -200,7 +209,14 @@ namespace converter
         [&ss,&seperator] (typename t_T2Sconv_c<T_C>::input_type const&... tupleArgs)
         {
           std::size_t n{0};
+#ifdef  __clang__
+          std::string seperatorStr(1,seperator);
+          std::string empty{""};
+          ((ss << t_T2Sconv_c<T_C>::ToStr(tupleArgs) << (++n != sizeof...(T_C) ?
+                                                         seperatorStr : empty)), ...);
+#else
           ((ss << t_T2Sconv_c<T_C>::ToStr(tupleArgs) << (++n != sizeof...(T_C) ? &seperator : "")), ...);
+#endif
           //((ss << tupleArgs << (++n != sizeof...(T_C) ? "," : "")), ...);
         }, theTuple
       );
