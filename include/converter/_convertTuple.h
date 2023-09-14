@@ -209,13 +209,13 @@ namespace converter
         [&ss,&seperator] (typename t_T2Sconv_c<T_C>::input_type const&... tupleArgs)
         {
           std::size_t n{0};
-#ifdef  __clang__
+#if USE_CLANG_CHARS_WORKAROUND_2 == 1
           CONVERTER_DEBUG_LOG("###### ConvertFromTuple::ToStr() -> using std::string");
           std::string seperatorStr(1,seperator);
           std::string empty{""};
           ((ss << t_T2Sconv_c<T_C>::ToStr(tupleArgs) << (++n != sizeof...(T_C) ?
                                                          seperatorStr : empty)), ...);
-#else
+#elif USE_CLANG_CHARS_WORKS_1 == 1
           CONVERTER_DEBUG_LOG("###### ConvertFromTuple::ToStr() -> using char*");
           ((ss << t_T2Sconv_c<T_C>::ToStr(tupleArgs) << (++n != sizeof...(T_C) ? &seperator : "")), ...);
 #endif

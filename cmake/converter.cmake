@@ -280,7 +280,14 @@ macro(check_clang_string_workaround)
                 set(USE_CLANG_STRING_WORKAROUND_2  ${_e_DISABLE_FEATURE_})
             endif()
         endif()
-    endif()    
+    endif()
+
+    set(USE_CLANG_CHARS_WORKS_1       ${_e_ENABLE_FEATURE_})
+    set(USE_CLANG_CHARS_WORKAROUND_2  ${_e_DISABLE_FEATURE_})
+    if(clang_cxx)
+        set(USE_CLANG_CHARS_WORKS_1       ${_e_DISABLE_FEATURE_})
+        set(USE_CLANG_CHARS_WORKAROUND_2  ${_e_ENABLE_FEATURE_})
+    endif()
 endmacro()
 
 # check if compiler supports "elementary string conversions" for floating-point types

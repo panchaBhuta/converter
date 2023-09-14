@@ -55,6 +55,8 @@
   [[maybe_unused]]static std::u32string clang_string_workaround(const char32_t* a, const char32_t* b) { return {a, b}; }
 #endif
 
+#cmakedefine01 USE_CLANG_CHARS_WORKS_1
+#cmakedefine01 USE_CLANG_CHARS_WORKAROUND_2
 
 /*
  * floating-point conversion by "Elementary string conversions*" is not supported by all OSes.

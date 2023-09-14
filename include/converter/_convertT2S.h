@@ -384,19 +384,19 @@ namespace converter
 
   /**
    * @brief     Specialized implementation handling char to string conversion.
-   * @tparam  T                     'char-type' converted from, to string data.
+   * @tparam  CH                    'char-type' converted from, to string data.
    */
-  template<c_char T>
-  struct ConvertFromVal<T, T2S_Format_WorkAround>
+  template<c_char CH>
+  struct ConvertFromVal<CH, T2S_Format_WorkAround>
   {
     /**
      * @brief   'type' definition being declared for.
      */
-    using value_type = T;
+    using value_type = CH;
     /**
      * @brief   'type' definition expected by the convertor.
      */
-    using input_type = T;
+    using input_type = CH;
 
     static const int template_uid = -5;
 
@@ -407,10 +407,10 @@ namespace converter
      * @returns string.
      */
     inline static std::string
-    ToStr(const T& val)
+    ToStr(const CH& val)
     {
       // https://stackoverflow.com/questions/27720553/conversion-of-wchar-t-to-string
-      std::basic_string<T> ssVal(&val,1);
+      std::basic_string<CH> ssVal(&val,1);
       return std::string(ssVal.begin(),ssVal.end());
     }
   };
