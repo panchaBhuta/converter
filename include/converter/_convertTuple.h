@@ -210,11 +210,13 @@ namespace converter
         {
           std::size_t n{0};
 #ifdef  __clang__
+          CONVERTER_DEBUG_LOG("ConvertFromTuple::ToStr() -> using std::string");
           std::string seperatorStr(1,seperator);
           std::string empty{""};
           ((ss << t_T2Sconv_c<T_C>::ToStr(tupleArgs) << (++n != sizeof...(T_C) ?
                                                          seperatorStr : empty)), ...);
 #else
+          CONVERTER_DEBUG_LOG("ConvertFromTuple::ToStr() -> using char*");
           ((ss << t_T2Sconv_c<T_C>::ToStr(tupleArgs) << (++n != sizeof...(T_C) ? &seperator : "")), ...);
 #endif
           //((ss << tupleArgs << (++n != sizeof...(T_C) ? "," : "")), ...);
