@@ -28,7 +28,7 @@ void conversionEqualCheck(const std::string& rowInput, const std::tuple<T...>& c
     unittest::ExpectEqual(std::string, rowInput, rowOutput);
   } else {
     std::string expStr(expectedCharOutput);
-    unittest::ExpectEqual(std::string, rowInput, expStr);
+    unittest::ExpectEqual(std::string, expStr, rowOutput);
   }
   //unittest::ExpectEqual(T, converter::ConvertFromStr<T...>::ToVal(vStr), val);
 }

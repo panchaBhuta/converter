@@ -43,9 +43,10 @@ Converts string holding a integer represenation to integer datatype.
 
 
 ---
+## class converter::ConvertFromStr< T, S2T_Format_std_CtoT< T, PROCESS_ERR > >
 
 ```c++
-template<c_integer_type T, FailureS2Tprocess PROCESS_ERR>
+template<c_floating_point T, FailureS2Tprocess PROCESS_ERR>
 struct ConvertFromStr<T, S2T_Format_std_CtoT<T, PROCESS_ERR> >
 ```
 

@@ -395,6 +395,7 @@ namespace converter
    *            This conversion is achieved using either of 'std::stoi' or 'std::stol',
    *            and similar std-functions based on type 'T'.
    * @tparam  T                     'integer-type' converted to, from string data.
+   * @tparam  PROCESS_ERR            enum variable of type FailureS2Tprocess.
    */
   template <c_integer_type T, FailureS2Tprocess PROCESS_ERR>
   struct ConvertFromStr<T, S2T_Format_std_StoT<T, PROCESS_ERR> >
@@ -499,6 +500,7 @@ namespace converter
    *            This conversion is achieved using either of 'std::stof' or 'std::stod',
    *            or 'std::stdold' based on type 'T'.
    * @tparam  T                     'floating-type' converted to, from string data.
+   * @tparam  PROCESS_ERR            enum variable of type FailureS2Tprocess.
    */
   template<c_floating_point T, FailureS2Tprocess PROCESS_ERR>
   struct ConvertFromStr<T, S2T_Format_std_StoT<T, PROCESS_ERR> >

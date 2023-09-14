@@ -166,7 +166,7 @@ namespace converter
     /**
      * @brief   Converts floating-point datatype to string.
      * @param   val                 numerical value.
-     * @param   fmt                 floating-point formatting to use, a bitmask of type std::chars_format
+     * @param   fmt                 floating-point formatting to use, a bitmask of type 'std::chars_format'
      * @returns string holding a floating-point represenation.
      *          Else throws error on conversion failure.
      */
