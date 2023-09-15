@@ -84,7 +84,7 @@ int main()
 
     std::vector<std::string> expectedOutputVector{"2023-02-21", "1", "2.29999995", "-3.39999999999999991", "-5"};
     conversionVectorEqualCheck<std::chrono::year_month_day,unsigned,float,double,int>
-        ("2023-02-21,1,2.3,-3.4,-5", chkTuple, expectedOutputVector);
+        (inputVector, chkTuple, expectedOutputVector);
 #else
     conversionStringEqualCheck<std::chrono::year_month_day,unsigned,float,double,int>
         ("2023-02-21,1,2.3,-3.4,-5", chkTuple);
