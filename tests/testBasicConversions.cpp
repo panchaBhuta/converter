@@ -50,6 +50,8 @@ int main()
     conversionEqualCheck<char8_t>('e',  "e");
     conversionEqualCheck<char16_t>('f',  "f");
     conversionEqualCheck<char32_t>('g',  "g");
+#else
+  #warning Possibly wrong build initialization. Either USE_CLANG_STRING_WORKS_1  or USE_CLANG_STRING_WORKAROUND_2 should be enabled.
 #endif
 
 
