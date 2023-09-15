@@ -218,6 +218,8 @@ namespace converter
 #elif USE_CLANG_CHARS_WORKS_1 == 1
           CONVERTER_DEBUG_LOG("###### ConvertFromTuple::ToStr() -> using char*");
           ((ss << t_T2Sconv_c<T_C>::ToStr(tupleArgs) << (++n != sizeof...(T_C) ? &seperator : "")), ...);
+#else
+  #error either USE_CLANG_CHARS_WORKS_1 or USE_CLANG_CHARS_WORKAROUND_2 should be 1
 #endif
           //((ss << tupleArgs << (++n != sizeof...(T_C) ? "," : "")), ...);
         }, theTuple

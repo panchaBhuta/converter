@@ -14,6 +14,15 @@ endif()
 
 include(CMakePackageConfigHelpers)
 
+set(clang_cxx "$<COMPILE_LANG_AND_ID:CXX,Clang>")
+set(clang_like_cxx "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang>")
+set(gcc_cxx "$<COMPILE_LANG_AND_ID:CXX,GNU>")
+set(gcc_like_cxx "$<OR:$<COMPILE_LANG_AND_ID:CXX,GNU,LCC>,${clang_like_cxx}>")
+set(msvc_cxx "$<COMPILE_LANG_AND_ID:CXX,MSVC>")
+
+set(_e_DISABLE_FEATURE_    0)
+set(_e_ENABLE_FEATURE_     1)
+
 function(converter_getversion version_arg)
     # Parse the current version from the converter header
     file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/include/converter/converter.h" converter_version_defines
@@ -238,10 +247,14 @@ endmacro()
 
 # Failure to compile std::u16string from libstdc++ 12.1 in c++20 mode #55560 
 # https://github.com/llvm/llvm-project/issues/55560
-macro(check_clang_string_workaround)
+macro(check_clang_string_workaround)  # NOTE setters should be in 'macro' and NOT in 'function'
     set(USE_CLANG_STRING_WORKS_1       ${_e_ENABLE_FEATURE_})
     set(USE_CLANG_STRING_WORKAROUND_2  ${_e_DISABLE_FEATURE_})
-    if(clang_like_cxx)
+
+    set(USE_CLANG_CHARS_WORKS_1       ${_e_ENABLE_FEATURE_})
+    set(USE_CLANG_CHARS_WORKAROUND_2  ${_e_DISABLE_FEATURE_})
+
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         try_compile(COMPILE_RESULT_CLANG_STRING_DEFAULT
                     SOURCE_FROM_FILE    check_clang_string.cpp
                                         "${CMAKE_CURRENT_SOURCE_DIR}/cmake/check_clang_string.cpp"
@@ -280,13 +293,12 @@ macro(check_clang_string_workaround)
                 set(USE_CLANG_STRING_WORKAROUND_2  ${_e_DISABLE_FEATURE_})
             endif()
         endif()
-    endif()
 
-    set(USE_CLANG_CHARS_WORKS_1       ${_e_ENABLE_FEATURE_})
-    set(USE_CLANG_CHARS_WORKAROUND_2  ${_e_DISABLE_FEATURE_})
-    if(clang_cxx)
+        message(STATUS "enabling USE_CLANG_CHARS_WORKAROUND_2")
         set(USE_CLANG_CHARS_WORKS_1       ${_e_DISABLE_FEATURE_})
         set(USE_CLANG_CHARS_WORKAROUND_2  ${_e_ENABLE_FEATURE_})
+    else()
+        message(STATUS "non clang compiler, default settings for USE_CLANG_STRING  and USE_CLANG_CHARS")
     endif()
 endmacro()
 

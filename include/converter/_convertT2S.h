@@ -463,10 +463,10 @@ namespace converter
 
     // TODO unit tests
     /**
-     * @brief   Converts variant<T, string> value to string.
+     * @brief   Converts `variant<T, string>` value to string.
      *          If input variant has T then 'T->S' conversion is applied,
      *          else variant's underlying string value is returned.
-     * @param   val                 input variant<T,string> value.
+     * @param   val                 input 'variant<T,string>' value.
      * @returns string.
      */
     inline static std::string ToStr(const input_type& val)

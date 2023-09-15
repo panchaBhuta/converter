@@ -32,16 +32,6 @@ converter_getversion(VERSION)
 # https://cmake.org/cmake/help/latest/variable/CMAKE_LANG_COMPILER_ID.html
 #
 #]==================================================================================]
-set(clang_cxx "$<COMPILE_LANG_AND_ID:CXX,Clang>")
-set(clang_like_cxx "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang>")
-set(gcc_cxx "$<COMPILE_LANG_AND_ID:CXX,GNU>")
-set(gcc_like_cxx "$<OR:$<COMPILE_LANG_AND_ID:CXX,GNU,LCC>,${clang_like_cxx}>")
-set(msvc_cxx "$<COMPILE_LANG_AND_ID:CXX,MSVC>")
-
-set(_e_DISABLE_FEATURE_    0)
-set(_e_ENABLE_FEATURE_     1)
-
-
 
 project(converter
         VERSION "${VERSION}"
@@ -49,11 +39,29 @@ project(converter
         HOMEPAGE_URL "${PROJECT_HOMEPAGE_URL}"
         LANGUAGES CXX)
 
+
+
 # Must include after the project call due to GNUInstallDirs requiring a language be enabled (IE. CXX)
 include(GNUInstallDirs)
 
+message(STATUS "COMPILER_ID=${CMAKE_CXX_COMPILER_ID}  version=${CXX_COMPILER_VERSION}")
+
 # Determine whether this is a standalone project or included by other projects
+set(CONVERTER_STANDALONE_PROJECT OFF)
+if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+    set(CONVERTER_STANDALONE_PROJECT ON)
+endif()
+#[===========[  donot use
 set(CONVERTER_STANDALONE_PROJECT   $<STREQUAL:"${CMAKE_SOURCE_DIR}","${PROJECT_SOURCE_DIR}">)
+# refer  https://stackoverflow.com/questions/35695152/cmake-generator-expression-is-not-being-evaluated
+# While generator expression is stored at configuration stage
+# (when corresponded CMake command is executed), evaluation of
+# generator expressions is performed at build stage.
+
+# This is why message() command prints generator expression in
+# non-dereferenced form: value denoted by the generator
+# expression is not known at this stage.
+#]===========]
 
 # Establish the project options
 option(CONVERTER_BUILD_EXAMPLES "Set to ON to build examples"        ${CONVERTER_STANDALONE_PROJECT})
@@ -66,8 +74,9 @@ if (CONVERTER_STANDALONE_PROJECT)
     converter_set_cxx_standard()
 endif()
 
+#message(STATUS "clang_cxx=${clang_cxx}")
 file(TO_NATIVE_PATH "/" _path_separator)
-message("The systems's path separator is '${_path_separator}'")
+message(STATUS "The systems's path separator is '${_path_separator}'")
 
 # Library
 add_library(converter INTERFACE)
