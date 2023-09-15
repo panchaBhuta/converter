@@ -117,6 +117,11 @@ namespace converter
                        size_t colIdx,
                        std::vector<std::string>& dataVec)
   {
+    constexpr size_t eleSize = std::tuple_size_v< std::tuple<typename T2Sconv::input_type ...> >;
+    if(dataVec.size() < eleSize )
+    {
+      dataVec.resize(eleSize, "");
+    }
     //https://stackoverflow.com/questions/42494715/c-transform-a-stdtuplea-a-a-to-a-stdvector-or-stddeque
     //auto read_tuple = [&dataVec,&colIdx] (auto&& ... rowElem) -> void   # doesnot work for msvc
     auto read_tuple = [&dataVec,&colIdx] (typename T2Sconv::input_type const& ... rowElem) -> void

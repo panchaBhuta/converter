@@ -5,6 +5,7 @@
 #include <tuple>
 #include <chrono>
 #include <string>
+#include <vector>
 #include <iostream>
 
 #include <converter/converter.h>
@@ -12,20 +13,51 @@
 #include "unittest.h"
 
 template <typename ... T>
-void conversionEqualCheck(const std::string& rowInput, const std::tuple<T...>& chkTuple,
-                          const char* expectedCharOutput = nullptr)
+void conversionVectorEqualCheck(const std::vector<std::string>& rowVecInput, const std::tuple<T...>& chkTuple,
+                                const std::vector<std::string>* expectedOutputVector = nullptr)
 {
-  std::cout << "######  rowInput=" << rowInput << std::endl;
+  std::cout << "######  rowVecInput" << /*rowVecInput <<*/ std::endl;
   using t_tupleRow = std::tuple<T...>;
-  t_tupleRow convTuple = converter::ConvertFromString<T...>::ToVal(rowInput);
+  t_tupleRow convTuple;
+  converter::GetTuple<converter::t_S2Tconv_c<T>...>(rowVecInput, 0, convTuple);
   if(chkTuple != convTuple)
   {
-    throw std::runtime_error("tuple row mismatch");
+    throw std::runtime_error("vector->tuple row mismatch");
+  }
+
+  std::vector<std::string> rowOutput;
+  converter::SetTuple<converter::t_T2Sconv_c<T>...>(convTuple, 0, rowOutput);
+  if(expectedOutputVector == nullptr)
+  {
+    if(rowVecInput != rowOutput)
+    {
+      throw std::runtime_error("tuple->vector row mismatch  : rowVecInput");
+    }
+    //unittest::ExpectEqual(std::vector<std::string>, rowVecInput, rowOutput);
+  } else {
+    if((*expectedOutputVector) != rowOutput)
+    {
+      throw std::runtime_error("tuple->vector row mismatch  : (*expectedOutputVector)");
+    }
+    //unittest::ExpectEqual(std::vector<std::string>, (*expectedOutputVector), rowOutput);
+  }
+}
+
+template <typename ... T>
+void conversionStringEqualCheck(const std::string& rowStrInput, const std::tuple<T...>& chkTuple,
+                                const char* expectedCharOutput = nullptr)
+{
+  std::cout << "######  rowStrInput=" << rowStrInput << std::endl;
+  using t_tupleRow = std::tuple<T...>;
+  t_tupleRow convTuple = converter::ConvertFromString<T...>::ToVal(rowStrInput);
+  if(chkTuple != convTuple)
+  {
+    throw std::runtime_error("string->tuple row mismatch");
   }
   std::string rowOutput = converter::ConvertFromTuple<T...>::ToStr(convTuple);
   if(expectedCharOutput == nullptr)
   {
-    unittest::ExpectEqual(std::string, rowInput, rowOutput);
+    unittest::ExpectEqual(std::string, rowStrInput, rowOutput);
   } else {
     std::string expStr(expectedCharOutput);
     unittest::ExpectEqual(std::string, expStr, rowOutput);
@@ -41,14 +73,24 @@ int main()
       chkTuple{std::chrono::year_month_day(std::chrono::year(2023),
                                            std::chrono::month(2),
                                            std::chrono::day(21)),
-              1,2.3f,-3.4,-5};
+               1,2.3f,-3.4,-5};
+
+    std::vector<std::string> inputVector{"2023-02-21", "1", "2.3", "-3.4", "-5"};
+
 #if defined(__APPLE__) && defined(__MACH__)
-    conversionEqualCheck<std::chrono::year_month_day,unsigned,float,double,int>
+    conversionStringEqualCheck<std::chrono::year_month_day,unsigned,float,double,int>
         ("2023-02-21,1,2.3,-3.4,-5", chkTuple,
          "2023-02-21,1,2.29999995,-3.39999999999999991,-5");
+
+    std::vector<std::string> expectedOutputVector{"2023-02-21", "1", "2.29999995", "-3.39999999999999991", "-5"};
+    conversionVectorEqualCheck<std::chrono::year_month_day,unsigned,float,double,int>
+        ("2023-02-21,1,2.3,-3.4,-5", chkTuple, expectedOutputVector);
 #else
-    conversionEqualCheck<std::chrono::year_month_day,unsigned,float,double,int>
+    conversionStringEqualCheck<std::chrono::year_month_day,unsigned,float,double,int>
         ("2023-02-21,1,2.3,-3.4,-5", chkTuple);
+
+    conversionVectorEqualCheck<std::chrono::year_month_day,unsigned,float,double,int>
+        (inputVector, chkTuple);
 #endif
   } catch (const std::exception& ex) {
     std::cout << "Unexpected exception in testTupleConversions: " << ex.what() << std::endl;

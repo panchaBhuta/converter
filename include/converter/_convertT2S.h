@@ -446,6 +446,13 @@ namespace converter
   };
 
 
+  /**
+   * @brief     Convertor class implementation for any types, TO string.
+   *            Data is 'variant<T, string>' represents either of type `T`
+   *            or string if underlying data has error.
+   * @tparam  T                     'type' converted from, to string data. (Not Applicable for string to string conversion)
+   * @tparam  T2S_FORMAT            Class which encapsulates conversion parameters/directives such as using 'Locale'.
+   */
   template< c_NOT_string T, typename T2S_FORMAT >
   struct ConvertFromVal<std::variant<T, std::string>, T2S_FORMAT>
   {
