@@ -65,6 +65,25 @@ void conversionStringEqualCheck(const std::string& rowStrInput, const std::tuple
   //unittest::ExpectEqual(T, converter::ConvertFromStr<T...>::ToVal(vStr), val);
 }
 
+#if defined(__APPLE__) && defined(__MACH__)
+  #if USE_FLOATINGPOINT_FROM_CHARS_1  ==  _e_ENABLE_FEATURE_ && USE_FLOATINGPOINT_TO_CHARS_1  ==  _e_ENABLE_FEATURE_
+    // when compiler is GNU.
+    #define FLOATINGPOINT_DISTORT 0
+  #else
+    // when compiler is AppleClang.
+    // The macro __GNUC__is defined even for AppleClang compiler,
+    // hence not able to use system dependent macro here.
+    // instead using application macros USE_FLOATINGPOINT_FROM_CHARS_1 and USE_FLOATINGPOINT_TO_CHARS_1.
+        // macOS does not support 'std::from_chars()' and
+        // 'std::to_chars()'. The fall back functions
+        // induces variations in results when compared to other OS's.
+    #define FLOATINGPOINT_DISTORT 1
+  #endif
+#else
+  #define FLOATINGPOINT_DISTORT 0
+#endif
+  
+
 int main()
 {
   int rv = 0;
@@ -77,7 +96,7 @@ int main()
 
     std::vector<std::string> inputVector{"2023-02-21", "1", "2.3", "-3.4", "-5"};
 
-#if defined(__APPLE__) && defined(__MACH__) && !defined(__GNUC__)
+#if  FLOATINGPOINT_DISTORT == 1
     conversionStringEqualCheck<std::chrono::year_month_day,unsigned,float,double,int>
         ("2023-02-21,1,2.3,-3.4,-5", chkTuple,
          "2023-02-21,1,2.29999995,-3.39999999999999991,-5");

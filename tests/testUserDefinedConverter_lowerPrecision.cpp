@@ -58,11 +58,21 @@ int main()
 // https://web.archive.org/web/20191012035921/http://nadeausoftware.com/articles/2012/01/c_c_tip_how_use_compiler_predefined_macros_detect_operating_system
 #if defined(WIN64) || defined(_WIN64) || defined(__WIN64) || defined(__WIN64__)
     const unsigned indexOS = 2;
-#elif defined(__APPLE__) && defined(__MACH__) && !defined(__GNUC__)
-    // macOS does not support 'std::from_chars()' and
-    // 'std::to_chars()'. The fall back functions
-    // induces variations in results when compared to other OS's.
+#elif defined(__APPLE__) && defined(__MACH__)
+  #if USE_FLOATINGPOINT_FROM_CHARS_1  ==  _e_ENABLE_FEATURE_ && USE_FLOATINGPOINT_TO_CHARS_1  ==  _e_ENABLE_FEATURE_
+    // when compiler is GNU.
+    #define  TEMPLATE_UID  103
+    const unsigned indexOS = 0;
+  #else
+    // when compiler is AppleClang.
+    // The macro __GNUC__is defined even for AppleClang compiler,
+    // hence not able to use system dependent macro her.
+    // instead using application macros USE_FLOATINGPOINT_FROM_CHARS_1 and USE_FLOATINGPOINT_TO_CHARS_1.
+        // macOS does not support 'std::from_chars()' and
+        // 'std::to_chars()'. The fall back functions
+        // induces variations in results when compared to other OS's.
     const unsigned indexOS = 1;
+  #endif
 #else  // ubuntu and other OS's
     const unsigned indexOS = 0;
 #endif

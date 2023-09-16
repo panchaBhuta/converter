@@ -35,9 +35,11 @@ jobs:
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software
         # os: [ macos-11, macos-12 ] compiles with 'AppleClang-14' which is not available in macos-11
         os: [ macos-12, macOS-latest ]  #  macOS-latest  ==  macOS-13
-        # clang++ = 'AppleClang-14'
-        # default = 'AppleClang-14'
-        compiler: [ default, g++-11, g++-12 ]
+        # https://github.com/actions/runner-images/blob/main/images/macos/macos-13-Readme.md#language-and-runtime
+        # https://github.com/actions/runner-images/blob/main/images/macos/macos-12-Readme.md#language-and-runtime
+          # clang++ = 'AppleClang-14'
+          # default = 'AppleClang-14'
+        compiler: [ default, g++-11, g++-12, clang++-15 ]
     runs-on: ${{matrix.os}}
     steps:
       - name: Checkout Repo

@@ -36,9 +36,10 @@ jobs:
         os: [windows-latest]  #  windows-latest  ==  windows-2022
         # https://cmake.org/cmake/help/latest/manual/cmake.1.html#cmdoption-cmake-T
         # CMake compiler option doesn't work for Visual Studio project :: https://youtrack.jetbrains.com/issue/CPP-17314
+        # https://github.com/actions/runner-images/blob/main/images/win/Windows2022-Readme.md#tools
           # default == 'MSVC 19'
           # ClangCl == 'Clang 16'
-        toolset_compiler: [ default, g++, ClangCl ]
+        toolset_compiler: [ default, g++-11, g++-12, g++-13, clang, ClangCl ]
     runs-on: ${{matrix.os}}
     steps:
       - name: Add msbuild to PATH
@@ -53,8 +54,11 @@ jobs:
         # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idif
         if: matrix.toolset_compiler == 'default'
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug
-      - name: Configure CMake (compiler=NOT-default) [Debug]
-        if: matrix.toolset_compiler != 'default'
+      - name: Configure CMake (compiler=${{matrix.toolset_compiler}}) [Debug]
+        if: matrix.toolset_compiler != 'default' &&  matrix.toolset_compiler != 'ClangCl'
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=${{matrix.toolset_compiler}}
+      - name: Configure CMake (compiler='ClangCl') [Debug]
+        if: matrix.toolset_compiler == 'ClangCl'
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug  -T "${{matrix.toolset_compiler}}"
       - name: Build [Debug]
         run: cmake --build "${{github.workspace}}/build-debug" --config Debug -j   -- -m -nologo -verbosity:quiet
@@ -67,8 +71,11 @@ jobs:
       - name: Configure CMake (compiler=default) [Release]
         if: matrix.toolset_compiler == 'default'
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release
-      - name: Configure CMake (compiler=NOT-default) [Release]
-        if: matrix.toolset_compiler != 'default'
+      - name: Configure CMake (compiler=${{matrix.toolset_compiler}}) [Release]
+        if: matrix.toolset_compiler != 'default' &&  matrix.toolset_compiler != 'ClangCl'
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=${{matrix.toolset_compiler}}
+      - name: Configure CMake (compiler='ClangCl') [Release]
+        if: matrix.toolset_compiler == 'ClangCl'
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release  -T "${{matrix.toolset_compiler}}"
       - name: Build [Release]
         run: cmake --build "${{github.workspace}}/build-release" --config Release -j   -- -m -nologo -verbosity:quiet
