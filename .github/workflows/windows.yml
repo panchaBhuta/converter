@@ -33,13 +33,20 @@ jobs:
         # https://github.com/actions/runner-images#available-images
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources  (os-labels : windows-2022)
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software
-        os: [windows-2019, windows-latest]  #  windows-latest  ==  windows-2022
+        os: [windows-latest]  #  windows-latest  ==  windows-2022
         # https://cmake.org/cmake/help/latest/manual/cmake.1.html#cmdoption-cmake-T
         # CMake compiler option doesn't work for Visual Studio project :: https://youtrack.jetbrains.com/issue/CPP-17314
         # https://github.com/actions/runner-images/blob/main/images/win/Windows2022-Readme.md#tools
           # default == 'MSVC 19'
+          # g++-11  == 'MSVC 19'
+          # g++-12  == 'MSVC 19'
+          # g++-13  == 'MSVC 19'
+          # clang   == 'MSVC 19'
           # ClangCl == 'Clang 16'
-        toolset_compiler: [ default, g++-11, g++-12, g++-13, clang, ClangCl ]
+        toolset_compiler: [ default, ClangCl ]
+        include:
+          - os: windows-2019
+            compiler : ClangCl
     runs-on: ${{matrix.os}}
     steps:
       - name: Add msbuild to PATH
@@ -58,7 +65,7 @@ jobs:
       - name: Configure CMake (compiler=${{matrix.toolset_compiler}}) [Debug]
         if: matrix.toolset_compiler != 'default' &&  matrix.toolset_compiler != 'ClangCl'
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=${{matrix.toolset_compiler}}
-      - name: Configure CMake (compiler='ClangCl') [Debug]
+      - name: Configure CMake (toolset_compiler='ClangCl') [Debug]
         if: matrix.toolset_compiler == 'ClangCl'
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug  -T "${{matrix.toolset_compiler}}"
       - name: Build [Debug]

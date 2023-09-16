@@ -44,7 +44,8 @@ project(converter
 # Must include after the project call due to GNUInstallDirs requiring a language be enabled (IE. CXX)
 include(GNUInstallDirs)
 
-message(STATUS "CXX_COMPILER_ID=${CMAKE_CXX_COMPILER_ID}  version=${CMAKE_CXX_COMPILER_VERSION}")
+message(STATUS "#### OS-id=${CMAKE_SYSTEM_NAME}   OS-id-version=${CMAKE_SYSTEM}")
+message(STATUS "#### CXX_COMPILER_ID=${CMAKE_CXX_COMPILER_ID}    version=${CMAKE_CXX_COMPILER_VERSION}")
 
 # Determine whether this is a standalone project or included by other projects
 set(CONVERTER_STANDALONE_PROJECT OFF)
