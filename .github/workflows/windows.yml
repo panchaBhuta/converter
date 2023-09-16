@@ -26,14 +26,14 @@ defaults:
 
 jobs:
   build-windows:
-    name: Build Windows
+    name: Build
     strategy:
       fail-fast: false
       matrix:
         # https://github.com/actions/runner-images#available-images
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources  (os-labels : windows-2022)
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software
-        os: [windows-latest]  #  windows-latest  ==  windows-2022
+        os: [windows-2019, windows-latest]  #  windows-latest  ==  windows-2022
         # https://cmake.org/cmake/help/latest/manual/cmake.1.html#cmdoption-cmake-T
         # CMake compiler option doesn't work for Visual Studio project :: https://youtrack.jetbrains.com/issue/CPP-17314
         # https://github.com/actions/runner-images/blob/main/images/win/Windows2022-Readme.md#tools
@@ -46,7 +46,8 @@ jobs:
         uses: microsoft/setup-msbuild@v1.3.1
       - name: Checkout Repo
         uses: actions/checkout@v3
-      - run: cmake --version
+      - name: Get Version
+        run: uname -a && cmake --version
       - name: Configure CMake (compiler=default) [Debug]
         # https://hungvu.tech/advanced-github-actions-conditional-workflow
         # https://samanpavel.medium.com/github-actions-conditional-job-execution-e6aa363d2867

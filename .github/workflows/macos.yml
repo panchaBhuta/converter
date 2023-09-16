@@ -26,7 +26,7 @@ defaults:
 
 jobs:
   build-macos:
-    name: Build MacOS
+    name: Build
     strategy:
       fail-fast: false
       matrix:
@@ -39,12 +39,13 @@ jobs:
         # https://github.com/actions/runner-images/blob/main/images/macos/macos-12-Readme.md#language-and-runtime
           # clang++ = 'AppleClang-14'
           # default = 'AppleClang-14'
-        compiler: [ default, g++-11, g++-12, clang++-15 ]
+        compiler: [ default, g++-11, g++-12, clang++ ]
     runs-on: ${{matrix.os}}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
-      - run: cmake --version
+      - name: Get Version
+        run: uname -a && cmake --version
       - name: Configure CMake (compiler=default) [Debug]
         if: matrix.compiler == 'default'
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
