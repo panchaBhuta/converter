@@ -35,9 +35,7 @@ jobs:
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software
         os: [ ubuntu-latest ]  #  ubuntu-latest  ==  ubuntu-22.04
         #  default  ==  g++-11
-        #  g++-latest  ==  g++-12
-        #  clang++-latest  ==  clang++-14
-        compiler: [ default, g++-latest, clang++-12, clang++-13, clang++-latest ]
+        compiler: [ default, g++-12, clang++-12, clang++-13, clang++-14 ]
     runs-on: ${{matrix.os}}
     steps:
       - name: Checkout Repo

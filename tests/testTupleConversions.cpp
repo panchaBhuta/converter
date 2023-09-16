@@ -77,7 +77,7 @@ int main()
 
     std::vector<std::string> inputVector{"2023-02-21", "1", "2.3", "-3.4", "-5"};
 
-#if defined(__APPLE__) && defined(__MACH__) && !defined(__GNUG__)
+#if defined(__APPLE__) && defined(__MACH__) && !defined(__GNUC__)
     conversionStringEqualCheck<std::chrono::year_month_day,unsigned,float,double,int>
         ("2023-02-21,1,2.3,-3.4,-5", chkTuple,
          "2023-02-21,1,2.29999995,-3.39999999999999991,-5");

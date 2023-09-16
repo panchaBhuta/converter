@@ -28,7 +28,7 @@ void checkConversionTemplateInstances()
 }
 
 const unsigned indexOS = 2;
-#elif defined(__APPLE__) && defined(__MACH__) && !defined(__GNUG__)
+#elif defined(__APPLE__) && defined(__MACH__) && !defined(__GNUC__)
 template<converter::c_floating_point T>
 void checkConversionTemplateInstances()
 {

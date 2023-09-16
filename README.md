@@ -10,29 +10,15 @@ Converter ( with Filter and Sort )
 |-----------|---------|-------------|
 | [![Linux](https://github.com/panchaBhuta/converter/workflows/Linux/badge.svg)](https://github.com/panchaBhuta/converter/actions?query=workflow%3ALinux) | [![macOS](https://github.com/panchaBhuta/converter/workflows/macOS/badge.svg)](https://github.com/panchaBhuta/converter/actions?query=workflow%3AmacOS) | [![Windows](https://github.com/panchaBhuta/converter/workflows/Windows/badge.svg)](https://github.com/panchaBhuta/converter/actions?query=workflow%3AWindows) |
 
-Converter is an easy-to-use C++ CSV parser library. It supports C++20 (and
+Converter is an easy-to-use C++ text<->type conversion library. It supports C++20 (and
 later), is header-only and comes with a basic test suite.
 
-
-Example Usage
-=============
-Here is a simple example reading a CSV file and getting 'Close' column as a vector of floats.
-
-https://github.com/panchaBhuta/converter/blob/d77d4e870d1672534d2dcb4f737eb33b7a5c7eb1/examples/colhdr.csv#L1-L6
-
-
-https://github.com/panchaBhuta/converter/blob/d77d4e870d1672534d2dcb4f737eb33b7a5c7eb1/examples/ex001.cpp#L1-L12
-
-
-
-Refer to section [More Examples](#more-examples) below for more examples.
-The [tests](tests/) directory also contains many simple usage examples.
 
 Supported Platforms
 ===================
 Converter is implemented using C++20 with the intention of being portable. It's been tested on:
-- Ubuntu 22.04 LTS
-- macOS Ventura 13.0
+- Ubuntu : 22.04 LTS
+- macOS : Monterey 12.0 ; Ventura 13.0
 - Windows 10 / Visual Studio 2019
 
 Installation

@@ -37,8 +37,7 @@ jobs:
         os: [ macos-12, macOS-latest ]  #  macOS-latest  ==  macOS-13
         # clang++ = 'AppleClang-14'
         # default = 'AppleClang-14'
-        # g++-latest  ==  g++-12
-        compiler: [ default, clang++, g++-11, g++-latest ]
+        compiler: [ default, g++-11, g++-12 ]
     runs-on: ${{matrix.os}}
     steps:
       - name: Checkout Repo
