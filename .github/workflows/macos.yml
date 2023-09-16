@@ -34,7 +34,7 @@ jobs:
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources  (os-labels : macos-12)
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software
         # os: [ macos-11, macos-12 ] compiles with 'AppleClang-14' which is not available in macos-11
-        os: [ macos-12, macOS-latest ]  #  macOS-latest  ==  macOS-13
+        os: [ macos-12, macOS-13 ]  #  macOS-latest  ==  macOS-13
         # https://github.com/actions/runner-images/blob/main/images/macos/macos-13-Readme.md#language-and-runtime
         # https://github.com/actions/runner-images/blob/main/images/macos/macos-12-Readme.md#language-and-runtime
           # clang++ == 'AppleClang-14'
