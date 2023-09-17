@@ -1,0 +1,67 @@
+name: Windows
+
+on:
+  push:
+    branches: [ master, main ]
+    paths-ignore:
+      - 'docs/**'
+    tags-ignore:
+      - v*
+  pull_request:
+    branches: [ master, main ]
+    paths-ignore:
+      - 'docs/**'
+    tags-ignore:
+      - v*
+  workflow_dispatch:
+
+#env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  #BUILD_TYPE: Release
+
+
+defaults:
+  run:
+    shell: cmd
+
+jobs:
+  build-windows:
+    name: Build
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2019, windows-2022]
+        generator: [ "MinGW Makefiles" ]
+    runs-on: ${{matrix.os}}
+    steps:
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.3.1
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+      - name: Get Version
+        shell: bash
+        run: uname -a && cmake --version
+      - name: Configure CMake (compiler=GNU) [Debug]
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -G "${{matrix.generator}}"
+      - name: Build [Debug]
+        run: cmake --build "${{github.workspace}}/build-debug" --config Debug -j   -- /m /nologo /verbosity:quiet
+      - name: Test [Debug]
+        working-directory: ${{github.workspace}}/build-debug
+        #run: ctest -C Debug --output-on-failure -j
+        run: ctest -C Debug --verbose
+      - name: Install [Debug]
+        run: cmake --install "${{github.workspace}}/build-debug" --config Debug
+      - name: Configure CMake (compiler=default) [Release]
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release -G "${{matrix.generator}}"
+      - name: Build [Release]
+        run: cmake --build "${{github.workspace}}/build-release" --config Release -j   -- /m /nologo /verbosity:quiet
+      - name: Test [Release]
+        working-directory: ${{github.workspace}}/build-release
+        run: ctest -C Release --verbose
+      - name: Install [Release]
+        run: cmake --install "${{github.workspace}}/build-release" --config Release
+      - name: Check Work-Arounds
+        shell: bash
+        run: grep define "${{github.workspace}}/build-release/include/converter/_workaroundConfig.h" | grep -v -e "^//" -e " _e_"
+
+
