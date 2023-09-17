@@ -59,7 +59,7 @@ jobs:
       - name: Get Version
         run: uname -a && cmake --version
       - name: Check mingw64-binaries
-        run: ls -l C:\msys64\mingw64\bin && echo "##### 'whereis g++'" && whereis g++ && "##### 'g++ --version'" && g++ --version
+        run: ls -l /mnt/c/msys64/mingw64/bin && echo "##### 'whereis g++'" && whereis g++ && "##### 'g++ --version'" && g++ --version
       - name: Set g++ to env-PATH
         run: echo "PATH=$PATH:C:\msys64\mingw64\bin" >> $GITHUB_ENV
       - name: Configure CMake (compiler=default) [Debug]
