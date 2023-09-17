@@ -34,15 +34,6 @@ CMake ExternalProject_Add
 -------------------------
 Converter may be included in a CMake project using _ExternalProject_Add_. Refer [here](https://github.com/panchaBhuta/cmakeExampleExternalProjectAdd).
 
-[//]: # (or Simply copy ...)
-[//]: # (------------------)
-
-[//]: # ([include/converter/converter.h]\(include/converter/converter.h\)  )
-[//]: # ([include/converter/converter.h]\(include/converter/converter.h\)  )
-[//]: # ([include/converter/view.h]\(include/converter/view.h\)  )
-
-[//]: # (... to your project/include/converter/ directory and include it.)
-
 
 [//]: # (TODO : add to 'vcpkg' and 'conan' packages)
 [//]: # (Converter is also available via)
@@ -66,51 +57,6 @@ These can be individually compiled using [manualBuild.sh](./manualBuild.sh) and 
 ```
 
 
-
-Reading a File with Column and Row Headers
-------------------------------------------
-By default converter treats the first row as column headers, and the first
-column is treated as data. This allows accessing columns using their labels,
-but not rows or cells (only using indices). In order to treat the first column
-as row headers one needs to use LabelParams and set pRowNameIdx to 0.
-
-### Column and Row Headers
-csv file with both column and row headers
-
-https://github.com/panchaBhuta/converter/blob/d77d4e870d1672534d2dcb4f737eb33b7a5c7eb1/examples/colrowhdr.csv#L1-L6
-
-
-https://github.com/panchaBhuta/converter/blob/d77d4e870d1672534d2dcb4f737eb33b7a5c7eb1/examples/ex002.cpp#L1-L16
-
-
-### Row Headers Only
-csv file with row header (no column header)
-
-https://github.com/panchaBhuta/converter/blob/d77d4e870d1672534d2dcb4f737eb33b7a5c7eb1/examples/rowhdr.csv#L1-L6
-
-
-https://github.com/panchaBhuta/converter/blob/d77d4e870d1672534d2dcb4f737eb33b7a5c7eb1/examples/ex003.cpp#L1-L13
-
-
-### No Headers
-csv file with no column and row headers
-
-https://github.com/panchaBhuta/converter/blob/d77d4e870d1672534d2dcb4f737eb33b7a5c7eb1/examples/nohdr.csv#L1-L5
-
-
-https://github.com/panchaBhuta/converter/blob/d77d4e870d1672534d2dcb4f737eb33b7a5c7eb1/examples/ex004.cpp#L1-L15
-
-
-Reading a File with Custom Separator
-------------------------------------
-For reading of files with custom separator (i.e. not comma), one need to
-specify the SeparatorParams argument. The following example reads a file using
-semi-colon as separator.
-
-https://github.com/panchaBhuta/converter/blob/d77d4e870d1672534d2dcb4f737eb33b7a5c7eb1/examples/semi.csv#L1-L6
-
-
-https://github.com/panchaBhuta/converter/blob/d77d4e870d1672534d2dcb4f737eb33b7a5c7eb1/examples/ex005.cpp#L1-L16
 
 
 
@@ -150,74 +96,6 @@ It is also possible to override conversions on a per-call basis, enabling more f
 
 https://github.com/panchaBhuta/converter/blob/d77d4e870d1672534d2dcb4f737eb33b7a5c7eb1/examples/ex009.cpp#L1-L43
 
-
-Reading CSV Data from a Stream or String
-----------------------------------------
-In addition to specifying a filename, converter supports constructing a Document
-from a stream and, indirectly through stringstream, from a string. File streams
-used with converter should be opened in `std::ios::binary` mode to enable full
-functionality. Here is a simple example reading CSV data from a string:
-
-https://github.com/panchaBhuta/converter/blob/d77d4e870d1672534d2dcb4f737eb33b7a5c7eb1/examples/ex007.cpp#L1-L25
-
-
-Check if a Column Exists
-------------------------
-Converter provides the methods GetColumnNames() and GetRowNames() to retrieve
-the column and row names. To check whether a particular column name exists
-one can for example do:
-
-```cpp
-converter::Document doc("file.csv");
-std::vector<std::string> columnNames = doc.GetColumnNames();
-bool columnExists =
-  (std::find(columnNames.begin(), columnNames.end(), "A") != columnNames.end());
-```
-
-Handling Quoted Cells
----------------------
-By default converter automatically dequotes quoted cells (i.e. removes the encapsulating
-`"` characters from `"example quoted cell"`). This functionality may be disabled by
-passing `pAutoQuote = false` in `SeparatorParams`, example:
-
-```cpp
-converter::Document doc("file.csv", converter::LabelParams(),
-                       converter::SeparatorParams(',' /* pSeparator */,
-                                                 false /* pTrim */,
-                                                 converter::sPlatformHasCR /* pHasCR */,
-                                                 false /* pQuotedLinebreaks */,
-                                                 false /* pAutoQuote */));
-```
-
-Skipping Empty and Comment Lines
---------------------------------
-Converter reads all lines by default, but may be called to ignore comment lines
-starting with a specific character, example:
-
-```cpp
-converter::Document doc("file.csv", converter::LabelParams(), converter::SeparatorParams(),
-                       converter::LineReaderParams(true /* pSkipCommentLines */,
-                                                  '#' /* pCommentPrefix */));
-```
-
-Using LineReaderParams it is also possible to skip empty lines, example:
-
-```cpp
-converter::Document doc("file.csv", converter::LabelParams(), converter::SeparatorParams(),
-                       converter::LineReaderParams(false /* pSkipCommentLines */,
-                                                  '#' /* pCommentPrefix */,
-                                                  true /* pSkipEmptyLines */));
-```
-
-UTF-16 and UTF-8
-----------------
-Converter's preferred encoding for non-ASCII text is UTF-8. UTF-16 LE and
-UTF-16 BE can be read and written by converter on systems where codecvt header
-is present. Define HAS_CODECVT before including converter.h in order to enable
-the functionality. Converter unit tests automatically detects the presence of
-codecvt and sets HAS_CODECVT as needed, see [CMakeLists.txt](CMakeLists.txt)
-for reference. When enabled, the UTF-16 encoding of any loaded file is
-automatically detected.
 
 
 Architecture Components and Overview
