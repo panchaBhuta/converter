@@ -39,23 +39,28 @@ jobs:
     steps:
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.3.1
-      #- name: Setup MSYS2
+      - name: Setup MSYS2
+      ## https://github.com/msys2/setup-msys2/tree/main
       ## https://github.com/msys2/setup-msys2/blob/main/examples/cmake.yml
-      #  with:
-      #    msystem: mingw64
-      #    update: true
-      #    install: >-
-      #      git
-      #      make
-      #    pacboy: >-
-      #      toolchain:p
-      #      cmake:p
-      #  run: make --version
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: mingw64
+      #    msystem: UCRT64
+          update: true
+          install: >-
+            git
+            make
+          pacboy: >-
+            toolchain:p
+            cmake:p
       - name: Checkout Repo
         uses: actions/checkout@v3
       - name: Get Version
         shell: bash
-        run: uname -a && cmake --version && cmake --help
+        run: uname -a && cmake --version
+      - name: Check Generators
+        # https://stackoverflow.com/questions/25941536/what-is-a-cmake-generator
+        run: cmake --help
       - name: Configure CMake (compiler=GNU) [Debug]
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -G "${{matrix.generator}}"
       - name: Build [Debug]
