@@ -47,6 +47,9 @@ jobs:
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -G "${{matrix.generator}}"
       - name: Build [Debug]
         run: cmake --build "${{github.workspace}}/build-debug" --config Debug -j   -- -m -nologo #-verbosity:quiet
+      - name: Check Test binary path
+        shell: bash
+        run: find "${{github.workspace}}/build-debug" -name "testBasicConversions*"
       - name: Test [Debug]
         shell: bash
         working-directory: ${{github.workspace}}/build-debug
