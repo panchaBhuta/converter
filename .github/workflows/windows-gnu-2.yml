@@ -66,26 +66,26 @@ jobs:
       - name: Build [Debug]
         run: cmake --build "${{github.workspace}}/build-debug" --config Debug    -- -m -nologo #-verbosity:quiet
       - name: Check Test binary path
-        shell: bash
-        run: find "${{github.workspace}}/build-debug" -name "testBasicConversions*"
+        #shell: bash
+        run: find "${{github.workspace}}/build-debug" -name "testBasicConversions*" && ls "${{github.workspace}}/build-debug/tests"
       - name: Test [Debug]
-        shell: bash
+        #shell: bash
         working-directory: ${{github.workspace}}/build-debug
         #run: ctest -C Debug --output-on-failure -j
         run: ctest -C Debug --verbose
       - name: Install [Debug]
-        shell: bash
+        #shell: bash
         run: cmake --install "${{github.workspace}}/build-debug" --config Debug
       - name: Configure CMake (compiler=default) [Release]
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release -G "${{matrix.generator}}"
       - name: Build [Release]
         run: cmake --build "${{github.workspace}}/build-release" --config Release -j   -- -m -nologo -verbosity:quiet
       - name: Test [Release]
-        shell: bash
+        #shell: bash
         working-directory: ${{github.workspace}}/build-release
         run: ctest -C Release --verbose
       - name: Install [Release]
-        shell: bash
+        #shell: bash
         run: cmake --install "${{github.workspace}}/build-release" --config Release
       - name: Check Work-Arounds
         shell: bash
