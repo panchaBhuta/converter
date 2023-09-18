@@ -44,7 +44,7 @@ jobs:
       - name: Get Version
         shell: bash
         run: uname -a && cmake --version
-      - name: Setup MSYS2
+      - name: Setup MSYS2 ; Configure CMake (compiler=GNU) [Debug]
         with:
           msystem: mingw64
           update: true
@@ -54,7 +54,7 @@ jobs:
           pacboy: >-
             toolchain:p
             cmake:p
-      - name: Configure CMake (compiler=GNU) [Debug]
+      #- name: Configure CMake (compiler=GNU) [Debug]
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -G "${{matrix.generator}}"
       - name: Build [Debug]
         run: cmake --build "${{github.workspace}}/build-debug" --config Debug    -- -m -nologo #-verbosity:quiet
