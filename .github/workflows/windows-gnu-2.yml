@@ -23,7 +23,8 @@ on:
 defaults:
   run:
     #shell: cmd
-    shell: bash 
+    #shell: bash
+    shell: msys2 {0}
 
 jobs:
   build-windows:
@@ -43,10 +44,20 @@ jobs:
       - name: Get Version
         shell: bash
         run: uname -a && cmake --version
+      - name: Setup MSYS2
+        with:
+          msystem: mingw64
+          update: true
+          install: >-
+            git
+            make
+          pacboy: >-
+            toolchain:p
+            cmake:p
       - name: Configure CMake (compiler=GNU) [Debug]
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -G "${{matrix.generator}}"
       - name: Build [Debug]
-        run: cmake --build "${{github.workspace}}/build-debug" --config Debug -j   -- -m -nologo #-verbosity:quiet
+        run: cmake --build "${{github.workspace}}/build-debug" --config Debug    -- -m -nologo #-verbosity:quiet
       - name: Check Test binary path
         shell: bash
         run: find "${{github.workspace}}/build-debug" -name "testBasicConversions*"
