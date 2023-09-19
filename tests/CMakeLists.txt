@@ -48,7 +48,7 @@ endmacro(add_example)
 #add_unit_test(testDefaultTemplateInstantiation)
 #add_unit_test(testAllTemplateInstantiation)
 add_unit_test(testBasicConversions)
-a#dd_unit_test(testFloatingPointNaN)
+#add_unit_test(testFloatingPointNaN)
 #add_unit_test(testIntegerNaN)
 
 #add_unit_test(testFloatingPointPrecision)
