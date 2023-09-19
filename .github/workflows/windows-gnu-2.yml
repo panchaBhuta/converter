@@ -66,9 +66,11 @@ jobs:
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=gcc -G "${{matrix.generator}}"
       - name: Build [Debug]
         run: cmake --build "${{github.workspace}}/build-debug" --config Debug    -- -m -nologo #-verbosity:quiet
-      - name: Check Test binary path
+      - name: Check Test binaries in build-debug
         #shell: bash
         run: find "${{github.workspace}}/build-debug" -name "testBasicConversions*" && ls "${{github.workspace}}/build-debug/tests"
+      - name: Check Test binaries in .../msys64/mingw64/bin/
+        run: ls "/D/a/_temp/msys64/mingw64/bin/"
       - name: Test [Debug]
         #shell: bash
         working-directory: ${{github.workspace}}/build-debug
