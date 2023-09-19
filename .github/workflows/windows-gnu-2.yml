@@ -53,24 +53,24 @@ jobs:
           pacboy: >-
             toolchain:p
             cmake:p
-            gcc:p
+      #      gcc:p
       - name: Checkout Repo
         uses: actions/checkout@v3
       - name: Get Version
         shell: bash
         run: uname -a && cmake --version
+      - name: Check Test binaries in .../msys64/mingw64/bin/
+        run: ls -l "/D/a/_temp/msys64/mingw64/bin/" && echo "g++ --version" && g++ --version
       - name: Check Generators
         # https://stackoverflow.com/questions/25941536/what-is-a-cmake-generator
         run: cmake --help
       - name: Configure CMake (compiler=GNU) [Debug]
-        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=gcc -G "${{matrix.generator}}"
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=g++ -G "${{matrix.generator}}"
       - name: Build [Debug]
-        run: cmake --build "${{github.workspace}}/build-debug" --config Debug    -- -m -nologo #-verbosity:quiet
+        run: cmake --build "${{github.workspace}}/build-debug" --config Debug  --verbose  -- -m -nologo #-verbosity:quiet
       - name: Check Test binaries in build-debug
         #shell: bash
         run: find "${{github.workspace}}/build-debug" -name "testBasicConversions*" && ls "${{github.workspace}}/build-debug/tests"
-      - name: Check Test binaries in .../msys64/mingw64/bin/
-        run: ls "/D/a/_temp/msys64/mingw64/bin/"
       - name: Test [Debug]
         #shell: bash
         working-directory: ${{github.workspace}}/build-debug
@@ -80,7 +80,7 @@ jobs:
         #shell: bash
         run: cmake --install "${{github.workspace}}/build-debug" --config Debug
       - name: Configure CMake (compiler=default) [Release]
-        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release -G "${{matrix.generator}}"
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -G "${{matrix.generator}}"
       - name: Build [Release]
         run: cmake --build "${{github.workspace}}/build-release" --config Release -j   -- -m -nologo -verbosity:quiet
       - name: Test [Release]
