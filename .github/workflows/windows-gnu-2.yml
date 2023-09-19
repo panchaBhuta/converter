@@ -63,7 +63,7 @@ jobs:
         # https://stackoverflow.com/questions/25941536/what-is-a-cmake-generator
         run: cmake --help
       - name: Configure CMake (compiler=GNU) [Debug]
-        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=g++ -G "${{matrix.generator}}"
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=gcc -G "${{matrix.generator}}"
       - name: Build [Debug]
         run: cmake --build "${{github.workspace}}/build-debug" --config Debug    -- -m -nologo #-verbosity:quiet
       - name: Check Test binary path
