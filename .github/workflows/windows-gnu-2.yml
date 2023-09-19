@@ -53,6 +53,7 @@ jobs:
           pacboy: >-
             toolchain:p
             cmake:p
+            g++:p
       - name: Checkout Repo
         uses: actions/checkout@v3
       - name: Get Version
