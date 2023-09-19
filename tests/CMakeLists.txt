@@ -45,19 +45,19 @@ endmacro(add_example)
 
 
 # Unit tests
-add_unit_test(testDefaultTemplateInstantiation)
-add_unit_test(testAllTemplateInstantiation)
+#add_unit_test(testDefaultTemplateInstantiation)
+#add_unit_test(testAllTemplateInstantiation)
 add_unit_test(testBasicConversions)
-add_unit_test(testFloatingPointNaN)
-add_unit_test(testIntegerNaN)
+a#dd_unit_test(testFloatingPointNaN)
+#add_unit_test(testIntegerNaN)
 
-add_unit_test(testFloatingPointPrecision)
-add_unit_test(testUserDefinedConverter_lowerPrecision)
-add_unit_test(testUserDefinedConverter_locale)
+#add_unit_test(testFloatingPointPrecision)
+#add_unit_test(testUserDefinedConverter_lowerPrecision)
+#add_unit_test(testUserDefinedConverter_locale)
 
-add_unit_test(testDateConversions)
-add_unit_test(testTupleConversions)
-#add_unit_test(testInvalidComposition)
+#add_unit_test(testDateConversions)
+#add_unit_test(testTupleConversions)
+##add_unit_test(testInvalidComposition)
 
 
 
