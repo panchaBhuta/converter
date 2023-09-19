@@ -67,7 +67,11 @@ jobs:
       - name: Configure CMake (compiler=GNU) [Debug]
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=g++ -G "${{matrix.generator}}"
       - name: Build [Debug]
-        run: cmake --build "${{github.workspace}}/build-debug" --config Debug  --verbose  -- -m -nologo #-verbosity:quiet
+        run: |
+          pwd
+          cmake --build "${{github.workspace}}/build-debug" --config Debug  --verbose  -- -m -nologo #-verbosity:quiet
+          echo "find ..."
+          find . -name "testBasicConversions*"
       - name: Check Test binaries in build-debug
         run: find "${{github.workspace}}/build-debug" -name "testBasicConversions*" && ls "${{github.workspace}}/build-debug/tests"
       - name: Test [Debug]
