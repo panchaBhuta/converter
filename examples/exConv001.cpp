@@ -101,7 +101,7 @@ int main()
   testType<long double>("LongDouble", 23453.1234567890123456789012345L);
   testType<char>("Char", 'G');
   testType<bool>("Bool", true);
-  namespace rdb = converter::datelib;
+  namespace rdb = std::chrono;
   testType<rdb::year_month_day>("YearMonthDay", rdb::year_month_day{rdb::year{2023}, rdb::month{3}, rdb::day{14} } );
 
   typename std::string (*dmY_To_str)(const rdb::year_month_day& str) =

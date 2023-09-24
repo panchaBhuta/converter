@@ -40,7 +40,9 @@ void conversion_String2FloatingPoint_FailureCheck(const std::string& vStr)
   {
     ExpectException(_ConvS2T_CtoT<T COMMA converter::FailureS2Tprocess::THROW_ERROR>::ToVal(vStr), std::invalid_argument);
     unittest::ExpectTrue(std::isnan(_ConvS2T_CtoT<T COMMA converter::FailureS2Tprocess::QUIET_NAN>::ToVal(vStr)));
+
     unittest::ExpectTrue(std::isnan(_ConvS2T_CtoT<T COMMA converter::FailureS2Tprocess::SIGNAL_NAN>::ToVal(vStr)));
+    unittest::ExpectTrue(std::isnan(converter::ConvertFromStr<T>::ToVal(vStr))); // default: same as above, as S2T_Format_std_CtoT<T, SIGNAL_NAN> is default
 
     typename converter::OnError<T, converter::FailureS2Tprocess::VARIANT_NAN>::return_type varT = 
       _ConvS2T_CtoT<T , converter::FailureS2Tprocess::VARIANT_NAN>::ToVal(vStr);
@@ -52,10 +54,15 @@ void conversion_String2FloatingPoint_FailureCheck(const std::string& vStr)
   {
     ExpectException(_ConvS2T_StoT<T COMMA converter::FailureS2Tprocess::THROW_ERROR>::ToVal(vStr), std::invalid_argument);
     unittest::ExpectTrue(std::isnan(_ConvS2T_StoT<T COMMA converter::FailureS2Tprocess::QUIET_NAN>::ToVal(vStr)));
+#if USE_FLOATINGPOINT_FROM_CHARS_1  ==  _e_ENABLE_FEATURE_
     unittest::ExpectTrue(std::isnan(_ConvS2T_StoT<T COMMA converter::FailureS2Tprocess::SIGNAL_NAN>::ToVal(vStr)));
+#elif USE_FLOATINGPOINT_FROM_CHARS_1  ==  _e_DISABLE_FEATURE_
+    unittest::ExpectTrue(std::isnan(_ConvS2T_StoT<T COMMA converter::FailureS2Tprocess::SIGNAL_NAN>::ToVal(vStr)));
+    unittest::ExpectTrue(std::isnan(converter::ConvertFromStr<T>::ToVal(vStr))); // default: same as above, as S2T_Format_std_StoT<T, SIGNAL_NAN> is default
+#endif
 
     typename converter::OnError<T, converter::FailureS2Tprocess::VARIANT_NAN>::return_type varT = 
-      _ConvS2T_StoT<T , converter::FailureS2Tprocess::VARIANT_NAN>::ToVal(vStr);
+      _ConvS2T_StoT<T, converter::FailureS2Tprocess::VARIANT_NAN>::ToVal(vStr);
     unittest::ExpectTrue(varT.index() == 1);
     unittest::ExpectEqual(std::string, std::get<std::string>(varT), vStr);
   }
@@ -90,6 +97,9 @@ void conversion_FloatingPointNAN2String_FailureCheck(const std::string& vStr)
                                                                   converter::T2S_Format_std_TtoC
                                                     >::ToStr(std::variant<T COMMA std::string>{vStr}),
                                        vStr);
+    unittest::ExpectEqual(std::string, converter::ConvertFromVal< std::variant<T COMMA std::string>
+                                                    >::ToStr(std::variant<T COMMA std::string>{vStr}),
+                                       vStr); // same as above as T2S_Format_std_TtoC is default
   }
 #endif
 

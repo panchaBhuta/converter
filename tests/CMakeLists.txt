@@ -34,29 +34,22 @@ macro(add_perf_test testname)
 endmacro(add_perf_test)
 
 
-# Test macro add_example
-macro(add_example testname)
-  if(CMAKE_BUILD_TYPE MATCHES "Debug")
-    add_executable(${testname} ../examples/${testname}.cpp)
-    target_link_libraries(${testname} PUBLIC converter)
-  endif()
-endmacro(add_example)
-
 
 
 # Unit tests
-#add_unit_test(testDefaultTemplateInstantiation)
-#add_unit_test(testAllTemplateInstantiation)
+add_unit_test(testDefaultTemplateInstantiation)
+add_unit_test(testAllTemplateInstantiation)
 add_unit_test(testBasicConversions)
-#add_unit_test(testFloatingPointNaN)
-#add_unit_test(testIntegerNaN)
+add_unit_test(testFloatingPointNaN)
+add_unit_test(testIntegerNaN)
 
-#add_unit_test(testFloatingPointPrecision)
-#add_unit_test(testUserDefinedConverter_lowerPrecision)
-#add_unit_test(testUserDefinedConverter_locale)
+add_unit_test(testFloatingPointPrecision)
+add_unit_test(testUserDefinedConverter_lowerPrecision)
+add_unit_test(testUserDefinedConverter_locale)
 
-#add_unit_test(testDateConversions)
-#add_unit_test(testTupleConversions)
+add_unit_test(testDateConversions)
+add_unit_test(testDateConversionFormat)
+add_unit_test(testTupleConversions)
 ##add_unit_test(testInvalidComposition)
 
 
@@ -66,3 +59,5 @@ add_unit_test(testBasicConversions)
 add_perf_test(ptest001)
 add_perf_test(ptest002)
 #]======================]
+
+

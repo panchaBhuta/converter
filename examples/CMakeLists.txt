@@ -34,3 +34,5 @@ add_example(ex008 examples/ex008.cpp)
 add_example(ex009 examples/ex009.cpp)
 #]=========================================]
 
+
+add_example(exConv001 examples/exConv001.cpp)
