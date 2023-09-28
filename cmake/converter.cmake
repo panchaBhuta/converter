@@ -227,7 +227,8 @@ macro(check_chrono_stream_functionality)
         if(COMPILE_RESULT_DATE_FROMSTREAM   OR   COMPILE_RESULT_DATE_TOSTREAM)
             message(STATUS "Using DATE_TIME-lib : <date/date.h>")
         else()
-            unset(DATELIB PARENT_SCOPE)
+            unset(DATELIB) # local-variable
+            unset(DATELIB PARENT_SCOPE) # global-variable
         endif()
 
         if(USE_JUGAAD_FROMSTREAM_3   OR   USE_JUGAAD_TOSTREAM_3)
@@ -359,24 +360,33 @@ endmacro()
   https://gcc.gnu.org/onlinedocs/gcc/Preprocessor-Options.html#index-fmacro-prefix-map
   https://gcc.gnu.org/onlinedocs/gcc/Overall-Options.html#index-ffile-prefix-map
 #]===========]
-macro(check_cxx_compiler_flag_file_prefix_map)
+macro(project_check_cxx_compiler_flag_file_prefix_map)  # donot replicate
     include(CheckCXXCompilerFlag)
     check_cxx_compiler_flag(-ffile-prefix-map=${CMAKE_CURRENT_SOURCE_DIR}=.
                             cxx_compiler_file_prefix_map
                            )
+    if (NOT CONVERTER_STANDALONE_PROJECT)
+    	set(cxx_compiler_file_prefix_map ${cxx_compiler_file_prefix_map} PARENT_SCOPE)  # global-variable
+    endif()
     if(cxx_compiler_file_prefix_map)
-        message(STATUS "compiler option '-ffile-prefix-map=old=new' SUPPORTED")
+        message(STATUS "converter : compiler option '-ffile-prefix-map=old=new' SUPPORTED")
         target_compile_definitions(converter INTERFACE
-                                        USE_MACROPREFIXMAP=1)
+                                        USE_FILEPREFIXMAP=1)
 
         target_compile_options(converter INTERFACE
             "-ffile-prefix-map=${CMAKE_CURRENT_SOURCE_DIR}${_path_separator}=")
     else()
         # as of writing this code, clang does not support option '-ffile-prefix-map=...'
-        message(STATUS "compiler option '-ffile-prefix-map=old=new' NOT SUPPORTED")
+        message(STATUS "converter : compiler option '-ffile-prefix-map=old=new' NOT SUPPORTED")
+        target_compile_definitions(converter INTERFACE
+                                        USE_FILEPREFIXMAP=0)
+    endif()
+endmacro()
+macro(converter_check_cxx_compiler_flag_file_prefix_map)
+    project_check_cxx_compiler_flag_file_prefix_map()
+    if(NOT cxx_compiler_file_prefix_map)
         string(LENGTH "${CMAKE_CURRENT_SOURCE_DIR}/" CONVERTER_SOURCE_PATH_SIZE)
         target_compile_definitions(converter INTERFACE
-                                        USE_MACROPREFIXMAP=0
         # https://stackoverflow.com/questions/8487986/file-macro-shows-full-path/40947954#40947954
                                         CONVERTER_SOURCE_PATH_SIZE=${CONVERTER_SOURCE_PATH_SIZE})
     endif()
@@ -423,7 +433,7 @@ macro(converter_build)
         message(STATUS "Using build type '${CMAKE_BUILD_TYPE}'.")
     endif()
 
-    option(ENABLE_CONVERTER_DEBUG_LOG  "Set to ON for debugging logs"   $<CONFIG:Debug>)
+    option(ENABLE_CONVERTER_DEBUG_LOG  "Set to ON for debugging logs"   "$<AND:$<CONFIG:Debug>,$<CONVERTER_STANDALONE_PROJECT>>")
 
     #[==================================================================================[
     add_subdirectory(include)  ??? is it needed ; if so then with include/converter
@@ -443,7 +453,7 @@ macro(converter_build)
         # BUILD_INTERFACE: Content of ... when the property is exported using export(), or when the
         # target is used by another target in the same buildsystem. Expands to the empty string otherwise.
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>  #  /converter/_dateConfig.h
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>  #  /converter/_workaroundConfig.h
         # https://cmake.org/cmake/help/v3.27/manual/cmake-packages.7.html#creating-relocatable-packages
         # INSTALL_INTERFACE: Content of ... when the property is exported using install(EXPORT), and empty otherwise.
         $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>)
@@ -570,6 +580,7 @@ function(converter_install_logic)
     # with a target are included in the export.
     #]==================================================================================]
     install(TARGETS      converter
+                         ${DATELIB}
         EXPORT           ${targets_export_name}
         FILE_SET         converter_headers
         DESTINATION      ${CMAKE_INSTALL_INCLUDEDIR}
@@ -619,6 +630,7 @@ function(converter_install_logic)
     # Export targets or packages for outside projects to use them
     # directly from the current project's build tree, without installation.
     export(TARGETS converter
+                   ${DATELIB}
         NAMESPACE  converter::
         FILE       ${PROJECT_BINARY_DIR}/${targets_export_name}.cmake)
 

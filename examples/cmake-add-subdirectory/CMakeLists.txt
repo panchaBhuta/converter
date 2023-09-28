@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 add_subdirectory(converter)
 
 add_executable(exprog2 src/exprog2.cpp)
-target_link_libraries(exprog2 PUBLIC converter)
+target_link_libraries(exprog2 PUBLIC converter) # INTERFACE causes failure. keep it PUBLIC
 install(TARGETS exprog2 DESTINATION bin)
 
 add_custom_target(uninstall

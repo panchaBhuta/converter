@@ -18,15 +18,14 @@ Supported Platforms/Compilers
 =============================
 Converter is implemented using C++20 with the intention of being portable. It's been tested on:
 
-|  🖥️ OS ->  | **Ubuntu 22.04** | **macOS-11** | **macOS-12** | **macOS-13** | **Windows 10 <br> VS 17 - 2022** | **Windows 10 <br> VS 16 - 2019** |
+|  🖥️ OS ➡️ <br> 🤖 Compiler ⬇️ | **Ubuntu 22.04** | **macOS-11** | **macOS-12** | **macOS-13** | **Windows 10 <br> VS 17 - 2022** | **Windows 10 <br> VS 16 - 2019** |
 |------------|------------------|--------------|--------------|--------------|-------------------------------|-------------------------------|
-| 🤖 Compiler |
-| g++ (11,12) | ✅ (default:11) | ✅ | ✅ | ✅ | - | - |
-| clang++ (12,13,14) | ✅ | - | - | - | - | - |
-| AppleClang 14 | NA | NA | ✅ (default) | ✅ (default) | NA | NA |
-| msvc 19 | NA | NA | NA | NA | ✅ (default) | - |
-| clangCL 12 | - | - | - | - | - | ✅ |
-| clangCL 16 | - | - | - | - | ✅ | - |
+| **g++ (11,12)** | ✅ (default:11) | ✅ | ✅ | ✅ | - | - |
+| **clang++ (12,13,14)** | ✅ | - | - | - | - | - |
+| **AppleClang 14** | NA | NA | ✅ (default) | ✅ (default) | NA | NA |
+| **msvc 19** | NA | NA | NA | NA | ✅ (default) | - |
+| **clangCL 12** | - | - | - | - | - | ✅ |
+| **clangCL 16** | - | - | - | - | ✅ | - |
 
 
 [//]:  ❌
@@ -75,17 +74,16 @@ Function Nomenclature:<br>
 
 Precision Nomenclature ( for roundtrip conversion :: **string -> data-type -> string**): <br>
 ✅ : Good. Minimal precision loss, best of the lot.  <br>
-☑️ : Average. Precision loss is non-uniform, can be high for some FP values.
+☑️ : Average. Precision loss is non-uniform, loss can be high for some FP values.
 
-|  🖥️ OS ->  | **Ubuntu 22.04** | **macOS-11** | **macOS-12** | **macOS-13** | **Windows 10 : VS 17 - 2022** | **Windows 10 : VS 16 - 2019** |
+|  🖥️ OS ➡️ <br> 🤖 Compiler ⬇️ | **Ubuntu 22.04** | **macOS-11** | **macOS-12** | **macOS-13** | **Windows 10 <br> VS 17 - 2022** | **Windows 10 <br> VS 16 - 2019** |
 |------------|------------------|--------------|--------------|--------------|-------------------------------|-------------------------------|
-| 🤖 Compiler |
-| g++ (11,12) | ⚔️✅ | ⚔️✅ | ⚔️✅ | ⚔️✅ | - | - |
-| clang++ (12,13,14) | ⚔️✅ | - | - | - | - | - |
-| AppleClang 14 | NA | NA | 🛠️☑️ | 🛠️☑️ | NA | NA |
-| msvc 19 | NA | NA | NA | NA | ⚔️☑️ | - |
-| clangCL 12 | - | - | - | - | - | ⚔️☑️ |
-| clangCL 16 | - | - | - | - | ⚔️☑️ | - |
+| **g++ (11,12)** | ⚔️✅ | ⚔️✅ | ⚔️✅ | ⚔️✅ | - | - |
+| **clang++ (12,13,14)** | ⚔️✅ | - | - | - | - | - |
+| **AppleClang 14** | NA | NA | 🛠️☑️ | 🛠️☑️ | NA | NA |
+| **msvc 19** | NA | NA | NA | NA | ⚔️☑️ | - |
+| **clangCL 12** | - | - | - | - | - | ⚔️☑️ |
+| **clangCL 16** | - | - | - | - | ⚔️☑️ | - |
 
 ### Data Conversion Precision
 
@@ -144,11 +142,10 @@ For _year_month_day -> string_ conversion, refers to call to ...<br>
 ⚔️ : `std::chrono::from_stream()` and `std::chrono::to_stream` are preffered.<br>
 🛠️ : `date::from_stream()` and `date::to_stream` are workarounds, if `std::chrono::*` functions are not supported.<br>
 
-|  🖥️ OS ->  | **Linux** 🐧![Ubuntu](https://cdn.emojidex.com/emoji/px16/Ubuntu.png "Ubuntu")  | **Mac** ![apple logo](https://cdn.emojidex.com/emoji/px16/apple_logo.png "apple logo") | **Windows** ![windows official](https://cdn.emojidex.com/emoji/px16/windows_official.png "windows official") |
+|  🖥️ OS ➡️ <br> 🪄 conversion type | **Linux** 🐧![Ubuntu](https://cdn.emojidex.com/emoji/px16/Ubuntu.png "Ubuntu")  | **Mac** ![apple logo](https://cdn.emojidex.com/emoji/px16/apple_logo.png "apple logo") | **Windows** ![windows official](https://cdn.emojidex.com/emoji/px16/windows_official.png "windows official") |
 |------------|--------------|---------|-------------|
-| 🪄 conversion type |
-| string -> year_month_day | 🛠️ date::from_stream() | 🛠️ date::from_stream() | ⚔️ **std::chrono::from_stream()** |
-| year_month_day -> string | 🛠️ date::to_stream() | 🛠️ date::to_stream() | 🛠️ date::to_stream() |
+| **string -> year_month_day** | 🛠️ date::from_stream() | 🛠️ date::from_stream() | ⚔️ **std::chrono::from_stream()** |
+| **year_month_day -> string** | 🛠️ date::to_stream() | 🛠️ date::to_stream() | 🛠️ date::to_stream() |
 
 
 The default date format is _"%F"_ (i.e "%Y-%m-%d"). For configuring a different date format refer [testDateConversionFormat.cpp](tests/testDateConversionFormat.cpp)

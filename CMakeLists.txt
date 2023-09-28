@@ -87,11 +87,13 @@ check_chrono_stream_functionality()
 check_clang_string_workaround()
 check_floatingPoint_elementaryStringConversions()
 
-check_cxx_compiler_flag_file_prefix_map()
-
-#if (CONVERTER_ENABLE_WARNINGS)
-    converter_enable_warnings()
+#if (CONVERTER_STANDALONE_PROJECT)
+    converter_check_cxx_compiler_flag_file_prefix_map()
 #endif()
+
+if (CONVERTER_ENABLE_WARNINGS)
+    converter_enable_warnings()
+endif()
 
 converter_build()
 
@@ -126,9 +128,10 @@ endif()
 
 
 
-#[======================[
+
 # Build examples when requested by the user
+message(STATUS "Build examples: ${CONVERTER_BUILD_EXAMPLES}")
 if (CONVERTER_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
-#]======================]
+

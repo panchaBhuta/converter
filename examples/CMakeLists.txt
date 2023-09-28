@@ -23,16 +23,16 @@ endmacro(add_example)
 
 #[=========================================[
 # Examples
-add_example(ex001 examples/ex001.cpp)
-add_example(ex002 examples/ex002.cpp)
-add_example(ex003 examples/ex003.cpp)
-add_example(ex004 examples/ex004.cpp)
-add_example(ex005 examples/ex005.cpp)
-add_example(ex006 examples/ex006.cpp)
-add_example(ex007 examples/ex007.cpp)
-add_example(ex008 examples/ex008.cpp)
-add_example(ex009 examples/ex009.cpp)
+add_example(ex001 ex001.cpp)
+add_example(ex002 ex002.cpp)
+add_example(ex003 ex003.cpp)
+add_example(ex004 ex004.cpp)
+add_example(ex005 ex005.cpp)
+add_example(ex006 ex006.cpp)
+add_example(ex007 ex007.cpp)
+add_example(ex008 ex008.cpp)
+add_example(ex009 ex009.cpp)
 #]=========================================]
 
 
-add_example(exConv001 examples/exConv001.cpp)
+add_example(exConv001 exConv001.cpp)

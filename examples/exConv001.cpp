@@ -102,7 +102,6 @@ int main()
   testType<char>("Char", 'G');
   testType<bool>("Bool", true);
   namespace rdb = std::chrono;
-  testType<rdb::year_month_day>("YearMonthDay", rdb::year_month_day{rdb::year{2023}, rdb::month{3}, rdb::day{14} } );
 
   typename std::string (*dmY_To_str)(const rdb::year_month_day& str) =
               &converter::ConvertFromVal< rdb::year_month_day,
@@ -118,8 +117,8 @@ int main()
     const std::string strT = dmY_To_str(orgT);
     const rdb::year_month_day convT = To_dmY(strT);
 
-    std::cout << std::setprecision(25) << "orgYMD = " << orgT << " ; str_dmY"
-              << " = " << strT << " ; convYMD" << " = " << convT << std::endl;
+    std::cout << std::setprecision(25) << "orgYMD ='" << unsigned(orgT.day()) << "-" << unsigned(orgT.month()) << "-" << int(orgT.year()) << "'; "
+              << "str_dmY = " << strT << " ; convYMD ='" << unsigned(convT.day()) << "-" << unsigned(convT.month()) << "-" << int(convT.year()) << "'" << std::endl;
   }
 
   std::cout << "=============   using specialization" << std::endl;

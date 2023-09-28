@@ -32,7 +32,7 @@
 
 #define CONVERTER__VERSION_MAJOR 1
 #define CONVERTER__VERSION_MINOR 2
-#define CONVERTER__VERSION_PATCH 0
+#define CONVERTER__VERSION_PATCH 2
 
 
 
@@ -44,8 +44,8 @@
 
 //  Project path is removed from the __FILE__
 //  Resulting file-path is relative path from project-root-folder.
-#if  USE_MACROPREFIXMAP == 1
-  // the project-prefix-path is removed via compilation directive macro-prefix-map
+#if  USE_FILEPREFIXMAP == 1
+  // the project-prefix-path is removed via compilation directive file-prefix-map
   #define __CONVERTER_FILE__    __FILE__
 #else
   // https://stackoverflow.com/questions/8487986/file-macro-shows-full-path/40947954#40947954
