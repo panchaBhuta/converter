@@ -142,7 +142,7 @@ For _year_month_day -> string_ conversion, refers to call to ...<br>
 ⚔️ : `std::chrono::from_stream()` and `std::chrono::to_stream` are preffered.<br>
 🛠️ : `date::from_stream()` and `date::to_stream` are workarounds, if `std::chrono::*` functions are not supported.<br>
 
-|  🖥️ OS ➡️ <br> 🪄 conversion type | **Linux** 🐧![Ubuntu](https://cdn.emojidex.com/emoji/px16/Ubuntu.png "Ubuntu")  | **Mac** ![apple logo](https://cdn.emojidex.com/emoji/px16/apple_logo.png "apple logo") | **Windows** ![windows official](https://cdn.emojidex.com/emoji/px16/windows_official.png "windows official") |
+|  🖥️ OS ➡️ <br> 🪄 conversion type ⬇️ | **Linux** 🐧![Ubuntu](https://cdn.emojidex.com/emoji/px16/Ubuntu.png "Ubuntu")  | **Mac** ![apple logo](https://cdn.emojidex.com/emoji/px16/apple_logo.png "apple logo") | **Windows** ![windows official](https://cdn.emojidex.com/emoji/px16/windows_official.png "windows official") |
 |------------|--------------|---------|-------------|
 | **string -> year_month_day** | 🛠️ date::from_stream() | 🛠️ date::from_stream() | ⚔️ **std::chrono::from_stream()** |
 | **year_month_day -> string** | 🛠️ date::to_stream() | 🛠️ date::to_stream() | 🛠️ date::to_stream() |

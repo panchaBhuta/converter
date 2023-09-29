@@ -620,10 +620,12 @@ function(converter_install_logic)
     # https://cmake.org/cmake/help/v3.27/command/install.html
     install(TARGETS         converter
         CONFIGURATIONS      Debug
-        RUNTIME DESTINATION Debug/bin)
+        #RUNTIME DESTINATION Debug/bin
+    	PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/converter)
     install(TARGETS         converter
         CONFIGURATIONS      Release
-        RUNTIME DESTINATION Release/bin)
+        #RUNTIME DESTINATION Release/bin
+    	PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/converter)
 
 
     # https://cmake.org/cmake/help/v3.27/command/export.html#command:export
