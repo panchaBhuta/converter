@@ -18,7 +18,7 @@ Supported Platforms/Compilers
 =============================
 Converter is implemented using C++20 with the intention of being portable. It's been tested on:
 
-|  🖥️ OS ➡️ <br> 🤖 Compiler ⬇️ | **Ubuntu 22.04** | **macOS-11** | **macOS-12** | **macOS-13** | **Windows 10 <br> VS 17 - 2022** | **Windows 10 <br> VS 16 - 2019** |
+|  🖥️ OS ➡️ <br> 🤖 Compiler ⬇️ | **Ubuntu 22.04** | **macOS-11** | **macOS-12** | **macOS-13** | **Windows 10<br>VS 17 - 2022** | **Windows 10<br>VS 16 - 2019** |
 |------------|------------------|--------------|--------------|--------------|-------------------------------|-------------------------------|
 | **g++ (11,12)** | ✅ (default:11) | ✅ | ✅ | ✅ | - | - |
 | **clang++ (12,13,14)** | ✅ | - | - | - | - | - |
@@ -76,14 +76,14 @@ Precision Nomenclature ( for roundtrip conversion :: **string -> data-type -> st
 ✅ : Good. Minimal precision loss, best of the lot.  <br>
 ☑️ : Average. Precision loss is non-uniform, loss can be high for some FP values.
 
-|  🖥️ OS ➡️ <br> 🤖 Compiler ⬇️ | **Ubuntu 22.04** | **macOS-11** | **macOS-12** | **macOS-13** | **Windows 10 <br> VS 17 - 2022** | **Windows 10 <br> VS 16 - 2019** |
+|  🖥️ OS ➡️ <br> 🤖 Compiler ⬇️ | **Ubuntu 22.04** | **macOS-11** | **macOS-12** | **macOS-13** | **Windows 10<br>VS 17 - 2022** | **Windows 10<br>VS 16 - 2019** |
 |------------|------------------|--------------|--------------|--------------|-------------------------------|-------------------------------|
-| **g++ (11,12)** | ⚔️✅ | ⚔️✅ | ⚔️✅ | ⚔️✅ | - | - |
-| **clang++ (12,13,14)** | ⚔️✅ | - | - | - | - | - |
-| **AppleClang 14** | NA | NA | 🛠️☑️ | 🛠️☑️ | NA | NA |
-| **msvc 19** | NA | NA | NA | NA | ⚔️☑️ | - |
-| **clangCL 12** | - | - | - | - | - | ⚔️☑️ |
-| **clangCL 16** | - | - | - | - | ⚔️☑️ | - |
+| **g++ (11,12)** | ⚔️ ✅ | ⚔️ ✅ | ⚔️ ✅ | ⚔️ ✅ | - | - |
+| **clang++ (12,13,14)** | ⚔️ ✅ | - | - | - | - | - |
+| **AppleClang 14** | NA | NA | 🛠️ ☑️ | 🛠️ ☑️ | NA | NA |
+| **msvc 19** | NA | NA | NA | NA | ⚔️ ☑️ | - |
+| **clangCL 12** | - | - | - | - | - | ⚔️ ☑️ |
+| **clangCL 16** | - | - | - | - | ⚔️ ☑️ | - |
 
 ### Data Conversion Precision
 

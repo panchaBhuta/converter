@@ -580,7 +580,7 @@ function(converter_install_logic)
     # with a target are included in the export.
     #]==================================================================================]
     install(TARGETS      converter
-                         ${DATELIB}
+                         #${DATELIB} not needed
         EXPORT           ${targets_export_name}
         FILE_SET         converter_headers
         DESTINATION      ${CMAKE_INSTALL_INCLUDEDIR}
@@ -630,7 +630,7 @@ function(converter_install_logic)
     # Export targets or packages for outside projects to use them
     # directly from the current project's build tree, without installation.
     export(TARGETS converter
-                   ${DATELIB}
+                   #${DATELIB} not needed
         NAMESPACE  converter::
         FILE       ${PROJECT_BINARY_DIR}/${targets_export_name}.cmake)
 
