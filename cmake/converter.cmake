@@ -360,14 +360,11 @@ endmacro()
   https://gcc.gnu.org/onlinedocs/gcc/Preprocessor-Options.html#index-fmacro-prefix-map
   https://gcc.gnu.org/onlinedocs/gcc/Overall-Options.html#index-ffile-prefix-map
 #]===========]
-macro(project_check_cxx_compiler_flag_file_prefix_map)  # donot replicate
+macro(converter_check_cxx_compiler_flag_file_prefix_map)
     include(CheckCXXCompilerFlag)
     check_cxx_compiler_flag(-ffile-prefix-map=${CMAKE_CURRENT_SOURCE_DIR}=.
                             cxx_compiler_file_prefix_map
                            )
-    if (NOT CONVERTER_STANDALONE_PROJECT)
-    	set(cxx_compiler_file_prefix_map ${cxx_compiler_file_prefix_map} PARENT_SCOPE)  # global-variable
-    endif()
     if(cxx_compiler_file_prefix_map)
         message(STATUS "converter : compiler option '-ffile-prefix-map=old=new' SUPPORTED")
         target_compile_definitions(converter INTERFACE
@@ -378,15 +375,9 @@ macro(project_check_cxx_compiler_flag_file_prefix_map)  # donot replicate
     else()
         # as of writing this code, clang does not support option '-ffile-prefix-map=...'
         message(STATUS "converter : compiler option '-ffile-prefix-map=old=new' NOT SUPPORTED")
-        target_compile_definitions(converter INTERFACE
-                                        USE_FILEPREFIXMAP=0)
-    endif()
-endmacro()
-macro(converter_check_cxx_compiler_flag_file_prefix_map)
-    project_check_cxx_compiler_flag_file_prefix_map()
-    if(NOT cxx_compiler_file_prefix_map)
         string(LENGTH "${CMAKE_CURRENT_SOURCE_DIR}/" CONVERTER_SOURCE_PATH_SIZE)
         target_compile_definitions(converter INTERFACE
+                                        USE_FILEPREFIXMAP=0
         # https://stackoverflow.com/questions/8487986/file-macro-shows-full-path/40947954#40947954
                                         CONVERTER_SOURCE_PATH_SIZE=${CONVERTER_SOURCE_PATH_SIZE})
     endif()
@@ -433,7 +424,17 @@ macro(converter_build)
         message(STATUS "Using build type '${CMAKE_BUILD_TYPE}'.")
     endif()
 
-    option(ENABLE_CONVERTER_DEBUG_LOG  "Set to ON for debugging logs"   "$<AND:$<CONFIG:Debug>,$<CONVERTER_STANDALONE_PROJECT>>")
+    set(_DEBUG_LOG FALSE)
+    if (CONVERTER_STANDALONE_PROJECT AND
+        CMAKE_BUILD_TYPE STREQUAL "Debug")
+            set(_DEBUG_LOG TRUE)
+    endif()
+    #message(STATUS "_DEBUG_LOG=${_DEBUG_LOG}")
+    option(CONVERTER_DEBUG_LOG  "Set to ON for debugging logs"  ${_DEBUG_LOG})
+    message(STATUS "CONVERTER_DEBUG_LOG=${CONVERTER_DEBUG_LOG}")
+    #[===========[  donot use generator-expressions in option() functions
+    # option(CONVERTER_DEBUG_LOG  "Set to ON for debugging logs"   "$<AND:$<CONFIG:Debug>,$<CONVERTER_STANDALONE_PROJECT>>")
+    #]===========]
 
     #[==================================================================================[
     add_subdirectory(include)  ??? is it needed ; if so then with include/converter

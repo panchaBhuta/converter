@@ -49,10 +49,10 @@ message(STATUS "#### CXX_COMPILER_ID=${CMAKE_CXX_COMPILER_ID}    version=${CMAKE
 
 # Determine whether this is a standalone project or included by other projects
 set(CONVERTER_STANDALONE_PROJECT OFF)
-if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     set(CONVERTER_STANDALONE_PROJECT ON)
 endif()
-#[===========[  donot use
+#[===========[  donot use generator-expressions in set() functions
 set(CONVERTER_STANDALONE_PROJECT   $<STREQUAL:"${CMAKE_SOURCE_DIR}","${PROJECT_SOURCE_DIR}">)
 # refer  https://stackoverflow.com/questions/35695152/cmake-generator-expression-is-not-being-evaluated
 # While generator expression is stored at configuration stage
@@ -63,6 +63,7 @@ set(CONVERTER_STANDALONE_PROJECT   $<STREQUAL:"${CMAKE_SOURCE_DIR}","${PROJECT_S
 # non-dereferenced form: value denoted by the generator
 # expression is not known at this stage.
 #]===========]
+message(STATUS "CONVERTER_STANDALONE_PROJECT=${CONVERTER_STANDALONE_PROJECT}")
 
 # Establish the project options
 option(CONVERTER_BUILD_EXAMPLES "Set to ON to build examples"        ${CONVERTER_STANDALONE_PROJECT})
