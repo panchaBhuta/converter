@@ -458,8 +458,8 @@ macro(converter_build)
         # INSTALL_INTERFACE: Content of ... when the property is exported using install(EXPORT), and empty otherwise.
         $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>)
     # refer https://cmake.org/cmake/help/latest/manual/cmake-generator-expressions.7.html#introduction
-    target_include_directories(converter INTERFACE
-        "$<$<BOOL:${CMAKE_HOST_UNIX}>:/opt/include/$<CXX_COMPILER_ID>>")
+    #target_include_directories(converter INTERFACE
+    #    "$<$<BOOL:${CMAKE_HOST_UNIX}>:/opt/include/$<CXX_COMPILER_ID>>")
 
     target_compile_definitions(converter INTERFACE
         $<$<CONFIG:Debug>:DEBUG_BUILD>
@@ -555,19 +555,22 @@ function(converter_install_logic)
 
 
 
+    #[==================================================================================[
     # Add source to a target ( target_source -> cmake v3.23 )
     # File set(s) are defined here.
+    # https://cmake.org/cmake/help/v3.27/command/target_sources.html#file-sets
+    #]==================================================================================]
     target_sources(converter
         INTERFACE
         FILE_SET   converter_headers
         TYPE       HEADERS
         BASE_DIRS  include
-        PRIVATE
+        INTERFACE
         FILE_SET   converter_autoheader
         TYPE       HEADERS
         FILES      ${CMAKE_CURRENT_BINARY_DIR}/include/converter/_workaroundConfig.h)
     #[==================================================================================[
-    https://cmake.org/cmake/help/v3.27/command/install.html#targets
+    # https://cmake.org/cmake/help/v3.27/command/install.html#targets
     # Install the header files and export the target
     # EXPORT
     # This option associates(or defines) the installed target files with an export called <export-name>.
@@ -632,7 +635,7 @@ function(converter_install_logic)
     # Export targets or packages for outside projects to use them
     # directly from the current project's build tree, without installation.
     export(TARGETS converter
-                   #${DATELIB} not needed
+                   ${DATELIB} # works even when commented
         NAMESPACE  converter::
         FILE       ${PROJECT_BINARY_DIR}/${targets_export_name}.cmake)
 
