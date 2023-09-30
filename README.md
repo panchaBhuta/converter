@@ -79,11 +79,13 @@ Precision Nomenclature ( for roundtrip conversion :: **string -> data-type -> st
 |  🖥️ OS ➡️ <br> 🤖 Compiler ⬇️ | **Ubuntu 22.04** | **macOS-11** | **macOS-12** | **macOS-13** | **Windows 10<br>VS 17 - 2022** | **Windows 10<br>VS 16 - 2019** |
 |------------|------------------|--------------|--------------|--------------|-------------------------------|-------------------------------|
 | **g++ (11,12)** | ⚔️ ✅ | ⚔️ ✅ | ⚔️ ✅ | ⚔️ ✅ | - | - |
-| **clang++ (12,13,14)** | ⚔️ ✅ | - | - | - | - | - |
+| **clang++ (<span style="color:grey">12\*</span>,13,14)** | ⚔️ ✅ | - | - | - | - | - |
 | **AppleClang 14** | NA | NA | 🛠️ ☑️ | 🛠️ ☑️ | NA | NA |
 | **msvc 19** | NA | NA | NA | NA | ⚔️ ☑️ | - |
 | **clangCL 12** | - | - | - | - | - | ⚔️ ☑️ |
 | **clangCL 16** | - | - | - | - | ⚔️ ☑️ | - |
+
+<span style="color:grey">12\*</span> : Last successful run with [Clang 12.0.1](https://github.com/panchaBhuta/converter/actions/runs/6291468380/job/17079862439) and `OS-id-version=Linux-6.2.0-1011-azure`. Newer Ubuntu-image OS-version stopped supporting Clang-12.
 
 ### Data Conversion Precision
 

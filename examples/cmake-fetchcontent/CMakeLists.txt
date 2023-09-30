@@ -6,7 +6,7 @@ include(FetchContent)
 FetchContent_Declare(
   converter
   GIT_REPOSITORY "https://github.com/panchaBhuta/converter.git"
-  GIT_TAG        "v1.2.6"
+  GIT_TAG        "v1.2.7"
 )
 FetchContent_MakeAvailable(converter)
 
