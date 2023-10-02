@@ -152,7 +152,7 @@ namespace converter
        */
         )
       {
-        CONVERTER_DEBUG_LOG(dateClass << " for string2date conversion-succeded : iY=" << (int(ymd.year())) \
+        CONVERTER_DEBUG_LOG(dateClass << " for string2date conversion-succeded : iY=" << (int(ymd.year()))         \
                                       << ", iM=" << (unsigned(ymd.month())) << ", iD=" << (unsigned(ymd.day())));
   #if   USE_CHRONO_FROMSTREAM_1  ==  _e_ENABLE_FEATURE_
         return ymd;
@@ -251,26 +251,18 @@ namespace converter
         }
       }
 
-        static const std::string func("std::chrono::year_month_day converter::ConvertFromStr<std::chrono::year_month_day, S2T_FORMAT_YMD>::ToVal_args(const std::string& str)");
-  #ifdef ENABLE_CONVERTER_DEBUG_LOG
-        CONVERTER_DEBUG_LOG("ERROR : rapidcsv :: in function '" << func << "' ::: strYMD='" << str <<"' format='" << fmt << "'");
-        CONVERTER_DEBUG_LOG("istringstream-conversion<" << dateClass << "> failed."    \
-             << std::boolalpha << "   iss.fail() = " << iss.fail()                     \
-                               << " : iss.bad() = " << iss.bad()                       \
-                               << " : iss.eof() = " << iss.eof());
-        CONVERTER_DEBUG_LOG(" dateComponents "                                                                   \
-                               << "   ymd.ok() = " << ymd.ok()                                                   \
-                               << " : ymd.year(" << int(ymd.year()) << ").ok() = " << ymd.year().ok()            \
-                               << " : ymd.month(" << unsigned(ymd.month()) << ").ok() = " << ymd.month().ok()    \
-                               << " : ymd.day(" << unsigned(ymd.day()) << ").ok() = " << ymd.day().ok());
-  #endif
-      //if (iss.fail() || iss.bad()) // || (!iss.eof()))
-      //{
-        static const std::string errMsg("Invalid date-string received in '"+func+"'");
-        CONVERTER_DEBUG_LOG(errMsg << " : string-txt='" << str << "' : format='" << fmt << "'");
-        static const std::invalid_argument err(errMsg);
-        return S2T_FORMAT_YMD::handler(str, err);
-      //}
+      static const std::string func("std::chrono::year_month_day converter::ConvertFromStr<std::chrono::year_month_day, S2T_FORMAT_YMD>::ToVal_args(const std::string& str)");
+      static const std::string errMsg("Invalid date-string received in '"+func+"'");
+      CONVERTER_DEBUG_LOG(errMsg << "  ERROR :: in function '" << func << "' ::: strYMD='" << str <<"' format='" << fmt  << "'");
+      CONVERTER_DEBUG_LOG("  istringstream-conversion<" << dateClass << "> failed."                      \
+                                 << std::boolalpha << "   iss.fail() = " << iss.fail()                   \
+                                 << " : iss.bad() = "  << iss.bad() << " : iss.eof() = "  << iss.eof());
+      CONVERTER_DEBUG_LOG(" dateComponents    ymd.ok() = " << ymd.ok()                                          \
+                              << " : ymd.year(" << int(ymd.year()) << ").ok() = " << ymd.year().ok()            \
+                              << " : ymd.month(" << unsigned(ymd.month()) << ").ok() = " << ymd.month().ok()    \
+                              << " : ymd.day(" << unsigned(ymd.day()) << ").ok() = " << ymd.day().ok());
+      static const std::invalid_argument err(errMsg);
+      return S2T_FORMAT_YMD::handler(str, err);
     }
 #else
     {
@@ -360,12 +352,9 @@ namespace converter
         }
       }
       static const std::string func("std::chrono::year_month_day converter::ConvertFromStr<std::chrono::year_month_day, S2T_FORMAT_YMD>::ToVal_args(const std::string& str)");
-  #ifdef ENABLE_CONVERTER_DEBUG_LOG
-      CONVERTER_DEBUG_LOG("ERROR : rapidcsv :: in function '" << func << "' ::: strYMD='" << str <<"' format='" << fmt << "'");
-      CONVERTER_DEBUG_LOG("istringstream-conversion<" << dateClass << "> failed.");
-  #endif
       static const std::string errMsg("Invalid date-string received in '"+func+"'");
-      CONVERTER_DEBUG_LOG(errMsg << " : string-txt='" << str << "' : format='" << fmt << "'");
+      CONVERTER_DEBUG_LOG(errMsg << " :: ERROR :: in function '" << func << "' ::: strYMD='" << str <<"' format='"   \
+                                 << fmt << "' istringstream-conversion<" << dateClass << "> failed.");
       static const std::invalid_argument err(errMsg);
       return S2T_FORMAT_YMD::handler(str, err);
     }

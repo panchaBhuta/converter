@@ -259,13 +259,12 @@ namespace converter
         try {
           eoss << "val='" << val << "'";
         } catch (...) {} // on error do-nothing.
-        eoss << " ostringstream-conversion failed.";
-        eoss << std::boolalpha << "   iss.fail() = " << oss.fail()
-                               << " : iss.bad() = " << oss.bad()
-                               << " : iss.eof() = " << oss.eof();
-        CONVERTER_DEBUG_LOG("ERROR : rapidcsv :: in function " << funcName << " ::: " << eoss.str());
+        CONVERTER_DEBUG_LOG(" ERROR : converter :: in function " << funcName << " ::: ostringstream-conversion failed."  \
+                              << eoss.str() << std::boolalpha << "   iss.fail() = " << oss.fail()                        \
+                              << " : iss.bad() = " << oss.bad() << " : iss.eof() = " << oss.eof());
   #endif
-        throw std::invalid_argument("Invalid argument. "+funcName);
+        static const std::string errMsg = "Invalid argument. "+funcName;
+        throw std::invalid_argument(errMsg);
       }
       return oss.str();
     }

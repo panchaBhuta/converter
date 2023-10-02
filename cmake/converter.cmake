@@ -62,7 +62,7 @@ endfunction()
 macro(converter_set_cxx_standard)
     # DOUBT : Q  : where does CONVERTER_CXX_STANDARD get set?
     #         Ans: as this macro gets called only in standalone-mode,
-    #              CONVERTER_CXX_STANDARD might be set on comman line
+    #              CONVERTER_CXX_STANDARD might be set on command line
     #              while invoking cmake !
     if (CONVERTER_CXX_STANDARD)
         set(CMAKE_CXX_STANDARD ${CONVERTER_CXX_STANDARD})
