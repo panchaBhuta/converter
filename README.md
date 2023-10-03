@@ -18,14 +18,16 @@ Supported Platforms/Compilers
 =============================
 Converter is implemented using C++20 with the intention of being portable. It's been tested on:
 
-|  🖥️ OS ➡️ <br> 🤖 Compiler ⬇️ | **Ubuntu 22.04** | **macOS-11** | **macOS-12** | **macOS-13** | **Windows 10<br>VS 17 - 2022** | **Windows 10<br>VS 16 - 2019** |
-|------------|------------------|--------------|--------------|--------------|-------------------------------|-------------------------------|
-| **g++ (11,12)** | ✅ (default:11) | ✅ | ✅ | ✅ | - | - |
-| **clang++ (12,13,14)** | ✅ | - | - | - | - | - |
-| **AppleClang 14** | NA | NA | ✅ (default) | ✅ (default) | NA | NA |
-| **msvc 19** | NA | NA | NA | NA | ✅ (default) | - |
-| **clangCL 12** | - | - | - | - | - | ✅ |
-| **clangCL 16** | - | - | - | - | ✅ | - |
+|  🖥️ OS ➡️ <br> 🤖 Compiler ⬇️ | **Ubuntu 22.04** | **macOS-(12,13)** | **macOS-11** | **Windows 10<br>VS 17 - 2022** | **Windows 10<br>VS 16 - 2019** |
+|------------|------------------|--------------|--------------|-------------------------------|-------------------------------|
+| **g++ (11,12)** | ✅ (default:11) | ✅ | ✅ | - | - |
+| **clang++ (**<span style="color:grey">12\*</span>,**13,14)** | ✅ | - | - | - | - |
+| **AppleClang 14** | NA | ✅ (default) | NA | NA | NA |
+| **msvc 19** | NA | NA | NA | ✅ (default) | - |
+| **clangCL 12** | - | - | - | - | ✅ |
+| **clangCL 16** | - | - | - | ✅ | - |
+
+<span style="color:grey">12\*</span> : Last successful run with [Clang 12.0.1](https://github.com/panchaBhuta/converter/actions/runs/6291468380/job/17079862439) and `OS-id-version=Linux-6.2.0-1011-azure`. Newer Ubuntu-image OS-version stopped supporting Clang-12.
 
 
 [//]:  ❌
@@ -59,10 +61,10 @@ particular its [CMakeLists.txt](examples/cmake-add-subdirectory/CMakeLists.txt).
 
 Supported Data Types for Conversion
 ===================================
-Floating-types, Integer-types, char-types, bool, `std::chrono::year_month_day` are the various types supported. 
-Use `T ConvertFromStr<T>::ToVal(const std::string&)` for `std::string` to T conversions.
-Use `std::string ConvertFromVal<T>::ToStr(const T&)` for T to `std::string` conversions.
-The Default convertion functions, maps to best available converter functions (for a type) provided by std library.
+Floating-types, Integer-types, char-types, bool, `std::chrono::year_month_day` are the various types supported.<br>
+Use `T ConvertFromStr<T>::ToVal(const std::string&)` for `std::string` to T conversions.<br>
+Use `std::string ConvertFromVal<T>::ToStr(const T&)` for T to `std::string` conversions.<br>
+The Default convertion functions, maps to best available converter functions (for a type) provided by _std_ library.
 
 Numeric Floating-Point types
 ----------------------------
@@ -76,14 +78,14 @@ Precision Nomenclature ( for roundtrip conversion :: **string -> data-type -> st
 ✅ : Good. Minimal precision loss, best of the lot.  <br>
 ☑️ : Average. Precision loss is non-uniform, loss can be high for some FP values.
 
-|  🖥️ OS ➡️ <br> 🤖 Compiler ⬇️ | **Ubuntu 22.04** | **macOS-11** | **macOS-12** | **macOS-13** | **Windows 10<br>VS 17 - 2022** | **Windows 10<br>VS 16 - 2019** |
-|------------|------------------|--------------|--------------|--------------|-------------------------------|-------------------------------|
-| **g++ (11,12)** | ⚔️ ✅ | ⚔️ ✅ | ⚔️ ✅ | ⚔️ ✅ | - | - |
-| **clang++ (<span style="color:grey">12\*</span>,13,14)** | ⚔️ ✅ | - | - | - | - | - |
-| **AppleClang 14** | NA | NA | 🛠️ ☑️ | 🛠️ ☑️ | NA | NA |
-| **msvc 19** | NA | NA | NA | NA | ⚔️ ☑️ | - |
-| **clangCL 12** | - | - | - | - | - | ⚔️ ☑️ |
-| **clangCL 16** | - | - | - | - | ⚔️ ☑️ | - |
+|  🖥️ OS ➡️ <br> 🤖 Compiler ⬇️ | **Ubuntu 22.04** | **macOS-(12,13)** | **macOS-11** | **Windows 10<br>VS 17 - 2022** | **Windows 10<br>VS 16 - 2019** |
+|------------|------------------|--------------|--------------|-------------------------------|-------------------------------|
+| **g++ (11,12)** | ⚔️ ✅ | ⚔️ ✅ | ⚔️ ✅ | - | - |
+| **clang++ (**<span style="color:grey">12\*</span>,**13,14)** | ⚔️ ✅ | - | - | - | - |
+| **AppleClang 14** | NA | 🛠️ ☑️ | NA | NA | NA |
+| **msvc 19** | NA | NA | NA | ⚔️ ☑️ | - |
+| **clangCL 12** | - | - | - | - | ⚔️ ☑️ |
+| **clangCL 16** | - | - | - | ⚔️ ☑️ | - |
 
 <span style="color:grey">12\*</span> : Last successful run with [Clang 12.0.1](https://github.com/panchaBhuta/converter/actions/runs/6291468380/job/17079862439) and `OS-id-version=Linux-6.2.0-1011-azure`. Newer Ubuntu-image OS-version stopped supporting Clang-12.
 
@@ -150,7 +152,8 @@ For _year_month_day -> string_ conversion, refers to call to ...<br>
 | **year_month_day -> string** | 🛠️ date::to_stream() | 🛠️ date::to_stream() | 🛠️ date::to_stream() |
 
 
-The default date format is _"%F"_ (i.e "%Y-%m-%d"). For configuring a different date format refer [testDateConversionFormat.cpp](tests/testDateConversionFormat.cpp)
+The default date format is _"%F"_ (i.e "%Y-%m-%d"). For configuring a different date format refer [testDateConversionFormat.cpp](tests/testDateConversionFormat.cpp).
+
 
 
 char(s) and bool types
@@ -159,11 +162,12 @@ For `char-types`, converter interprets the cell's (first)
 byte as a character. For `bool`, the expected integer values are `0` or `1`.
 
 
+Locale Parsing Formats : String-to-T (i.e S2T)
+----------------------------------------------
+**converter** by default, uses `std::from_chars()` conversion function(s) when parsing numeric-type values from string. `std::from_chars()` donot use any locale for parsing.
 
-Custom Data Type Conversion
-===========================
-
-In situations where, for string representing numeric values uses a particular format , stream conversion can be used as shown below. Refer [testUserDefinedConverter_locale.cpp](tests/testUserDefinedConverter_locale.cpp) for full details.
+To use a particular locale for parsing numeric values, stream conversion can be used as shown below. <br>
+Refer [testUserDefinedConverter_locale.cpp](tests/testUserDefinedConverter_locale.cpp) for full details.
 ```c++
 // string literal object with static storage duration
 constexpr char de_Loc[] = "de_DE.UTF-8"; // uses comma (,) as decimal separator
@@ -174,8 +178,63 @@ using deLocal_iss = converter::S2T_Format_StreamUserLocale<T, converter::Failure
 template<converter::c_floating_point T>
 using ConvertFromStr_loc = converter::ConvertFromStr<T, deLocal_iss<T> >;
 ```
+<br>
 
-Or a different precision can be specified as below. Refer [testUserDefinedConverter_lowerPrecision.cpp](tests/testUserDefinedConverter_lowerPrecision.cpp) for more details.
+It is possible to configure **converter** to use locale dependent parsing by passing template-parameter <br>
+S2T_FORMAT=`converter::S2T_Format_StreamAsIs<T, converter::FailureS2Tprocess::THROW_ERROR, char>`. <br>
+Refer [testUserDefinedConverter_locale.cpp](tests/testUserDefinedConverter_locale.cpp).
+```c++
+template<typename T>
+using convertS2T_stream =
+    converter::ConvertFromStr<T,
+                              converter::S2T_Format_StreamAsIs<T,
+                                                               converter::FailureS2Tprocess::THROW_ERROR,
+                                                               char>
+                             >;
+```
+<br>
+
+... or configure **converter** to use either classic-locale parsing by setting template-parameter <br>
+S2T_FORMAT=`converter::S2T_Format_StreamUseClassicLocale<T, converter::FailureS2Tprocess::THROW_ERROR, char>`. <br>
+Refer [testFloatingPointNaN.cpp](tests/testFloatingPointNaN.cpp) and [testIntegerNaN.cpp](tests/testIntegerNaN.cpp).
+```c++
+template <typename T, converter::FailureS2Tprocess EP>
+using _ConvS2T_ISS = converter::ConvertFromStr<T, converter::S2T_Format_StreamUseClassicLocale<T, EP, char>>;
+```
+
+Locale Parsing Formats : T-to-String (i.e T2S)
+----------------------------------------------
+**converter** by default uses, `std::to_chars()` conversion functions when converting numeric-type values to string.
+
+To use a particular locale for converting numeric values, stream conversion can be used as shown below. <br>
+Refer [testUserDefinedConverter_locale.cpp](tests/testUserDefinedConverter_locale.cpp) for full details.
+```c++
+template<typename T>
+using deLocal_oss = converter::T2S_Format_StreamUserLocale<char, de_Loc>;
+
+template<typename T>
+using combine_deLocal_oss =
+    converter::T2S_Format_floating_StreamCombine< T,
+                                                  converter::T2S_Format_StreamDecimalPrecision<T>,
+                                                  deLocal_oss<T>
+                                                >;
+```
+
+It is possible to configure **converter** to use locale dependent parsing by changing template-parameter T2S_FORMAT=`T2S_Format_StreamAsIs<char>`. <br>
+
+... or configure **converter** to use either classic-locale parsing by setting template-parameter T2S_FORMAT=`T2S_Format_StreamUseClassicLocale<char>`. Refer [testIntegerNaN.cpp](tests/testIntegerNaN.cpp). <br>
+```c++
+template <typename T>
+using _ConvT2S_OSS = converter::ConvertFromVal<T, converter::T2S_Format_StreamUseClassicLocale<char>>;
+```
+
+### WARNING
+With floating point types `std::to_string(...)` may yield unexpected results as the number of significant digits in the returned string can be zero, for e.g: `pVal = 1e-09`. The return value may differ significantly from what `std::cout` prints by default. This particular specialization is disabled by default. In case if this is needed, enable it by defining macro `ENABLE_STD_TtoS`. <br> <br>
+
+
+Custom Data Type Conversion
+===========================
+A different precision can be specified as below. Refer [testUserDefinedConverter_lowerPrecision.cpp](tests/testUserDefinedConverter_lowerPrecision.cpp) for more details.
 
 ```c++
 template<converter::c_floating_point T>
@@ -196,9 +255,6 @@ using T2S_Format_ldp = converter::T2S_Format_StreamDecimalPrecision<T, getLowerD
 template<converter::c_floating_point T>
 using ConvertFromVal_lDP = converter::ConvertFromVal<T, T2S_Format_ldp<T> >;
 ```
-
-### WARNING
-With floating point types `std::to_string(...)` may yield unexpected results as the number of significant digits in the returned string can be zero, for e.g: `pVal = 1e-09`. The return value may differ significantly from what `std::cout` prints by default. That's why this particular specialization is disabled by default. In case if this is needed, enable it by defining macro `ENABLE_STD_TtoS`. <br> <br>
 
 
 
@@ -257,6 +313,7 @@ The reason for this is to ensure data correctness. If one wants to be able
 to identify variables with invalid values/numbers(for numeric data types), one can use the below class.
 
 ```c++
+Note: If only data conversions is needed, then just include [converter/converter.h](include/converter/converter.h).
   template< c_NOT_string T, typename T2S_FORMAT >
   struct ConvertFromVal<std::variant<T, std::string>, T2S_FORMAT>
   {
@@ -265,7 +322,7 @@ to identify variables with invalid values/numbers(for numeric data types), one c
   };
 ```
 
-Above Template-specializaton can be used for all types(integer, floating, bool) to write the underlying valid-number or the string which raised the conversion-error.
+Above Template-specializaton can be used for all types(integer, floating, bool) to write the underlying valid-data(of type `T`) or the string which raised the conversion-error.
 
 
 Architecture Components and Overview

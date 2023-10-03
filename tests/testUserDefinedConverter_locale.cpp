@@ -24,7 +24,7 @@
  * refer ::: https://askubuntu.com/questions/76013/how-do-i-add-locale-to-ubuntu-server
  */
 
-
+//------------------------
 // string literal object with static storage duration
 constexpr char de_Loc[] = "de_DE.UTF-8"; // uses comma (,) as decimal separator
 
@@ -34,7 +34,7 @@ using deLocal_iss = converter::S2T_Format_StreamUserLocale<T, converter::Failure
 template<converter::c_floating_point T>
 using ConvertFromStr_loc = converter::ConvertFromStr<T, deLocal_iss<T> >;
 
-
+//------------------------
 
 template<typename T>
 using deLocal_oss = converter::T2S_Format_StreamUserLocale<char, de_Loc>;
@@ -44,8 +44,9 @@ using combine_deLocal_oss =
     converter::T2S_Format_floating_StreamCombine< T,
                                                   converter::T2S_Format_StreamDecimalPrecision<T>,
                                                   deLocal_oss<T>
-                                                  >;
+                                                >;
 
+//------------------------
 
 template<converter::c_floating_point T>
 using ConvertFromVal_loc = converter::ConvertFromVal<T, combine_deLocal_oss<T> >;
@@ -59,6 +60,7 @@ using convertS2T_stream =
                                                                char>
                              >;
 
+//------------------------
 
 
 
