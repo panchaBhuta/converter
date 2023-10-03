@@ -166,7 +166,7 @@ int main()
                                                            "9007199254740993",      // MacOS
                                                            "9.007.199.254.740.992", };// Windows
     checkRoundTripConversion_txt2Val2txt<long double, ConvertFromStr_loc<long double>, ConvertFromVal_loc<long double>>("testUserDefinedConverter_locale-8",
-                 "9007199254740993", 9007199254740993L,
+                 "9007199254740993", 9007199254740993.0L,
                  expected_longDouble_9007199254740993[indexOS], std::numeric_limits<long double>::digits10, ',', '.');
 
 

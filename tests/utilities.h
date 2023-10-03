@@ -68,7 +68,7 @@ void checkRoundTripConversion_txt2Val2txt( const std::string& testID,
         std::istringstream iss_input(_strInput);
         std::string exponentInputStr;
         bool inputHasExponent = false;
-        int inputExponent;
+        int inputExponent = 0;
         if(std::getline(iss_input, exponentInputStr, 'e') &&
            std::getline(iss_input, exponentInputStr, 'e'))  // getline() called twice since 2nd token is exponent
         {
@@ -80,7 +80,7 @@ void checkRoundTripConversion_txt2Val2txt( const std::string& testID,
         std::istringstream iss_actual(_strRoundtripActual);
         std::string exponentActualStr;
         bool actualHasExponent = false;
-        int actualExponent;
+        int actualExponent = 0;
         if(std::getline(iss_actual, exponentActualStr, 'e') &&
            std::getline(iss_actual, exponentActualStr, 'e'))  // getline() called twice since 2nd token is exponent
         {

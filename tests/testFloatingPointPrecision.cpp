@@ -110,7 +110,7 @@ int main()
                                                            "9007199254740993",
                                                            "9007199254740992" }; // Windows
     checkRoundTripConversion_txt2Val2txt<long double>("testFloatingPointPrecision-8",
-                 "9007199254740993", 9007199254740993L, expected_longDouble_9007199254740993[indexOS]);
+                 "9007199254740993", 9007199254740993.0L, expected_longDouble_9007199254740993[indexOS]);
 
 
     std::string expected_float_3d3123[] = { "3.3123",

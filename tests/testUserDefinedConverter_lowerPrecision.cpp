@@ -116,7 +116,7 @@ int main()
                                                            "9.007199254741e+15" }; // Windows
     checkRoundTripConversion_txt2Val2txt<long double, converter::ConvertFromStr<long double>,
                                                       ConvertFromVal_lDP<long double>>("testUserDefinedConverter_lowerPrecision-8",
-                 "9007199254740993", 9007199254740993L,
+                 "9007199254740993", 9007199254740993.0L,
                  expected_longDouble_9007199254740993[indexOS],
                  getLowerDecimalPrecision<long double>());
 
