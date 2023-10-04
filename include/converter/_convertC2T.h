@@ -141,7 +141,7 @@ namespace converter
     inline static return_type
     ToVal(const std::string& str)
     {
-      return _ConvertFromStr_POS<T, PROCESS_ERR, S2T_Format_std_CtoT<T, PROCESS_ERR> >::_ToVal(str);
+      return pConvertFromStr_POS<T, PROCESS_ERR, S2T_Format_std_CtoT<T, PROCESS_ERR> >::_toVal(str);
     }
   };
 
@@ -190,7 +190,7 @@ namespace converter
     inline static return_type
     ToVal(const std::string& str)
     {
-      return _ConvertFromStr_POS<T, PROCESS_ERR, S2T_Format_std_CtoT<T, PROCESS_ERR> >::_ToVal(str);
+      return pConvertFromStr_POS<T, PROCESS_ERR, S2T_Format_std_CtoT<T, PROCESS_ERR> >::_toVal(str);
     }
   };
 #endif

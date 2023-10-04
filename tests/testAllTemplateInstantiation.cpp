@@ -112,7 +112,7 @@ void checkFormatInstance_Float()
 #define S2T_FORMAT_MACRO4(FORMAT_TEMPLATE, PROCESS)  converter::FORMAT_TEMPLATE<T, converter::FailureS2Tprocess::PROCESS, char, de_Loc>
 
 template<typename T>
-void __Format_WorkAround__Process2()
+void Format_WorkAround_Process2()
 {
   using t_vNaN = std::variant<T, std::string>;
   static_assert(std::is_same_v< decltype(&converter::ConvertFromStr<T, S2T_FORMAT_MACRO2(S2T_Format_WorkAround,THROW_ERROR)>::ToVal),
@@ -127,7 +127,7 @@ void __Format_WorkAround__Process2()
 }
 
 template<typename T>
-void __Format_std_CtoT__Process2() // needed for integer types
+void Format_std_CtoT_Process2() // needed for integer types
 {
   using t_vNaN = std::variant<T, std::string>;
   static_assert(std::is_same_v< decltype(&converter::ConvertFromStr<T, S2T_FORMAT_MACRO2(S2T_Format_std_CtoT,THROW_ERROR)>::ToVal),
@@ -142,9 +142,9 @@ void __Format_std_CtoT__Process2() // needed for integer types
 }
 #if USE_FLOATINGPOINT_TO_CHARS_1  ==  _e_ENABLE_FEATURE_
 template<typename T>
-void __Format_std_CtoT__Process4()
+void Format_std_CtoT_Process4()
 {
-  __Format_std_CtoT__Process2<T>();
+  Format_std_CtoT_Process2<T>();
   static_assert(std::is_same_v< decltype(&converter::ConvertFromStr<T, S2T_FORMAT_MACRO2(S2T_Format_std_CtoT,QUIET_NAN)>::ToVal),
                                 T(*)(const std::string&)>);
   static_assert(std::is_same_v< decltype(&converter::ConvertFromStr<T, S2T_FORMAT_MACRO2(S2T_Format_std_CtoT,SIGNAL_NAN)>::ToVal),
@@ -153,7 +153,7 @@ void __Format_std_CtoT__Process4()
 #endif
 
 template<typename T>
-void __Format_std_StoT__Process2()
+void Format_std_StoT_Process2()
 {
   using t_vNaN = std::variant<T, std::string>;
   static_assert(std::is_same_v< decltype(&converter::ConvertFromStr<T, S2T_FORMAT_MACRO2(S2T_Format_std_StoT,THROW_ERROR)>::ToVal),
@@ -169,7 +169,7 @@ void __Format_std_StoT__Process2()
 }
 
 template<typename T>
-void __Format_StreamAsIs__Process2()
+void Format_StreamAsIs_Process2()
 {
   using t_vNaN = std::variant<T, std::string>;
   static_assert(std::is_same_v< decltype(&converter::ConvertFromStr<T, S2T_FORMAT_MACRO3(S2T_Format_StreamAsIs,THROW_ERROR)>::ToVal),
@@ -183,9 +183,9 @@ void __Format_StreamAsIs__Process2()
                                 std::string(*)(const t_vNaN&)>);
 }
 template<typename T>
-void __Format_StreamAsIs__Process4()
+void Format_StreamAsIs_Process4()
 {
-  __Format_StreamAsIs__Process2<T>();
+  Format_StreamAsIs_Process2<T>();
   static_assert(std::is_same_v< decltype(&converter::ConvertFromStr<T, S2T_FORMAT_MACRO3(S2T_Format_StreamAsIs,QUIET_NAN)>::ToVal),
                                 T(*)(const std::string&)>);
   static_assert(std::is_same_v< decltype(&converter::ConvertFromStr<T, S2T_FORMAT_MACRO3(S2T_Format_StreamAsIs,SIGNAL_NAN)>::ToVal),
@@ -193,7 +193,7 @@ void __Format_StreamAsIs__Process4()
 }
 
 template<typename T>
-void __Format_StreamUseClassicLocale__Process2()
+void Format_StreamUseClassicLocale_Process2()
 {
   using t_vNaN = std::variant<T, std::string>;
   static_assert(std::is_same_v< decltype(&converter::ConvertFromStr<T, S2T_FORMAT_MACRO3(S2T_Format_StreamUseClassicLocale,THROW_ERROR)>::ToVal),
@@ -207,9 +207,9 @@ void __Format_StreamUseClassicLocale__Process2()
                                 std::string(*)(const t_vNaN&)>);
 }
 template<typename T>
-void __Format_StreamUseClassicLocale__Process4()
+void Format_StreamUseClassicLocale_Process4()
 {
-  __Format_StreamUseClassicLocale__Process2<T>();
+  Format_StreamUseClassicLocale_Process2<T>();
   static_assert(std::is_same_v< decltype(&converter::ConvertFromStr<T, S2T_FORMAT_MACRO3(S2T_Format_StreamUseClassicLocale,QUIET_NAN)>::ToVal),
                                 T(*)(const std::string&)>);
   static_assert(std::is_same_v< decltype(&converter::ConvertFromStr<T, S2T_FORMAT_MACRO3(S2T_Format_StreamUseClassicLocale,SIGNAL_NAN)>::ToVal),
@@ -217,7 +217,7 @@ void __Format_StreamUseClassicLocale__Process4()
 }
 
 template<typename T>
-void __Format_StreamUserLocale__Process2()
+void Format_StreamUserLocale_Process2()
 {
   using t_vNaN = std::variant<T, std::string>;
   static_assert(std::is_same_v< decltype(&converter::ConvertFromStr<T, S2T_FORMAT_MACRO4(S2T_Format_StreamUserLocale,THROW_ERROR)>::ToVal),
@@ -231,9 +231,9 @@ void __Format_StreamUserLocale__Process2()
                                 std::string(*)(const t_vNaN&)>);
 }
 template<typename T>
-void __Format_StreamUserLocale__Process4()
+void Format_StreamUserLocale_Process4()
 {
-  __Format_StreamUserLocale__Process2<T>();
+  Format_StreamUserLocale_Process2<T>();
   static_assert(std::is_same_v< decltype(&converter::ConvertFromStr<T, S2T_FORMAT_MACRO4(S2T_Format_StreamUserLocale,QUIET_NAN)>::ToVal),
                                 T(*)(const std::string&)>);
   static_assert(std::is_same_v< decltype(&converter::ConvertFromStr<T, S2T_FORMAT_MACRO4(S2T_Format_StreamUserLocale,SIGNAL_NAN)>::ToVal),
@@ -254,11 +254,11 @@ void checkFunctionInstance_Integer()
    *                        T2S_Format_floating_StreamCombine<>
   **/
 
-  __Format_std_CtoT__Process2<T>();
-  __Format_std_StoT__Process2<T>();
-  __Format_StreamAsIs__Process2<T>();
-  __Format_StreamUseClassicLocale__Process2<T>();
-  __Format_StreamUserLocale__Process2<T>();
+  Format_std_CtoT_Process2<T>();
+  Format_std_StoT_Process2<T>();
+  Format_StreamAsIs_Process2<T>();
+  Format_StreamUseClassicLocale_Process2<T>();
+  Format_StreamUserLocale_Process2<T>();
 }
 
 template<typename T>
@@ -274,7 +274,7 @@ void checkFunctionInstance_Float()
   **/
 
 #if USE_FLOATINGPOINT_TO_CHARS_1  ==  _e_ENABLE_FEATURE_
-  __Format_std_CtoT__Process4<T>();
+  Format_std_CtoT_Process4<T>();
 #endif
 
   using t_vNaN = std::variant<T, std::string>;
@@ -304,9 +304,9 @@ void checkFunctionInstance_Float()
 #endif
   }
 
-  __Format_StreamAsIs__Process4<T>();
-  __Format_StreamUseClassicLocale__Process4<T>();
-  __Format_StreamUserLocale__Process4<T>();
+  Format_StreamAsIs_Process4<T>();
+  Format_StreamUseClassicLocale_Process4<T>();
+  Format_StreamUserLocale_Process4<T>();
 }
 
 template<typename T>
@@ -322,10 +322,10 @@ void checkFunctionInstance_char()
    *                        T2S_Format_floating_StreamCombine<>
   **/
 
-  __Format_WorkAround__Process2<T>();
-  __Format_StreamAsIs__Process2<T>();
-  __Format_StreamUseClassicLocale__Process2<T>();
-  __Format_StreamUserLocale__Process2<T>();
+  Format_WorkAround_Process2<T>();
+  Format_StreamAsIs_Process2<T>();
+  Format_StreamUseClassicLocale_Process2<T>();
+  Format_StreamUserLocale_Process2<T>();
 }
 
 template<typename T>
@@ -341,10 +341,10 @@ void checkFunctionInstance_bool()
    *                        T2S_Format_floating_StreamCombine<>
   **/
 
-  __Format_WorkAround__Process2<T>();
-  __Format_StreamAsIs__Process2<T>();
-  __Format_StreamUseClassicLocale__Process2<T>();
-  __Format_StreamUserLocale__Process2<T>();
+  Format_WorkAround_Process2<T>();
+  Format_StreamAsIs_Process2<T>();
+  Format_StreamUseClassicLocale_Process2<T>();
+  Format_StreamUserLocale_Process2<T>();
 }
 
 template<typename T>

@@ -58,14 +58,15 @@ namespace converter
    * This a helper internal class, not meant to be called by upstream users.
   */
   template<typename T>
-  struct _ConvertFromVal
+  class pConvertFromVal
   {
-  protected:
+    friend struct converter::ConvertFromVal<T, T2S_Format_std_TtoC >;
+
     /*
      * Function wrapper to query if the conversion was succes after calling 'std::to_chars'.
      */
     inline static std::string
-    _ToStr_args(const T& val, auto... format_args)
+    _toStr_args(const T& val, auto... format_args)
     {
       std::array<char, std::numeric_limits<T>::digits +5 > str;  // +5 just to be on the safe side :)
 
@@ -75,7 +76,7 @@ namespace converter
          ) {
         return std::string(str.data(), pos);
       } else {
-        //static const std::string errMsg("Number to String conversion failed. 'std::string _ConvertFromVal<T>::_ToStr_args(const T& val, auto... format_args)'");
+        //static const std::string errMsg("Number to String conversion failed. 'std::string pConvertFromVal<T>::_toStr_args(const T& val, auto... format_args)'");
         //std::cerr << errMsg << " :: T[" << val << "]" << std::endl;
         throw std::runtime_error( std::make_error_code(ec).message() );
       }
@@ -90,7 +91,6 @@ namespace converter
    */
   template<c_integer_type T>
   struct ConvertFromVal<T, T2S_Format_std_TtoC >
-        : protected  _ConvertFromVal<T>
   {
     /**
      * @brief   'integr type' definition being declared for.
@@ -125,7 +125,7 @@ namespace converter
     inline static std::string
     ToStr_args( const T& val, int base = 10)
     {
-      return _ConvertFromVal<T>::_ToStr_args(val, base);
+      return pConvertFromVal<T>::_toStr_args(val, base);
     }
   };
 
@@ -138,7 +138,6 @@ namespace converter
    */
   template<c_floating_point T>
   struct ConvertFromVal<T, T2S_Format_std_TtoC >
-        : public  _ConvertFromVal<T>
   {
     /**
      * @brief   'floating-point type' definition being declared for.
@@ -160,7 +159,7 @@ namespace converter
     inline static std::string
     ToStr( const T& val)
     {
-      return _ConvertFromVal<T>::_ToStr_args(val);
+      return pConvertFromVal<T>::_toStr_args(val);
     }
 
     /**
@@ -173,7 +172,7 @@ namespace converter
     inline static std::string
     ToStr_args( const T& val, std::chars_format fmt)
     {
-      return _ConvertFromVal<T>::_ToStr_args(val, fmt);
+      return pConvertFromVal<T>::_toStr_args(val, fmt);
     }
 
     /**
@@ -187,7 +186,7 @@ namespace converter
     inline static std::string
     ToStr_args( const T& val, std::chars_format fmt, int precision)
     {
-      return _ConvertFromVal<T>::_ToStr_args(val, fmt, precision);
+      return pConvertFromVal<T>::_toStr_args(val, fmt, precision);
     }
   };
 #endif

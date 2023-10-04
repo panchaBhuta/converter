@@ -27,13 +27,13 @@ set(_e_ENABLE_FEATURE_     1)
 function(converter_getversion version_arg)
     # Parse the current version from the converter header
     file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/include/converter/converter.h" converter_version_defines
-        REGEX "#define CONVERTER__VERSION_(MAJOR|MINOR|PATCH)")
+        REGEX "#define CONVERTER_VERSION_(MAJOR|MINOR|PATCH)")
     foreach(ver ${converter_version_defines})
-        if(ver MATCHES "#define CONVERTER__VERSION_(MAJOR|MINOR|PATCH) +([^ ]+)$")
-            set(CONVERTER__VERSION_${CMAKE_MATCH_1} "${CMAKE_MATCH_2}" CACHE INTERNAL "")
+        if(ver MATCHES "#define CONVERTER_VERSION_(MAJOR|MINOR|PATCH) +([^ ]+)$")
+            set(CONVERTER_VERSION_${CMAKE_MATCH_1} "${CMAKE_MATCH_2}" CACHE INTERNAL "")
         endif()
     endforeach()
-    set(VERSION ${CONVERTER__VERSION_MAJOR}.${CONVERTER__VERSION_MINOR}.${CONVERTER__VERSION_PATCH})
+    set(VERSION ${CONVERTER_VERSION_MAJOR}.${CONVERTER_VERSION_MINOR}.${CONVERTER_VERSION_PATCH})
 
     # Give feedback to the user. Prefer DEBUG when available since large projects tend to have a lot
     # going on already
@@ -406,7 +406,7 @@ macro(converter_enable_warnings)
         "$<${gcc_cxx_v5_or_later}:$<BUILD_INTERFACE:-Wsuggest-override>>"
         "$<$<NOT:${windows_os}>:$<BUILD_INTERFACE:-g>>"
         "$<${windows_os}:$<BUILD_INTERFACE:-Z7>>"  # -Z7 is equivalent for -g
-        "$<${windows_os_clang_cxx}:$<BUILD_INTERFACE:-Wno-c++98-compat;-Wnoc++98-compat-pedantic;-Wextra-semi-stmt>>"
+        "$<${windows_os_clang_cxx}:$<BUILD_INTERFACE:-Wno-c++98-compat;-Wno-c++98-compat-pedantic;-Wno-extra-semi-stmt>>"
         "$<${msvc_cxx}:$<BUILD_INTERFACE:-W4>>")
     #add_compile_options("/utf-8")  for msvc  -> check in cxxopts.cmake
 endmacro()

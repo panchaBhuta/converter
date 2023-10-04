@@ -30,9 +30,9 @@
 #include <locale>
 #include <stdexcept>
 
-#define CONVERTER__VERSION_MAJOR 1
-#define CONVERTER__VERSION_MINOR 2
-#define CONVERTER__VERSION_PATCH 8
+#define CONVERTER_VERSION_MAJOR 1
+#define CONVERTER_VERSION_MINOR 2
+#define CONVERTER_VERSION_PATCH 8
 
 
 
@@ -83,8 +83,8 @@ namespace converter
   static constexpr struct {
     uint8_t major, minor, patch;
   } version = {
-    CONVERTER__VERSION_MAJOR,
-    CONVERTER__VERSION_MINOR,
-    CONVERTER__VERSION_PATCH
+    CONVERTER_VERSION_MAJOR,
+    CONVERTER_VERSION_MINOR,
+    CONVERTER_VERSION_PATCH
   };
 }

@@ -285,7 +285,7 @@ namespace converter
              FailureS2Tprocess                               PROCESS_ERR,
              std::derived_from< OnError<T, PROCESS_ERR > >   ERR_HANDLER
            >
-  class _ConvertFromStr_POS
+  class pConvertFromStr_POS
   {
     friend struct ConvertFromStr< T, ERR_HANDLER >;
 
@@ -293,7 +293,7 @@ namespace converter
      * Function wrapper to query if the complete input string was read during conversion.
      */
     inline static typename ERR_HANDLER::return_type
-    _ToVal(const std::string& str)
+    _toVal(const std::string& str)
     {
       try
       {
@@ -318,7 +318,7 @@ namespace converter
         return ERR_HANDLER::handler(str, err);
       }
 
-      static const std::string errMsg("String isn't a numeric-type. 'return_type _ConvertFromStr_POS<T, PROCESS_ERR, ERR_HANDLER>::_ToVal(const std::string& str)'");
+      static const std::string errMsg("String isn't a numeric-type. 'return_type pConvertFromStr_POS<T, PROCESS_ERR, ERR_HANDLER>::_toVal(const std::string& str)'");
       CONVERTER_DEBUG_LOG( errMsg << "  string-conversion-failure for value '" << str << "'" );
       static const std::invalid_argument err(errMsg);
       return ERR_HANDLER::handler(str, err);
@@ -492,7 +492,7 @@ namespace converter
     inline static return_type
     ToVal(const std::string& str)
     {
-      return _ConvertFromStr_POS<T, PROCESS_ERR, S2T_Format_std_StoT<T, PROCESS_ERR> >::_ToVal(str);
+      return pConvertFromStr_POS<T, PROCESS_ERR, S2T_Format_std_StoT<T, PROCESS_ERR> >::_toVal(str);
     }
   };
 
@@ -548,7 +548,7 @@ namespace converter
     inline static return_type
     ToVal(const std::string& str)
     {
-      return _ConvertFromStr_POS<T, PROCESS_ERR, S2T_Format_std_StoT<T, PROCESS_ERR> >::_ToVal(str);
+      return pConvertFromStr_POS<T, PROCESS_ERR, S2T_Format_std_StoT<T, PROCESS_ERR> >::_toVal(str);
     }
   };
 
