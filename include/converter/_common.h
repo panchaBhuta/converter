@@ -335,6 +335,8 @@ namespace converter
     */
     //  https://www.learncpp.com/cpp-tutorial/floating-point-numbers/
     //  https://en.cppreference.com/w/cpp/types/numeric_limits/digits10
+    return std::numeric_limits<T>::digits10 + 3;
+    /*
     if constexpr (std::is_same_v<T, float>)
       return FLT_DIG+3;  // (4 bytes) -> 6 significant digits, typically 7
       //  (6 for IEEE float)
@@ -346,6 +348,7 @@ namespace converter
     if constexpr (std::is_same_v<T, long double>)
       return LDBL_DIG+3;  // (if 16 bytes) -> 33-36 significant digits
       //  (18 for 80-bit Intel long double; 33 for IEEE quadruple)
+    */
   }
   // ]=============================================================] COMMON_FORMAT
 }

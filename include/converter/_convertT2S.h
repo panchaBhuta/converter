@@ -251,23 +251,23 @@ namespace converter
       oss << val;
       if (oss.fail() || oss.bad()) // || oss.eof())
       {
-        static const std::string funcName = 
-          "'std::string ConvertFromVal<c_NOT_string T, c_formatOSS T2S_FORMAT>::ToStr(const T& val)'";
-
   #ifdef ENABLE_CONVERTER_DEBUG_LOG
         std::ostringstream eoss;
         try {
           eoss << "val='" << val << "'";
         } catch (...) {} // on error do-nothing.
-        CONVERTER_DEBUG_LOG(" ERROR : converter :: in function " << funcName << " ::: ostringstream-conversion failed."  \
-                              << eoss.str() << std::boolalpha << "   iss.fail() = " << oss.fail()                        \
-                              << " : iss.bad() = " << oss.bad() << " : iss.eof() = " << oss.eof());
+        CONVERTER_DEBUG_LOG(_errMsg << " ::: ostringstream-conversion failed." << eoss.str()     \
+                                    << std::boolalpha << "   iss.fail() = " << oss.fail()        \
+                                    << " : iss.bad() = " << oss.bad() << " : iss.eof() = " << oss.eof());
   #endif
-        static const std::string errMsg = "Invalid argument. "+funcName;
-        throw std::invalid_argument(errMsg);
+        throw _err;
       }
       return oss.str();
     }
+
+  private:
+    inline static const std::string _errMsg{"Invalid argument passed to function 'std::string ConvertFromVal<c_NOT_string T, c_formatOSS T2S_FORMAT>::ToStr(const T& val)'"};
+    inline static const std::invalid_argument _err{_errMsg};
   };
 
   // for types refer :: https://en.cppreference.com/w/cpp/language/type

@@ -10,6 +10,7 @@
 #include <iomanip>
 #include <string>
 #include <sstream>
+#include <type_traits>
 #include <chrono>
 
 #define COMMA ,
@@ -179,10 +180,26 @@ namespace unittest
   };
 
   template<typename T>
+  inline bool compareEqual(T pTest, T pRef, [[maybe_unused]]int ulp = -1) { return pTest == pRef; }
+
+  template<typename T>
+  concept c_floating_point = std::is_floating_point_v<T>;
+
+  template<c_floating_point T>
+  inline bool compareEqual(T pTest, T pRef, int ulp = std::numeric_limits<T>::digits10)
+  {
+    // the machine epsilon has to be scaled to the magnitude of the values used
+    // and multiplied by the desired precision in ULPs (units in the last place)
+    return std::fabs(pTest - pRef) <= std::numeric_limits<T>::epsilon() * std::fabs(pTest + pRef) * ulp
+        // unless the result is subnormal
+        || std::fabs(pTest - pRef) < std::numeric_limits<T>::min();
+  }
+
+  template<typename T>
   inline void ExpectEqualFun(T pTest, T pRef, const std::string& testName,
                              const std::string& refName, const std::string& filePath, int lineNo)
   {
-    if (pTest != pRef)
+    if (!compareEqual(pTest, pRef))
     {
       std::stringstream ss;
       ss << std::setprecision(std::numeric_limits<long double>::digits10 + 1);

@@ -318,11 +318,12 @@ namespace converter
         return ERR_HANDLER::handler(str, err);
       }
 
-      static const std::string errMsg("String isn't a numeric-type. 'return_type pConvertFromStr_POS<T, PROCESS_ERR, ERR_HANDLER>::_toVal(const std::string& str)'");
-      CONVERTER_DEBUG_LOG( errMsg << "  string-conversion-failure for value '" << str << "'" );
-      static const std::invalid_argument err(errMsg);
-      return ERR_HANDLER::handler(str, err);
+      CONVERTER_DEBUG_LOG( _errMsg << "  string-conversion-failure for value '" << str << "'" );
+      return ERR_HANDLER::handler(str, _err);
     }
+
+    inline static const std::string _errMsg{"String isn't a numeric-type. 'return_type pConvertFromStr_POS<T, PROCESS_ERR, ERR_HANDLER>::_toVal(const std::string& str)'"};
+    inline static const std::invalid_argument _err{_errMsg};
   };
 
   // https://eli.thegreenplace.net/2014/perfect-forwarding-and-universal-references-in-c/
@@ -342,6 +343,9 @@ namespace converter
       else
         return ( iss.fail() || iss.bad() || (!iss.eof()) );
     }
+
+    inline static const std::string _errMsg{"Stream read failure. 'T ConvertFromStr<c_NOT_string T, c_formatISS S2T_FORMAT>::ToVal(const std::string& str)'"};
+    inline static const std::invalid_argument _err{_errMsg};
 
   public:
 
@@ -378,12 +382,10 @@ namespace converter
 
       if( _checkStreamFailure(iss) )
       {
-        static const std::string errMsg("Stream read failure. 'T ConvertFromStr<c_NOT_string T, c_formatISS S2T_FORMAT>::ToVal(const std::string& str)'");
-        CONVERTER_DEBUG_LOG(errMsg << " input-string-stream-failure for value '" << str << "'"           \
-                                   << std::boolalpha << " iss.fail()=" << iss.fail() << "  iss.bad()="   \
-                                   << iss.bad() << "  iss.eof()=" << iss.eof());
-        static const std::invalid_argument err(errMsg);
-        return S2T_FORMAT_STREAM::handler(str, err);
+        CONVERTER_DEBUG_LOG(_errMsg << " input-string-stream-failure for value '" << str << "'"           \
+                                    << std::boolalpha << " iss.fail()=" << iss.fail() << "  iss.bad()="   \
+                                    << iss.bad() << "  iss.eof()=" << iss.eof());
+        return S2T_FORMAT_STREAM::handler(str, _err);
       }
       return val;
     }
@@ -607,10 +609,8 @@ namespace converter
     {
       if(str.length()>1)
       {
-        static const std::string errMsg("String isn't a char-type. 'CH ConvertFromStr<c_char CH,S2T_Format_WorkAround>::ToVal(const std::string& str)'");
-        static const std::invalid_argument err(errMsg);
-        CONVERTER_DEBUG_LOG( errMsg <<  " string2charT-conversion-failure for value '" << str << "'");
-        return S2T_Format_WorkAround<CH, PROCESS_ERR>::handler(str, err);
+        CONVERTER_DEBUG_LOG( _errMsg <<  " string2charT-conversion-failure for value '" << str << "'");
+        return S2T_Format_WorkAround<CH, PROCESS_ERR>::handler(str, _err);
       }
 
       if constexpr( std::is_same<CH, std::string::value_type>::value ) {
@@ -619,6 +619,10 @@ namespace converter
         return static_cast<CH>(str[0]);
       }
     }
+
+  private:
+    inline static const std::string _errMsg{"String isn't a char-type. 'CH ConvertFromStr<c_char CH,S2T_Format_WorkAround>::ToVal(const std::string& str)'"};
+    inline static const std::invalid_argument _err{_errMsg};
   };
 
   /**
@@ -651,13 +655,15 @@ namespace converter
       unsigned long val = std::stoul(str); //(str, pos, base);
       if(val > 1)
       {
-        static const std::string errMsg("String isn't a bool. 'T ConvertFromStr<bool,S2T_Format_WorkAround>::ToVal(const std::string& str)'");
-        static const std::invalid_argument err(errMsg);
-        CONVERTER_DEBUG_LOG( errMsg << " string2bool-conversion-failure for value '" << str << "'" );
-        return S2T_Format_WorkAround<bool, PROCESS_ERR>::handler(str, err);
+        CONVERTER_DEBUG_LOG( _errMsg << " string2bool-conversion-failure for value '" << str << "'" );
+        return S2T_Format_WorkAround<bool, PROCESS_ERR>::handler(str, _err);
       }
       return val;
     }
+
+  private:
+    inline static const std::string _errMsg{"String isn't a bool. 'T ConvertFromStr<bool,S2T_Format_WorkAround>::ToVal(const std::string& str)'"};
+    inline static const std::invalid_argument _err{_errMsg};
   };
 
   // ]=============================================================] ConvertFromStr

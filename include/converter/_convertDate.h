@@ -109,6 +109,24 @@ namespace converter
 
     static const int template_uid = 10000;
 
+    /**
+     * @brief   Converts string holding 'year_month_day' value. The string has the format "%F" -> "%Y-%m-%d"
+     * @param   str                 input string representing date.
+     * @returns 'year_month_day'.
+     */
+    inline static return_type //std::chrono::year_month_day
+    ToVal(const std::string& str)
+    {
+      try {
+       return ToVal_args( str, S2T_FORMAT_YMD::ymdFormat); // %F -> "%Y-%m-%d"
+      } catch (const std::invalid_argument& err) {
+        return S2T_FORMAT_YMD::handler(str, err);
+      } catch (const std::exception& err) {
+        //static const std::string errMsg("std::chrono::year_month_day _ConvertFromStr<std::chrono::year_month_day, S2T_FORMAT_YMD>::ToVal(const std::string& str)");
+        return S2T_FORMAT_YMD::handler(str, err);
+      }
+    }
+
     // TODO unit tests
     /**
      * @brief   Converts string holding 'year_month_day' value. The string has the format "%F" -> "%Y-%m-%d"
@@ -251,9 +269,7 @@ namespace converter
         }
       }
 
-      static const std::string func("std::chrono::year_month_day converter::ConvertFromStr<std::chrono::year_month_day, S2T_FORMAT_YMD>::ToVal_args(const std::string& str)");
-      static const std::string errMsg("Invalid date-string received in '"+func+"'");
-      CONVERTER_DEBUG_LOG(errMsg << "  ERROR :: in function '" << func << "' ::: strYMD='" << str <<"' format='" << fmt  << "'");
+      CONVERTER_DEBUG_LOG(_errMsg << "' ::: strYMD='" << str <<"' format='" << fmt  << "'");
       CONVERTER_DEBUG_LOG("  istringstream-conversion<" << dateClass << "> failed."                      \
                                  << std::boolalpha << "   iss.fail() = " << iss.fail()                   \
                                  << " : iss.bad() = "  << iss.bad() << " : iss.eof() = "  << iss.eof());
@@ -261,9 +277,12 @@ namespace converter
                               << " : ymd.year(" << int(ymd.year()) << ").ok() = " << ymd.year().ok()            \
                               << " : ymd.month(" << unsigned(ymd.month()) << ").ok() = " << ymd.month().ok()    \
                               << " : ymd.day(" << unsigned(ymd.day()) << ").ok() = " << ymd.day().ok());
-      static const std::invalid_argument err(errMsg);
-      return S2T_FORMAT_YMD::handler(str, err);
+      return S2T_FORMAT_YMD::handler(str, _err);
     }
+
+  private:
+    inline static const std::string _errMsg{"Invalid date-string received in 'std::chrono::year_month_day converter::ConvertFromStr<std::chrono::year_month_day, S2T_FORMAT_YMD>::ToVal_args(const std::string& str)'"};
+    inline static const std::invalid_argument _err{_errMsg};
 #else
     {
       const std::string dateClass = "workaround_datelib::from_stream";
@@ -351,36 +370,18 @@ namespace converter
                                               std::chrono::day(iD) };
         }
       }
-      static const std::string func("std::chrono::year_month_day converter::ConvertFromStr<std::chrono::year_month_day, S2T_FORMAT_YMD>::ToVal_args(const std::string& str)");
-      static const std::string errMsg("Invalid date-string received in '"+func+"'");
-      CONVERTER_DEBUG_LOG(errMsg << " :: ERROR :: in function '" << func << "' ::: strYMD='" << str <<"' format='"   \
-                                 << fmt << "' istringstream-conversion<" << dateClass << "> failed.");
-      static const std::invalid_argument err(errMsg);
-      return S2T_FORMAT_YMD::handler(str, err);
+      CONVERTER_DEBUG_LOG(_errMsg << "' ::: strYMD='" << str <<"' format='"   \
+                                  << fmt << "' istringstream-conversion<" << dateClass << "> failed.");
+      return S2T_FORMAT_YMD::handler(str, _err);
     }
+  private:
+    inline static const std::string _errMsg{"Invalid date-string received in 'std::chrono::year_month_day converter::ConvertFromStr<std::chrono::year_month_day, S2T_FORMAT_YMD>::ToVal_args(const std::string& str)'"};
+    inline static const std::invalid_argument _err{_errMsg};
     /*
     WARNING : Due to limitations of 'std::chrono' and 'date' libs, internal implementation of string-to-Date
               conversions is provided. This conversion support a limited sub-set of date-formats.
     */
 #endif
-
-    /**
-     * @brief   Converts string holding 'year_month_day' value. The string has the format "%F" -> "%Y-%m-%d"
-     * @param   str                 input string representing date.
-     * @returns 'year_month_day'.
-     */
-    inline static return_type //std::chrono::year_month_day
-    ToVal(const std::string& str)
-    {
-      try {
-       return ToVal_args( str, S2T_FORMAT_YMD::ymdFormat); // %F -> "%Y-%m-%d"
-      } catch (const std::invalid_argument& err) {
-        return S2T_FORMAT_YMD::handler(str, err);
-      } catch (const std::exception& err) {
-        //static const std::string errMsg("std::chrono::year_month_day _ConvertFromStr<std::chrono::year_month_day, S2T_FORMAT_YMD>::ToVal(const std::string& str)");
-        return S2T_FORMAT_YMD::handler(str, err);
-      }
-    }
   };
 
   // ]=============================================================] ConvertFromStr
@@ -615,10 +616,9 @@ namespace converter
 
       if (oss.fail() || oss.bad()) // || oss.eof())
       {
-        static const std::string func("std::string ConvertFromVal<std::chrono::year_month_date, T2S_FORMAT_YMD>::ToStr_args(const std::chrono::year_month_date& val)");
   #ifdef ENABLE_CONVERTER_DEBUG_LOG
         std::ostringstream eoss;
-        eoss << "ERROR : rapidcsv :: in function '" << func << "' ::: ";
+        eoss << _errMsg << " ::: ";
         try {
           eoss << "year{" << int(val.year()) << "}-month{" << unsigned(val.month()) << "}-day{" 
           << unsigned(val.day()) << "}' : val.ok()=" << val.ok() << " format='" << fmt << "'  resultString='"
@@ -630,12 +630,15 @@ namespace converter
                                << " : iss.eof() = " << oss.eof();
         CONVERTER_DEBUG_LOG(eoss.str());
   #endif
-        static const std::string errMsg("error in date-conversion in '"+func+"'");
-        throw std::invalid_argument(errMsg);
+        throw _err;
       }
       CONVERTER_DEBUG_LOG(dateClass << " for date2string output : str=" << oss.str());
       return oss.str();
     }
+
+  private:
+    inline static const std::string _errMsg{"error in date-conversion in 'std::string ConvertFromVal<std::chrono::year_month_date, T2S_FORMAT_YMD>::ToStr_args(const std::chrono::year_month_date& val)'"};
+    inline static const std::invalid_argument _err{_errMsg};
   };
 
   // ]=============================================================] ConvertFromVal
