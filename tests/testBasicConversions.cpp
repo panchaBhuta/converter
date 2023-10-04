@@ -45,11 +45,12 @@ int main()
     conversionEqualCheck<char>('a',  "a");
     conversionEqualCheck<signed char>('b', "b");
     conversionEqualCheck<unsigned char>('c', "c");
-    conversionEqualCheck<wchar_t>('d',  "d");
+    conversionEqualCheck<wchar_t>(wchar_t('d'),  "d");
+    // refer https://stackoverflow.com/questions/148403/utf8-to-from-wide-char-conversion-in-stl
 #if USE_CLANG_STRING_WORKS_1 == _e_ENABLE_FEATURE_ || USE_CLANG_STRING_WORKAROUND_2 == _e_ENABLE_FEATURE_
     conversionEqualCheck<char8_t>('e',  "e");
-    conversionEqualCheck<char16_t>('f',  "f");
-    conversionEqualCheck<char32_t>('g',  "g");
+    conversionEqualCheck<char16_t>(char16_t('f'),  "f");
+    conversionEqualCheck<char32_t>(char32_t('g'),  "g");
 #else
   #warning Possibly wrong build initialization. Either USE_CLANG_STRING_WORKS_1  or USE_CLANG_STRING_WORKAROUND_2 should be enabled.
 #endif
