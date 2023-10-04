@@ -19,7 +19,7 @@ set(clang_like_cxx "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang>")
 set(gcc_cxx "$<COMPILE_LANG_AND_ID:CXX,GNU>")
 set(gcc_like_cxx "$<OR:$<COMPILE_LANG_AND_ID:CXX,GNU,LCC>,${clang_like_cxx}>")
 set(msvc_cxx "$<COMPILE_LANG_AND_ID:CXX,MSVC>")
-set(windows_os "$<STREQUAL:${CMAKE_SYSTEM_NAME},Windows>")
+set(windows_os "$<BOOL:${WIN32}>")
 
 set(_e_DISABLE_FEATURE_    0)
 set(_e_ENABLE_FEATURE_     1)
@@ -396,7 +396,6 @@ macro(converter_enable_warnings)
     set(v5_or_later "$<VERSION_GREATER_EQUAL:$<CXX_COMPILER_VERSION>,5>")
     set(gcc_cxx_v5_or_later "$<AND:${gcc_cxx},${v5_or_later}>")
     set(windows_os_clang_cxx "$<AND:${windows_os},${clang_cxx}>")  # used when Windows-ClangCl toolchain
-    set(not_windows_os "$<NOT:${windows_os}>")
     #[==================================================================================[
     # we only want these warning flags to be used during builds.
     # Consumers of our installed project should not inherit our warning flags.
@@ -405,7 +404,7 @@ macro(converter_enable_warnings)
     target_compile_options(converter INTERFACE
         "$<${gcc_like_cxx}:$<BUILD_INTERFACE:${gcc_warnings}>>"
         "$<${gcc_cxx_v5_or_later}:$<BUILD_INTERFACE:-Wsuggest-override>>"
-        "$<${not_windows_os}:$<BUILD_INTERFACE:-g>>"
+        "$<$<NOT:${windows_os}>:$<BUILD_INTERFACE:-g>>"
         "$<${windows_os}:$<BUILD_INTERFACE:-Z7>>"  # -Z7 is equivalent for -g
         "$<${windows_os_clang_cxx}:$<BUILD_INTERFACE:-Wc++20-compat>>"
         "$<${msvc_cxx}:$<BUILD_INTERFACE:-W4>>")
