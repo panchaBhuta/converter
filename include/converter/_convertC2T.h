@@ -54,9 +54,9 @@ namespace converter
  
   /*
    * This a helper internal class, not meant to be called by upstream users.
-  */
+   */
   template <typename T, FailureS2Tprocess PROCESS_ERR>
-  class _ConvertFromStr_POS_Cargs
+  class pConvertFromStr_POS_Cargs
   {
     friend struct converter::ConvertFromStr< T, S2T_Format_std_CtoT<T, PROCESS_ERR> >;
 
@@ -64,7 +64,7 @@ namespace converter
      * Function wrapper to query if the complete input string was read during conversion.
      */
     inline static T
-    _ToVal_args(const std::string& str, std::size_t* pos, auto format_args)
+    _toVal_args(const std::string& str, std::size_t* pos, auto format_args)
     {
       //  https://en.cppreference.com/w/cpp/utility/from_chars
       //  std::from_chars is locale-independent, non-allocating, and non-throwing
@@ -78,7 +78,7 @@ namespace converter
       }
 
       static const std::string funcName = 
-        " : 'T _ConvertFromStr_POS_Cargs<T>::_ToVal_args(const std::string& str, std::size_t* pos, auto format_args)'";
+        " : 'T pConvertFromStr_POS_Cargs<T>::_toVal_args(const std::string& str, std::size_t* pos, auto format_args)'";
       if (ec == std::errc()) {
         return result;
       } else if (ec == std::errc::invalid_argument) {
@@ -129,7 +129,7 @@ namespace converter
     inline static T
     ToVal_args(const std::string& str, std::size_t* pos = nullptr, int base = 10)
     {
-      return _ConvertFromStr_POS_Cargs<T, PROCESS_ERR>::_ToVal_args(str, pos, base);
+      return pConvertFromStr_POS_Cargs<T, PROCESS_ERR>::_toVal_args(str, pos, base);
     }
   
     /**
@@ -178,7 +178,7 @@ namespace converter
     ToVal_args(const std::string& str, std::size_t* pos = nullptr,
                std::chars_format fmt = std::chars_format::general)
     {
-      return _ConvertFromStr_POS_Cargs<T, PROCESS_ERR>::_ToVal_args(str, pos, fmt);
+      return pConvertFromStr_POS_Cargs<T, PROCESS_ERR>::_toVal_args(str, pos, fmt);
     }
   
     /**

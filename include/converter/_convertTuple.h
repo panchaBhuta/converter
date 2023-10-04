@@ -142,8 +142,8 @@ namespace converter
   struct ConvertFromString
   {
   private:
-    template <typename _TC>
-    inline static typename t_S2Tconv_c<_TC>::return_type
+    template <typename TC>
+    inline static typename t_S2Tconv_c<TC>::return_type
     _getTokenConvert(std::istringstream& ss, char seperator)
     {
       std::string token;
@@ -151,10 +151,10 @@ namespace converter
       if(std::getline(ss, token, seperator))
       {
         //std::cout << "token=" << token <<std::endl;
-        return t_S2Tconv_c<_TC>::ToVal(token);
+        return t_S2Tconv_c<TC>::ToVal(token);
       }
 
-      return typename t_S2Tconv_c<_TC>::return_type();
+      return typename t_S2Tconv_c<TC>::return_type();
     }
   public:
     /**
