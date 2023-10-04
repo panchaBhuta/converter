@@ -406,7 +406,7 @@ macro(converter_enable_warnings)
         "$<${gcc_cxx_v5_or_later}:$<BUILD_INTERFACE:-Wsuggest-override>>"
         "$<$<NOT:${windows_os}>:$<BUILD_INTERFACE:-g>>"
         "$<${windows_os}:$<BUILD_INTERFACE:-Z7>>"  # -Z7 is equivalent for -g
-        "$<${windows_os_clang_cxx}:$<BUILD_INTERFACE:-Wno-c++98-compat;-Wno-c++98-compat-pedantic;-Wno-extra-semi-stmt>>"
+        "$<${windows_os_clang_cxx}:$<BUILD_INTERFACE:-Wno-c++98-compat;-Wno-c++98-compat-pedantic;-Wno-extra-semi-stmt;-Wno-global-constructors;-Wno-exit-time-destructors>>"
         "$<${msvc_cxx}:$<BUILD_INTERFACE:-W4>>")
     #add_compile_options("/utf-8")  for msvc  -> check in cxxopts.cmake
 endmacro()

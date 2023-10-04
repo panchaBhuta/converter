@@ -491,25 +491,25 @@ namespace converter
 
       if (strlen(fmt)>1)
       {
-        enum _ParseState { READ, REPLACE };
-        _ParseState state = _ParseState::READ;
+        enum e_ParseState { READ, REPLACE };
+        e_ParseState state = e_ParseState::READ;
         char present = fmt[0];
         if( '%' == present )
-          state = _ParseState::REPLACE;
+          state = e_ParseState::REPLACE;
         for(size_t iii = 1; iii < strlen(fmt); ++iii)
         {
           present = fmt[iii];
-          if(_ParseState::REPLACE == state)
+          if(e_ParseState::REPLACE == state)
           {
             write(present);
-            state = _ParseState::READ;
+            state = e_ParseState::READ;
           } else {
             if( '%' == present )
             {
-              state = _ParseState::REPLACE;
+              state = e_ParseState::REPLACE;
             } else {
               oss << present;
-              //state = _ParseState::READ;
+              //state = e_ParseState::READ;
             }
           }
         }
