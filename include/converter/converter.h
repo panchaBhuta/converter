@@ -50,13 +50,8 @@
 #else
   // https://stackoverflow.com/questions/8487986/file-macro-shows-full-path/40947954#40947954
   // the project-prefix-path is skipped by offsetting to length of project-prefix-path
-  //#define CONVERTER_FILE   (__FILE__ + CONVERTER_SOURCE_PATH_SIZE)
-  inline const char* offsetFILE(char* fileName) // this function workaround is for windows:clangCL
-  {
-    fileName += CONVERTER_SOURCE_PATH_SIZE;
-    return fileName;
-  }
-  #define CONVERTER_FILE   offsetFILE(__FILE__)
+  //#define CONVERTER_FILE   (__FILE__ + CONVERTER_SOURCE_PATH_SIZE)  // gives lot of warnings on windows:clangCL
+  #define CONVERTER_FILE   &(__FILE__[CONVERTER_SOURCE_PATH_SIZE])
 #endif
 
 // to handle windows back-slash path seperator

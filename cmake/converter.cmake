@@ -21,6 +21,7 @@ set(gcc_like_cxx "$<OR:$<COMPILE_LANG_AND_ID:CXX,GNU,LCC>,${clang_like_cxx}>")
 set(msvc_cxx "$<COMPILE_LANG_AND_ID:CXX,MSVC>")
 set(windows_os "$<BOOL:${WIN32}>")
 
+
 set(_e_DISABLE_FEATURE_    0)
 set(_e_ENABLE_FEATURE_     1)
 
@@ -438,6 +439,7 @@ macro(converter_build)
             set(_DEBUG_LOG TRUE)
     endif()
     #message(STATUS "_DEBUG_LOG=${_DEBUG_LOG}")
+    # for _DEBUG_LOG can't use generator-expression as its computed during build-stage, but we need it during config-stage
     option(CONVERTER_DEBUG_LOG  "Set to ON for debugging logs"  ${_DEBUG_LOG})
     message(STATUS "CONVERTER_DEBUG_LOG=${CONVERTER_DEBUG_LOG}")
     #[===========[  donot use generator-expressions in option() functions
