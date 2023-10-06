@@ -616,7 +616,7 @@ namespace converter
 
       if (oss.fail() || oss.bad()) // || oss.eof())
       {
-  #ifdef ENABLE_CONVERTER_DEBUG_LOG
+  #if ENABLE_CONVERTER_DEBUG_LOG == 1
         std::ostringstream eoss;
         eoss << _errMsg << " ::: ";
         try {
