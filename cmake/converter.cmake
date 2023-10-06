@@ -370,7 +370,7 @@ macro(converter_check_cxx_compiler_flag_file_prefix_map)
     if(cxx_compiler_file_prefix_map)
         message(STATUS "converter : compiler option '-ffile-prefix-map=old=new' SUPPORTED")
         target_compile_definitions(converter INTERFACE
-                                        USE_FILEPREFIXMAP=1)
+                                        CONVERTER_USE_FILEPREFIXMAP=1)
 
         target_compile_options(converter INTERFACE
             "-ffile-prefix-map=${CMAKE_CURRENT_SOURCE_DIR}${_path_separator}=")
@@ -379,7 +379,7 @@ macro(converter_check_cxx_compiler_flag_file_prefix_map)
         message(STATUS "converter : compiler option '-ffile-prefix-map=old=new' NOT SUPPORTED")
         string(LENGTH "${CMAKE_CURRENT_SOURCE_DIR}/" CONVERTER_SOURCE_PATH_SIZE)
         target_compile_definitions(converter INTERFACE
-                                        USE_FILEPREFIXMAP=0
+                                        CONVERTER_USE_FILEPREFIXMAP=0
         # https://stackoverflow.com/questions/8487986/file-macro-shows-full-path/40947954#40947954
                                         CONVERTER_SOURCE_PATH_SIZE=${CONVERTER_SOURCE_PATH_SIZE})
     endif()

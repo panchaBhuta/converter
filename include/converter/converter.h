@@ -32,7 +32,7 @@
 
 #define CONVERTER_VERSION_MAJOR 1
 #define CONVERTER_VERSION_MINOR 2
-#define CONVERTER_VERSION_PATCH 8
+#define CONVERTER_VERSION_PATCH 9
 
 
 
@@ -44,7 +44,7 @@
 
 //  Project path is removed from the __FILE__
 //  Resulting file-path is relative path from project-root-folder.
-#if  USE_FILEPREFIXMAP == 1
+#if  CONVERTER_USE_FILEPREFIXMAP == 1
   // the project-prefix-path is removed via compilation directive file-prefix-map
   #define CONVERTER_FILE    __FILE__
 #else
@@ -59,9 +59,9 @@
 
 
 #ifdef ENABLE_CONVERTER_DEBUG_LOG
-#define CONVERTER_DEBUG_LOG(aMessage) { std::cout << aMessage << " :: file:" << CONVERTER_PREFERRED_PATH << ":" << __LINE__ << std::endl; }
+  #define CONVERTER_DEBUG_LOG(aMessage) { std::cout << aMessage << " :: file:" << CONVERTER_PREFERRED_PATH << ":" << __LINE__ << std::endl; }
 #else
-#define CONVERTER_DEBUG_LOG(aMessage)
+  #define CONVERTER_DEBUG_LOG(aMessage)
 #endif
 
 
