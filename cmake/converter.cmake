@@ -433,10 +433,10 @@ macro(converter_build)
         message(STATUS "Using build type '${CMAKE_BUILD_TYPE}'.")
     endif()
 
-    set(_DEBUG_LOG FALSE)
+    set(_DEBUG_LOG 0FF)
     if (CONVERTER_STANDALONE_PROJECT AND
         CMAKE_BUILD_TYPE STREQUAL "Debug")
-            set(_DEBUG_LOG TRUE)
+            set(_DEBUG_LOG ON)
     endif()
     #message(STATUS "_DEBUG_LOG=${_DEBUG_LOG}")
     # for _DEBUG_LOG can't use generator-expression as its computed during build-stage, but we need it during config-stage
@@ -475,7 +475,8 @@ macro(converter_build)
     target_compile_definitions(converter INTERFACE
         $<$<CONFIG:Debug>:DEBUG_BUILD>
         $<$<CONFIG:Release>:RELEASE_BUILD>
-        $<$<BOOL:"${CONVERTER_DEBUG_LOG}">:ENABLE_CONVERTER_DEBUG_LOG>)
+	ENABLE_CONVERTER_DEBUG_LOG=$<BOOL:${CONVERTER_DEBUG_LOG}>)
+        #$<$<BOOL:${CONVERTER_DEBUG_LOG}>:ENABLE_CONVERTER_DEBUG_LOG>)
     #[==================================================================================[
     # refer https://cmake.org/cmake/help/v3.27/manual/cmake-generator-expressions.7.html#genex:COMPILE_LANG_AND_ID
     # This specifies the use of different compile definitions based on both the compiler id and compilation language.

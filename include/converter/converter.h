@@ -58,7 +58,7 @@
 #define CONVERTER_PREFERRED_PATH    std::filesystem::path(CONVERTER_FILE).make_preferred().string()
 
 
-#ifdef ENABLE_CONVERTER_DEBUG_LOG
+#if ENABLE_CONVERTER_DEBUG_LOG == 1
   #define CONVERTER_DEBUG_LOG(aMessage) { std::cout << aMessage << " :: file:" << CONVERTER_PREFERRED_PATH << ":" << __LINE__ << std::endl; }
 #else
   #define CONVERTER_DEBUG_LOG(aMessage)
