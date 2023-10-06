@@ -433,7 +433,7 @@ macro(converter_build)
         message(STATUS "Using build type '${CMAKE_BUILD_TYPE}'.")
     endif()
 
-    set(_DEBUG_LOG 0FF)
+    set(_DEBUG_LOG OFF)
     if (CONVERTER_STANDALONE_PROJECT AND
         CMAKE_BUILD_TYPE STREQUAL "Debug")
             set(_DEBUG_LOG ON)
