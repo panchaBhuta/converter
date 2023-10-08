@@ -66,15 +66,15 @@ int main()
     {
       unittest::ExpectEqual(float, converter::ConvertFromStr<float>::ToVal("0.1"), 0.1f);
 
-      unittest::ExpectEqual(float, convertS2T_stream<float>::ToVal("0.1"), 0.1f);
+      unittest::ExpectEqual(float, convertS2T_stream<float>::ToVal("0.2"), 0.2f);
 
-      unittest::ExpectEqual(float, convertS2T_streamClassic<float>::ToVal("0.1"), 0.1f);
+      unittest::ExpectEqual(float, convertS2T_streamClassic<float>::ToVal("0.3"), 0.3f);
 
-      unittest::ExpectEqual(float, convertS2T_StoT<float>::ToVal("0.1"), 0.1f);  //  <<  decimal-point
+      unittest::ExpectEqual(float, convertS2T_StoT<float>::ToVal("0.4"), 0.4f);  //  <<  decimal-point
     }
 
     if(testUserLocale) {
-      unittest::ExpectEqual(float, convertS2T_userLocale<float>::ToVal("0,1"), 0.1f);  //  <<  comma
+      unittest::ExpectEqual(float, convertS2T_userLocale<float>::ToVal("0,5"), 0.5f);  //  <<  comma
     }
   } catch (const std::exception& ex) {
     std::cout << "#2# " << ex.what() << std::endl;
@@ -95,23 +95,23 @@ int main()
 
   try
   {
-#if USE_FLOATINGPOINT_TO_CHARS_1  ==  e_ENABLE_FEATURE
+#if USE_FLOATINGPOINT_FROM_CHARS_1  ==  e_ENABLE_FEATURE
     // independent of system-locale
-    unittest::ExpectEqual(float, converter::ConvertFromStr<float>::ToVal("0.1"), 0.1f);
+    unittest::ExpectEqual(float, converter::ConvertFromStr<float>::ToVal("0.11"), 0.11f);
 #else
     // for compiler 'AppleClang'
     // as converter::S2T_Format_std_StoT<T,...> is fall-back and this is dependent on C locale
-    unittest::ExpectEqual(float, converter::ConvertFromStr<float>::ToVal("0,1"), 0.1f);  //  <<  comma
+    unittest::ExpectEqual(float, converter::ConvertFromStr<float>::ToVal("0,12"), 0.12f);  //  <<  comma
 #endif
 
     // independent of system-locale
-    unittest::ExpectEqual(float, convertS2T_stream<float>::ToVal("0.1"), 0.1f);
+    unittest::ExpectEqual(float, convertS2T_stream<float>::ToVal("0.2"), 0.2f);
 
     // independent of system-locale
-    unittest::ExpectEqual(float, convertS2T_streamClassic<float>::ToVal("0.1"), 0.1f);
+    unittest::ExpectEqual(float, convertS2T_streamClassic<float>::ToVal("0.3"), 0.3f);
 
     // dependent on system-locale
-    unittest::ExpectEqual(float, convertS2T_StoT<float>::ToVal("0,1"), 0.1f);  //  <<  comma
+    unittest::ExpectEqual(float, convertS2T_StoT<float>::ToVal("0,4"), 0.4f);  //  <<  comma
   } catch (const std::exception& ex) {
     std::cout << "#4# " << ex.what() << std::endl;
     rv = 1;
