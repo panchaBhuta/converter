@@ -22,8 +22,8 @@ set(msvc_cxx "$<COMPILE_LANG_AND_ID:CXX,MSVC>")
 set(windows_os "$<BOOL:${WIN32}>")
 
 
-set(_e_DISABLE_FEATURE_    0)
-set(_e_ENABLE_FEATURE_     1)
+set(e_DISABLE_FEATURE    0)
+set(e_ENABLE_FEATURE     1)
 
 function(converter_getversion version_arg)
     # Parse the current version from the converter header
@@ -79,13 +79,13 @@ endmacro()
 
 #    Check if chrono-lib stream conversion is supported
 macro(check_chrono_stream_functionality)
-    set(USE_CHRONO_FROMSTREAM_1 ${_e_ENABLE_FEATURE_})
-    set(USE_DATE_FROMSTREAM_2   ${_e_DISABLE_FEATURE_})
-    set(USE_JUGAAD_FROMSTREAM_3 ${_e_DISABLE_FEATURE_})
+    set(USE_CHRONO_FROMSTREAM_1 ${e_ENABLE_FEATURE})
+    set(USE_DATE_FROMSTREAM_2   ${e_DISABLE_FEATURE})
+    set(USE_JUGAAD_FROMSTREAM_3 ${e_DISABLE_FEATURE})
 
-    set(USE_CHRONO_TOSTREAM_1   ${_e_ENABLE_FEATURE_})
-    set(USE_DATE_TOSTREAM_2     ${_e_DISABLE_FEATURE_})
-    set(USE_JUGAAD_TOSTREAM_3   ${_e_DISABLE_FEATURE_})
+    set(USE_CHRONO_TOSTREAM_1   ${e_ENABLE_FEATURE})
+    set(USE_DATE_TOSTREAM_2     ${e_DISABLE_FEATURE})
+    set(USE_JUGAAD_TOSTREAM_3   ${e_DISABLE_FEATURE})
 
 
     # Platform check variables
@@ -102,7 +102,7 @@ macro(check_chrono_stream_functionality)
                 CMAKE_FLAGS "$<${linux_host_with_gcc_like_cxx}:--std=gnu++2a>"
                 CMAKE_FLAGS "$<${linux_host_with_gcc_cxx}:-fconcepts>"
                 #CMAKE_FLAGS  "--std=gnu++2a -fconcepts"
-                COMPILE_DEFINITIONS "-DUSE_CHRONO_FROMSTREAM_1=${_e_ENABLE_FEATURE_}"
+                COMPILE_DEFINITIONS "-DUSE_CHRONO_FROMSTREAM_1=${e_ENABLE_FEATURE}"
                 CXX_STANDARD "${CMAKE_CXX_STANDARD}"
                 CXX_STANDARD_REQUIRED True)
 
@@ -111,9 +111,9 @@ macro(check_chrono_stream_functionality)
         message(STATUS "checkChrono_fromStream[std::chrono::from_stream()] ++SUCCESS++")
         message(STATUS "checkChrono_fromStream[date::from_stream()] __SKIPPED__")
         message(STATUS "checkChrono_fromStream[jugaad::from_stream()] __SKIPPED__")
-        set(USE_CHRONO_FROMSTREAM_1 ${_e_ENABLE_FEATURE_})
-        set(USE_DATE_FROMSTREAM_2   ${_e_DISABLE_FEATURE_})
-        set(USE_JUGAAD_FROMSTREAM_3 ${_e_DISABLE_FEATURE_})
+        set(USE_CHRONO_FROMSTREAM_1 ${e_ENABLE_FEATURE})
+        set(USE_DATE_FROMSTREAM_2   ${e_DISABLE_FEATURE})
+        set(USE_JUGAAD_FROMSTREAM_3 ${e_DISABLE_FEATURE})
     else()
         message(STATUS "checkChrono_fromStream[std::chrono::from_stream()] --FAILED--")
     endif()
@@ -124,7 +124,7 @@ macro(check_chrono_stream_functionality)
                 CMAKE_FLAGS "$<${linux_host_with_gcc_like_cxx}:--std=gnu++2a>"
                 CMAKE_FLAGS "$<${linux_host_with_gcc_cxx}:-fconcepts>"
                 #CMAKE_FLAGS  "--std=gnu++2a -fconcepts"
-                COMPILE_DEFINITIONS "-DUSE_CHRONO_TOSTREAM_1=${_e_ENABLE_FEATURE_}"
+                COMPILE_DEFINITIONS "-DUSE_CHRONO_TOSTREAM_1=${e_ENABLE_FEATURE}"
                 CXX_STANDARD "${CMAKE_CXX_STANDARD}"
                 CXX_STANDARD_REQUIRED True)
 
@@ -133,9 +133,9 @@ macro(check_chrono_stream_functionality)
         message(STATUS "checkChrono_toStream[std::chrono::to_stream()] ++SUCCESS++")
         message(STATUS "checkChrono_toStream[date::to_stream()] __SKIPPED__")
         message(STATUS "checkChrono_toStream[jugaad::to_stream()] __SKIPPED__")
-        set(USE_CHRONO_TOSTREAM_1 ${_e_ENABLE_FEATURE_})
-        set(USE_DATE_TOSTREAM_2   ${_e_DISABLE_FEATURE_})
-        set(USE_JUGAAD_TOSTREAM_3 ${_e_DISABLE_FEATURE_})
+        set(USE_CHRONO_TOSTREAM_1 ${e_ENABLE_FEATURE})
+        set(USE_DATE_TOSTREAM_2   ${e_DISABLE_FEATURE})
+        set(USE_JUGAAD_TOSTREAM_3 ${e_DISABLE_FEATURE})
     else()
         message(STATUS "checkChrono_toStream[std::chrono::to_stream()] --FAILED--")
     endif()
@@ -175,7 +175,7 @@ macro(check_chrono_stream_functionality)
                         #CMAKE_FLAGS  "-DINCLUDE_DIRECTORIES=${${DATELIB}_SOURCE_DIR}"
                         CMAKE_FLAGS  "-DINCLUDE_DIRECTORIES=${CMAKE_BINARY_DIR}/_deps/date-src/include/"
                                     #"-DLINK_DIRECTORIES=${${DATELIB}_BINARY_DIR}"
-                        COMPILE_DEFINITIONS "-DUSE_CHRONO_FROMSTREAM_1=${_e_DISABLE_FEATURE_}"
+                        COMPILE_DEFINITIONS "-DUSE_CHRONO_FROMSTREAM_1=${e_DISABLE_FEATURE}"
                         CXX_STANDARD "${CMAKE_CXX_STANDARD}"
                         CXX_STANDARD_REQUIRED True)
 
@@ -183,16 +183,16 @@ macro(check_chrono_stream_functionality)
                 # ubuntu, mac - clang
                 message(STATUS "checkChrono_fromStream[date::from_stream()] ++SUCCESS++")
                 message(STATUS "checkChrono_fromStream[jugaad::from_stream()] __SKIPPED__")
-                set(USE_CHRONO_FROMSTREAM_1 ${_e_DISABLE_FEATURE_})
-                set(USE_DATE_FROMSTREAM_2   ${_e_ENABLE_FEATURE_})
-                set(USE_JUGAAD_FROMSTREAM_3 ${_e_DISABLE_FEATURE_})
+                set(USE_CHRONO_FROMSTREAM_1 ${e_DISABLE_FEATURE})
+                set(USE_DATE_FROMSTREAM_2   ${e_ENABLE_FEATURE})
+                set(USE_JUGAAD_FROMSTREAM_3 ${e_DISABLE_FEATURE})
             else()
                 message(STATUS "checkChrono_fromStream[date::from_stream()] --FAILED--")
                 message(STATUS "checkChrono_fromStream[jugaad::from_stream()] ##ENABLED##")
                 message(STATUS "WARNING: The jugaad-conversion enabled handles a limited sub-set of date-format specifiers.")
-                set(USE_CHRONO_FROMSTREAM_1 ${_e_DISABLE_FEATURE_})
-                set(USE_DATE_FROMSTREAM_2   ${_e_DISABLE_FEATURE_})
-                set(USE_JUGAAD_FROMSTREAM_3 ${_e_ENABLE_FEATURE_})
+                set(USE_CHRONO_FROMSTREAM_1 ${e_DISABLE_FEATURE})
+                set(USE_DATE_FROMSTREAM_2   ${e_DISABLE_FEATURE})
+                set(USE_JUGAAD_FROMSTREAM_3 ${e_ENABLE_FEATURE})
             endif()
         endif()
 
@@ -204,7 +204,7 @@ macro(check_chrono_stream_functionality)
                         CMAKE_FLAGS "$<${linux_host_with_gcc_cxx}:-fconcepts>"
                         #CMAKE_FLAGS  "--std=gnu++2a -fconcepts"
                         CMAKE_FLAGS  "-DINCLUDE_DIRECTORIES=${CMAKE_BINARY_DIR}/_deps/date-src/include/"
-                        COMPILE_DEFINITIONS "-DUSE_CHRONO_TOSTREAM_1=${_e_DISABLE_FEATURE_}"
+                        COMPILE_DEFINITIONS "-DUSE_CHRONO_TOSTREAM_1=${e_DISABLE_FEATURE}"
                         CXX_STANDARD "${CMAKE_CXX_STANDARD}"
                         CXX_STANDARD_REQUIRED True)
 
@@ -212,17 +212,17 @@ macro(check_chrono_stream_functionality)
                 # ubuntu, mac - clang
                 message(STATUS "checkChrono_toStream[date::to_stream()] ++SUCCESS++")
                 message(STATUS "checkChrono_toStream[jugaad::to_stream()] __SKIPPED__")
-                set(USE_CHRONO_TOSTREAM_1 ${_e_DISABLE_FEATURE_})
-                set(USE_DATE_TOSTREAM_2   ${_e_ENABLE_FEATURE_})
-                set(USE_JUGAAD_TOSTREAM_3 ${_e_DISABLE_FEATURE_})
+                set(USE_CHRONO_TOSTREAM_1 ${e_DISABLE_FEATURE})
+                set(USE_DATE_TOSTREAM_2   ${e_ENABLE_FEATURE})
+                set(USE_JUGAAD_TOSTREAM_3 ${e_DISABLE_FEATURE})
             else()
                 # msvc
                 message(STATUS "checkChrono_toStream[date::to_stream()] --FAILED--")
                 message(STATUS "checkChrono_toStream[jugaad::to_stream()] ##ENABLED##")
                 message(STATUS "WARNING: The jugaad-conversion enabled handles a limited sub-set of date-format specifiers.")
-                set(USE_CHRONO_TOSTREAM_1 ${_e_DISABLE_FEATURE_})
-                set(USE_DATE_TOSTREAM_2   ${_e_DISABLE_FEATURE_})
-                set(USE_JUGAAD_TOSTREAM_3 ${_e_ENABLE_FEATURE_})
+                set(USE_CHRONO_TOSTREAM_1 ${e_DISABLE_FEATURE})
+                set(USE_DATE_TOSTREAM_2   ${e_DISABLE_FEATURE})
+                set(USE_JUGAAD_TOSTREAM_3 ${e_ENABLE_FEATURE})
             endif()
         endif()
 
@@ -238,12 +238,12 @@ macro(check_chrono_stream_functionality)
         endif()
     endif()
     #[==[   uncomment for testing purpose
-                set(USE_CHRONO_FROMSTREAM_1 ${_e_DISABLE_FEATURE_})
-                set(USE_DATE_FROMSTREAM_2   ${_e_DISABLE_FEATURE_})
-                set(USE_JUGAAD_FROMSTREAM_3 ${_e_ENABLE_FEATURE_})
-                set(USE_CHRONO_TOSTREAM_1 ${_e_DISABLE_FEATURE_})
-                set(USE_DATE_TOSTREAM_2   ${_e_DISABLE_FEATURE_})
-                set(USE_JUGAAD_TOSTREAM_3 ${_e_ENABLE_FEATURE_})
+                set(USE_CHRONO_FROMSTREAM_1 ${e_DISABLE_FEATURE})
+                set(USE_DATE_FROMSTREAM_2   ${e_DISABLE_FEATURE})
+                set(USE_JUGAAD_FROMSTREAM_3 ${e_ENABLE_FEATURE})
+                set(USE_CHRONO_TOSTREAM_1 ${e_DISABLE_FEATURE})
+                set(USE_DATE_TOSTREAM_2   ${e_DISABLE_FEATURE})
+                set(USE_JUGAAD_TOSTREAM_3 ${e_ENABLE_FEATURE})
     #]==]
 endmacro()
 
@@ -251,11 +251,11 @@ endmacro()
 # Failure to compile std::u16string from libstdc++ 12.1 in c++20 mode #55560 
 # https://github.com/llvm/llvm-project/issues/55560
 macro(check_clang_string_workaround)  # NOTE setters should be in 'macro' and NOT in 'function'
-    set(USE_CLANG_STRING_WORKS_1       ${_e_ENABLE_FEATURE_})
-    set(USE_CLANG_STRING_WORKAROUND_2  ${_e_DISABLE_FEATURE_})
+    set(USE_CLANG_STRING_WORKS_1       ${e_ENABLE_FEATURE})
+    set(USE_CLANG_STRING_WORKAROUND_2  ${e_DISABLE_FEATURE})
 
-    set(USE_CLANG_CHARS_WORKS_1       ${_e_ENABLE_FEATURE_})
-    set(USE_CLANG_CHARS_WORKAROUND_2  ${_e_DISABLE_FEATURE_})
+    set(USE_CLANG_CHARS_WORKS_1       ${e_ENABLE_FEATURE})
+    set(USE_CLANG_CHARS_WORKAROUND_2  ${e_DISABLE_FEATURE})
 
     if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
         try_compile(COMPILE_RESULT_CLANG_STRING_DEFAULT
@@ -264,15 +264,15 @@ macro(check_clang_string_workaround)  # NOTE setters should be in 'macro' and NO
                     CMAKE_FLAGS "$<${linux_host_with_gcc_like_cxx}:--std=gnu++2a>"
                     CMAKE_FLAGS "$<${linux_host_with_gcc_cxx}:-fconcepts>"
                     #CMAKE_FLAGS  "--std=gnu++2a -fconcepts"
-                    COMPILE_DEFINITIONS "-DUSE_CLANG_STRING_WORKAROUND_2=${_e_DISABLE_FEATURE_}"
+                    COMPILE_DEFINITIONS "-DUSE_CLANG_STRING_WORKAROUND_2=${e_DISABLE_FEATURE}"
                     CXX_STANDARD "${CMAKE_CXX_STANDARD}"
                     CXX_STANDARD_REQUIRED True)
 
         if(COMPILE_RESULT_CLANG_STRING_DEFAULT)
             message(STATUS "check_clang_string :: default mode ++SUCCESS++")
             message(STATUS "check_clang_string :: workaround   __SKIPPED__")
-            set(USE_CLANG_STRING_WORKS_1       ${_e_ENABLE_FEATURE_})
-            set(USE_CLANG_STRING_WORKAROUND_2  ${_e_DISABLE_FEATURE_})
+            set(USE_CLANG_STRING_WORKS_1       ${e_ENABLE_FEATURE})
+            set(USE_CLANG_STRING_WORKAROUND_2  ${e_DISABLE_FEATURE})
         else()
             message(STATUS "check_clang_string :: default mode --FAILED--")
 
@@ -282,24 +282,24 @@ macro(check_clang_string_workaround)  # NOTE setters should be in 'macro' and NO
                         CMAKE_FLAGS "$<${linux_host_with_gcc_like_cxx}:--std=gnu++2a>"
                         CMAKE_FLAGS "$<${linux_host_with_gcc_cxx}:-fconcepts>"
                         #CMAKE_FLAGS  "--std=gnu++2a -fconcepts"
-                        COMPILE_DEFINITIONS "-DUSE_CLANG_STRING_WORKAROUND_2=${_e_ENABLE_FEATURE_}"
+                        COMPILE_DEFINITIONS "-DUSE_CLANG_STRING_WORKAROUND_2=${e_ENABLE_FEATURE}"
                         CXX_STANDARD "${CMAKE_CXX_STANDARD}"
                         CXX_STANDARD_REQUIRED True)
 
             if(COMPILE_RESULT_CLANG_STRING_WORKAROUND)
                 message(STATUS "check_clang_string :: workaround ++SUCCESS++")
-                set(USE_CLANG_STRING_WORKS_1       ${_e_DISABLE_FEATURE_})
-                set(USE_CLANG_STRING_WORKAROUND_2  ${_e_ENABLE_FEATURE_})
+                set(USE_CLANG_STRING_WORKS_1       ${e_DISABLE_FEATURE})
+                set(USE_CLANG_STRING_WORKAROUND_2  ${e_ENABLE_FEATURE})
             else()
                 message(STATUS "check_clang_string :: workaround --FAILED--")
-                set(USE_CLANG_STRING_WORKS_1       ${_e_DISABLE_FEATURE_})
-                set(USE_CLANG_STRING_WORKAROUND_2  ${_e_DISABLE_FEATURE_})
+                set(USE_CLANG_STRING_WORKS_1       ${e_DISABLE_FEATURE})
+                set(USE_CLANG_STRING_WORKAROUND_2  ${e_DISABLE_FEATURE})
             endif()
         endif()
 
         message(STATUS "enabling USE_CLANG_CHARS_WORKAROUND_2")
-        set(USE_CLANG_CHARS_WORKS_1       ${_e_DISABLE_FEATURE_})
-        set(USE_CLANG_CHARS_WORKAROUND_2  ${_e_ENABLE_FEATURE_})
+        set(USE_CLANG_CHARS_WORKS_1       ${e_DISABLE_FEATURE})
+        set(USE_CLANG_CHARS_WORKAROUND_2  ${e_ENABLE_FEATURE})
     else()
         message(STATUS "NON Clang compiler, default settings for USE_CLANG_STRING  and USE_CLANG_CHARS")
     endif()
@@ -308,47 +308,47 @@ endmacro()
 # check if compiler supports "elementary string conversions" for floating-point types
 # https://en.cppreference.com/w/cpp/compiler_support/17#C.2B.2B17_library_features
 macro(check_floatingPoint_elementaryStringConversions)
-    set(USE_FLOATINGPOINT_FROM_CHARS_1  ${_e_ENABLE_FEATURE_})
+    set(USE_FLOATINGPOINT_FROM_CHARS_1  ${e_ENABLE_FEATURE})
     try_compile(COMPILE_FLOATINGPOINT_FROM_CHARS
                 SOURCE_FROM_FILE    check_floatingPoint_fromChars.cpp
                                     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/check_floatingPoint_fromChars.cpp"
                 CMAKE_FLAGS "$<${linux_host_with_gcc_like_cxx}:--std=gnu++2a>"
                 CMAKE_FLAGS "$<${linux_host_with_gcc_cxx}:-fconcepts>"
                 #CMAKE_FLAGS  "--std=gnu++2a -fconcepts"  not needed
-                #COMPILE_DEFINITIONS "-DUSE_FLOATINGPOINT_FROM_CHARS=${_e_ENABLE_FEATURE_}"  not needed
+                #COMPILE_DEFINITIONS "-DUSE_FLOATINGPOINT_FROM_CHARS=${e_ENABLE_FEATURE}"  not needed
                 CXX_STANDARD "${CMAKE_CXX_STANDARD}"
                 CXX_STANDARD_REQUIRED True)
 
     if(COMPILE_FLOATINGPOINT_FROM_CHARS)
         message(STATUS "check_floatingPoint_fromChars ::  ++SUCCESS++")
-        set(USE_FLOATINGPOINT_FROM_CHARS_1   ${_e_ENABLE_FEATURE_})
+        set(USE_FLOATINGPOINT_FROM_CHARS_1   ${e_ENABLE_FEATURE})
     else()
         message(STATUS "check_floatingPoint_fromChars ::  --FAILED--   workaround-enabled")
-        set(USE_FLOATINGPOINT_FROM_CHARS_1   ${_e_DISABLE_FEATURE_})
+        set(USE_FLOATINGPOINT_FROM_CHARS_1   ${e_DISABLE_FEATURE})
     endif()
 
 
-    set(USE_FLOATINGPOINT_TO_CHARS_1  ${_e_ENABLE_FEATURE_})
+    set(USE_FLOATINGPOINT_TO_CHARS_1  ${e_ENABLE_FEATURE})
     try_compile(COMPILE_FLOATINGPOINT_TO_CHARS
                 SOURCE_FROM_FILE    check_floatingPoint_toChars.cpp
                                     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/check_floatingPoint_toChars.cpp"
                 CMAKE_FLAGS "$<${linux_host_with_gcc_like_cxx}:--std=gnu++2a>"
                 CMAKE_FLAGS "$<${linux_host_with_gcc_cxx}:-fconcepts>"
                 #CMAKE_FLAGS  "--std=gnu++2a -fconcepts"   not needed
-                #COMPILE_DEFINITIONS "-DUSE_FLOATINGPOINT_FROM_CHARS=${_e_ENABLE_FEATURE_}"  not needed
+                #COMPILE_DEFINITIONS "-DUSE_FLOATINGPOINT_FROM_CHARS=${e_ENABLE_FEATURE}"  not needed
                 CXX_STANDARD "${CMAKE_CXX_STANDARD}"
                 CXX_STANDARD_REQUIRED True)
 
     if(COMPILE_FLOATINGPOINT_TO_CHARS)
         message(STATUS "check_floatingPoint_toChars ::  ++SUCCESS++")
-        set(USE_FLOATINGPOINT_TO_CHARS_1   ${_e_ENABLE_FEATURE_})
+        set(USE_FLOATINGPOINT_TO_CHARS_1   ${e_ENABLE_FEATURE})
     else()
         message(STATUS "check_floatingPoint_toChars ::  --FAILED--   workaround-enabled")
-        set(USE_FLOATINGPOINT_TO_CHARS_1   ${_e_DISABLE_FEATURE_})
+        set(USE_FLOATINGPOINT_TO_CHARS_1   ${e_DISABLE_FEATURE})
     endif()
     #[===[  for testing purpose
-        set(USE_FLOATINGPOINT_FROM_CHARS_1   ${_e_DISABLE_FEATURE_})
-        set(USE_FLOATINGPOINT_TO_CHARS_1     ${_e_DISABLE_FEATURE_})
+        set(USE_FLOATINGPOINT_FROM_CHARS_1   ${e_DISABLE_FEATURE})
+        set(USE_FLOATINGPOINT_TO_CHARS_1     ${e_DISABLE_FEATURE})
     #]===]
 endmacro()
 

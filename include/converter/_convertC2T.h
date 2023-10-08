@@ -29,6 +29,14 @@ namespace converter
   // [[============[[ Conversion formats
   template<typename T, FailureS2Tprocess PROCESS_ERR>
   struct S2T_Format_std_CtoT : public OnError<T, PROCESS_ERR> {};
+
+#if USE_FLOATINGPOINT_FROM_CHARS_1  ==  e_DISABLE_FEATURE
+  template<c_floating_point T, FailureS2Tprocess PROCESS_ERR>
+  struct S2T_Format_std_CtoT<T, PROCESS_ERR> : public OnError<T, PROCESS_ERR>
+  {
+    #error "compiler does not support 'std::from_chars(...)' function"
+  };
+#endif
   // ]]============]] Conversion formats
 
 
@@ -39,7 +47,7 @@ namespace converter
     using type = S2T_Format_std_CtoT<T, FailureS2Tprocess::THROW_ERROR>;
   };
 
-#if USE_FLOATINGPOINT_FROM_CHARS_1  ==  _e_ENABLE_FEATURE_
+#if USE_FLOATINGPOINT_FROM_CHARS_1  ==  e_ENABLE_FEATURE
   template<c_floating_point T>
   struct S2T_DefaultFormat< T >
   {
@@ -145,7 +153,7 @@ namespace converter
     }
   };
 
-#if USE_FLOATINGPOINT_FROM_CHARS_1  ==  _e_ENABLE_FEATURE_
+#if USE_FLOATINGPOINT_FROM_CHARS_1  ==  e_ENABLE_FEATURE
   /**
    * @brief     Convertor class implementation for floating-point types FROM string.
    *            This conversion is achieved using 'std::from_chars'.

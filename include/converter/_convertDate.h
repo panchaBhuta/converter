@@ -30,7 +30,7 @@
 #include <converter/_workaroundConfig.h>
 
 
-#if  USE_DATE_FROMSTREAM_2 == _e_ENABLE_FEATURE_  ||  USE_DATE_TOSTREAM_2 == _e_ENABLE_FEATURE_
+#if  USE_DATE_FROMSTREAM_2 == e_ENABLE_FEATURE  ||  USE_DATE_TOSTREAM_2 == e_ENABLE_FEATURE
   #include <date/date.h>
 #endif
 
@@ -141,12 +141,12 @@ namespace converter
                  const std::string::value_type* fmt,
                  [[maybe_unused]] std::string* abbrev  = nullptr,
                  [[maybe_unused]] std::chrono::minutes* offset = nullptr)
-#if   USE_JUGAAD_FROMSTREAM_3  !=  _e_ENABLE_FEATURE_
+#if   USE_JUGAAD_FROMSTREAM_3  !=  e_ENABLE_FEATURE
     {
-  #if   USE_CHRONO_FROMSTREAM_1  ==  _e_ENABLE_FEATURE_
+  #if   USE_CHRONO_FROMSTREAM_1  ==  e_ENABLE_FEATURE
       namespace _dateLib = std::chrono;
       const std::string dateClass = "std::chrono::year_month_day";
-  #elif USE_DATE_FROMSTREAM_2  ==  _e_ENABLE_FEATURE_
+  #elif USE_DATE_FROMSTREAM_2  ==  e_ENABLE_FEATURE
       namespace _dateLib = date;
       const std::string dateClass = "date::year_month_day";
   #endif
@@ -172,9 +172,9 @@ namespace converter
       {
         CONVERTER_DEBUG_LOG(dateClass << " for string2date conversion-succeded : iY=" << (int(ymd.year()))         \
                                       << ", iM=" << (unsigned(ymd.month())) << ", iD=" << (unsigned(ymd.day())));
-  #if   USE_CHRONO_FROMSTREAM_1  ==  _e_ENABLE_FEATURE_
+  #if   USE_CHRONO_FROMSTREAM_1  ==  e_ENABLE_FEATURE
         return ymd;
-  #elif USE_DATE_FROMSTREAM_2  ==  _e_ENABLE_FEATURE_
+  #elif USE_DATE_FROMSTREAM_2  ==  e_ENABLE_FEATURE
         return std::chrono::year_month_day{ std::chrono::year(int(ymd.year())),
                                             std::chrono::month(unsigned(ymd.month())),
                                             std::chrono::day(unsigned(ymd.day())) };
@@ -437,7 +437,7 @@ namespace converter
   template<c_formatYMDoss T2S_FORMAT_YMD>
   struct ConvertFromVal< std::chrono::year_month_day, T2S_FORMAT_YMD>
   {
-#if USE_DATE_TOSTREAM_2  ==  _e_ENABLE_FEATURE_ ||  USE_JUGAAD_TOSTREAM_3  ==  _e_ENABLE_FEATURE_
+#if USE_DATE_TOSTREAM_2  ==  e_ENABLE_FEATURE ||  USE_JUGAAD_TOSTREAM_3  ==  e_ENABLE_FEATURE
   private:
     inline static void
     _jugaad(  const std::chrono::year_month_day& val,
@@ -560,7 +560,7 @@ namespace converter
     {
       std::ostringstream oss;
       T2S_FORMAT_YMD::streamUpdate(oss);
-#if   USE_CHRONO_TOSTREAM_1  ==  _e_ENABLE_FEATURE_
+#if   USE_CHRONO_TOSTREAM_1  ==  e_ENABLE_FEATURE
       const std::string dateClass = "std::chrono::year_month_day";
       CONVERTER_DEBUG_LOG(dateClass << " for date2string input : YMD Y=" << (int(val.year())) \
                 << "  M=" << (unsigned(val.month())) << "  D=" << (unsigned(val.day())) );
@@ -570,7 +570,7 @@ namespace converter
       // refer https://omegaup.com/docs/cpp/en/cpp/chrono/local_t/to_stream.html
       // no OS in particular
       std::chrono::to_stream(oss, fmt, val, abbrev, offset_sec); // does not compile
-#elif USE_DATE_TOSTREAM_2  ==  _e_ENABLE_FEATURE_
+#elif USE_DATE_TOSTREAM_2  ==  e_ENABLE_FEATURE
       const std::string dateClass = "date::year_month_day";
       CONVERTER_DEBUG_LOG(dateClass << " for date2string input : YMD Y=" << (int(val.year())) \
                 << "  M=" << (unsigned(val.month())) << "  D=" << (unsigned(val.day())) );
@@ -595,7 +595,7 @@ namespace converter
           return oss2.str();
         }
       }
-#elif USE_JUGAAD_TOSTREAM_3  ==  _e_ENABLE_FEATURE_
+#elif USE_JUGAAD_TOSTREAM_3  ==  e_ENABLE_FEATURE
       const std::string dateClass = "workaround_datelib::to_stream";
       CONVERTER_DEBUG_LOG(dateClass << " for date2string input : YMD Y=" << (int(val.year())) \
                 << "  M=" << (unsigned(val.month())) << "  D=" << (unsigned(val.day())) );

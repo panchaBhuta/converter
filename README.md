@@ -8,7 +8,7 @@ Converter
 
 | **Linux** 🐧![Ubuntu](https://cdn.emojidex.com/emoji/px16/Ubuntu.png "Ubuntu")  | **Mac** ![apple logo](https://cdn.emojidex.com/emoji/px16/apple_logo.png "apple logo") | **Windows** ![windows official](https://cdn.emojidex.com/emoji/px16/windows_official.png "windows official") |
 |--------------|---------|-------------|
-| [![Linux](https://github.com/panchaBhuta/converter/workflows/Linux/badge.svg)](https://github.com/panchaBhuta/converter/actions?query=workflow%3ALinux) | [![macOS](https://github.com/panchaBhuta/converter/workflows/macOS/badge.svg)](https://github.com/panchaBhuta/converter/actions?query=workflow%3AmacOS) | [![Windows](https://github.com/panchaBhuta/converter/workflows/Windows/badge.svg)](https://github.com/panchaBhuta/converter/actions?query=workflow%3AWindows) |
+| [![Linux](https://github.com/panchaBhuta/converter/actions/workflows/linux.yml/badge.svg)](https://github.com/panchaBhuta/converter/actions/workflows/linux.yml) | [![macOS](https://github.com/panchaBhuta/converter/actions/workflows/macos.yml/badge.svg)](https://github.com/panchaBhuta/converter/actions/workflows/macos.yml) | [![Windows](https://github.com/panchaBhuta/converter/actions/workflows/windows.yml/badge.svg)](https://github.com/panchaBhuta/converter/actions/workflows/windows.yml) |
 
 Converter is an easy-to-use C++ `text<->type` conversion library. It supports C++20 (and
 later), is header-only and comes with a basic test suite.
@@ -164,7 +164,7 @@ byte as a character. For `bool`, the expected integer values are `0` or `1`.
 
 Locale Parsing Formats : String-to-T (i.e S2T)
 ----------------------------------------------
-**converter** by default, uses `std::from_chars()` conversion function(s) when parsing numeric-type values from string. `std::from_chars()` donot use any locale for parsing.
+**converter** by default, uses `std::from_chars()` conversion function(s) when parsing numeric-type values from string. `std::from_chars()` donot use any locale for parsing. Note that `std::from_chars()` is not supported by 'AppleClang' compiler, refer [testFloatingPointLocale.cpp](tests/testFloatingPointLocale.cpp) for interplay between user-defined-locale, C-locale and limitations of 'AppleClang' compiler.
 
 To use a particular locale for parsing numeric values, stream conversion can be used as shown below. <br>
 Refer [testUserDefinedConverter_locale.cpp](tests/testUserDefinedConverter_locale.cpp) for full details.

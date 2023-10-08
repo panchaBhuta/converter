@@ -39,13 +39,15 @@ namespace converter
     using type = T2S_Format_std_TtoC;
   };
 
-#if USE_FLOATINGPOINT_TO_CHARS_1  ==  _e_ENABLE_FEATURE_
   template<c_floating_point T>
   struct T2S_DefaultFormat<T, void >
   {
+#if USE_FLOATINGPOINT_TO_CHARS_1  ==  e_ENABLE_FEATURE
     using type = T2S_Format_std_TtoC;
-  };
+#else
+    #error "compiler does not support 'std::to_chars(...)' function"
 #endif
+  };
   // ]]============]] type - Default Conversion format
   // ]=============================================================] T2S_FORMAT
 
@@ -129,7 +131,7 @@ namespace converter
     }
   };
 
-#if USE_FLOATINGPOINT_TO_CHARS_1  ==  _e_ENABLE_FEATURE_
+#if USE_FLOATINGPOINT_TO_CHARS_1  ==  e_ENABLE_FEATURE
   // for types refer :: https://en.cppreference.com/w/cpp/language/type
   /**
    * @brief     Convertor class implementation from floating-point types TO string.

@@ -21,7 +21,7 @@ void checkDefaultFormatInstance_Integer()
 template<typename T>
 void checkDefaultFormatInstance_Float()
 {
-#if   USE_FLOATINGPOINT_FROM_CHARS_1  ==  _e_ENABLE_FEATURE_
+#if   USE_FLOATINGPOINT_FROM_CHARS_1  ==  e_ENABLE_FEATURE
   static_assert(std::is_same_v<typename converter::S2T_DefaultFormat<T>::type,
                                         converter::S2T_Format_std_CtoT<T, converter::FailureS2Tprocess::SIGNAL_NAN>>);
 #else
@@ -29,7 +29,7 @@ void checkDefaultFormatInstance_Float()
                                         converter::S2T_Format_std_StoT<T, converter::FailureS2Tprocess::SIGNAL_NAN>>);
 #endif
 
-#if   USE_FLOATINGPOINT_TO_CHARS_1  ==  _e_ENABLE_FEATURE_
+#if   USE_FLOATINGPOINT_TO_CHARS_1  ==  e_ENABLE_FEATURE
   static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<T>::type,
                                         converter::T2S_Format_std_TtoC>);
 #else
@@ -71,13 +71,13 @@ void checkDefaultFunctionInstance()
   static_assert(std::is_same_v< decltype(&converter::ConvertFromVal<T>::ToStr), std::string(*)(const T&)>);
 }
 
-#if   USE_FLOATINGPOINT_FROM_CHARS_1  ==  _e_ENABLE_FEATURE_
+#if   USE_FLOATINGPOINT_FROM_CHARS_1  ==  e_ENABLE_FEATURE
   static constexpr const int fp_S2T_uid = 103;
 #else
   static constexpr const int fp_S2T_uid = 3;
 #endif
 
-#if   USE_FLOATINGPOINT_TO_CHARS_1  ==  _e_ENABLE_FEATURE_
+#if   USE_FLOATINGPOINT_TO_CHARS_1  ==  e_ENABLE_FEATURE
   static constexpr const int fp_T2S_uid = -103;
 #else
   static constexpr const int fp_T2S_uid = -1;

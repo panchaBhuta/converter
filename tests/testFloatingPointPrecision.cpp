@@ -19,7 +19,7 @@
   #define  TEMPLATE_UID  103
   const unsigned indexOS = 2;
 #elif defined(__APPLE__) && defined(__MACH__)
-  #if USE_FLOATINGPOINT_FROM_CHARS_1  ==  _e_ENABLE_FEATURE_ && USE_FLOATINGPOINT_TO_CHARS_1  ==  _e_ENABLE_FEATURE_
+  #if USE_FLOATINGPOINT_FROM_CHARS_1  ==  e_ENABLE_FEATURE && USE_FLOATINGPOINT_TO_CHARS_1  ==  e_ENABLE_FEATURE
     // when compiler is GNU.
     #define  TEMPLATE_UID  103
     const unsigned indexOS = 0;

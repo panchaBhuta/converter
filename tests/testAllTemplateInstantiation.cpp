@@ -140,7 +140,7 @@ void Format_std_CtoT_Process2() // needed for integer types
   static_assert(std::is_same_v< decltype(&converter::ConvertFromVal<t_vNaN, converter::T2S_Format_std_TtoC>::ToStr),
                                 std::string(*)(const t_vNaN&)>);
 }
-#if USE_FLOATINGPOINT_TO_CHARS_1  ==  _e_ENABLE_FEATURE_
+#if USE_FLOATINGPOINT_TO_CHARS_1  ==  e_ENABLE_FEATURE
 template<typename T>
 void Format_std_CtoT_Process4()
 {
@@ -273,7 +273,7 @@ void checkFunctionInstance_Float()
    *   FORMAT_TEMPLATE ->   T2S_Format_WorkAround, T2S_Format_std_TtoS
   **/
 
-#if USE_FLOATINGPOINT_TO_CHARS_1  ==  _e_ENABLE_FEATURE_
+#if USE_FLOATINGPOINT_TO_CHARS_1  ==  e_ENABLE_FEATURE
   Format_std_CtoT_Process4<T>();
 #endif
 

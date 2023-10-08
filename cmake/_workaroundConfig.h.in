@@ -13,8 +13,8 @@
 
 #pragma once
 
-#cmakedefine01 _e_ENABLE_FEATURE_
-#cmakedefine01 _e_DISABLE_FEATURE_
+#cmakedefine01 e_ENABLE_FEATURE
+#cmakedefine01 e_DISABLE_FEATURE
 
 
 /*
@@ -48,7 +48,7 @@
  */
 #cmakedefine01  USE_CLANG_STRING_WORKS_1
 #cmakedefine01  USE_CLANG_STRING_WORKAROUND_2
-#if USE_CLANG_STRING_WORKAROUND_2 == _e_ENABLE_FEATURE_
+#if USE_CLANG_STRING_WORKAROUND_2 == e_ENABLE_FEATURE
   #include <string>
   [[maybe_unused]]static std::u8string  clang_string_workaround(const  char8_t* a, const  char8_t* b) { return {a, b}; }
   [[maybe_unused]]static std::u16string clang_string_workaround(const char16_t* a, const char16_t* b) { return {a, b}; }

@@ -83,7 +83,7 @@ namespace converter
   };
 */
 
-#if USE_FLOATINGPOINT_TO_CHARS_1  ==  _e_DISABLE_FEATURE_
+#if USE_FLOATINGPOINT_TO_CHARS_1  ==  e_DISABLE_FEATURE
   template<c_floating_point T>
   struct T2S_DefaultFormat<T, void >
   {

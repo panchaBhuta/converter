@@ -133,7 +133,7 @@ namespace converter
   };
 */
 
-#if USE_FLOATINGPOINT_FROM_CHARS_1  ==  _e_DISABLE_FEATURE_
+#if USE_FLOATINGPOINT_FROM_CHARS_1  ==  e_DISABLE_FEATURE
   template<c_floating_point T>
   struct S2T_DefaultFormat< T >
   {

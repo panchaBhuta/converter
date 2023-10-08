@@ -10,7 +10,7 @@
 
 #include "unittest.h"
 
-#if USE_FLOATINGPOINT_FROM_CHARS_1  ==  _e_ENABLE_FEATURE_
+#if USE_FLOATINGPOINT_FROM_CHARS_1  ==  e_ENABLE_FEATURE
 template <typename T, converter::FailureS2Tprocess EP>
 using _ConvS2T_CtoT = converter::ConvertFromStr<T, converter::S2T_Format_std_CtoT<T, EP>>;
 #endif
@@ -21,7 +21,7 @@ using _ConvS2T_StoT = converter::ConvertFromStr<T, converter::S2T_Format_std_Sto
 template <typename T, converter::FailureS2Tprocess EP>
 using _ConvS2T_ISS = converter::ConvertFromStr<T, converter::S2T_Format_StreamUseClassicLocale<T, EP, char>>;
 
-#if USE_FLOATINGPOINT_TO_CHARS_1  ==  _e_ENABLE_FEATURE_
+#if USE_FLOATINGPOINT_TO_CHARS_1  ==  e_ENABLE_FEATURE
 template <typename T>
 using _ConvT2S_TtoC = converter::ConvertFromVal<T, converter::T2S_Format_std_TtoC>;
 #endif
@@ -36,7 +36,7 @@ using _ConvT2S_OSS = converter::ConvertFromVal<T, converter::T2S_Format_StreamUs
 template <typename T>
 void conversion_String2FloatingPoint_FailureCheck(const std::string& vStr)
 {
-#if USE_FLOATINGPOINT_FROM_CHARS_1  ==  _e_ENABLE_FEATURE_
+#if USE_FLOATINGPOINT_FROM_CHARS_1  ==  e_ENABLE_FEATURE
   {
     ExpectException(_ConvS2T_CtoT<T COMMA converter::FailureS2Tprocess::THROW_ERROR>::ToVal(vStr), std::invalid_argument);
     unittest::ExpectTrue(std::isnan(_ConvS2T_CtoT<T COMMA converter::FailureS2Tprocess::QUIET_NAN>::ToVal(vStr)));
@@ -54,9 +54,9 @@ void conversion_String2FloatingPoint_FailureCheck(const std::string& vStr)
   {
     ExpectException(_ConvS2T_StoT<T COMMA converter::FailureS2Tprocess::THROW_ERROR>::ToVal(vStr), std::invalid_argument);
     unittest::ExpectTrue(std::isnan(_ConvS2T_StoT<T COMMA converter::FailureS2Tprocess::QUIET_NAN>::ToVal(vStr)));
-#if USE_FLOATINGPOINT_FROM_CHARS_1  ==  _e_ENABLE_FEATURE_
+#if USE_FLOATINGPOINT_FROM_CHARS_1  ==  e_ENABLE_FEATURE
     unittest::ExpectTrue(std::isnan(_ConvS2T_StoT<T COMMA converter::FailureS2Tprocess::SIGNAL_NAN>::ToVal(vStr)));
-#elif USE_FLOATINGPOINT_FROM_CHARS_1  ==  _e_DISABLE_FEATURE_
+#elif USE_FLOATINGPOINT_FROM_CHARS_1  ==  e_DISABLE_FEATURE
     unittest::ExpectTrue(std::isnan(_ConvS2T_StoT<T COMMA converter::FailureS2Tprocess::SIGNAL_NAN>::ToVal(vStr)));
     unittest::ExpectTrue(std::isnan(converter::ConvertFromStr<T>::ToVal(vStr))); // default: same as above, as S2T_Format_std_StoT<T, SIGNAL_NAN> is default
 #endif
@@ -82,7 +82,7 @@ void conversion_String2FloatingPoint_FailureCheck(const std::string& vStr)
 template <typename T>
 void conversion_FloatingPointNAN2String_FailureCheck(const std::string& vStr)
 {
-#if USE_FLOATINGPOINT_TO_CHARS_1  ==  _e_ENABLE_FEATURE_
+#if USE_FLOATINGPOINT_TO_CHARS_1  ==  e_ENABLE_FEATURE
   {
     unittest::ExpectEqual(std::string, _ConvT2S_TtoC<T>::ToStr(std::numeric_limits<T>::quiet_NaN()), "nan");
   #if defined(WIN64) || defined(_WIN64) || defined(__WIN64) || defined(__WIN64__)
