@@ -45,6 +45,21 @@ using convertS2T_userLocale =
 int main()
 {
   int rv = 0;
+  bool testUserLocale = true;
+
+  try
+  {
+    std::istringstream iss;
+    deLocal_iss<float>::streamUpdate(iss);
+  }
+  catch (const std::exception& ex)
+  {
+    std::cout << "#1# locale " << loc << " not available (" << ex.what()
+              << "), skipping userlocale-checks.\n";
+    // pass test for systems without locale present. for ci testing, make.sh
+    // ensures that the necessary locale is installed.
+    testUserLocale = true;
+  }
 
   try
   {
@@ -58,11 +73,11 @@ int main()
       unittest::ExpectEqual(float, convertS2T_StoT<float>::ToVal("0.1"), 0.1f);
     }
 
-    {
+    if(testUserLocale) {
       unittest::ExpectEqual(float, convertS2T_userLocale<float>::ToVal("0,1"), 0.1f);  //  <<  comma
     }
   } catch (const std::exception& ex) {
-    std::cout << ex.what() << std::endl;
+    std::cout << "#2# " << ex.what() << std::endl;
     rv = 1;
   }
 
@@ -74,7 +89,7 @@ int main()
       return 0;
     }
   } catch (const std::exception& ex) {
-    std::cout << "locale " << loc << " not available(" << ex.what()
+    std::cout << "#3# locale " << loc << " not available(" << ex.what()
               << "), skipping user-locale test.\n";
     return 0;
   }
@@ -99,7 +114,7 @@ int main()
     // dependent on system-locale
     unittest::ExpectEqual(float, convertS2T_StoT<float>::ToVal("0,1"), 0.1f);  //  <<  comma
   } catch (const std::exception& ex) {
-    std::cout << ex.what() << std::endl;
+    std::cout << "#4# " << ex.what() << std::endl;
     rv = 1;
   }
 
