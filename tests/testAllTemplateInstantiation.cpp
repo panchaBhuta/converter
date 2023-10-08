@@ -72,17 +72,23 @@ void checkFormatInstance_Integer()
 template<typename T>
 void checkFormatInstance_Float()
 {
+#if USE_FLOATINGPOINT_FROM_CHARS_1  ==  e_ENABLE_FEATURE
   checkFormatInstance_Integer<T>();
+#else
+  checkFormatInstance_General<T>();
+#endif
 
   {
     static_assert(std::is_same_v<T, typename converter::S2T_Format_WorkAround<T, converter::FailureS2Tprocess::QUIET_NAN>::return_type>);
     static_assert(std::is_same_v<T, typename converter::S2T_Format_WorkAround<T, converter::FailureS2Tprocess::SIGNAL_NAN>::return_type>);
   }
 
+#if USE_FLOATINGPOINT_FROM_CHARS_1  ==  e_ENABLE_FEATURE
   {
     static_assert(std::is_same_v<T, typename converter::S2T_Format_std_CtoT<T, converter::FailureS2Tprocess::QUIET_NAN>::return_type>);
     static_assert(std::is_same_v<T, typename converter::S2T_Format_std_CtoT<T, converter::FailureS2Tprocess::SIGNAL_NAN>::return_type>);
   }
+#endif
 
   {
     static_assert(std::is_same_v<T, typename converter::S2T_Format_std_StoT<T, converter::FailureS2Tprocess::QUIET_NAN>::return_type>);

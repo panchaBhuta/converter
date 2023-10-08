@@ -27,15 +27,12 @@ namespace converter
 {
   // [=============================================================[ S2T_FORMAT
   // [[============[[ Conversion formats
+#if USE_FLOATINGPOINT_FROM_CHARS_1  ==  e_ENABLE_FEATURE
   template<typename T, FailureS2Tprocess PROCESS_ERR>
   struct S2T_Format_std_CtoT : public OnError<T, PROCESS_ERR> {};
-
-#if USE_FLOATINGPOINT_FROM_CHARS_1  ==  e_DISABLE_FEATURE
-  template<c_floating_point T, FailureS2Tprocess PROCESS_ERR>
-  struct S2T_Format_std_CtoT<T, PROCESS_ERR> : public OnError<T, PROCESS_ERR>
-  {
-    #error "compiler does not support 'std::from_chars(...)' function"
-  };
+#else
+  template<c_NOT_floating_point T, FailureS2Tprocess PROCESS_ERR>
+  struct S2T_Format_std_CtoT : public OnError<T, PROCESS_ERR> {}; // "for floating-point types, compiler does not support 'std::from_chars(...)' function"
 #endif
   // ]]============]] Conversion formats
 

@@ -131,6 +131,9 @@ namespace converter
   // Going with the flow, and just wrapping up floating_point
   template<typename T>
   concept c_floating_point = std::is_floating_point_v<T>;
+
+  template<typename T>
+  concept c_NOT_floating_point = !std::is_floating_point_v<T>;
   // ]=========]  concept : floating_point-types
 
 

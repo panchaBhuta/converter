@@ -39,15 +39,13 @@ namespace converter
     using type = T2S_Format_std_TtoC;
   };
 
+#if USE_FLOATINGPOINT_TO_CHARS_1  ==  e_ENABLE_FEATURE
   template<c_floating_point T>
   struct T2S_DefaultFormat<T, void >
   {
-#if USE_FLOATINGPOINT_TO_CHARS_1  ==  e_ENABLE_FEATURE
     using type = T2S_Format_std_TtoC;
-#else
-    #error "compiler does not support 'std::to_chars(...)' function"
-#endif
   };
+#endif
   // ]]============]] type - Default Conversion format
   // ]=============================================================] T2S_FORMAT
 
