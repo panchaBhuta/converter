@@ -46,8 +46,6 @@ int main()
 {
   int rv = 0;
 
-  std::string path = unittest::TempPath();
-
   try
   {
     {
@@ -63,19 +61,26 @@ int main()
     {
       unittest::ExpectEqual(float, convertS2T_userLocale<float>::ToVal("0,1"), 0.1f);  //  <<  comma
     }
+  } catch (const std::exception& ex) {
+    std::cout << ex.what() << std::endl;
+    rv = 1;
+  }
 
-    try {
-      if (std::setlocale(LC_ALL, loc) == nullptr) {
-        std::cout << "locale " << loc << " not available, skipping user-locale test.\n";
-        // pass test for systems without locale present. for ci testing, make.sh
-        // ensures that the necessary locale is installed.
-        return 0;
-      }
-    } catch (const std::exception& ex) {
-      std::cout << "locale " << loc << " not available(" << ex.what()
-                << "), skipping user-locale test.\n";
+  try {
+    if (std::setlocale(LC_ALL, loc) == nullptr) {
+      std::cout << "locale " << loc << " not available, skipping user-locale test.\n";
+      // pass test for systems without locale present. for ci testing, make.sh
+      // ensures that the necessary locale is installed.
       return 0;
     }
+  } catch (const std::exception& ex) {
+    std::cout << "locale " << loc << " not available(" << ex.what()
+              << "), skipping user-locale test.\n";
+    return 0;
+  }
+
+  try
+  {
 #if USE_FLOATINGPOINT_TO_CHARS_1  ==  e_ENABLE_FEATURE
     // independent of system-locale
     unittest::ExpectEqual(float, converter::ConvertFromStr<float>::ToVal("0.1"), 0.1f);
