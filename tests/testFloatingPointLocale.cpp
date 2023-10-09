@@ -96,9 +96,11 @@ int main()
   try
   {
 #if USE_FLOATINGPOINT_FROM_CHARS_1  ==  e_ENABLE_FEATURE
+    static_assert(converter::ConvertFromStr<float>::template_uid ==  103);
     // independent of system-locale
     unittest::ExpectEqual(float, converter::ConvertFromStr<float>::ToVal("0.11"), 0.11f);
 #else
+    static_assert(converter::ConvertFromStr<float>::template_uid ==  3);
     // for compiler 'AppleClang'
     // as converter::S2T_Format_std_StoT<T,...> is fall-back and this is dependent on C locale
     unittest::ExpectEqual(float, converter::ConvertFromStr<float>::ToVal("0,12"), 0.12f);  //  <<  comma
