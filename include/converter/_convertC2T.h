@@ -71,6 +71,7 @@ namespace converter
     inline static T
     _toVal_args(const std::string& str, std::size_t* pos, auto format_args)
     {
+      CONVERTER_DEBUG_LOG("trace :: pConvertFromStr_POS_Cargs< T, PROCESS_ERR >::_toVal_args('" << str << "')");
       //  https://en.cppreference.com/w/cpp/utility/from_chars
       //  std::from_chars is locale-independent, non-allocating, and non-throwing
       T result{};
@@ -140,6 +141,7 @@ namespace converter
     inline static T
     ToVal_args(const std::string& str, std::size_t* pos = nullptr, int base = 10)
     {
+      CONVERTER_DEBUG_LOG("trace :: ConvertFromStr< c_integer_type T, S2T_Format_std_CtoT<T, PROCESS_ERR> >::ToVal_args('" << str << "')");
       CONVERTER_DEBUG_TRY_START
         return pConvertFromStr_POS_Cargs<T, PROCESS_ERR>::_toVal_args(str, pos, base);
       CONVERTER_DEBUG_TRY_END
@@ -158,6 +160,7 @@ namespace converter
     inline static return_type
     ToVal(const std::string& str)
     {
+      CONVERTER_DEBUG_LOG("trace :: ConvertFromStr< c_integer_type T, S2T_Format_std_CtoT<T, PROCESS_ERR> >::ToVal('" << str << "')");
       CONVERTER_DEBUG_TRY_START
         return pConvertFromStr_POS<T, PROCESS_ERR, S2T_Format_std_CtoT<T, PROCESS_ERR> >::_toVal(str);
       CONVERTER_DEBUG_TRY_END
@@ -200,6 +203,7 @@ namespace converter
     ToVal_args(const std::string& str, std::size_t* pos = nullptr,
                std::chars_format fmt = std::chars_format::general)
     {
+      CONVERTER_DEBUG_LOG("trace :: ConvertFromStr< c_floating_point T, S2T_Format_std_CtoT<T, PROCESS_ERR> >::ToVal_args('" << str << "')");
       CONVERTER_DEBUG_TRY_START
         return pConvertFromStr_POS_Cargs<T, PROCESS_ERR>::_toVal_args(str, pos, fmt);
       CONVERTER_DEBUG_TRY_END
@@ -218,6 +222,7 @@ namespace converter
     inline static return_type
     ToVal(const std::string& str)
     {
+      CONVERTER_DEBUG_LOG("trace :: ConvertFromStr< c_floating_point T, S2T_Format_std_CtoT<T, PROCESS_ERR> >::ToVal('" << str << "')");
       CONVERTER_DEBUG_TRY_START
         return pConvertFromStr_POS<T, PROCESS_ERR, S2T_Format_std_CtoT<T, PROCESS_ERR> >::_toVal(str);
       CONVERTER_DEBUG_TRY_END

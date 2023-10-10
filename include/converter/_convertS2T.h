@@ -431,7 +431,7 @@ namespace converter
     inline static T
     ToVal_args(const std::string& str, std::size_t* pos = nullptr, int base = 10)
     {
-      CONVERTER_DEBUG_LOG("trace :: ConvertFromStr< c_integer_type T, FailureS2Tprocess PROCESS_ERR >::ToVal_args('" << str << "')");
+      CONVERTER_DEBUG_LOG("trace :: ConvertFromStr< c_integer_type T, S2T_Format_std_StoT<T, PROCESS_ERR> >::ToVal_args('" << str << "')");
       /*
        * Size of int and short are implementation defined.
        * int and short are 2 bytes on 16 compilers.
@@ -487,7 +487,7 @@ namespace converter
     inline static return_type
     ToVal(const std::string& str)
     {
-      CONVERTER_DEBUG_LOG("trace :: ConvertFromStr< c_integer_type T, FailureS2Tprocess PROCESS_ERR >::ToVal('" << str << "')");
+      CONVERTER_DEBUG_LOG("trace :: ConvertFromStr< c_integer_type T, S2T_Format_std_StoT<T, PROCESS_ERR> >::ToVal('" << str << "')");
       CONVERTER_DEBUG_TRY_START
         return pConvertFromStr_POS<T, PROCESS_ERR, S2T_Format_std_StoT<T, PROCESS_ERR> >::_toVal(str);
       CONVERTER_DEBUG_TRY_END
@@ -529,7 +529,7 @@ namespace converter
     inline static T
     ToVal_args(const std::string& str, std::size_t* pos = nullptr)
     {
-      CONVERTER_DEBUG_LOG("trace :: ConvertFromStr< c_floating_point T, FailureS2Tprocess PROCESS_ERR >::ToVal_args('" << str << "')");
+      CONVERTER_DEBUG_LOG("trace :: ConvertFromStr< c_floating_point T, S2T_Format_std_StoT<T, PROCESS_ERR> >::ToVal_args('" << str << "')");
       if constexpr( std::is_same_v<T, float> ) {
         return std::stof(str, pos);
       } else
@@ -550,7 +550,7 @@ namespace converter
     inline static return_type
     ToVal(const std::string& str)
     {
-      CONVERTER_DEBUG_LOG("trace :: ConvertFromStr< c_floating_point T, FailureS2Tprocess PROCESS_ERR >::ToVal('" << str << "')");
+      CONVERTER_DEBUG_LOG("trace :: ConvertFromStr< c_floating_point T, S2T_Format_std_StoT<T, PROCESS_ERR> >::ToVal('" << str << "')");
       CONVERTER_DEBUG_TRY_START
         return pConvertFromStr_POS<T, PROCESS_ERR, S2T_Format_std_StoT<T, PROCESS_ERR> >::_toVal(str);
       CONVERTER_DEBUG_TRY_END
