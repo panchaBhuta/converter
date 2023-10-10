@@ -88,16 +88,22 @@ namespace converter
         return result;
       } else if (ec == std::errc::invalid_argument) {
         static const std::string errMsg = std::make_error_code(std::errc::invalid_argument).message() + funcName;
+        static const std::invalid_argument err(errMsg);
         //std::cerr << errMsg << " :: str[" << str << "]" << std::endl;
-        throw std::invalid_argument(errMsg);
+        CONVERTER_DEBUG_LOG( errMsg << "  str = '" << str << "'");
+        throw err;
       } else if (ec == std::errc::result_out_of_range) {
         static const std::string errMsg = std::make_error_code(std::errc::result_out_of_range).message() + funcName;
+        static const std::out_of_range err(errMsg);
         //std::cerr << errMsg << " :: str[" << str << "]" << std::endl;
-        throw std::out_of_range(errMsg);
+        CONVERTER_DEBUG_LOG( errMsg << "  str = '" << str << "'");
+        throw err;
       } else {
         static const std::string errMsg = std::make_error_code(ec).message() + funcName;
+        static const std::runtime_error err(errMsg);
         //std::cerr << errMsg << " :: str[" << str << "]" << std::endl;
-        throw std::runtime_error(errMsg);
+        CONVERTER_DEBUG_LOG( errMsg << "  str = '" << str << "'");
+        throw err;
       }
     }
   };
@@ -134,7 +140,13 @@ namespace converter
     inline static T
     ToVal_args(const std::string& str, std::size_t* pos = nullptr, int base = 10)
     {
-      return pConvertFromStr_POS_Cargs<T, PROCESS_ERR>::_toVal_args(str, pos, base);
+      CONVERTER_DEBUG_TRY_START
+        return pConvertFromStr_POS_Cargs<T, PROCESS_ERR>::_toVal_args(str, pos, base);
+      CONVERTER_DEBUG_TRY_END
+      CONVERTER_DEBUG_TRY_CATCH(std::invalid_argument)
+      CONVERTER_DEBUG_TRY_CATCH(std::out_of_range)
+      CONVERTER_DEBUG_TRY_CATCH(std::runtime_error)
+      CONVERTER_DEBUG_TRY_CATCH(std::exception)
     }
   
     /**
@@ -146,7 +158,12 @@ namespace converter
     inline static return_type
     ToVal(const std::string& str)
     {
-      return pConvertFromStr_POS<T, PROCESS_ERR, S2T_Format_std_CtoT<T, PROCESS_ERR> >::_toVal(str);
+      CONVERTER_DEBUG_TRY_START
+        return pConvertFromStr_POS<T, PROCESS_ERR, S2T_Format_std_CtoT<T, PROCESS_ERR> >::_toVal(str);
+      CONVERTER_DEBUG_TRY_END
+      CONVERTER_DEBUG_TRY_CATCH(std::invalid_argument)
+      CONVERTER_DEBUG_TRY_CATCH(std::out_of_range)
+      CONVERTER_DEBUG_TRY_CATCH(std::exception)
     }
   };
 
@@ -183,7 +200,13 @@ namespace converter
     ToVal_args(const std::string& str, std::size_t* pos = nullptr,
                std::chars_format fmt = std::chars_format::general)
     {
-      return pConvertFromStr_POS_Cargs<T, PROCESS_ERR>::_toVal_args(str, pos, fmt);
+      CONVERTER_DEBUG_TRY_START
+        return pConvertFromStr_POS_Cargs<T, PROCESS_ERR>::_toVal_args(str, pos, fmt);
+      CONVERTER_DEBUG_TRY_END
+      CONVERTER_DEBUG_TRY_CATCH(std::invalid_argument)
+      CONVERTER_DEBUG_TRY_CATCH(std::out_of_range)
+      CONVERTER_DEBUG_TRY_CATCH(std::runtime_error)
+      CONVERTER_DEBUG_TRY_CATCH(std::exception)
     }
   
     /**
@@ -195,7 +218,12 @@ namespace converter
     inline static return_type
     ToVal(const std::string& str)
     {
-      return pConvertFromStr_POS<T, PROCESS_ERR, S2T_Format_std_CtoT<T, PROCESS_ERR> >::_toVal(str);
+      CONVERTER_DEBUG_TRY_START
+        return pConvertFromStr_POS<T, PROCESS_ERR, S2T_Format_std_CtoT<T, PROCESS_ERR> >::_toVal(str);
+      CONVERTER_DEBUG_TRY_END
+      CONVERTER_DEBUG_TRY_CATCH(std::invalid_argument)
+      CONVERTER_DEBUG_TRY_CATCH(std::out_of_range)
+      CONVERTER_DEBUG_TRY_CATCH(std::exception)
     }
   };
 #endif

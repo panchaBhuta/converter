@@ -311,10 +311,13 @@ namespace converter
           return val;
         }
       } catch (const std::invalid_argument& err) {
+        CONVERTER_DEBUG_LOG( "got-error: " << err.what() );
         return ERR_HANDLER::handler(str, err);
       } catch (const std::out_of_range& err) {
+        CONVERTER_DEBUG_LOG( "got-error: " << err.what() );
         return ERR_HANDLER::handler(str, err);
       } catch (const std::exception& err) {
+        CONVERTER_DEBUG_LOG( "got-error: " << err.what() );
         return ERR_HANDLER::handler(str, err);
       }
 
@@ -403,19 +406,6 @@ namespace converter
   template <c_integer_type T, FailureS2Tprocess PROCESS_ERR>
   struct ConvertFromStr<T, S2T_Format_std_StoT<T, PROCESS_ERR> >
   {
-  private:
-    template <typename T2,
-              T (*StoINT)( const std::string& str, std::size_t* pos, int base) >
-    inline static T _str2INT( const std::string& str, std::size_t* pos = nullptr, int base = 10 )
-    {
-      if constexpr( std::is_same_v<T, T2> ) {
-        return StoINT(str, pos, base);
-      } else {
-        return static_cast<T>(StoINT(str, pos, base));
-      }
-    }
-
-  public:
     /**
      * @brief   'type' definition being declared for.
      */
@@ -451,13 +441,13 @@ namespace converter
       if constexpr(std::is_signed_v<T>)
       {
         if constexpr( std::is_same_v<T,long long> ) {
-          return _str2INT<long long, &std::stoll>(str, pos, base);
+          return std::stoll(str, pos, base);
         } else
         if constexpr( std::is_same_v<T,long> ) {
-          return _str2INT<long, &std::stol>(str, pos, base);
+          return std::stol(str, pos, base);
         } else
         if constexpr( std::is_same_v<T,int> ) {
-          return _str2INT<int, &std::stoi>(str, pos, base);
+          return std::stoi(str, pos, base);
         } else
         if constexpr( std::is_same_v<T,short> ) {
           // as std::stos(...) is not part of the standard. Hence just static_cast from s -> i
@@ -468,10 +458,10 @@ namespace converter
       } else
       if constexpr(std::is_unsigned_v<T>) {
         if constexpr( std::is_same_v<T,unsigned long long> ) {
-          return _str2INT<unsigned long long, &std::stoull>(str, pos, base);
+          return std::stoull(str, pos, base);
         } else
         if constexpr( std::is_same_v<T,unsigned long> ) {
-          return _str2INT<unsigned long, &std::stoul>(str, pos, base);
+          return std::stoul(str, pos, base);
         } else
         if constexpr( std::is_same_v<T,unsigned> || std::is_same_v<T,unsigned short> ) {
           // as std::stou(...) is not part of the standard. Hence just static_cast from ul -> u
@@ -494,7 +484,12 @@ namespace converter
     inline static return_type
     ToVal(const std::string& str)
     {
-      return pConvertFromStr_POS<T, PROCESS_ERR, S2T_Format_std_StoT<T, PROCESS_ERR> >::_toVal(str);
+      CONVERTER_DEBUG_TRY_START
+        return pConvertFromStr_POS<T, PROCESS_ERR, S2T_Format_std_StoT<T, PROCESS_ERR> >::_toVal(str);
+      CONVERTER_DEBUG_TRY_END
+      CONVERTER_DEBUG_TRY_CATCH(std::invalid_argument)
+      CONVERTER_DEBUG_TRY_CATCH(std::out_of_range)
+      CONVERTER_DEBUG_TRY_CATCH(std::exception)
     }
   };
 
@@ -550,7 +545,12 @@ namespace converter
     inline static return_type
     ToVal(const std::string& str)
     {
-      return pConvertFromStr_POS<T, PROCESS_ERR, S2T_Format_std_StoT<T, PROCESS_ERR> >::_toVal(str);
+      CONVERTER_DEBUG_TRY_START
+        return pConvertFromStr_POS<T, PROCESS_ERR, S2T_Format_std_StoT<T, PROCESS_ERR> >::_toVal(str);
+      CONVERTER_DEBUG_TRY_END
+      CONVERTER_DEBUG_TRY_CATCH(std::invalid_argument)
+      CONVERTER_DEBUG_TRY_CATCH(std::out_of_range)
+      CONVERTER_DEBUG_TRY_CATCH(std::exception)
     }
   };
 

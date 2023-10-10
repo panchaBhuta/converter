@@ -299,8 +299,11 @@ namespace converter
     inline static std::string
     ToStr( const T& val)
     {
-      // refer :: https://en.cppreference.com/w/cpp/string/basic_string/to_string
-      return std::to_string(val);
+      CONVERTER_DEBUG_TRY_START
+        // refer :: https://en.cppreference.com/w/cpp/string/basic_string/to_string
+        return std::to_string(val);
+      CONVERTER_DEBUG_TRY_END
+      CONVERTER_DEBUG_TRY_CATCH(std::exception)
     }
   };
 
@@ -352,7 +355,10 @@ namespace converter
          std::cout: 1.23457e+08
          to_string: 123456789.000000
        */
-      return std::to_string(val);
+      CONVERTER_DEBUG_TRY_START
+        return std::to_string(val);
+      CONVERTER_DEBUG_TRY_END
+      CONVERTER_DEBUG_TRY_CATCH(std::exception)
     }
   };
 
@@ -477,12 +483,15 @@ namespace converter
      */
     inline static std::string ToStr(const input_type& val)
     {
-      if(val.index()==0)
-      {
-        return ConvertFromVal<T,T2S_FORMAT>::ToStr(std::get<T>(val));
-      } else {
-        return std::get<std::string>(val);
-      }
+      CONVERTER_DEBUG_TRY_START
+        if(val.index()==0)
+        {
+          return ConvertFromVal<T,T2S_FORMAT>::ToStr(std::get<T>(val));
+        } else {
+          return std::get<std::string>(val);
+        }
+      CONVERTER_DEBUG_TRY_END
+      CONVERTER_DEBUG_TRY_CATCH(std::exception)
     }
   };
   // ]=============================================================] ConvertFromVal
@@ -501,7 +510,10 @@ namespace converter
     inline static typename std::enable_if_t< (!std::is_same_v<std::string, TI>),std::string>
     ToStr(const input_type& val)
     {
-      return CONV_T2S(val);
+      CONVERTER_DEBUG_TRY_START
+        return CONV_T2S(val);
+      CONVERTER_DEBUG_TRY_END
+      CONVERTER_DEBUG_TRY_CATCH(std::exception)
     }
   };
 

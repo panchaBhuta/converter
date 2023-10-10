@@ -76,9 +76,12 @@ namespace converter
          ) {
         return std::string(str.data(), pos);
       } else {
-        //static const std::string errMsg("Number to String conversion failed. 'std::string pConvertFromVal<T>::_toStr_args(const T& val, auto... format_args)'");
+        static const std::string funcName(" : 'std::string pConvertFromVal<T>::_toStr_args(const T& val, auto... format_args)'");
+        static const std::string errMsg = std::make_error_code(ec).message() + funcName;
+        static const std::runtime_error err(errMsg);
         //std::cerr << errMsg << " :: T[" << val << "]" << std::endl;
-        throw std::runtime_error( std::make_error_code(ec).message() );
+        CONVERTER_DEBUG_LOG( errMsg ); //<< "  val = '" << val << "'");
+        throw err;
       }
     }
   };
@@ -112,7 +115,11 @@ namespace converter
     inline static std::string
     ToStr( const T& val)
     {
-      return ToStr_args(val);
+      CONVERTER_DEBUG_TRY_START
+        return ToStr_args(val);
+      CONVERTER_DEBUG_TRY_END
+      CONVERTER_DEBUG_TRY_CATCH(std::runtime_error)
+      CONVERTER_DEBUG_TRY_CATCH(std::exception)
     }
 
     /**
@@ -125,7 +132,11 @@ namespace converter
     inline static std::string
     ToStr_args( const T& val, int base = 10)
     {
-      return pConvertFromVal<T>::_toStr_args(val, base);
+      CONVERTER_DEBUG_TRY_START
+        return pConvertFromVal<T>::_toStr_args(val, base);
+      CONVERTER_DEBUG_TRY_END
+      CONVERTER_DEBUG_TRY_CATCH(std::runtime_error)
+      CONVERTER_DEBUG_TRY_CATCH(std::exception)
     }
   };
 
@@ -159,7 +170,11 @@ namespace converter
     inline static std::string
     ToStr( const T& val)
     {
-      return pConvertFromVal<T>::_toStr_args(val);
+      CONVERTER_DEBUG_TRY_START
+        return pConvertFromVal<T>::_toStr_args(val);
+      CONVERTER_DEBUG_TRY_END
+      CONVERTER_DEBUG_TRY_CATCH(std::runtime_error)
+      CONVERTER_DEBUG_TRY_CATCH(std::exception)
     }
 
     /**
@@ -172,7 +187,11 @@ namespace converter
     inline static std::string
     ToStr_args( const T& val, std::chars_format fmt)
     {
-      return pConvertFromVal<T>::_toStr_args(val, fmt);
+      CONVERTER_DEBUG_TRY_START
+        return pConvertFromVal<T>::_toStr_args(val, fmt);
+      CONVERTER_DEBUG_TRY_END
+      CONVERTER_DEBUG_TRY_CATCH(std::runtime_error)
+      CONVERTER_DEBUG_TRY_CATCH(std::exception)
     }
 
     /**
@@ -186,7 +205,11 @@ namespace converter
     inline static std::string
     ToStr_args( const T& val, std::chars_format fmt, int precision)
     {
-      return pConvertFromVal<T>::_toStr_args(val, fmt, precision);
+      CONVERTER_DEBUG_TRY_START
+        return pConvertFromVal<T>::_toStr_args(val, fmt, precision);
+      CONVERTER_DEBUG_TRY_END
+      CONVERTER_DEBUG_TRY_CATCH(std::runtime_error)
+      CONVERTER_DEBUG_TRY_CATCH(std::exception)
     }
   };
 #endif
