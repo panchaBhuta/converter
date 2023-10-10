@@ -47,8 +47,7 @@ int main()
   int rv = 0;
   bool testUserLocale = true;
 
-  try
-  {
+  try {
     std::istringstream iss;
     deLocal_iss<float>::streamUpdate(iss);
   }
@@ -61,8 +60,7 @@ int main()
     testUserLocale = false;
   }
 
-  try
-  {
+  try {
     {
       unittest::ExpectEqual(float, converter::ConvertFromStr<float>::ToVal("0.1"), 0.1f);
 
@@ -93,8 +91,7 @@ int main()
     return 0;
   }
 
-  try
-  {
+  try {
 #if USE_FLOATINGPOINT_FROM_CHARS_1  ==  e_ENABLE_FEATURE
     static_assert(converter::ConvertFromStr<float>::template_uid ==  103);
     // independent of system-locale

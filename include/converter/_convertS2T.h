@@ -295,9 +295,10 @@ namespace converter
     inline static typename ERR_HANDLER::return_type
     _toVal(const std::string& str)
     {
+      CONVERTER_DEBUG_LOG("trace :: pConvertFromStr_POS< T, PROCESS_ERR, ERR_HANDLER >::_toVal('" << str << "')");
+      std::size_t pos = 0;
       try
       {
-        std::size_t pos = 0;
         T val = ConvertFromStr<T, ERR_HANDLER>::ToVal_args(str, &pos);
 
         if(pos == str.length())
@@ -321,7 +322,7 @@ namespace converter
         return ERR_HANDLER::handler(str, err);
       }
 
-      CONVERTER_DEBUG_LOG( _errMsg << "  string-conversion-failure for value '" << str << "'" );
+      CONVERTER_DEBUG_LOG( _errMsg << ":  string-conversion-failure for value '" << str << "'  pos=" << pos );
       return ERR_HANDLER::handler(str, _err);
     }
 
@@ -373,6 +374,7 @@ namespace converter
     inline static return_type
     ToVal(const std::string& str)
     {
+      CONVERTER_DEBUG_LOG("trace :: ConvertFromStr< c_NOT_string T, c_formatISS S2T_FORMAT_STREAM >::ToVal('" << str << "')");
       using stream_type = typename S2T_FORMAT_STREAM::stream_type;
 
       T val;
@@ -429,6 +431,7 @@ namespace converter
     inline static T
     ToVal_args(const std::string& str, std::size_t* pos = nullptr, int base = 10)
     {
+      CONVERTER_DEBUG_LOG("trace :: ConvertFromStr< c_integer_type T, FailureS2Tprocess PROCESS_ERR >::ToVal_args('" << str << "')");
       /*
        * Size of int and short are implementation defined.
        * int and short are 2 bytes on 16 compilers.
@@ -484,6 +487,7 @@ namespace converter
     inline static return_type
     ToVal(const std::string& str)
     {
+      CONVERTER_DEBUG_LOG("trace :: ConvertFromStr< c_integer_type T, FailureS2Tprocess PROCESS_ERR >::ToVal('" << str << "')");
       CONVERTER_DEBUG_TRY_START
         return pConvertFromStr_POS<T, PROCESS_ERR, S2T_Format_std_StoT<T, PROCESS_ERR> >::_toVal(str);
       CONVERTER_DEBUG_TRY_END
@@ -525,6 +529,7 @@ namespace converter
     inline static T
     ToVal_args(const std::string& str, std::size_t* pos = nullptr)
     {
+      CONVERTER_DEBUG_LOG("trace :: ConvertFromStr< c_floating_point T, FailureS2Tprocess PROCESS_ERR >::ToVal_args('" << str << "')");
       if constexpr( std::is_same_v<T, float> ) {
         return std::stof(str, pos);
       } else
@@ -545,6 +550,7 @@ namespace converter
     inline static return_type
     ToVal(const std::string& str)
     {
+      CONVERTER_DEBUG_LOG("trace :: ConvertFromStr< c_floating_point T, FailureS2Tprocess PROCESS_ERR >::ToVal('" << str << "')");
       CONVERTER_DEBUG_TRY_START
         return pConvertFromStr_POS<T, PROCESS_ERR, S2T_Format_std_StoT<T, PROCESS_ERR> >::_toVal(str);
       CONVERTER_DEBUG_TRY_END
@@ -684,7 +690,11 @@ namespace converter
     inline static return_type
     ToVal(const std::string& str)
     {
-      return CONV_S2T(str);
+      CONVERTER_DEBUG_LOG("trace :: S2TwrapperFunction< T, ... >::ToVal('" << str << "')");
+      CONVERTER_DEBUG_TRY_START
+        return CONV_S2T(str);
+      CONVERTER_DEBUG_TRY_END
+      CONVERTER_DEBUG_TRY_CATCH(std::exception)
     }
   };
 

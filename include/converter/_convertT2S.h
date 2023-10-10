@@ -244,6 +244,7 @@ namespace converter
     inline static std::string
     ToStr(const T& val)
     {
+      CONVERTER_DEBUG_LOG("trace :: ConvertFromVal< c_NOT_string T, c_formatOSS T2S_FORMAT_STREAM  >::ToStr('" << val << "')");
       using stream_type = typename T2S_FORMAT_STREAM::stream_type;
 
       stream_type oss;
@@ -299,6 +300,7 @@ namespace converter
     inline static std::string
     ToStr( const T& val)
     {
+      CONVERTER_DEBUG_LOG("trace :: ConvertFromVal< c_integer_type T >::ToStr('" << val << "')");
       CONVERTER_DEBUG_TRY_START
         // refer :: https://en.cppreference.com/w/cpp/string/basic_string/to_string
         return std::to_string(val);
@@ -332,6 +334,7 @@ namespace converter
 #endif
     ToStr(const T& val)
     {
+      CONVERTER_DEBUG_LOG("trace :: ConvertFromVal< c_floating_point T >::ToStr('" << val << "')");
       /*
          WARNING :: With floating point types std::to_string may yield unexpected results as the number
                     of significant digits in the returned string can be zero, for e.g: pVal = 1e-09
@@ -483,6 +486,7 @@ namespace converter
      */
     inline static std::string ToStr(const input_type& val)
     {
+      CONVERTER_DEBUG_LOG("trace :: ConvertFromVal< std::variant<T, std::string>, T2S_FORMAT >::ToStr(...)");
       CONVERTER_DEBUG_TRY_START
         if(val.index()==0)
         {
@@ -510,6 +514,7 @@ namespace converter
     inline static typename std::enable_if_t< (!std::is_same_v<std::string, TI>),std::string>
     ToStr(const input_type& val)
     {
+      CONVERTER_DEBUG_LOG("trace :: T2SwrapperFunction< ... >::ToStr(...)");
       CONVERTER_DEBUG_TRY_START
         return CONV_T2S(val);
       CONVERTER_DEBUG_TRY_END
