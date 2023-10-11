@@ -113,17 +113,16 @@ int main()
     const unsigned indexOS = 2;
 #elif defined(__APPLE__) && defined(__MACH__)
   #if USE_FLOATINGPOINT_FROM_CHARS_1  ==  e_ENABLE_FEATURE && USE_FLOATINGPOINT_TO_CHARS_1  ==  e_ENABLE_FEATURE
-    // when compiler is GNU.
+    // when compiler is GNU or clang, under macOS.
     #define  TEMPLATE_UID  103
     const unsigned indexOS = 0;
   #else
     // when compiler is AppleClang.
     // The macro __GNUC__is defined even for AppleClang compiler,
     // hence not able to use system dependent macro her.
-    // instead using application macros USE_FLOATINGPOINT_FROM_CHARS_1 and USE_FLOATINGPOINT_TO_CHARS_1.
-        // macOS does not support 'std::from_chars()' and
-        // 'std::to_chars()'. The fall back functions
-        // induces variations in results when compared to other OS's.
+    // Instead using application macros USE_FLOATINGPOINT_FROM_CHARS_1 and USE_FLOATINGPOINT_TO_CHARS_1.
+    // macOS does not support 'std::from_chars()' and 'std::to_chars()'.
+    // The fall back functions induces variations in results when compared to other OS's.
     const unsigned indexOS = 1;
   #endif
 #else  // ubuntu and other OS's
