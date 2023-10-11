@@ -1,5 +1,9 @@
 // testFloatingPointLocale.cpp - numeric c locale
 
+#if defined(__APPLE__) && defined(__MACH__)
+#include <Availability.h>
+#endif
+
 #include <clocale>
 #include <converter/converter.h>
 
