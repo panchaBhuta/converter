@@ -55,10 +55,10 @@ jobs:
         run: cmake --help
       - name: Configure CMake (compiler=default) [Debug]
         if: matrix.compiler == 'default'
-        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON  -DCONVERTER_TEST_OS_VERSION=${{matrix.os}}
       - name: Configure CMake (compiler=NOT-default) [Debug]
         if: matrix.compiler != 'default'
-        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON  -DCONVERTER_TEST_OS_VERSION=${{matrix.os}} -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
       - name: Show compile commands [Debug]
         run: cat build-debug/compile_commands.json
       - name: Build [Debug]

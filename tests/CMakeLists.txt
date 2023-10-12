@@ -18,6 +18,8 @@ macro(add_unit_test testname)
     FILE(GLOB sources ${testname}*.cpp)
     add_executable(${testname} ${sources})
     add_test(NAME ${testname} COMMAND "${PROJECT_BINARY_DIR}/tests/${testname}")
+    target_compile_definitions(${testname} PUBLIC
+	CONVERTER_TEST_MACOS_13=$<STREQUAL:"${CONVERTER_TEST_OS_VERSION}","macos-13">)
     target_link_libraries(${testname} PUBLIC converter)
     set_target_properties(${testname} PROPERTIES  LINKER_LANGUAGE CXX)
   endif()
