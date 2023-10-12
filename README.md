@@ -164,7 +164,9 @@ byte as a character. For `bool`, the expected integer values are `0` or `1`.
 
 Locale Parsing Formats : String-to-T (i.e S2T)
 ----------------------------------------------
-**converter** by default, uses `std::from_chars()` conversion function(s) when parsing numeric-type values from string. `std::from_chars()` donot use any locale for parsing. Note that `std::from_chars()` is not supported by 'AppleClang' compiler, refer [testFloatingPointLocale.cpp](tests/testFloatingPointLocale.cpp) for interplay between user-defined-locale, C-locale and limitations of 'AppleClang' compiler.
+**converter** by default, uses `std::from_chars()` conversion function(s) when parsing numeric-type values from string. `std::from_chars()` donot use any locale for parsing. Though caveat observed for `macos-13` and `g++-11` combination, where in `std::from_chars()` is dependent on C-locale, refer [testUserDefinedConverter_locale.cpp](tests/testUserDefinedConverter_locale.cpp) for details.<br>
+ Note that `std::from_chars()` is not supported by 'AppleClang' compiler, refer [testFloatingPointLocale.cpp](tests/testFloatingPointLocale.cpp) for interplay between user-defined-locale, C-locale and limitations of 'AppleClang' compiler.<br>
+
 
 To use a particular locale for parsing numeric values, stream conversion can be used as shown below. <br>
 Refer [testUserDefinedConverter_locale.cpp](tests/testUserDefinedConverter_locale.cpp) for full details.
