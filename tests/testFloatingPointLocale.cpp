@@ -80,17 +80,18 @@ int main()
     }
   } catch (const std::exception& ex) {
     std::cout << "#2# " << ex.what() << std::endl;
+    // return 1;
   }
 
   try {
     if (std::setlocale(LC_ALL, loc) == nullptr) {
-      std::cout << "locale " << loc << " not available, skipping user-locale test.\n";
+      std::cout << "#3.1# locale " << loc << " not available, skipping user-locale test.\n";
       // pass test for systems without locale present. for ci testing, make.sh
       // ensures that the necessary locale is installed.
       return 0;
     }
   } catch (const std::exception& ex) {
-    std::cout << "#3# locale " << loc << " not available(" << ex.what()
+    std::cout << "#3.2# locale " << loc << " not available(" << ex.what()
               << "), skipping user-locale test.\n";
     return 0;
   }
@@ -101,12 +102,12 @@ int main()
     static_assert(converter::ConvertFromStr<float>::template_uid ==  103);
   #if (defined(CONVERTER_TEST_MACOS_13) && CONVERTER_TEST_MACOS_13 == 1) && \
       (defined(__GNUC__) && __GNUC__ == 11)
-    // WARNING : DEPENDENT on system-locale, the comma in '0,101' is a BUG in (macOS-13:g++-11) combination.
+    // WARNING : DEPENDENT on system-locale, the comma-seperator in '0,101' is a BUG in (macOS-13:g++-11) combination.
     //           The underlying call to 'std::from_chars(...)' function should be independent of C-locale,
     //           should is true for other `OS:compiler` combinations except `macOS-13:g++-11`.
     //           `macOS-13:g++-11` combination is dependent on C-locale. Refer test failure below URL for details...
     //        https://github.com/panchaBhuta/converter/actions/runs/6473173855/job/17575327365
-    unittest::ExpectEqual(float, converter::ConvertFromStr<float>::ToVal("0,101"), 0.101f);
+    unittest::ExpectEqual(float, converter::ConvertFromStr<float>::ToVal("0,101"), 0.101f);  //  <<  comma
   #else
     // this is the EXPECTED outcome
     // independent of system-locale
