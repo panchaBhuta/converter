@@ -441,6 +441,7 @@ namespace converter
        * https://cplusplus.com/forum/general/140825/
        * https://en.cppreference.com/w/cpp/language/types
        */
+      // numeric formats may be accepted by the currently installed C locale.
       if constexpr(std::is_signed_v<T>)
       {
         if constexpr( std::is_same_v<T,long long> ) {
@@ -530,6 +531,7 @@ namespace converter
     ToVal_args(const std::string& str, std::size_t* pos = nullptr)
     {
       CONVERTER_DEBUG_LOG("trace :: ConvertFromStr< c_floating_point T, S2T_Format_std_StoT<T, PROCESS_ERR> >::ToVal_args('" << str << "')");
+      // any other expression that may be accepted by the currently installed C locale
       if constexpr( std::is_same_v<T, float> ) {
         return std::stof(str, pos);
       } else

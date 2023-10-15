@@ -305,7 +305,7 @@ Output String Conversion with Invalid Values/Numbers (e.g. Empty Cells) as input
 1. For floating-point numbers
 -----------------------------
 A `NaN` value(both `std::numeric_limits<T>::quiet_NaN()` and `std::numeric_limits<T>::signaling_NaN()`) generally converts to a string  value 'nan'.<br>
-Only exception is for _Windows_, where `std::numeric_limits<T>::signaling_NaN()` will to convert to either of 'nan' or 'nan(snan)'.
+Only exception is for _Windows_, where `std::numeric_limits<T>::signaling_NaN()` will to convert to either of string values 'nan' or 'nan(snan)'.
 
 2. For values of type `std::variant<T, std::string>` (instead of type `T`)
 --------------------------------------------------------------------------
@@ -315,7 +315,6 @@ The reason for this is to ensure data correctness. If one wants to be able
 to identify variables with invalid values/numbers(for numeric data types), one can use the below class.
 
 ```c++
-Note: If only data conversions is needed, then just include [converter/converter.h](include/converter/converter.h).
   template< c_NOT_string T, typename T2S_FORMAT >
   struct ConvertFromVal<std::variant<T, std::string>, T2S_FORMAT>
   {

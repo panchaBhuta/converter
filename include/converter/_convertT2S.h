@@ -303,6 +303,10 @@ namespace converter
       CONVERTER_DEBUG_LOG("trace :: ConvertFromVal< c_integer_type T >::ToStr('" << val << "')");
       CONVERTER_DEBUG_TRY_START
         // refer :: https://en.cppreference.com/w/cpp/string/basic_string/to_string
+        // std::to_string relies on the current locale for formatting purposes, and
+        // therefore concurrent calls to std::to_string from multiple threads may
+        // result in partial serialization of calls. C++17 provides std::to_chars as
+        // a higher-performance locale-independent alternative.
         return std::to_string(val);
       CONVERTER_DEBUG_TRY_END
       CONVERTER_DEBUG_TRY_CATCH(std::exception)
