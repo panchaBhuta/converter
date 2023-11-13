@@ -62,8 +62,8 @@
   #define CONVERTER_DEBUG_LOG(aMessage) { std::cout << aMessage << " :: file:" << CONVERTER_PREFERRED_PATH << ":" << __LINE__ << std::endl; }
   #define CONVERTER_DEBUG_TRY_START try {
   #define CONVERTER_DEBUG_TRY_END   }
-  #define CONVERTER_DEBUG_TRY_CATCH(EXCEPTION_TYPE) \
-      catch(const EXCEPTION_TYPE& ex) { \
+  #define CONVERTER_DEBUG_TRY_CATCH(EXCEPTION_TYPE)                                   \
+      catch(const EXCEPTION_TYPE& ex) {                                               \
         CONVERTER_DEBUG_LOG( "got-ERROR: " << ex.what() );                            \
         throw ex;                                                                     \
       }

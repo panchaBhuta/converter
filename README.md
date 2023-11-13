@@ -21,7 +21,8 @@ Converter is implemented using C++20 with the intention of being portable. It's 
 |  🖥️ OS ➡️ <br> 🤖 Compiler ⬇️ | **Ubuntu 22.04** | **macOS-(12,13)** | **macOS-11** | **Windows 10<br>VS 17 - 2022** | **Windows 10<br>VS 16 - 2019** |
 |------------|------------------|--------------|--------------|-------------------------------|-------------------------------|
 | **g++ (11,12)** | ✅ (default:11) | ✅ | ✅ | - | - |
-| **clang++ (**<span style="color:grey">12\*</span>,**13,14)** | ✅ | - | - | - | - |
+| **g++ 13** | ✅ | ✅ | - | - | - |
+| **clang++ (**<span style="color:grey">12\*</span>,**13,14,15)** | ✅ | - | - | - | - |
 | **AppleClang 14** | NA | ✅ (default) | NA | NA | NA |
 | **msvc 19** | NA | NA | NA | ✅ (default) | - |
 | **clangCL 12** | - | - | - | - | ✅ |
@@ -81,7 +82,8 @@ Precision Nomenclature ( for roundtrip conversion :: **string -> data-type -> st
 |  🖥️ OS ➡️ <br> 🤖 Compiler ⬇️ | **Ubuntu 22.04** | **macOS-(12,13)** | **macOS-11** | **Windows 10<br>VS 17 - 2022** | **Windows 10<br>VS 16 - 2019** |
 |------------|------------------|--------------|--------------|-------------------------------|-------------------------------|
 | **g++ (11,12)** | ⚔️ ✅ | ⚔️ ✅ | ⚔️ ✅ | - | - |
-| **clang++ (**<span style="color:grey">12\*</span>,**13,14)** | ⚔️ ✅ | - | - | - | - |
+| **g++ 13** | ⚔️ ✅ | ⚔️ ✅ | - | - | - |
+| **clang++ (**<span style="color:grey">12\*</span>,**13,14,15)** | ⚔️ ✅ | - | - | - | - |
 | **AppleClang 14** | NA | 🛠️ ☑️ | NA | NA | NA |
 | **msvc 19** | NA | NA | NA | ⚔️ ☑️ | - |
 | **clangCL 12** | - | - | - | - | ⚔️ ☑️ |

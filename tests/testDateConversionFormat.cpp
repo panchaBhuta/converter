@@ -33,6 +33,14 @@ int main()
     unittest::ExpectEqual(std::string,
                           From_dmY( chr::year_month_day{chr::year{1980} COMMA chr::month{2} COMMA chr::day{28} } ),
                           "28-02-1980");
+
+
+    unittest::ExpectEqual(chr::year_month_day,
+                          converter::fromStr_dbY("27-Dec-2020"),
+                          chr::year_month_day{chr::year{2020} COMMA chr::month{12} COMMA chr::day{27} });
+    unittest::ExpectEqual(std::string,
+                          converter::toStr_dbY( chr::year_month_day{chr::year{1980} COMMA chr::month{2} COMMA chr::day{28} } ),
+                          "28-Feb-1980");
   } catch (const std::exception& ex) {
     std::cout << "Unexpected exception in testDateConversion: " << ex.what() << std::endl;
     rv = 1;

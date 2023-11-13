@@ -264,7 +264,7 @@ namespace converter
   struct has_streamUpdate : std::false_type {};
 
   template <typename FMT>
-  struct has_streamUpdate<FMT, std::void_t< decltype(FMT::streamUpdate),  // check for the presence of static member finction   FMT::streamUpdate
+  struct has_streamUpdate<FMT, std::void_t< decltype(FMT::streamUpdate),  // check for the presence of static member function   FMT::streamUpdate
                                             typename FMT::stream_type     // check for the presence of type-def FMT::stream_type
                                           >
                          >

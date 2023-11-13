@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ./manualBuild.sh tests test001   > err.log 2>&1
-# ./manualBuild.sh tests testDefaultTemplateInstantiation -DENABLE_STD_TtoS
+# ./manualBuild.sh tests testDefaultTemplateInstantiation [-DENABLE_STD_TtoS]
 # ./manualBuild.sh cmake checkChrono_fromStream
 
 #[=============================[    find which standards my GCC compiler supports?

@@ -495,6 +495,13 @@ namespace converter
       CONVERTER_DEBUG_TRY_CATCH(std::invalid_argument)
       CONVERTER_DEBUG_TRY_CATCH(std::out_of_range)
       CONVERTER_DEBUG_TRY_CATCH(std::exception)
+      //                        WARNING
+      // std::exception :: behaviour change during debugging, as any derived std::exception
+      //                   will get caught here and when will be rethrown as std::exception.
+      //                   This will potentially impact the callee which has a catch-block
+      //                   for that derived exception; as the exception will not be caught
+      //                   in that particular catch and land up in a different catch block,
+      //                   thus any applcation will might behave differently in debug mode.
     }
   };
 
@@ -559,6 +566,13 @@ namespace converter
       CONVERTER_DEBUG_TRY_CATCH(std::invalid_argument)
       CONVERTER_DEBUG_TRY_CATCH(std::out_of_range)
       CONVERTER_DEBUG_TRY_CATCH(std::exception)
+      //                        WARNING
+      // std::exception :: behaviour change during debugging, as any derived std::exception
+      //                   will get caught here and when will be rethrown as std::exception.
+      //                   This will potentially impact the callee which has a catch-block
+      //                   for that derived exception; as the exception will not be caught
+      //                   in that particular catch and land up in a different catch block,
+      //                   thus any applcation will might behave differently in debug mode.
     }
   };
 
