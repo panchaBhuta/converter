@@ -475,7 +475,7 @@ macro(converter_build)
     target_compile_definitions(converter INTERFACE
         $<$<CONFIG:Debug>:DEBUG_BUILD>
         $<$<CONFIG:Release>:RELEASE_BUILD>
-	ENABLE_CONVERTER_DEBUG_LOG=$<BOOL:${CONVERTER_DEBUG_LOG}>)
+	    ENABLE_CONVERTER_DEBUG_LOG=$<BOOL:${CONVERTER_DEBUG_LOG}>)
     #[==================================================================================[
     # refer https://cmake.org/cmake/help/v3.27/manual/cmake-generator-expressions.7.html#genex:COMPILE_LANG_AND_ID
     # This specifies the use of different compile definitions based on both the compiler id and compilation language.

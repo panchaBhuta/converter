@@ -643,15 +643,18 @@ namespace converter
 
   constexpr char dbY_fmt[] = "%d-%b-%Y";  // string literal object with static storage duration
 
-  constexpr std::string (*toStr_dbY)(const std::chrono::year_month_day& val) =
-                       &ConvertFromVal< std::chrono::year_month_day,
-                                        T2S_Format_StreamYMD< dbY_fmt >
-                                      >::ToStr;
+  using ConvertFromDbY_toStr = ConvertFromVal< std::chrono::year_month_day,
+                                               T2S_Format_StreamYMD< dbY_fmt >
+                                             >;
 
-  constexpr std::chrono::year_month_day (*fromStr_dbY)(const std::string& str) =
-                       &ConvertFromStr< std::chrono::year_month_day,
-                                        S2T_Format_StreamYMD< dbY_fmt >
-                                      >::ToVal;
+  constexpr std::string (*toStr_dbY)(const std::chrono::year_month_day& val) = &ConvertFromDbY_toStr::ToStr;
+
+
+  using ConvertFromStr_toDbY = ConvertFromStr< std::chrono::year_month_day,
+                                               S2T_Format_StreamYMD< dbY_fmt >
+                                             >;
+
+  constexpr std::chrono::year_month_day (*fromStr_dbY)(const std::string& str) = &ConvertFromStr_toDbY::ToVal;
 
   // ]=============================================================] ConvertFromVal
 }
