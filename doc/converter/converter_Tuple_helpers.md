@@ -65,7 +65,6 @@ Converts variable holding 'tuple' value to string. The output string has the for
 ```c++
 template <c_S2Tconverter ... S2Tconv>
 inline void GetTuple(const std::vector<std::string>& dataVec,
-                     size_t colIdx,
                      std::tuple<typename S2Tconv::return_type ...>& dataTuple)
 ```
 populate a tuple from a vector of string.
@@ -75,7 +74,6 @@ populate a tuple from a vector of string.
 
 **Parameters**
 - `dataVec`             vector of string, having string representation of numeric values.
-- `colIdx`              start id of dataVec in case vector starts with the column-name.
 - `dataTuple`           values stored in the tuple after performing string-to-value conversion.
 
 ---
@@ -87,7 +85,6 @@ populate a tuple from a vector of string.
 ```c++
 template <c_T2Sconverter ... T2Sconv>
 inline void SetTuple(const std::tuple<typename T2Sconv::input_type ...>& dataTuple,
-                     size_t colIdx,
                      std::vector<std::string>& dataVec)
 ```
 
@@ -98,5 +95,4 @@ populate a vector of string from a tuple.
 
 **Parameters**
 - `dataTuple`           values stored in the tuple after performing string-to-value conversion.
-- `colIdx`              start id of dataVec in case vector starts with the column-name.
 - `dataVec`             vector of string, having string representation of numeric values.

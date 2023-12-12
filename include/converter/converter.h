@@ -32,7 +32,7 @@
 
 #define CONVERTER_VERSION_MAJOR 1
 #define CONVERTER_VERSION_MINOR 2
-#define CONVERTER_VERSION_PATCH 11
+#define CONVERTER_VERSION_PATCH 12
 
 
 
@@ -58,7 +58,7 @@
 #define CONVERTER_PREFERRED_PATH    std::filesystem::path(CONVERTER_FILE).make_preferred().string()
 
 
-#if ENABLE_CONVERTER_DEBUG_LOG == 1
+#if FLAG_CONVERTER_DEBUG_LOG == 1
   #define CONVERTER_DEBUG_LOG(aMessage) { std::cout << aMessage << " :: file:" << CONVERTER_PREFERRED_PATH << ":" << __LINE__ << std::endl; }
   #define CONVERTER_DEBUG_TRY_START try {
   #define CONVERTER_DEBUG_TRY_END   }

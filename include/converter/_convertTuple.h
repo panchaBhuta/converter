@@ -56,14 +56,13 @@ namespace converter
    * @brief   populate a tuple from a vector of string.
    * @tparam  S2Tconv             converter types that satisfies concept 'c_S2Tconverter'.
    * @param   dataVec             vector of string, having string representation of numeric values.
-   * @param   colIdx              start id of dataVec in case vector starts with the column-name.
    * @param   dataTuple           values stored in the tuple after performing string-to-value conversion.
    */
   template <c_S2Tconverter ... S2Tconv>
   inline void GetTuple(const std::vector<std::string>& dataVec,
-                       size_t colIdx,
                        std::tuple<typename S2Tconv::return_type ...>& dataTuple)
   {
+    size_t colIdx = 0;
     //auto write_tuple = [&dataVec,&colIdx] (auto&& ... wrt_result) -> void   # doesnot work for msvc
     auto write_tuple = [&dataVec,&colIdx] (typename S2Tconv::return_type & ... wrt_result) -> void
     {
@@ -86,21 +85,19 @@ namespace converter
    * @tparam  IDX                 The tuple/vector index being processed by the template instance.
    * @tparam  T2Sconv             converter types that satisfies concept 'c_T2Sconverter'.
    * @param   dataTuple           values stored in the tuple after performing string-to-value conversion.
-   * @param   colIdx              start id of dataVec in case vector starts with the column-name.
    * @param   dataVec             vector of string, having string representation of numeric values.
    */
   template <size_t IDX,c_T2Sconverter ... T2Sconv>
   inline static void setTupleElements(const std::tuple<typename T2Sconv::input_type ...>& dataTuple,
-                                      const size_t colIdx,
                                       std::vector<std::string>& dataVec)
   {
     using _t_tuple_convertors = std::tuple< T2Sconv ...>;
-    dataVec.at(IDX+colIdx) = std::tuple_element_t<IDX, _t_tuple_convertors>::ToStr(std::get<IDX>(dataTuple));
+    dataVec.at(IDX) = std::tuple_element_t<IDX, _t_tuple_convertors>::ToStr(std::get<IDX>(dataTuple));
     if constexpr(IDX>0)
     {
       // "((IDX>0)?(IDX-1):0)" eliminates infinite compile time looping,
       // and we don't have to define function specialization for setTupleElements<0>()
-      setTupleElements< ((IDX>0)?(IDX-1):0), T2Sconv ... >(dataTuple,colIdx,dataVec);
+      setTupleElements< ((IDX>0)?(IDX-1):0), T2Sconv ... >(dataTuple,dataVec);
     }
   }
   // ]===========] workarounds in case std::apply() doesn't work as expected for a given compiler(MSVC)
@@ -109,14 +106,13 @@ namespace converter
    * @brief   populate a vector of string from a tuple.
    * @tparam  T2Sconv             converter types that satisfies concept 'c_T2Sconverter'.
    * @param   dataTuple           values stored in the tuple after performing string-to-value conversion.
-   * @param   colIdx              start id of dataVec in case vector starts with the column-name.
    * @param   dataVec             vector of string, having string representation of numeric values.
    */
   template <c_T2Sconverter ... T2Sconv>
   inline void SetTuple(const std::tuple<typename T2Sconv::input_type ...>& dataTuple,
-                       size_t colIdx,
                        std::vector<std::string>& dataVec)
   {
+    size_t colIdx = 0;
     constexpr size_t eleSize = std::tuple_size_v< std::tuple<typename T2Sconv::input_type ...> >;
     if(dataVec.size() < eleSize )
     {

@@ -19,14 +19,14 @@ void conversionVectorEqualCheck(const std::vector<std::string>& rowVecInput, con
   std::cout << "######  rowVecInput" << /*rowVecInput <<*/ std::endl;
   using t_tupleRow = std::tuple<T...>;
   t_tupleRow convTuple;
-  converter::GetTuple<converter::t_S2Tconv_c<T>...>(rowVecInput, 0, convTuple);
+  converter::GetTuple<converter::t_S2Tconv_c<T>...>(rowVecInput, convTuple);
   if(chkTuple != convTuple)
   {
     throw std::runtime_error("vector->tuple row mismatch");
   }
 
   std::vector<std::string> rowOutput;
-  converter::SetTuple<converter::t_T2Sconv_c<T>...>(convTuple, 0, rowOutput);
+  converter::SetTuple<converter::t_T2Sconv_c<T>...>(convTuple, rowOutput);
   if(expectedOutputVector == nullptr)
   {
     if(rowVecInput != rowOutput)
