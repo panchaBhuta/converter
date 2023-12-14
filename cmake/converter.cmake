@@ -153,7 +153,7 @@ macro(check_chrono_stream_functionality)
 
         include( FetchContent )
         FetchContent_Declare( ${DATELIB}
-                              GIT_REPOSITORY git@github.com:HowardHinnant/date.git
+                              GIT_REPOSITORY https://github.com/HowardHinnant/date.git
                               GIT_TAG        v3.0.1) # adjust tag/branch/commit as needed
         FetchContent_MakeAvailable(${DATELIB})
 
