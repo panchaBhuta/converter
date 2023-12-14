@@ -153,7 +153,7 @@ macro(check_chrono_stream_functionality)
 
         include( FetchContent )
         FetchContent_Declare( ${DATELIB}
-                              GIT_REPOSITORY https://github.com/HowardHinnant/date.git
+                              GIT_REPOSITORY git@github.com:HowardHinnant/date.git
                               GIT_TAG        v3.0.1) # adjust tag/branch/commit as needed
         FetchContent_MakeAvailable(${DATELIB})
 
@@ -504,9 +504,27 @@ macro(converter_build)
     target_link_libraries(converter INTERFACE
                 $<$<LINK_LANG_AND_ID:CXX,Clang,AppleClang>:libCXX_Clang>
                 $<$<LINK_LANG_AND_ID:CXX,Intel>:libCXX_Intel>)
+
+        # https://cmake.org/cmake/help/latest/command/target_link_libraries.html#libraries-for-both-a-target-and-its-dependents
+        # Library dependencies are transitive by default with this signature. When this target is linked into another target
+        # then the libraries linked to this target will appear on the link line for the other target too.
+        #
+        # https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#target-usage-requirements
+        # add_executable(consumer consumer.cpp)
+        # target_link_libraries(consumer archiveExtras)    <<<< NOTE: for executable no scope specified, and the dependency becomes 'transitive'
     #]==================================================================================]
     if(DATELIB)
         message(STATUS "'converter' linking to '${DATELIB}'")
+        #[======================[
+        # https://cmake.org/cmake/help/latest/command/target_link_libraries.html#libraries-for-a-target-and-or-its-dependents
+        # The PUBLIC, PRIVATE and INTERFACE scope keywords can be used to specify both the
+        # link dependencies and the link interface in one command.
+        #
+        # when <target> is a library (i.e NOT an executable), then specify the scope.
+            target_link_libraries(<target>
+                        <PRIVATE|PUBLIC|INTERFACE> <item>...
+                        [<PRIVATE|PUBLIC|INTERFACE> <item>...]...)
+        #]======================]
         target_link_libraries(converter INTERFACE ${DATELIB})
     endif()
 endmacro()
