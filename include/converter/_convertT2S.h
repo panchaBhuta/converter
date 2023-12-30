@@ -252,7 +252,7 @@ namespace converter
       oss << val;
       if (oss.fail() || oss.bad()) // || oss.eof())
       {
-  #if FLAG_CONVERTER_DEBUG_LOG == 1
+  #if FLAG_CONVERTER_debug_log == 1
         std::ostringstream eoss;
         try {
           eoss << "val='" << val << "'";

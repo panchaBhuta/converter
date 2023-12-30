@@ -5,8 +5,8 @@ set(CMAKE_CXX_STANDARD 20)
 include(FetchContent)
 FetchContent_Declare(
   converter
-  GIT_REPOSITORY "git@github.com:panchaBhuta/converter.git"
-  GIT_TAG        "v1.2.13"
+  GIT_REPOSITORY "https://github.com/panchaBhuta/converter.git"
+  GIT_TAG        "v1.2.14"
 )
 FetchContent_MakeAvailable(converter)
 

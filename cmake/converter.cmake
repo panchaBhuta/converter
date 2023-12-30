@@ -440,10 +440,10 @@ macro(converter_build)
     endif()
     #message(STATUS "_DEBUG_LOG=${_DEBUG_LOG}")
     # for _DEBUG_LOG can't use generator-expression as its computed during build-stage, but we need it during config-stage
-    option(OPTION_CONVERTER_DEBUG_LOG  "Set to ON for debugging logs"  ${_DEBUG_LOG})
-    message(STATUS "OPTION_CONVERTER_DEBUG_LOG=${OPTION_CONVERTER_DEBUG_LOG}")
+    option(OPTION_CONVERTER_debug_log  "Set to ON for debugging logs"  ${_DEBUG_LOG})
+    message(STATUS "OPTION_CONVERTER_debug_log=${OPTION_CONVERTER_debug_log}")
     #[===========[  donot use generator-expressions in option() functions
-    # option(OPTION_CONVERTER_DEBUG_LOG  "Set to ON for debugging logs"   "$<AND:$<CONFIG:Debug>,$<CONVERTER_STANDALONE_PROJECT>>")
+    # option(OPTION_CONVERTER_debug_log  "Set to ON for debugging logs"   "$<AND:$<CONFIG:Debug>,$<CONVERTER_STANDALONE_PROJECT>>")
     #]===========]
 
     #[==================================================================================[
@@ -475,7 +475,7 @@ macro(converter_build)
     target_compile_definitions(converter INTERFACE
         $<$<CONFIG:Debug>:DEBUG_BUILD>
         $<$<CONFIG:Release>:RELEASE_BUILD>
-	    FLAG_CONVERTER_DEBUG_LOG=$<BOOL:${OPTION_CONVERTER_DEBUG_LOG}>)
+	    FLAG_CONVERTER_debug_log=$<BOOL:${OPTION_CONVERTER_debug_log}>)
     #[==================================================================================[
     # refer https://cmake.org/cmake/help/v3.27/manual/cmake-generator-expressions.7.html#genex:COMPILE_LANG_AND_ID
     # This specifies the use of different compile definitions based on both the compiler id and compilation language.

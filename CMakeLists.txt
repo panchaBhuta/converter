@@ -14,7 +14,7 @@
 cmake_minimum_required(VERSION 3.23)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
-include(converter)
+include(converter)   # cmake/converter.cmake
 set(PROJECT_DESCRIPTION "A header-only lightweight C++ string2Type and Type2string converter")
 set(PROJECT_HOMEPAGE_URL "https://github.com/panchaBhuta/converter")
 
