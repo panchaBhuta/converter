@@ -26,13 +26,13 @@ namespace converter
   template<typename T, FailureS2Tprocess PROCESS_ERR>
   struct OnError;
 
-  template<>
-  struct OnError<std::string, FailureS2Tprocess::THROW_ERROR>
+  template<c_basic_string T>
+  struct OnError<T, FailureS2Tprocess::THROW_ERROR>
   {
-    using return_type = std::string;
+    using return_type = T;
   };
 
-  template<c_NOT_string T>
+  template<c_NOT_basic_string T>
   struct OnError<T, FailureS2Tprocess::THROW_ERROR>
   {
     /**
@@ -77,7 +77,7 @@ namespace converter
     }
   };
 
-  template<c_NOT_string T>
+  template<c_NOT_basic_string T>
   struct OnError<T, FailureS2Tprocess::VARIANT_NAN>
   {
     /**
@@ -151,7 +151,7 @@ namespace converter
 
   template<typename T>
   struct S2T_DefaultFormat< T,
-                            typename  std::enable_if_t< std::is_same_v<T, std::string> ||
+                            typename  std::enable_if_t< is_string<T> || // std::is_same_v<T, std::string> ||
                                                         is_char<T>::value ||
                                                         std::is_same_v<T, bool>
                                                       >
@@ -247,10 +247,10 @@ namespace converter
      *  are not as expected. The static function 'instanceEvaluater()'
      *  will help in figuring out the problem.
      */
-    static float instanceEvaluater()
+    constexpr static float instanceEvaluater()
     {
       static_assert(std::is_same_v< typename S2T_FORMAT::return_type, T >);
-      S2T_FORMAT::handler("dummyValue", std::exception() );
+      //S2T_FORMAT::handler("dummyValue", std::exception() );
 
       if constexpr(has_streamUpdate<S2T_FORMAT>::value)
       {
@@ -268,9 +268,9 @@ namespace converter
                                       std::basic_istringstream<typename S2T_FORMAT::stream_type::char_type>
                                     >);
         static_assert(converter::is_formatISS<S2T_FORMAT>::value);
-        std::cerr << "WARNING : Formater is istringstream type" << std::endl;
+        //std::cerr << "WARNING : Formater is istringstream type" << std::endl;
       } else {
-        std::cerr << "WARNING : Formater is NOT istringstream type" << std::endl;
+        //std::cerr << "WARNING : Formater is NOT istringstream type" << std::endl;
       }
       return 0.1f;
     }
@@ -336,7 +336,7 @@ namespace converter
    * @tparam  T                     'type' converted to, from string data. (Not Applicable for 'string to string' conversion.)
    * @tparam  S2T_FORMAT_STREAM     Class which encapsulates conversion parameters/directives such as using 'Locale'.
    */
-  template< c_NOT_string T, c_formatISS S2T_FORMAT_STREAM >
+  template< c_NOT_basic_string T, c_formatISS S2T_FORMAT_STREAM >
   struct ConvertFromStr<T, S2T_FORMAT_STREAM>
   {
   private:
@@ -348,7 +348,7 @@ namespace converter
         return ( iss.fail() || iss.bad() || (!iss.eof()) );
     }
 
-    inline static const std::string _errMsg{"Stream read failure. 'T ConvertFromStr<c_NOT_string T, c_formatISS S2T_FORMAT>::ToVal(const std::string& str)'"};
+    inline static const std::string _errMsg{"Stream read failure. 'T ConvertFromStr<c_NOT_basic_string T, c_formatISS S2T_FORMAT>::ToVal(const std::string& str)'"};
     inline static const std::invalid_argument _err{_errMsg};
 
   public:
@@ -374,7 +374,7 @@ namespace converter
     inline static return_type
     ToVal(const std::string& str)
     {
-      CONVERTER_DEBUG_LOG("trace :: ConvertFromStr< c_NOT_string T, c_formatISS S2T_FORMAT_STREAM >::ToVal('" << str << "')");
+      CONVERTER_DEBUG_LOG("trace :: ConvertFromStr< c_NOT_basic_string T, c_formatISS S2T_FORMAT_STREAM >::ToVal('" << str << "')");
       using stream_type = typename S2T_FORMAT_STREAM::stream_type;
 
       T val;
@@ -599,6 +599,31 @@ namespace converter
      * @returns string.
      */
     inline static std::string ToVal(const std::string& str) { return str; }
+  };
+  template<c_basic_string BSTR>
+  struct ConvertFromStr<BSTR, S2T_Format_WorkAround<BSTR, FailureS2Tprocess::THROW_ERROR> >
+  {
+    /**
+     * @brief   'type' definition being declared for.
+     */
+    using value_type  = BSTR;
+    /**
+     * @brief   'type' definition returned by the convertor.
+     */
+    using return_type = BSTR;
+
+    static const int template_uid = 14;
+
+    /**
+     * @brief   Converts string to string.
+     * @param   str                 input string.
+     * @returns string.
+     */
+    inline static BSTR ToVal(const std::string& str)
+    {
+      BSTR bstr = str.c_str();
+      return bstr;
+    }
   };
 
   /**

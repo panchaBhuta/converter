@@ -17,6 +17,7 @@
 //#include <string_view>
 //#include <format>
 #include <cstring>
+#include <string>
 #include <array>
 #include <map>
 #include <locale>
@@ -118,7 +119,7 @@ namespace converter
     ToVal(const std::string& str)
     {
       try {
-       return ToVal_args( str, S2T_FORMAT_YMD::ymdFormat); // %F -> "%Y-%m-%d"
+        return ToVal_args( str, S2T_FORMAT_YMD::ymdFormat); // %F -> "%Y-%m-%d"
       } catch (const std::invalid_argument& err) {
         return S2T_FORMAT_YMD::handler(str, err);
       } catch (const std::exception& err) {
@@ -518,7 +519,7 @@ namespace converter
           oss << fmt[1];
       }
     }
-  #endif
+#endif
 
   public:
     /**
@@ -640,7 +641,10 @@ namespace converter
     inline static const std::string _errMsg{"error in date-conversion in 'std::string ConvertFromVal<std::chrono::year_month_date, T2S_FORMAT_YMD>::ToStr_args(const std::chrono::year_month_date& val)'"};
     inline static const std::invalid_argument _err{_errMsg};
   };
+  // ]=============================================================] ConvertFromVal
 
+
+  // [=============================================================[ Helpers
   constexpr char dbY_fmt[] = "%d-%b-%Y";  // string literal object with static storage duration
 
   using ConvertFromDbY_toStr = ConvertFromVal< std::chrono::year_month_day,
@@ -656,5 +660,5 @@ namespace converter
 
   constexpr std::chrono::year_month_day (*fromStr_dbY)(const std::string& str) = &ConvertFromStr_toDbY::ToVal;
 
-  // ]=============================================================] ConvertFromVal
+  // ]=============================================================] Helpers
 }

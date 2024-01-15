@@ -5,6 +5,8 @@
 #include <iostream>
 
 #include <converter/converter.h>
+#include <converter/specializedTypes/date.h>
+#include <converter/specializedTypes/case_insensitive_string.h>
 
 #include "unittest.h"
 
@@ -61,7 +63,39 @@ int main()
                                          std::chrono::day(15)
                                        ),
             "2023-08-15");
+    using t_fmtdbY = converter::format_year_month_day<converter::dbY_fmt, converter::FailureS2Tprocess::THROW_ERROR>;
+    conversionEqualCheck<t_fmtdbY>(
+            t_fmtdbY( std::chrono::year(2023),
+                      std::chrono::month(8),
+                      std::chrono::day(15)
+                    ),
+            "15-Aug-2023");
+    using t_fmtYMD = converter::format_year_month_day<converter::defYMDfmt, converter::FailureS2Tprocess::THROW_ERROR>;
+    conversionEqualCheck<t_fmtYMD>(
+            t_fmtYMD( std::chrono::year(2023),
+                      std::chrono::month(8),
+                      std::chrono::day(15)
+                    ),
+            "2023-08-15");
 
+    ci_string    caps{"SHIV SHANKAR"};
+    ci_string    lowr{"shiv shankar"};
+    unittest::ExpectTrue(caps.compare(lowr) == 0);
+    unittest::ExpectEqual(std::string, converter::ConvertFromVal<ci_string>::ToStr(caps), "SHIV SHANKAR");
+    unittest::ExpectEqual(std::string, converter::ConvertFromVal<ci_string>::ToStr(lowr), "shiv shankar");
+    unittest::ExpectEqual(ci_string, converter::ConvertFromStr<ci_string>::ToVal("SHIV SHANKAR"), caps);
+    unittest::ExpectEqual(ci_string, converter::ConvertFromStr<ci_string>::ToVal("shiv shankar"), lowr);
+
+    /**
+     * NOTE : Before adding conversion tests here, check tests for template-instantiation in
+     *        'testAllTemplateInstantiation'.
+     *
+     *        Next check UID  in 'testDefaultTemplateInstantiation.cpp'
+     *
+     *        In order to select right conversion algo, templates
+     *        'S2T_Format_*', 'T2S_Format_*', 'OnError' needs to be type-specialized as well
+     *        along with type-specialization for 'ConvertFromVal' and 'ConvertFromStr'.
+    */
 
   } catch (const std::exception& ex) {
     std::cout << ex.what() << std::endl;

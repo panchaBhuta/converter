@@ -169,9 +169,12 @@ namespace unittest
     }
   };
 
-  template<>
-  struct SScompatible<std::chrono::year_month_day> {
-    inline static std::string getVal(const std::chrono::year_month_day& val)
+  template <typename T>
+  concept c_is_base_of_ymd_inclusive = std::is_base_of_v<std::chrono::year_month_day, T>;
+
+  template<c_is_base_of_ymd_inclusive T>
+  struct SScompatible<T> {
+    inline static std::string getVal(const T& val)
     {
       std::ostringstream oss;
       oss << std::setfill('0') << std::setw(4) << static_cast<int>(val.year()) << "-";

@@ -5,8 +5,11 @@
 #include <iomanip>
 
 #include <converter/converter.h>
+#include <converter/specializedTypes/date.h>
+#include <converter/specializedTypes/case_insensitive_string.h>
 
 #include "unittest.h"
+
 
 template<typename T>
 void checkDefaultFormatInstance_Integer()
@@ -58,14 +61,26 @@ void checkDefaultFormatInstance_Date()
                                         converter::T2S_Format_StreamYMD<converter::defYMDfmt>>);
 }
 
+template<typename T>
+void checkDefaultFormatInstance_FormatDate()
+{
+  static_assert(std::is_same_v<typename converter::S2T_DefaultFormat<T>::type,
+                                        converter::S2T_Format_StreamFormatYMD<T::formatYMD, T::errProcessing>>);
+  static_assert(std::is_same_v<typename converter::T2S_DefaultFormat<T>::type,
+                                        converter::T2S_Format_StreamFormatYMD<T::formatYMD>>);
+}
+
+
 
 
 
 template<typename T , int s2t_uid , int t2s_uid = -s2t_uid>
-void checkDefaultFunctionInstance()
+void checkConversionFunctionInstance()
 {
   static_assert(converter::ConvertFromStr<T>::template_uid == s2t_uid);
   static_assert(converter::ConvertFromVal<T>::template_uid == t2s_uid);
+  //unittest::ExpectEqual(int, converter::ConvertFromStr<T>::template_uid, s2t_uid);
+  //unittest::ExpectEqual(int, converter::ConvertFromVal<T>::template_uid, t2s_uid);
 
   static_assert(std::is_same_v< decltype(&converter::ConvertFromStr<T>::ToVal), T(*)(const std::string&)>);
   static_assert(std::is_same_v< decltype(&converter::ConvertFromVal<T>::ToStr), std::string(*)(const T&)>);
@@ -83,6 +98,12 @@ void checkDefaultFunctionInstance()
   static constexpr const int fp_T2S_uid = -1;
 #endif
 
+
+    using t_fmtdbY = converter::format_year_month_day<converter::dbY_fmt,
+                                                      converter::FailureS2Tprocess::THROW_ERROR>;
+
+    using t_fmtYMD = converter::format_year_month_day<converter::defYMDfmt,
+                                                      converter::FailureS2Tprocess::THROW_ERROR>;
 
 int main()
 {
@@ -167,30 +188,35 @@ int main()
   checkDefaultFormatInstance_WA<char32_t>();
   checkDefaultFormatInstance_WA<bool>();
   checkDefaultFormatInstance_Date<std::chrono::year_month_day>();
+  checkDefaultFormatInstance_FormatDate<t_fmtdbY>();
 
 
   // check for function signature
-  checkDefaultFunctionInstance<short,102>();  // 2
-  checkDefaultFunctionInstance<int,102>();    // 2
-  checkDefaultFunctionInstance<long,102>();   // 2
-  checkDefaultFunctionInstance<long long,102>();         // 2
-  checkDefaultFunctionInstance<unsigned short,102>();    // 2
-  checkDefaultFunctionInstance<unsigned int,102>();      // 2
-  checkDefaultFunctionInstance<unsigned long,102>();     // 2
-  checkDefaultFunctionInstance<unsigned long long,102>();// 2
-  checkDefaultFunctionInstance<float,fp_S2T_uid,fp_T2S_uid>();    // (103 | 3) , (-103 | -1)
-  checkDefaultFunctionInstance<double,fp_S2T_uid,fp_T2S_uid>();   // (103 | 3) , (-103 | -1)
-  checkDefaultFunctionInstance<long double,fp_S2T_uid,fp_T2S_uid>();  // (103 | 3) , (-103 | -1)
-  checkDefaultFunctionInstance<std::string,4>();
-  checkDefaultFunctionInstance<char,5>();
-  checkDefaultFunctionInstance<signed char,5>();
-  checkDefaultFunctionInstance<unsigned char,5>();
-  checkDefaultFunctionInstance<wchar_t,5>();
-  checkDefaultFunctionInstance<char8_t,5>();
-  checkDefaultFunctionInstance<char16_t,5>();
-  checkDefaultFunctionInstance<char32_t,5>();
-  checkDefaultFunctionInstance<bool,6>();
-  checkDefaultFunctionInstance<std::chrono::year_month_day,10000>();
+  checkConversionFunctionInstance<short,102>();  // 2
+  checkConversionFunctionInstance<int,102>();    // 2
+  checkConversionFunctionInstance<long,102>();   // 2
+  checkConversionFunctionInstance<long long,102>();         // 2
+  checkConversionFunctionInstance<unsigned short,102>();    // 2
+  checkConversionFunctionInstance<unsigned int,102>();      // 2
+  checkConversionFunctionInstance<unsigned long,102>();     // 2
+  checkConversionFunctionInstance<unsigned long long,102>();// 2
+  checkConversionFunctionInstance<float,fp_S2T_uid,fp_T2S_uid>();    // (103 | 3) , (-103 | -1)
+  checkConversionFunctionInstance<double,fp_S2T_uid,fp_T2S_uid>();   // (103 | 3) , (-103 | -1)
+  checkConversionFunctionInstance<long double,fp_S2T_uid,fp_T2S_uid>();  // (103 | 3) , (-103 | -1)
+  checkConversionFunctionInstance<std::string,4>();
+      checkConversionFunctionInstance<ci_string,14>();
+  checkConversionFunctionInstance<char,5>();
+  checkConversionFunctionInstance<signed char,5>();
+  checkConversionFunctionInstance<unsigned char,5>();
+  checkConversionFunctionInstance<wchar_t,5>();
+  checkConversionFunctionInstance<char8_t,5>();
+  checkConversionFunctionInstance<char16_t,5>();
+  checkConversionFunctionInstance<char32_t,5>();
+  checkConversionFunctionInstance<bool,6>();
+
+  checkConversionFunctionInstance<std::chrono::year_month_day, 10000>();
+  checkConversionFunctionInstance<t_fmtdbY,  10001>();
+  checkConversionFunctionInstance<t_fmtYMD,  10001>();
 
 
 

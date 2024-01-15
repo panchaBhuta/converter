@@ -102,7 +102,7 @@ namespace converter
 
   template<typename T>
   struct T2S_DefaultFormat< T,
-                            typename std::enable_if_t< std::is_same_v<T, std::string> ||
+                            typename std::enable_if_t< is_string<T> || // std::is_same_v<T, std::string> ||
                                                        is_char<T>::value ||
                                                        std::is_same_v<T, bool>
                                                      >
@@ -186,7 +186,7 @@ namespace converter
      *  are not as expected. The static function 'instanceEvaluater()'
      *  will help in figuring out the problem.
      */
-    static float instanceEvaluater()
+    constexpr static float instanceEvaluater()
     {
       if constexpr(has_streamUpdate<T2S_FORMAT>::value)
       {
@@ -198,16 +198,16 @@ namespace converter
         //          << typeid(std::basic_ostringstream<typename T2S_FORMAT::stream_type::char_type>).name() << std::endl;
 
         static_assert(!std::is_same_v< typename T2S_FORMAT::stream_type,
-                                      std::basic_istringstream<typename T2S_FORMAT::stream_type::char_type>
+                                       std::basic_istringstream<typename T2S_FORMAT::stream_type::char_type>
                                     >);  // ERROR :: invalid template param for FORMATTING -> 'ostringstream' should be passed instead of 'istringstream'
         static_assert(std::is_same_v< typename T2S_FORMAT::stream_type,
                                       std::basic_ostringstream<typename T2S_FORMAT::stream_type::char_type>
                                     >);
         static_assert(converter::is_formatOSS<T2S_FORMAT>::value);
         
-        std::cout << "WARNING : Formater is ostringstream type" << std::endl;
+        //std::cout << "WARNING : Formater is ostringstream type" << std::endl;
       } else {
-        std::cout << "WARNING : Formater is NOT ostringstream type" << std::endl;
+        //std::cout << "WARNING : Formater is NOT ostringstream type" << std::endl;
       }
       return -0.1f;
     }
@@ -221,7 +221,7 @@ namespace converter
    * @tparam  T                     'type' converted from, to string data. (Not Applicable for string to string conversion)
    * @tparam  T2S_FORMAT_STREAM      Class which encapsulates conversion parameters/directives such as using 'Locale'.
    */
-  template<c_NOT_string T, c_formatOSS T2S_FORMAT_STREAM >
+  template<c_NOT_basic_string T, c_formatOSS T2S_FORMAT_STREAM >
   struct ConvertFromVal<T, T2S_FORMAT_STREAM>
   {
     /**
@@ -244,7 +244,7 @@ namespace converter
     inline static std::string
     ToStr(const T& val)
     {
-      CONVERTER_DEBUG_LOG("trace :: ConvertFromVal< c_NOT_string T, c_formatOSS T2S_FORMAT_STREAM  >::ToStr('" << val << "')");
+      CONVERTER_DEBUG_LOG("trace :: ConvertFromVal< c_NOT_basic_string T, c_formatOSS T2S_FORMAT_STREAM  >::ToStr('" << val << "')");
       using stream_type = typename T2S_FORMAT_STREAM::stream_type;
 
       stream_type oss;
@@ -267,7 +267,7 @@ namespace converter
     }
 
   private:
-    inline static const std::string _errMsg{"Invalid argument passed to function 'std::string ConvertFromVal<c_NOT_string T, c_formatOSS T2S_FORMAT>::ToStr(const T& val)'"};
+    inline static const std::string _errMsg{"Invalid argument passed to function 'std::string ConvertFromVal<c_NOT_basic_string T, c_formatOSS T2S_FORMAT>::ToStr(const T& val)'"};
     inline static const std::invalid_argument _err{_errMsg};
   };
 
@@ -407,6 +407,29 @@ namespace converter
      */
     inline static std::string ToStr(const std::string& val) { return val; }
   };
+  template<c_basic_string BSTR>
+  struct ConvertFromVal<BSTR, T2S_Format_WorkAround>
+  {
+    /**
+     * @brief   'type' definition being declared for.
+     */
+    using value_type = BSTR;
+    /**
+     * @brief   'type' definition expected by the convertor.
+     */
+    using input_type = BSTR;
+
+    static const int template_uid = -14;
+
+    /**
+     * @brief   Converts string to string.
+     * @param   val                 input string.
+     * @returns string.
+     */
+    inline static std::string ToStr(const BSTR& val) {
+        //CONVERTER_DEBUG_LOG( "ConvertFromVal<BSTR> BSTR=" << val << ", BSTR.c_str()=" << val.c_str());
+        return std::string{val.c_str()}; }
+  };
 
   /**
    * @brief     Specialized implementation handling char to string conversion.
@@ -479,7 +502,7 @@ namespace converter
    * @tparam  T                     'type' converted from, to string data. (Not Applicable for string to string conversion)
    * @tparam  T2S_FORMAT            Class which encapsulates conversion parameters/directives such as using 'Locale'.
    */
-  template< c_NOT_string T, typename T2S_FORMAT >
+  template< c_NOT_basic_string T, typename T2S_FORMAT >
   struct ConvertFromVal<std::variant<T, std::string>, T2S_FORMAT>
   {
     /**

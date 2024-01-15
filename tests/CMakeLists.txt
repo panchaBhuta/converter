@@ -61,9 +61,13 @@ add_unit_test(testFloatingPointLocale)
 add_unit_test(testDateConversions)
 add_unit_test(testDateConversionFormat)
 add_unit_test(testDateConversionWindowsHeader)
+add_unit_test(testDateYMD_format_dbY)
+add_unit_test(testDateYMD_format_YMD)
+
 add_unit_test(testTupleConversions)
 ##add_unit_test(testInvalidComposition)
 
+add_unit_test(testCIstring)
 
 
 #[======================[

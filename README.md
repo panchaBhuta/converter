@@ -68,6 +68,7 @@ particular its [CMakeLists.txt](examples/cmake-add-subdirectory/CMakeLists.txt).
 Supported Data Types for Conversion
 ===================================
 Floating-types, Integer-types, char-types, bool, `std::chrono::year_month_day` are the various types supported.<br>
+Special types `ci_string` (i.e case-insensitive string) and `format_year_month_day<format-info>` (date-type with built-in format needed during string-conversion). <br>
 Use `T ConvertFromStr<T>::ToVal(const std::string&)` for `std::string` to T conversions.<br>
 Use `std::string ConvertFromVal<T>::ToStr(const T&)` for T to `std::string` conversions.<br>
 The Default convertion functions, maps to best available converter functions (for a type) provided by _std_ library.
@@ -80,7 +81,7 @@ Function Nomenclature:<br>
 ⚔️ : uses `std::from_chars()` and `std::to_chars()` for data conversion. <br>
 🛠️ : uses `std::from_string()` and `std::operator<<` workarounds, for data conversion. As complier doesn't support `std::*_chars()` functions.<br>
 
-Precision Nomenclature ( for roundtrip conversion :: **string -> data-type -> string**): <br>
+Precision Nomenclature ( for roundtrip conversions :: **string -> data-type -> string**): <br>
 ✅ : Good. Minimal precision loss, best of the lot.  <br>
 ☑️ : Average. Precision loss is non-uniform, loss can be high for some FP values.
 
@@ -332,6 +333,47 @@ to identify variables with invalid values/numbers(for numeric data types), one c
 Above Template-specializaton can be used for all types(integer, floating, bool) to write the underlying valid-data(of type `T`) or the string which raised the conversion-error.
 
 
+Special types
+=============
+1. date-type `converter::format_year_month_day< const char* dateFMT,  converter::FailureS2Tprocess PROCESS_ERR >`
+-----------------------------------------------------------------------------------------------------------------
+Use case for this type: For `std::tuple<std::chrono::year_month_day,int,float,...>` conversion read-from string OR write-to string, the default conversion format for type `std::chrono::year_month_day` is "%Y-%m-%d". If date-format "%d-%b-%Y" is needed, then read-from and write-to conversions would need different type-list as indicate in comments of code-block below. Also refer [testTupleConversions.cpp](tests/testTupleConversions.cpp) for working code.
+
+```c++
+    using t_tupleRowDD = std::tuple<std::chrono::year_month_day,  // pure data type  : 1/3
+                                    std::chrono::year_month_day>;
+    ...
+    t_tupleRowDD convTupleDD =
+          converter::ConvertFromString< converter::ConvertFromStr_toDbY,  // S2T-converter type   :   2/3
+                                        std::chrono::year_month_day  >::ToVal(rowDateStrInput);
+    std::string convTupleDD_toStr =
+          converter::ConvertFromTuple< converter::ConvertFromDbY_toStr,  // T2S-converter type    :   3/3
+                                       std::chrono::year_month_day  >::ToStr(convTupleDD);
+```
+
+Instead same conversion-list across declarations and conversion is a better approach. See code below for **recommended** approach.  (NOTE :: constexpr char dbY_fmt[] = "%d-%b-%Y";)
+
+```c++
+    using t_fmtdbY = converter::format_year_month_day<converter::dbY_fmt, converter::FailureS2Tprocess::THROW_ERROR>;
+
+    #define  TUPLE_TYPE_LIST   t_fmtdbY, std::chrono::year_month_day
+    using t_tupleRowDD = std::tuple<TUPLE_TYPE_LIST>;          //    :  same  type list  1/3
+    ...
+    t_tupleRowDD convTupleDD =
+          converter::ConvertFromString< TUPLE_TYPE_LIST >::    //    :  same  type list  2/3
+                      ToVal(rowDateStrInput);
+    std::string convTupleDD_toStr =
+          converter::ConvertFromTuple < TUPLE_TYPE_LIST >::    //    :  same  type list  3/3
+                      ToStr(convTupleDD);
+```
+
+For usage code, refer [testDateYMD_format_dbY.cpp](tests/testDateYMD_format_dbY.cpp) and [testDateYMD_format_YMD.cpp](tests/testDateYMD_format_YMD.cpp)
+
+2. Case-Insensitive String  `ci_string`
+---------------------------------------
+`ci_string` type which does a case-insentive comparision. This is based on std::basic_string<...> with a different TypeTraits then that used by `std::string`. Refer [case_insensitive_string.h](include/converter/specializedTypes/case_insensitive_string.h) and [testCIstring.cpp](tests/testCIstring.cpp).
+
+
 Architecture Components and Overview
 ====================================
 
@@ -339,28 +381,29 @@ Architecture Components and Overview
    `ConvertFromVal<T, T2S_FORMAT = T2S_DefaultFormat<T>::type>::ToStr(...)` function(s) convert `T` data-type to string. <br>
    There are several specializations of `ConvertFromStr` and `ConvertFromVal`. <br>
    Each specialization is for certain types `T` determined by _`concepts`_ and format type (`S2T_FORMAT` or `T2S_FORMAT`). <br>
-   Format types `S2T_FORMAT` and `T2S_FORMAT` (if needed), provide additional information for formatting for types(such as `Date`) or `Locale` specific info/params or precision for floating-point rypes. <br>
+   Format types `S2T_FORMAT` and `T2S_FORMAT` (if needed), provide additional information for formatting for types(such as `Date`) or `Locale` specific info/params or precision for floating-point types. <br>
    In addition if multiple conversion speicalization/algorithm is available for a particular type, the alternative specialization can be selected by passing the appropriate `S2T_FORMAT`/`T2S_FORMAT`. User could also define  their own specialization of `ConvertFromStr` or `ConvertFromVal` (NOTE: new class type of `S2T_FORMAT` or `T2S_FORMAT` will also need to be defined). <br>
 
 API Documentation
 -----------------
- - [class converter::ConvertFromStr< CH, S2T_Format_WorkAround< CH, PROCESS_ERR > >](converter_ConvertFromStr__CH.md)
- - [class converter::ConvertFromStr< T, S2T_FORMAT_STREAM >](converter_ConvertFromStr__T.md)
- - [class converter::ConvertFromStr< T, S2T_Format_std_CtoT< T, PROCESS_ERR > >](converter_ConvertFromStr__Numeric__S2T_Format_std_CtoT.md)
- - [class converter::ConvertFromStr< T, S2T_Format_std_StoT< T, PROCESS_ERR > >](converter_ConvertFromStr__Numeric__S2T_Format_std_StoT.md)
- - [class converter::ConvertFromStr< bool, S2T_Format_WorkAround< bool, PROCESS_ERR > >](converter_ConvertFromStr__bool.md)
- - [class converter::ConvertFromStr< std::chrono::year_month_day, S2T_FORMAT_YMD >](converter_ConvertFromStr__std_chrono_year_month_day.md)
- - [class converter::ConvertFromString< T_C >](converter_Tuple_helpers.md)
- - [class converter::ConvertFromTuple< T_C >](converter_Tuple_helpers.md)
- - [class converter::ConvertFromVal< CH, T2S_FORMAT_STREAM >](converter_ConvertFromVal__CH.md)
- - [class converter::ConvertFromVal< T, T2S_Format_WorkAround >](converter_ConvertFromVal__T.md)
- - [class converter::ConvertFromVal< T, T2S_Format_std_TtoC >](converter_ConvertFromVal__Numeric__T2S_Format_std_TtoC.md)
+ - [class converter::ConvertFromStr< CH, S2T_Format_WorkAround< CH, PROCESS_ERR > >](doc/converter/converter_ConvertFromStr__CH.md)
+ - [class converter::ConvertFromStr< T, S2T_FORMAT_STREAM >](doc/converter/converter_ConvertFromStr__T.md)
+ - [class converter::ConvertFromStr< T, S2T_Format_std_CtoT< T, PROCESS_ERR > >](doc/converter/converter_ConvertFromStr__Numeric__S2T_Format_std_CtoT.md)
+ - [class converter::ConvertFromStr< T, S2T_Format_std_StoT< T, PROCESS_ERR > >](doc/converter/converter_ConvertFromStr__Numeric__S2T_Format_std_StoT.md)
+ - [class converter::ConvertFromStr< bool, S2T_Format_WorkAround< bool, PROCESS_ERR > >](doc/converter/converter_ConvertFromStr__bool.md)
+ - [class converter::ConvertFromStr< std::chrono::year_month_day, S2T_FORMAT_YMD >](doc/converter/converter_ConvertFromStr__std_chrono_year_month_day.md)
+ - [class converter::ConvertFromString< T_C >](doc/converter/converter_Tuple_helpers.md)
+ - [class converter::ConvertFromTuple< T_C >](doc/converter/converter_Tuple_helpers.md)
+ - [class converter::ConvertFromVal< CH, T2S_FORMAT_STREAM >](doc/converter/converter_ConvertFromVal__CH.md)
+ - [class converter::ConvertFromVal< T, T2S_Format_WorkAround >](doc/converter/converter_ConvertFromVal__T.md)
+ - [class converter::ConvertFromVal< T, T2S_Format_std_TtoC >](doc/converter/converter_ConvertFromVal__Numeric__T2S_Format_std_TtoC.md)
  - [class converter::ConvertFromVal< T, T2S_Format_std_TtoS >](converter_ConvertFromVal__Numeric__T2S_Format_std_TtoS.md)
- - [class converter::ConvertFromVal< bool, T2S_Format_WorkAround >](converter_ConvertFromVal__bool.md)
- - [class converter::ConvertFromVal< std::chrono::year_month_day, T2S_FORMAT_YMD >](converter_ConvertFromVal__std_chrono_year_month_day.md)
- - [class converter::ConvertFromVal< std::variant< T, std::string >, T2S_FORMAT >](converter_ConvertFromVal__std_variant__T.md)
- - [class converter::t_S2Tconv< T_C >](converter_t_S2Tconv.md)
- - [class converter::t_T2Sconv< T_C >](converter_t_T2Sconv.md)
+ - [class converter::ConvertFromVal< bool, T2S_Format_WorkAround >](doc/converter/converter_ConvertFromVal__bool.md)
+ - [class converter::ConvertFromVal< std::chrono::year_month_day, T2S_FORMAT_YMD >](doc/converter/converter_ConvertFromVal__std_chrono_year_month_day.md)
+ - [class converter::format_year_month_day< dateFMT, PROCESS_ERR >](doc/converter/specializedTypes/converter__format_year_month_day.md)
+ - [class converter::ConvertFromVal< std::variant< T, std::string >, T2S_FORMAT >](doc/converter/converter_ConvertFromVal__std_variant__T.md)
+ - [class converter::t_S2Tconv< T_C >](doc/converter/converter_t_S2Tconv.md)
+ - [class converter::t_T2Sconv< T_C >](doc/converter/converter_t_T2Sconv.md)
 
 
 

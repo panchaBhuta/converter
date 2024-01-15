@@ -254,9 +254,6 @@ macro(check_clang_string_workaround)  # NOTE setters should be in 'macro' and NO
     set(USE_CLANG_STRING_WORKS_1       ${e_ENABLE_FEATURE})
     set(USE_CLANG_STRING_WORKAROUND_2  ${e_DISABLE_FEATURE})
 
-    set(USE_CLANG_CHARS_WORKS_1       ${e_ENABLE_FEATURE})
-    set(USE_CLANG_CHARS_WORKAROUND_2  ${e_DISABLE_FEATURE})
-
     if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
         try_compile(COMPILE_RESULT_CLANG_STRING_DEFAULT
                     SOURCE_FROM_FILE    check_clang_string.cpp
@@ -297,11 +294,8 @@ macro(check_clang_string_workaround)  # NOTE setters should be in 'macro' and NO
             endif()
         endif()
 
-        message(STATUS "enabling USE_CLANG_CHARS_WORKAROUND_2")
-        set(USE_CLANG_CHARS_WORKS_1       ${e_DISABLE_FEATURE})
-        set(USE_CLANG_CHARS_WORKAROUND_2  ${e_ENABLE_FEATURE})
     else()
-        message(STATUS "NON Clang compiler, default settings for USE_CLANG_STRING  and USE_CLANG_CHARS")
+        message(STATUS "NON Clang compiler, default settings for USE_CLANG_STRING_")
     endif()
 endmacro()
 

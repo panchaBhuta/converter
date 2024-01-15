@@ -165,8 +165,27 @@ namespace converter
   template<typename T>
   concept c_number_type = std::is_arithmetic_v<T> && (!is_char<T>::value);
 
+  // refer: https://stackoverflow.com/a/72451771/2299954
+  namespace _prv_impl
+  {
+    // decay_t will remove const, & and volatile from the type
+    template<typename T>
+    inline constexpr bool is_string_class_decayed = false;
+
+    template<typename... T>
+    inline constexpr bool is_string_class_decayed<std::basic_string<T...>> = true;
+  } // namespace impl
+
   template<typename T>
-  concept c_NOT_string = (!std::is_same_v<T, std::string>);
+  inline constexpr bool is_string = _prv_impl::is_string_class_decayed<std::decay_t<T>>;
+
+  template<typename T>
+  concept c_basic_string = is_string<T>;
+
+  template<typename T>
+  concept c_NOT_basic_string = !is_string<T>;
+
+
 
 
   template<typename T> struct is_variant : std::false_type {};

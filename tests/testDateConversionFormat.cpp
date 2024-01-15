@@ -42,7 +42,7 @@ int main()
                           converter::toStr_dbY( chr::year_month_day{chr::year{1980} COMMA chr::month{2} COMMA chr::day{28} } ),
                           "28-Feb-1980");
   } catch (const std::exception& ex) {
-    std::cout << "Unexpected exception in testDateConversion: " << ex.what() << std::endl;
+    std::cout << "Unexpected exception in testDateConversionFormat: " << ex.what() << std::endl;
     rv = 1;
   }
 
