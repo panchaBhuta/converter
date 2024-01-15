@@ -3,6 +3,7 @@
 
 
 #include <iostream>
+#include <sstream>
 
 #include <converter/converter.h>
 #include <converter/specializedTypes/date.h>
@@ -115,8 +116,9 @@ int main()
     unittest::ExpectEqual(t_fmtYMD,    chkD1,         chkD3);
 
     unittest::ExpectTrue(chkD1 == chkD2);
+#if  USE_THREE_WAY_COMPARISON  ==   e_ENABLE_FEATURE
     unittest::ExpectTrue((chkD1 <=> chkD2) == 0);
-
+#endif
 
   } catch (const std::exception& ex) {
     std::cout << "Unexpected exception in testDateYMD_format_YMD: " << ex.what() << std::endl;

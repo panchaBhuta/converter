@@ -116,7 +116,9 @@ int main()
     unittest::ExpectEqual(t_fmtdbY,    chkD1,         chkD3);
 
     unittest::ExpectTrue(chkD1 == chkD2);
+#if  USE_THREE_WAY_COMPARISON  ==   e_ENABLE_FEATURE
     unittest::ExpectTrue((chkD1 <=> chkD2) == 0);
+#endif
 
 
   } catch (const std::exception& ex) {

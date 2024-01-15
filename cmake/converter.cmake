@@ -237,6 +237,7 @@ macro(check_chrono_stream_functionality)
             message(STATUS "Using jugaad : This is an adhoc implementation, handling few of the date-conversion formats.")
         endif()
     endif()
+
     #[==[   uncomment for testing purpose
                 set(USE_CHRONO_FROMSTREAM_1 ${e_DISABLE_FEATURE})
                 set(USE_DATE_FROMSTREAM_2   ${e_DISABLE_FEATURE})
@@ -245,6 +246,7 @@ macro(check_chrono_stream_functionality)
                 set(USE_DATE_TOSTREAM_2   ${e_DISABLE_FEATURE})
                 set(USE_JUGAAD_TOSTREAM_3 ${e_ENABLE_FEATURE})
     #]==]
+
 endmacro()
 
 
@@ -346,6 +348,29 @@ macro(check_floatingPoint_elementaryStringConversions)
     #]===]
 endmacro()
 
+macro(check_three_way_comparison)
+    try_compile(COMPILE_RESULT_THREE_WAY_COMPARISON
+                SOURCE_FROM_FILE    testDateYMD_format_dbY.cpp
+                                    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/check_three_way_comparison.cpp"
+                CMAKE_FLAGS "$<${linux_host_with_gcc_like_cxx}:--std=gnu++2a>"
+                CMAKE_FLAGS "$<${linux_host_with_gcc_cxx}:-fconcepts>"
+                #CMAKE_FLAGS  "--std=gnu++2a -fconcepts"
+                CXX_STANDARD "${CMAKE_CXX_STANDARD}"
+                CXX_STANDARD_REQUIRED True)
+
+    if(COMPILE_RESULT_THREE_WAY_COMPARISON)
+        message(STATUS "THREE-WAY COMPARISON supported")
+        set(USE_THREE_WAY_COMPARISON ${e_ENABLE_FEATURE})
+    else()
+        # AppleClang-14 doesnot support "<=>" operator
+        message(STATUS "THREE-WAY COMPARISON  NOT  supported !!!")
+        set(USE_THREE_WAY_COMPARISON ${e_DISABLE_FEATURE})
+    endif()
+    #[===[  for testing purpose
+        set(USE_THREE_WAY_COMPARISON ${e_ENABLE_FEATURE})
+    #]===]
+endmacro()
+
 #[===========[
   Check if compiler supports '-fmacro-prefix-map=old=new'  option
   refer ::: https://fossies.org/linux/bareos/core/CMakeLists.txt
@@ -363,8 +388,8 @@ macro(converter_check_cxx_compiler_flag_file_prefix_map)
                            )
     if(cxx_compiler_file_prefix_map)
         message(STATUS "converter : compiler option '-ffile-prefix-map=old=new' SUPPORTED")
-        target_compile_definitions(converter INTERFACE
-                                        CONVERTER_USE_FILEPREFIXMAP=1)
+        target_compile_definitions( converter INTERFACE
+                                    CONVERTER_USE_FILEPREFIXMAP=1)
 
         target_compile_options(converter INTERFACE
             "-ffile-prefix-map=${CMAKE_CURRENT_SOURCE_DIR}${_path_separator}=")
@@ -372,10 +397,10 @@ macro(converter_check_cxx_compiler_flag_file_prefix_map)
         # as of writing this code, clang does not support option '-ffile-prefix-map=...'
         message(STATUS "converter : compiler option '-ffile-prefix-map=old=new' NOT SUPPORTED")
         string(LENGTH "${CMAKE_CURRENT_SOURCE_DIR}/" CONVERTER_SOURCE_PATH_SIZE)
-        target_compile_definitions(converter INTERFACE
-                                        CONVERTER_USE_FILEPREFIXMAP=0
+        target_compile_definitions( converter INTERFACE
+                                    CONVERTER_USE_FILEPREFIXMAP=0
         # https://stackoverflow.com/questions/8487986/file-macro-shows-full-path/40947954#40947954
-                                        CONVERTER_SOURCE_PATH_SIZE=${CONVERTER_SOURCE_PATH_SIZE})
+                                    CONVERTER_SOURCE_PATH_SIZE=${CONVERTER_SOURCE_PATH_SIZE})
     endif()
 endmacro()
 

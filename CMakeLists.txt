@@ -87,6 +87,7 @@ add_library(converter::converter ALIAS converter)
 check_chrono_stream_functionality()
 check_clang_string_workaround()
 check_floatingPoint_elementaryStringConversions()
+check_three_way_comparison()
 
 #if (CONVERTER_STANDALONE_PROJECT)
     converter_check_cxx_compiler_flag_file_prefix_map()

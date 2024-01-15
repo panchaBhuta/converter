@@ -63,3 +63,10 @@
  */
 #cmakedefine01  USE_FLOATINGPOINT_FROM_CHARS_1
 #cmakedefine01  USE_FLOATINGPOINT_TO_CHARS_1
+
+
+/*
+ *   AppleClang-14 doesnot support "<=>" operator.
+ *   This doesn't effect the converter lib. The macro is used to toggle unit-tests.
+ */
+#cmakedefine01  USE_THREE_WAY_COMPARISON
