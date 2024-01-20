@@ -17,7 +17,7 @@ constexpr chr::year_month_day (*To_dmY)(const std::string& str) =
                                                 converter::S2T_Format_StreamYMD< dmY_fmt >
                                               >::ToVal;
 
-constexpr std::string (*From_dmY)(const chr::year_month_day& str) =
+constexpr std::string (*From_dmY)(const chr::year_month_day& val) =
                     &converter::ConvertFromVal< chr::year_month_day,
                                                 converter::T2S_Format_StreamYMD< dmY_fmt >
                                               >::ToStr;

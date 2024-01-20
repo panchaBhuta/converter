@@ -204,7 +204,7 @@ int main()
   checkConversionFunctionInstance<double,fp_S2T_uid,fp_T2S_uid>();   // (103 | 3) , (-103 | -1)
   checkConversionFunctionInstance<long double,fp_S2T_uid,fp_T2S_uid>();  // (103 | 3) , (-103 | -1)
   checkConversionFunctionInstance<std::string,4>();
-      checkConversionFunctionInstance<ci_string,14>();
+      checkConversionFunctionInstance<converter::ci_string,14>();
   checkConversionFunctionInstance<char,5>();
   checkConversionFunctionInstance<signed char,5>();
   checkConversionFunctionInstance<unsigned char,5>();

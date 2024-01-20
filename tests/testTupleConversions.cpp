@@ -122,13 +122,13 @@ int main()
 #endif
 
 
-    std::tuple<std::string, ci_string, std::string>
+    std::tuple<std::string, converter::ci_string, std::string>
       chkStrTuple { "PRIVATE", "limited", "CoMpAnY"};
 
     std::vector<std::string> inputStrVector {"PRIVATE", "limited", "CoMpAnY"};
-    conversionStringEqualCheck<std::string, ci_string, std::string>
+    conversionStringEqualCheck<std::string, converter::ci_string, std::string>
         ("PRIVATE,limited,CoMpAnY", chkStrTuple);
-    conversionVectorEqualCheck<std::string, ci_string, std::string>
+    conversionVectorEqualCheck<std::string, converter::ci_string, std::string>
         (inputStrVector, chkStrTuple);
 
 

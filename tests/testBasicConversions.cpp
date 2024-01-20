@@ -78,13 +78,13 @@ int main()
                     ),
             "2023-08-15");
 
-    ci_string    caps{"SHIV SHANKAR"};
-    ci_string    lowr{"shiv shankar"};
+    converter::ci_string    caps{"SHIV SHANKAR"};
+    converter::ci_string    lowr{"shiv shankar"};
     unittest::ExpectTrue(caps.compare(lowr) == 0);
-    unittest::ExpectEqual(std::string, converter::ConvertFromVal<ci_string>::ToStr(caps), "SHIV SHANKAR");
-    unittest::ExpectEqual(std::string, converter::ConvertFromVal<ci_string>::ToStr(lowr), "shiv shankar");
-    unittest::ExpectEqual(ci_string, converter::ConvertFromStr<ci_string>::ToVal("SHIV SHANKAR"), caps);
-    unittest::ExpectEqual(ci_string, converter::ConvertFromStr<ci_string>::ToVal("shiv shankar"), lowr);
+    unittest::ExpectEqual(std::string, converter::ConvertFromVal<converter::ci_string>::ToStr(caps), "SHIV SHANKAR");
+    unittest::ExpectEqual(std::string, converter::ConvertFromVal<converter::ci_string>::ToStr(lowr), "shiv shankar");
+    unittest::ExpectEqual(converter::ci_string, converter::ConvertFromStr<converter::ci_string>::ToVal("SHIV SHANKAR"), caps);
+    unittest::ExpectEqual(converter::ci_string, converter::ConvertFromStr<converter::ci_string>::ToVal("shiv shankar"), lowr);
 
     /**
      * NOTE : Before adding conversion tests here, check tests for template-instantiation in

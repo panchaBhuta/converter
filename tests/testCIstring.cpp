@@ -22,23 +22,23 @@ int main()
 {
   int rv = 0;
   try {
-    ci_string    cistr{"+ci_string"};
+    converter::ci_string    cistr{"+ci_string"};
     std::string  str{"+string"};
 
     std::string  str_cistr = str + cistr;
     unittest::ExpectEqual(std::string, str_cistr, "+string+ci_string");
 
-    ci_string    cistr_str = cistr + str;
-    unittest::ExpectEqual(ci_string, cistr_str, "+ci_string+string");
+    converter::ci_string    cistr_str = cistr + str;
+    unittest::ExpectEqual(converter::ci_string, cistr_str, "+ci_string+string");
 
 
 
-    ci_string    cistr2{"ci_string"};
+    converter::ci_string    cistr2{"ci_string"};
     cistr2 += std::string{"+=string"};
-    unittest::ExpectEqual(ci_string, cistr2, "ci_string+=string");
+    unittest::ExpectEqual(converter::ci_string, cistr2, "ci_string+=string");
 
     std::string  str3{"string"};
-    str3 += ci_string{"+=ci_string"};
+    str3 += converter::ci_string{"+=ci_string"};
     unittest::ExpectEqual(std::string, str3, "string+=ci_string");
 
   } catch (const std::exception& ex) {
