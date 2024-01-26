@@ -39,7 +39,20 @@
 namespace converter
 {
   // [=============================================================[ COMMON_FORMAT
-  constexpr char defYMDfmt[] = "%F";  // string literal object with static storage duration
+
+  /*
+   *  IMPORTANT : constexpr char[] should be inline . Else only constexpr refers to char*
+   *  (i.e pointer address instead of the underlying value) to an internal linkage for EVERY translation unit.
+   *
+   *  compilation fails with message "has a field  whose type uses the anonymous namespace [-Wsubobject-linkage]"
+   *
+   *  https://stackoverflow.com/questions/72801432/why-do-i-get-the-child-has-a-base-whose-type-uses-the-anonymous-namespace-warn
+   *
+   *  "inline implies external linkage (even if the variable is const)"
+   */
+  inline constexpr char defYMDfmt[] = "%F";  // string literal object with static storage duration; inline implies external linkage
+
+
   template<c_iostream IOSS, const char* _ymdFormat = defYMDfmt> // %F -> "%Y-%m-%d"
   struct Format_StreamYMD
   {
@@ -645,7 +658,7 @@ namespace converter
 
 
   // [=============================================================[ Helpers
-  constexpr char dbY_fmt[] = "%d-%b-%Y";  // string literal object with static storage duration
+  inline constexpr char dbY_fmt[] = "%d-%b-%Y";  // string literal object with static storage duration; inline implies external linkage
 
   using ConvertFromDbY_toStr = ConvertFromVal< std::chrono::year_month_day,
                                                T2S_Format_StreamYMD< dbY_fmt >

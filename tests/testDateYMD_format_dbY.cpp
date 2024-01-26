@@ -52,22 +52,22 @@ int main()
                            std::chrono::month(2),
                            std::chrono::day(29) );  // NOT leap year (every 100 years)
     // The below checks are to ascertain that 'std::chrono::*' behavior is same across different OS's
-    unittest::ExpectEqual(bool, invalidDate1.ok(), false);
-    unittest::ExpectEqual(bool, invalidDate1.year().ok(), true);
-    unittest::ExpectEqual(bool, invalidDate1.month().ok(), true);
-    unittest::ExpectEqual(bool, invalidDate1.day().ok(), true);
-    unittest::ExpectEqual(int, int(invalidDate1.year()), 1900);
-    unittest::ExpectEqual(unsigned, unsigned(invalidDate1.month()), 2);
-    unittest::ExpectEqual(unsigned, unsigned(invalidDate1.day()), 29);
+    unittest::ExpectEqual(bool, invalidDate1.getYMD().ok(), false);
+    unittest::ExpectEqual(bool, invalidDate1.getYMD().year().ok(), true);
+    unittest::ExpectEqual(bool, invalidDate1.getYMD().month().ok(), true);
+    unittest::ExpectEqual(bool, invalidDate1.getYMD().day().ok(), true);
+    unittest::ExpectEqual(int, int(invalidDate1.getYMD().year()), 1900);
+    unittest::ExpectEqual(unsigned, unsigned(invalidDate1.getYMD().month()), 2);
+    unittest::ExpectEqual(unsigned, unsigned(invalidDate1.getYMD().day()), 29);
     t_fmtdbY invalidConversionDate1 =
                 converter::ConvertFromStr<t_fmtdbY>::ToVal("29-Feb-1900");
-    unittest::ExpectEqual(bool, invalidConversionDate1.ok(), false);
-    unittest::ExpectEqual(bool, invalidConversionDate1.year().ok(), true);
-    unittest::ExpectEqual(bool, invalidConversionDate1.month().ok(), true);
-    unittest::ExpectEqual(bool, invalidConversionDate1.day().ok(), true);
-    unittest::ExpectEqual(int, int(invalidConversionDate1.year()), 1900);
-    unittest::ExpectEqual(unsigned, unsigned(invalidConversionDate1.month()), 2);
-    unittest::ExpectEqual(unsigned, unsigned(invalidConversionDate1.day()), 29);
+    unittest::ExpectEqual(bool, invalidConversionDate1.getYMD().ok(), false);
+    unittest::ExpectEqual(bool, invalidConversionDate1.getYMD().year().ok(), true);
+    unittest::ExpectEqual(bool, invalidConversionDate1.getYMD().month().ok(), true);
+    unittest::ExpectEqual(bool, invalidConversionDate1.getYMD().day().ok(), true);
+    unittest::ExpectEqual(int, int(invalidConversionDate1.getYMD().year()), 1900);
+    unittest::ExpectEqual(unsigned, unsigned(invalidConversionDate1.getYMD().month()), 2);
+    unittest::ExpectEqual(unsigned, unsigned(invalidConversionDate1.getYMD().day()), 29);
     unittest::ExpectEqual(std::string,
                           converter::ConvertFromVal<t_fmtdbY>::ToStr(invalidDate1),
                           "29-Feb-1900");  // NOT leap year (every 100 years)
@@ -78,22 +78,22 @@ int main()
                            std::chrono::month(1),
                            std::chrono::day(32) );  // invalid date
     // The below checks are to ascertain that 'std::chrono::*' behavior is same across different OS's
-    unittest::ExpectEqual(bool, invalidDate2.ok(), false);
-    unittest::ExpectEqual(bool, invalidDate2.year().ok(), true);
-    unittest::ExpectEqual(bool, invalidDate2.month().ok(), true);
-    unittest::ExpectEqual(bool, invalidDate2.day().ok(), false);  // is False 32
-    unittest::ExpectEqual(int, int(invalidDate2.year()), 2023);
-    unittest::ExpectEqual(unsigned, unsigned(invalidDate2.month()), 1);
-    unittest::ExpectEqual(unsigned, unsigned(invalidDate2.day()), 32);
+    unittest::ExpectEqual(bool, invalidDate2.getYMD().ok(), false);
+    unittest::ExpectEqual(bool, invalidDate2.getYMD().year().ok(), true);
+    unittest::ExpectEqual(bool, invalidDate2.getYMD().month().ok(), true);
+    unittest::ExpectEqual(bool, invalidDate2.getYMD().day().ok(), false);  // is False 32
+    unittest::ExpectEqual(int, int(invalidDate2.getYMD().year()), 2023);
+    unittest::ExpectEqual(unsigned, unsigned(invalidDate2.getYMD().month()), 1);
+    unittest::ExpectEqual(unsigned, unsigned(invalidDate2.getYMD().day()), 32);
     t_fmtdbY invalidConversionDate2 =
                 converter::ConvertFromStr<t_fmtdbY>::ToVal("32-Jan-2023");
-    unittest::ExpectEqual(bool, invalidConversionDate2.ok(), false);
-    unittest::ExpectEqual(bool, invalidConversionDate2.year().ok(), true);
-    unittest::ExpectEqual(bool, invalidConversionDate2.month().ok(), true);
-    unittest::ExpectEqual(bool, invalidConversionDate2.day().ok(), false); // is False 32
-    unittest::ExpectEqual(int, int(invalidConversionDate2.year()), 2023);
-    unittest::ExpectEqual(unsigned, unsigned(invalidConversionDate2.month()), 1);
-    unittest::ExpectEqual(unsigned, unsigned(invalidConversionDate2.day()), 32);
+    unittest::ExpectEqual(bool, invalidConversionDate2.getYMD().ok(), false);
+    unittest::ExpectEqual(bool, invalidConversionDate2.getYMD().year().ok(), true);
+    unittest::ExpectEqual(bool, invalidConversionDate2.getYMD().month().ok(), true);
+    unittest::ExpectEqual(bool, invalidConversionDate2.getYMD().day().ok(), false); // is False 32
+    unittest::ExpectEqual(int, int(invalidConversionDate2.getYMD().year()), 2023);
+    unittest::ExpectEqual(unsigned, unsigned(invalidConversionDate2.getYMD().month()), 1);
+    unittest::ExpectEqual(unsigned, unsigned(invalidConversionDate2.getYMD().day()), 32);
     unittest::ExpectEqual(std::string,
                           converter::ConvertFromVal<t_fmtdbY>::ToStr(invalidDate2),
                           "32-Jan-2023");  // NOT leap year (every 100 years)

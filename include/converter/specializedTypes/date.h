@@ -18,15 +18,17 @@
 
 #include <converter/converter.h>
 
-
-namespace converter
-{
+namespace converter {
+/*
   template <typename T>
   concept c_is_base_of_ymd_inclusive = std::is_base_of_v<std::chrono::year_month_day, T>;
 
   template <typename T>
   concept c_is_base_of_ymd_exclusive = std::is_base_of_v<std::chrono::year_month_day, T> &&
                                        (!std::is_same_v <std::chrono::year_month_day, T>);
+*/
+
+  //using indirect_ymd = std::chrono::year_month_day;  for testing purpose
 
   // [=====================================[    format_year_month_day
   /**
@@ -34,25 +36,64 @@ namespace converter
    */
   template < const char* dateFMT, // %F -> "%Y-%m-%d"
              FailureS2Tprocess PROCESS_ERR >
-  struct format_year_month_day : public std::chrono::year_month_day
+  struct format_year_month_day
   {
     constexpr static const char* formatYMD = dateFMT;
     constexpr static const FailureS2Tprocess errProcessing = PROCESS_ERR ;
 
-    /**
-     * @brief   Constructor
-     * @tparam  ...Args               Type list of constructor arguments.
-     * @param   ...args               constructor arguments as required for underlying base class `std::chrono::year_month_day`.
-     */
-    template<typename... Args>
-    format_year_month_day(Args&&... args) :
-        std::chrono::year_month_day(std::forward<Args>(args)...) {}
+    constexpr format_year_month_day() : _ymd() {}
+    constexpr format_year_month_day( const std::chrono::year& y,
+                                     const std::chrono::month& m,
+                                     const std::chrono::day& d) noexcept
+        : _ymd(y, m, d) {}
 
-          std::chrono::year_month_day& getYMD()       { return (*this); }
-    const std::chrono::year_month_day& getYMD() const { return (*this); }
+    constexpr format_year_month_day( const std::chrono::year_month_day_last& ymdl) noexcept
+        : _ymd(ymdl) {}
 
-    std::string toStr() const;
-    void fromStr(const std::string& dateStr);
+    constexpr format_year_month_day( const std::chrono::sys_days& dp) noexcept
+        : _ymd(dp) {}
+
+    constexpr format_year_month_day( const std::chrono::local_days& dp) noexcept
+        : _ymd(dp) {}
+
+    constexpr format_year_month_day( const format_year_month_day& dp) noexcept
+        : _ymd(dp._ymd) {}
+
+    constexpr format_year_month_day( const std::chrono::year_month_day& ymd) noexcept
+        : _ymd(ymd) {}
+
+    //format_year_month_day() = default;
+    //format_year_month_day& operator=(format_year_month_day const&) = default;
+    inline format_year_month_day& operator=( const format_year_month_day& other)
+    {
+      _ymd = other._ymd;
+      return *this;
+    }
+    //inline bool operator==(format_year_month_day const& other) const = default;
+    inline constexpr bool operator==( const format_year_month_day& other) const noexcept { return _ymd == other._ymd; }
+
+    inline format_year_month_day& operator=( const std::chrono::year_month_day& ymd)
+    {
+      _ymd = ymd;
+      return *this;
+    }
+    inline constexpr bool operator==( const std::chrono::year_month_day& ymd) const noexcept { return _ymd == ymd; }
+
+    inline constexpr std::strong_ordering operator<=>( const format_year_month_day& other) const noexcept { return this->_ymd <=> other._ymd; }
+    inline constexpr std::strong_ordering operator<=>( const std::chrono::year_month_day& ymd) const noexcept { return _ymd <=> ymd; }
+
+    //      std::chrono::year_month_day& getYMD()       { return (*this); }
+    //const std::chrono::year_month_day& getYMD() const { return (*this); }
+    inline       std::chrono::year_month_day& getYMD()       { return _ymd; }
+    inline const std::chrono::year_month_day& getYMD() const { return _ymd; }
+
+    inline std::string toStr() const;
+    inline void fromStr(const std::string& dateStr);
+
+    /*virtual*/ ~format_year_month_day() {} // warning: base class ‘class std::chrono::year_month_day’ has accessible non-virtual destructor [-Wnon-virtual-dtor]
+
+  private:
+    std::chrono::year_month_day _ymd;
   };
   // ]=====================================]    format_year_month_day
 
@@ -150,7 +191,7 @@ namespace converter
     ToStr(  const format_year_month_day<dateFMT,PROCESS_ERR>& val)
     {
       return ConvertFromVal<  std::chrono::year_month_day,
-                              T2S_Format_StreamYMD< dateFMT > >::ToStr( val); // %F -> "%Y-%m-%d"
+                              T2S_Format_StreamYMD< dateFMT > >::ToStr( val.getYMD() ); // %F -> "%Y-%m-%d"
     }
   };
   // ]=============================================================] ConvertFromVal
@@ -173,10 +214,10 @@ namespace converter
              FailureS2Tprocess PROCESS_ERR >
   void format_year_month_day<dateFMT,PROCESS_ERR>::fromStr(const std::string& dateStr)
   {
-    (*this) =
+    _ymd =
     ConvertFromStr< format_year_month_day<dateFMT,PROCESS_ERR>,
                     S2T_Format_StreamFormatYMD <dateFMT,PROCESS_ERR>
-                  >::ToVal(dateStr);
+                  >::ToVal(dateStr).getYMD();
   }
 
   template< class CharT, class Traits,

@@ -44,71 +44,104 @@ namespace converter {
   };
 
   using ci_string  =  std::basic_string<char, ci_char_traits, std::string::allocator_type>;
-}
 
-std::ostream& operator<<(std::ostream& os, const converter::ci_string& cistr)
-{
-  os << cistr.c_str();
-  return os;
-}
-std::istream& operator>>(std::istream& is, converter::ci_string& cistr)
-{
-  std::string read;
-  is >> read;
-  cistr = read.c_str();
-  return is;
-}
+  template<typename Traits>
+  concept c_NOT_ci_char_traits = !std::is_same_v<ci_char_traits, Traits>;
 
-
-/*
-template<
-    class CharT,
-    class Traits = std::char_traits<CharT>,
-    class Allocator = std::allocator<CharT>
->
-template<>
-//std::string& std::string::operator=(const ci_string& cistr)
-std::basic_string<CharT, Traits, Allocator>&
-std::basic_string<CharT, Traits, Allocator>::operator=<ci_string>(const ci_string& cistr)
-{
-  (*this) = cistr.c_str();
-  return (*this);
-}
-
-template<>
-template<
-  class CharT,
-  class Traits = std::char_traits<CharT>,
-  class Allocator = std::allocator<CharT>
->
-ci_string& ci_string::operator=<std::basic_string<CharT, Traits, Allocator>>(const std::basic_string<CharT, Traits, Allocator>& str)
-{
-  (*this) = str.c_str();
-  return (*this);
-}
-*/
+  /*
+   *  https://stackoverflow.com/questions/5195512/namespaces-and-operator-resolution
+   *  refer URL^  for   "Namespaces and operator resolution"  for eg: 'operator<<'
+  */
+  template<typename CharT, c_NOT_ci_char_traits Traits, typename Allocator>
+  inline std::basic_ostream<CharT, Traits>&
+  operator<<( std::basic_ostream<CharT, Traits>& os,
+              const std::basic_string<CharT, converter::ci_char_traits, Allocator>& cistr)
+  {
+    return (os << cistr.c_str());
+  }
+  template<typename CharT, c_NOT_ci_char_traits Traits, typename Allocator>
+  inline std::basic_istream<CharT, Traits>&
+  operator>>( std::basic_istream<CharT, Traits>& is,
+              const std::basic_string<CharT, converter::ci_char_traits, Allocator>& cistr)
+  {
+    std::string read;
+    is >> read;
+    cistr = read.c_str();
+    return is;
+  }
 
 
-std::string operator+(const std::string& str, const converter::ci_string& cistr)
-{
-  return str + cistr.c_str();
-}
-converter::ci_string operator+(const converter::ci_string& cistr, const std::string& str)
-{
-  converter::ci_string plus = cistr;
-  plus += str.c_str();
-  return plus;
-}
+  template<typename CharT, c_NOT_ci_char_traits Traits, typename Allocator>
+  inline std::basic_string<CharT, Traits, Allocator>
+  operator+ ( const std::basic_string<CharT, Traits,         Allocator>& str,
+              const std::basic_string<CharT, ci_char_traits, Allocator>& cistr)
+  {
+    return str + cistr.c_str();
+  }
+  template<typename CharT, c_NOT_ci_char_traits Traits, typename Allocator>
+  inline std::basic_string<CharT, ci_char_traits, Allocator>
+  operator+ ( const std::basic_string<CharT, ci_char_traits, Allocator>& cistr,
+              const std::basic_string<CharT, Traits,         Allocator>& str)
+  {
+    std::basic_string<CharT, ci_char_traits, Allocator> plus = cistr;
+    plus += str.c_str();
+    return plus;
+  }
 
-std::string& operator+=(std::string& str, const converter::ci_string& cistr)
-{
-  str += cistr.c_str();
-  return str;
-}
-converter::ci_string& operator+=(converter::ci_string& cistr, const std::string& str)
-{
-  cistr += str.c_str();
-  return cistr;
+
+  template<typename CharT, c_NOT_ci_char_traits Traits, typename Allocator>
+  inline std::basic_string<CharT, Traits, Allocator>&
+  operator+=(       std::basic_string<CharT, Traits,         Allocator>& str,
+              const std::basic_string<CharT, ci_char_traits, Allocator>& cistr)
+  {
+    str += cistr.c_str();
+    return str;
+  }
+  template<typename CharT, c_NOT_ci_char_traits Traits, typename Allocator>
+  inline std::basic_string<CharT, ci_char_traits, Allocator>&
+  operator+=(       std::basic_string<CharT, ci_char_traits, Allocator>& cistr,
+              const std::basic_string<CharT, Traits,         Allocator>& str)
+  {
+    cistr += str.c_str();
+    return cistr;
+  }
+
+
+  template<typename CharT, c_NOT_ci_char_traits Traits, typename Allocator>
+  inline auto
+  operator==( const std::basic_string<CharT, Traits,         Allocator>& str,
+              const std::basic_string<CharT, ci_char_traits, Allocator>& cistr)
+  {
+    std::basic_string<CharT, ci_char_traits, Allocator> chk = str;
+    return chk == cistr;
+  }
+  template<typename CharT, c_NOT_ci_char_traits Traits, typename Allocator>
+  inline auto
+  operator==( const std::basic_string<CharT, ci_char_traits, Allocator>& cistr,
+              const std::basic_string<CharT, Traits,         Allocator>& str)
+  {
+    std::basic_string<CharT, ci_char_traits, Allocator> chk = str;
+    return cistr == chk;
+  }
+
+
+  template<typename CharT, c_NOT_ci_char_traits Traits, typename Allocator>
+  inline auto
+  operator<=>( const std::basic_string<CharT, Traits,         Allocator>& str,
+               const std::basic_string<CharT, ci_char_traits, Allocator>& cistr)
+  {
+    std::basic_string<CharT, ci_char_traits, Allocator> chk = str;
+    return chk <=> cistr;
+  }
+  template<typename CharT, c_NOT_ci_char_traits Traits, typename Allocator>
+  inline auto
+  operator<=>( const std::basic_string<CharT, ci_char_traits, Allocator>& cistr,
+               const std::basic_string<CharT, Traits,         Allocator>& str)
+  {
+    std::basic_string<CharT, ci_char_traits, Allocator> chk = str;
+    return cistr <=> chk;
+  }
+
 }
 
 
