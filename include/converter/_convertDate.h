@@ -49,6 +49,9 @@ namespace converter
    *  https://stackoverflow.com/questions/72801432/why-do-i-get-the-child-has-a-base-whose-type-uses-the-anonymous-namespace-warn
    *
    *  "inline implies external linkage (even if the variable is const)"
+   *
+   *  For more details on anonymous namespace , refer ::
+   * https://comp.lang.cpp.moderated.narkive.com/kbqPsoZR/warning-has-a-field-whose-type-uses-the-anonymous-namespace
    */
   inline constexpr char defYMDfmt[] = "%F";  // string literal object with static storage duration; inline implies external linkage
 
@@ -163,10 +166,17 @@ namespace converter
   #elif USE_DATE_FROMSTREAM_2  ==  e_ENABLE_FEATURE
       namespace _dateLib = date;
       const std::string dateClass = "date::year_month_day";
+      /*
+      date::year_month_day valDate{ date::year(int(val.year())),
+                                    date::month(unsigned(val.month())),
+                                    date::day(unsigned(val.day())) };
+      */
   #endif
       CONVERTER_DEBUG_LOG(dateClass << " for string2date input : str=" << str);
 
-      _dateLib::year_month_day ymd;
+      _dateLib::year_month_day ymd{ _dateLib::year(0),
+                                    _dateLib::month(0),
+                                    _dateLib::day(0) };
       std::istringstream iss(str);
       S2T_FORMAT_YMD::streamUpdate(iss);
       _dateLib::from_stream(iss, fmt, ymd, abbrev, offset);
@@ -234,7 +244,7 @@ namespace converter
             } else {
               std::istringstream issY(token);
               S2T_FORMAT_YMD::streamUpdate(issY);
-              date::year year;
+              date::year year(0);
               date::from_stream(issY, fmtToken.c_str(), year);
               iY = int(year);
             }
@@ -249,7 +259,7 @@ namespace converter
             } else {
               std::istringstream issM(token);
               S2T_FORMAT_YMD::streamUpdate(issM);
-              date::month month;
+              date::month month(0);
               date::from_stream(issM, fmtToken.c_str(), month);
               iM = unsigned(month);
             }
@@ -264,7 +274,7 @@ namespace converter
             } else {
               std::istringstream issD(token);
               S2T_FORMAT_YMD::streamUpdate(issD);
-              date::day day;
+              date::day day(0);
               date::from_stream(issD, fmtToken.c_str(), day);
               iD = unsigned(day);
             }
@@ -673,5 +683,21 @@ namespace converter
 
   constexpr std::chrono::year_month_day (*fromStr_dbY)(const std::string& str) = &ConvertFromStr_toDbY::ToVal;
 
+
+
+  inline constexpr char dmY_fmt[] = "%d-%m-%Y";  // string literal object with static storage duration; inline implies external linkage
+
+  using ConvertFromDmY_toStr = ConvertFromVal< std::chrono::year_month_day,
+                                               T2S_Format_StreamYMD< dmY_fmt >
+                                             >;
+
+  constexpr std::string (*toStr_dmY)(const std::chrono::year_month_day& val) = &ConvertFromDmY_toStr::ToStr;
+
+
+  using ConvertFromStr_toDmY = ConvertFromStr< std::chrono::year_month_day,
+                                               S2T_Format_StreamYMD< dmY_fmt >
+                                             >;
+
+  constexpr std::chrono::year_month_day (*fromStr_dmY)(const std::string& str) = &ConvertFromStr_toDmY::ToVal;
   // ]=============================================================] Helpers
 }
