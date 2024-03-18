@@ -15,12 +15,10 @@
 */
 
 // https://web.archive.org/web/20191012035921/http://nadeausoftware.com/articles/2012/01/c_c_tip_how_use_compiler_predefined_macros_detect_operating_system
-/*
 #if defined(WIN64) || defined(_WIN64) || defined(__WIN64) || defined(__WIN64__)
   #define  TEMPLATE_UID  103
   const unsigned indexOS = 2;
 #elif defined(__APPLE__) && defined(__MACH__)
-*/
   #if USE_FLOATINGPOINT_FROM_CHARS_1  ==  e_ENABLE_FEATURE && USE_FLOATINGPOINT_TO_CHARS_1  ==  e_ENABLE_FEATURE
     // when compiler is GNU.
     #define  TEMPLATE_UID  103
@@ -36,12 +34,10 @@
     #define  TEMPLATE_UID  3
     const unsigned indexOS = 1;
   #endif
-/*
 #else  // ubuntu and other OS's
   #define  TEMPLATE_UID  103
   const unsigned indexOS = 0;
 #endif
-*/
 
 #if TEMPLATE_UID == 103
   template<converter::c_floating_point T>

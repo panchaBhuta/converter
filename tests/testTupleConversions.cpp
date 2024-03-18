@@ -69,7 +69,7 @@ void conversionStringEqualCheck(const std::string& rowStrInput, const std::tuple
   }
 }
 
-//#if defined(__APPLE__) && defined(__MACH__)
+#if defined(__APPLE__) && defined(__MACH__)
   #if USE_FLOATINGPOINT_FROM_CHARS_1  ==  e_ENABLE_FEATURE && USE_FLOATINGPOINT_TO_CHARS_1  ==  e_ENABLE_FEATURE
     // when compiler is GNU.
     #define FLOATINGPOINT_DISTORT 0
@@ -83,11 +83,9 @@ void conversionStringEqualCheck(const std::string& rowStrInput, const std::tuple
         // induces variations in results when compared to other OS's.
     #define FLOATINGPOINT_DISTORT 1
   #endif
-/*
 #else
   #define FLOATINGPOINT_DISTORT 0
 #endif
-*/
 
 
 using t_fmtdbY = converter::format_year_month_day<converter::dbY_fmt, converter::FailureS2Tprocess::THROW_ERROR>;
