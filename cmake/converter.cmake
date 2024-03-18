@@ -317,10 +317,8 @@ macro(check_floatingPoint_elementaryStringConversions)
 
     if(COMPILE_FLOATINGPOINT_FROM_CHARS)
         message(STATUS "check_floatingPoint_fromChars ::  ++SUCCESS++")
-        set(USE_FLOATINGPOINT_FROM_CHARS_1   ${e_ENABLE_FEATURE})
     else()
-        message(STATUS "check_floatingPoint_fromChars ::  --FAILED--   workaround-enabled")
-        set(USE_FLOATINGPOINT_FROM_CHARS_1   ${e_DISABLE_FEATURE})
+        message(STATUS "check_floatingPoint_fromChars ::  --FAILED--")
     endif()
 
 
@@ -337,9 +335,19 @@ macro(check_floatingPoint_elementaryStringConversions)
 
     if(COMPILE_FLOATINGPOINT_TO_CHARS)
         message(STATUS "check_floatingPoint_toChars ::  ++SUCCESS++")
+    else()
+        message(STATUS "check_floatingPoint_toChars ::  --FAILED--")
+    endif()
+
+    if(COMPILE_FLOATINGPOINT_FROM_CHARS AND COMPILE_FLOATINGPOINT_TO_CHARS)
+        message(STATUS "floatingPoint_fromChars algo ::  workaround-enabled")
+        message(STATUS "floatingPoint_toChars algo ::  workaround-enabled")
+        set(USE_FLOATINGPOINT_FROM_CHARS_1   ${e_ENABLE_FEATURE})
         set(USE_FLOATINGPOINT_TO_CHARS_1   ${e_ENABLE_FEATURE})
     else()
-        message(STATUS "check_floatingPoint_toChars ::  --FAILED--   workaround-enabled")
+        message(STATUS "floatingPoint_fromChars algo ::  workaround-enabled")
+        message(STATUS "floatingPoint_toChars algo ::  workaround-enabled")
+        set(USE_FLOATINGPOINT_FROM_CHARS_1   ${e_DISABLE_FEATURE})
         set(USE_FLOATINGPOINT_TO_CHARS_1   ${e_DISABLE_FEATURE})
     endif()
     #[===[  for testing purpose
