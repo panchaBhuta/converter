@@ -85,16 +85,18 @@ Precision Nomenclature ( for roundtrip conversions :: **string -> data-type -> s
 ✅ : Good. Minimal precision loss, best of the lot.  <br>
 ☑️ : Average. Precision loss is non-uniform, loss can be high for some FP values.
 
-|  🖥️ OS ➡️ <br> 🤖 Compiler ⬇️ | **Ubuntu 22.04** | **macOS-(12,13)** | **macOS-11** | **Windows 10<br>VS 17 - 2022** | **Windows 10<br>VS 16 - 2019** |
-|------------|------------------|--------------|--------------|-------------------------------|-------------------------------|
-| **g++ (11,12)** | ⚔️ ✅ | ⚔️ ✅ | ⚔️ ✅ | - | - |
-| **g++ 13** | ⚔️ ✅ | ⚔️ ✅ | NA | - | - |
-| **clang++ 15** | ⚔️ ✅ | - | - | - | - |
-| **AppleClang 14** | NA | 🛠️ ☑️ | NA | NA | NA |
-| **msvc 19** | NA | NA | NA | ⚔️ ☑️ | NA |
-| **clangCL 12** | - | - | - | - | ⚔️ ☑️ |
-| **clangCL 16** | - | - | - | ⚔️ ☑️ | - |
+|  🖥️ OS ➡️ <br> 🤖 Compiler ⬇️ | **Ubuntu 22.04** | **macOS-13** | **macOS-12** | **macOS-11** | **Windows 10<br>VS 17 - 2022** | **Windows 10<br>VS 16 - 2019** |
+|------------|------------------|--------------|--------------|--------------|-------------------------------|-------------------------------|
+| **g++ (11,12)** | ⚔️ ✅ | # | ⚔️ ✅ | ⚔️ ✅ | - | - |
+| **g++ 13** | ⚔️ ✅ | # | ⚔️ ✅ | NA | - | - |
+| **clang++ 15** | ⚔️ ✅ | - | - | - | - | - |
+| **AppleClang 15** | NA | 🛠️ ☑️ | ️️NA | NA | NA | NA |
+| **AppleClang 14** | NA | NA | 🛠️ ☑️ | NA | NA | NA |
+| **msvc 19** | NA | NA | NA | NA | ⚔️ ☑️ | NA |
+| **clangCL 12** | - | - | - | - | - | ⚔️ ☑️ |
+| **clangCL 16** | - | - | - | - | ⚔️ ☑️ | - |
 
+* \#  New linker breaks the build. Both Cmake and Linker needs an update for this fix.
 
 ### Data Conversion Precision
 

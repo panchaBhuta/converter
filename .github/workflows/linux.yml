@@ -34,7 +34,7 @@ jobs:
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources  (os-labels : ubuntu-22.04)
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software
         os: [ ubuntu-22.04 ]  #  ubuntu-latest  ==  ubuntu-22.04
-        #  https://github.com/actions/runner-images/blob/main/images/linux/Ubuntu2204-Readme.md#installed-software
+        #  https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2204-Readme.md#installed-software
           #  GNU C++: 9.5.0, 10.5.0, 11.4.0, 12.3.0, 13.1.0
           #  Clang: 13.0.1, 14.0.0, 15.0.7
           #  default  ==  g++-11
