@@ -18,22 +18,26 @@ Supported Platforms/Compilers
 =============================
 Converter is implemented using C++20 with the intention of being portable. It's been tested on:
 
-|  🖥️ OS ➡️ <br> 🤖 Compiler ⬇️ | **Ubuntu 22.04** | **macOS-(12,13)** | **macOS-11** | **Windows 10<br>VS 17 - 2022** | **Windows 10<br>VS 16 - 2019** |
-|------------|------------------|--------------|--------------|-------------------------------|-------------------------------|
-| **g++ (11,12)** | ✅ (default:11) | ✅ | ✅ | - | - |
-| **g++ 13** | ✅ | ✅ | NA | - | - |
-| **clang++ (**<span style="color:grey">12\*,13\#,14\#</span>**)** | ❌ | - | - | - | - |
-| **clang++ 15** | ✅ | - | - | - | - |
-| **AppleClang 14** | NA | ✅ (default) | NA | NA | NA |
-| **msvc 19** | NA | NA | NA | ✅ (default) | NA |
-| **clangCL 12** | - | - | - | - | ✅ |
-| **clangCL 16** | - | - | - | ✅ | - |
 
-<span style="color:grey">clang++ 12\*</span> : Last successful run with [Clang 12.0.1](https://github.com/panchaBhuta/converter/actions/runs/6291468380/job/17079862439) and `OS-id-version=Linux-6.2.0-1011-azure`. Newer Ubuntu-image OS-version stopped supporting Clang-12.
+|  🖥️ OS ➡️ <br> 🤖 Compiler ⬇️ | **Ubuntu 22.04** | **macOS-13** | **macOS-12** | **macOS-11** | **Windows 10<br>VS 17 - 2022** | **Windows 10<br>VS 16 - 2019** |
+|------------|------------------|--------------|--------------|--------------|-------------------------------|-------------------------------|
+| **g++ 13** | ✅ | ❌1 | ✅ | NA | - | - | - |
+| **g++ (11,12)** | ✅ (default:11) | ❌1 | ✅ | ✅ | - | - |
+| **clang++ 15** | ✅ | - | - | - | - | - |
+| **clang++ (**<span style="color:grey">12\*,13\#,14\#</span>**)** | ❌2 | - | - | - | - | - |
+| **AppleClang 15** | NA | ✅ | NA | NA | NA | NA |
+| **AppleClang 14** | NA | NA | ✅ | NA | NA | NA |
+| **msvc 19** | NA | NA | NA | NA | ✅ (default) | NA |
+| **clangCL 16** | - | - | - | - | ✅ | - |
+| **clangCL 12** | - | - | - | - | - | ✅ |
 
-<span style="color:grey">clang++ 13\#</span> : Last successful run with [Clang 13.0.1](https://github.com/panchaBhuta/converter/actions/runs/6524732682/job/17716666880) and `OS-id-version=Linux-6.2.0-1012-azure`. **\<chorno>** headers stopped compiling in Newer Ubuntu-image OS-version. Refer [ubuntu-latest runners have an incompatible combination of clang and libstdc++](https://github.com/actions/runner-images/issues/8659).
+❌1 : <span style="color:grey">macOS-13</span> : New linker breaks the build. Both Cmake and Linker needs an update for this fix.
 
-<span style="color:grey">clang++ 14\#</span> : Last successful run with [Clang 14.0.0](https://github.com/panchaBhuta/converter/actions/runs/6524732682/job/17716666951) and `OS-id-version=Linux-6.2.0-1012-azure`. **\<chorno>** headers stopped compiling in Newer Ubuntu-image OS-version. Refer [ubuntu-latest runners have an incompatible combination of clang and libstdc++](https://github.com/actions/runner-images/issues/8659).
+❌2 : <span style="color:grey">clang++ 12\*</span> : Last successful run with [Clang 12.0.1](https://github.com/panchaBhuta/converter/actions/runs/6291468380/job/17079862439) and `OS-id-version=Linux-6.2.0-1011-azure`. Newer Ubuntu-image OS-version stopped supporting Clang-12.
+
+❌2 : <span style="color:grey">clang++ 13\#</span> : Last successful run with [Clang 13.0.1](https://github.com/panchaBhuta/converter/actions/runs/6524732682/job/17716666880) and `OS-id-version=Linux-6.2.0-1012-azure`. **\<chorno>** headers stopped compiling in Newer Ubuntu-image OS-version. Refer [ubuntu-latest runners have an incompatible combination of clang and libstdc++](https://github.com/actions/runner-images/issues/8659).
+
+❌2 : <span style="color:grey">clang++ 14\#</span> : Last successful run with [Clang 14.0.0](https://github.com/panchaBhuta/converter/actions/runs/6524732682/job/17716666951) and `OS-id-version=Linux-6.2.0-1012-azure`. **\<chorno>** headers stopped compiling in Newer Ubuntu-image OS-version. Refer [ubuntu-latest runners have an incompatible combination of clang and libstdc++](https://github.com/actions/runner-images/issues/8659).
 
 
 [//]:  ❌
@@ -78,8 +82,8 @@ Numeric Floating-Point types
 For floating point types, the converter S2T function calls `std::from_chars()` and the converter T2S calls `std::to_chars()`, if the compiler supports `std::*_chars` functions. The table below, is based on test results of [testFloatingPointPrecision.cpp](tests/testFloatingPointPrecision.cpp). <br>
 
 Function Nomenclature:<br>
-⚔️ : uses `std::from_chars()` and `std::to_chars()` for data conversion. <br>
-🛠️ : uses `std::from_string()` and `std::operator<<` workarounds, for data conversion. As complier doesn't support `std::*_chars()` functions.<br>
+⚔️ : uses `std::from_chars()` and `std::to_chars()` for data conversion and has better precision. <br>
+🛠️ : uses `std::from_string()` and `std::operator<<` workarounds, for data conversion. As complier doesn't support `std::*_chars()` functions. Precision is less compared to above approach. <br>
 
 Precision Nomenclature ( for roundtrip conversions :: **string -> data-type -> string**): <br>
 ✅ : Good. Minimal precision loss, best of the lot.  <br>
@@ -87,16 +91,16 @@ Precision Nomenclature ( for roundtrip conversions :: **string -> data-type -> s
 
 |  🖥️ OS ➡️ <br> 🤖 Compiler ⬇️ | **Ubuntu 22.04** | **macOS-13** | **macOS-12** | **macOS-11** | **Windows 10<br>VS 17 - 2022** | **Windows 10<br>VS 16 - 2019** |
 |------------|------------------|--------------|--------------|--------------|-------------------------------|-------------------------------|
-| **g++ (11,12)** | ⚔️ ✅ | # | ⚔️ ✅ | ⚔️ ✅ | - | - |
-| **g++ 13** | ⚔️ ✅ | # | ⚔️ ✅ | NA | - | - |
+| **g++ 13** | ⚔️ ✅ | ❌ | ⚔️ ✅ | NA | - | - |
+| **g++ (11,12)** | ⚔️ ✅ | ❌ | ⚔️ ✅ | ⚔️ ✅ | - | - |
 | **clang++ 15** | ⚔️ ✅ | - | - | - | - | - |
+| **clang++ (**<span style="color:grey">12\*,13\#,14\#</span>**)** | ❌ | - | - | - | - | - |
 | **AppleClang 15** | NA | 🛠️ ☑️ | ️️NA | NA | NA | NA |
 | **AppleClang 14** | NA | NA | 🛠️ ☑️ | NA | NA | NA |
 | **msvc 19** | NA | NA | NA | NA | ⚔️ ☑️ | NA |
-| **clangCL 12** | - | - | - | - | - | ⚔️ ☑️ |
 | **clangCL 16** | - | - | - | - | ⚔️ ☑️ | - |
+| **clangCL 12** | - | - | - | - | - | ⚔️ ☑️ |
 
-* \#  New linker breaks the build. Both Cmake and Linker needs an update for this fix.
 
 ### Data Conversion Precision
 
