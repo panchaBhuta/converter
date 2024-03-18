@@ -82,7 +82,7 @@ Numeric Floating-Point types
 For floating point types, the converter S2T function calls `std::from_chars()` and the converter T2S calls `std::to_chars()`, if the compiler supports `std::*_chars` functions. The table below, is based on test results of [testFloatingPointPrecision.cpp](tests/testFloatingPointPrecision.cpp). <br>
 
 Function Nomenclature:<br>
-⚔️ : uses `std::from_chars()` and `std::to_chars()` for data conversion and has better precision. <br>
+⚔️ : uses `std::from_chars()` and `std::to_chars()` for data conversion. <br>
 🛠️ : uses `std::from_string()` and `std::operator<<` workarounds, for data conversion. As complier doesn't support `std::*_chars()` functions. Precision is less compared to above approach. <br>
 
 Precision Nomenclature ( for roundtrip conversions :: **string -> data-type -> string**): <br>
