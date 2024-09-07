@@ -67,11 +67,11 @@ set(CONVERTER_STANDALONE_PROJECT   $<STREQUAL:"${CMAKE_SOURCE_DIR}","${PROJECT_S
 message(STATUS "CONVERTER_STANDALONE_PROJECT=${CONVERTER_STANDALONE_PROJECT}")
 
 # Establish the project options
-option(CONVERTER_BUILD_EXAMPLES "Set to ON to build examples"        ${CONVERTER_STANDALONE_PROJECT})
-option(CONVERTER_BUILD_TESTS "Set to ON to build tests"              ${CONVERTER_STANDALONE_PROJECT})
-option(CONVERTER_ENABLE_INSTALL "Generate the install target"        ${CONVERTER_STANDALONE_PROJECT})
-option(CONVERTER_ENABLE_WARNINGS "Add warnings to CMAKE_CXX_FLAGS"   ${CONVERTER_STANDALONE_PROJECT})
-#option(CONVERTER_USE_UNICODE_HELP "Use ICU Unicode library"         OFF)
+option(CONVERTER_BUILD_EXAMPLES   "Set to ON to build examples"        ${CONVERTER_STANDALONE_PROJECT})
+option(CONVERTER_BUILD_TESTS      "Set to ON to build tests"           ${CONVERTER_STANDALONE_PROJECT})
+option(CONVERTER_ENABLE_INSTALL   "Generate the install target"        ${CONVERTER_STANDALONE_PROJECT})
+option(CONVERTER_ENABLE_WARNINGS  "Add warnings to CMAKE_CXX_FLAGS"    ${CONVERTER_STANDALONE_PROJECT})
+#option(CONVERTER_USE_UNICODE_HELP "Use ICU Unicode library"            OFF)
 
 if (CONVERTER_STANDALONE_PROJECT)
     converter_set_cxx_standard()

@@ -41,7 +41,7 @@ jobs:
           # clang++ == 'AppleClang-14'
           # default : [ macos-11 -> AppleClang-13 ,
           #             macos-12 -> AppleClang-14 ,
-          #             macos-13 -> AppleClang-14 ]
+          #             macos-13 -> AppleClang-15 ]
         compiler: [ default, g++-11, g++-12, g++-13 ]
         exclude:
           - os: macos-11
@@ -58,7 +58,7 @@ jobs:
     runs-on: ${{matrix.os}}
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Get Version
         run: uname -a && cmake --version
       - name: Check Generators

@@ -23,6 +23,10 @@ int main()
   int rv = 0;
   try {
     converter::ci_string    cistr{"+ci_string"};
+    unittest::ExpectEqual(converter::ci_string, cistr, "+Ci_STrING");
+    unittest::ExpectTrue( cistr == "+Ci_STrING" );
+    unittest::ExpectTrue( cistr != "+Ci_STrING___" );
+    conversionEqualCheck(cistr, "+ci_string");
     std::string  str{"+string"};
 
     std::string  str_cistr = str + cistr;
