@@ -33,7 +33,7 @@ jobs:
         # https://github.com/actions/runner-images#available-images
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources  (os-labels : windows-2022)
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software
-        os: [windows-2022]  #  windows-latest  ==  windows-2022
+        os: [windows-2022,windows-2019]  #  windows-latest  ==  windows-2022
         # https://cmake.org/cmake/help/latest/manual/cmake.1.html#cmdoption-cmake-T
         # CMake compiler option doesn't work for Visual Studio project :: https://youtrack.jetbrains.com/issue/CPP-17314
         # https://github.com/actions/runner-images/blob/main/images/win/Windows2022-Readme.md#tools
@@ -46,10 +46,10 @@ jobs:
           # ClangCl == 'Clang 16'
         toolset_compiler: [ { compiler: default, toolset: -1 },
                             { compiler: ClangCl, toolset:  1 } ]
-        include:
-          - os: windows-2019
+        #include:
+        #  - os: windows-2019
               # ClangCl == 'Clang 12'
-            toolset_compiler : { compiler: ClangCl, toolset: 1 }
+        #    toolset_compiler : { compiler: ClangCl, toolset: 1 }
     runs-on: ${{matrix.os}}
     steps:
       - name: Add msbuild to PATH
