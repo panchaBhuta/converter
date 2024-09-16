@@ -6,7 +6,7 @@ Converter
 [//]: # (## Documentation is **NOT** updated to latest changes.)
 
 
-| **Linux** 🐧![Ubuntu](https://cdn.emojidex.com/emoji/px16/Ubuntu.png "Ubuntu")  | **Mac** ![apple logo](https://cdn.emojidex.com/emoji/px16/apple_logo.png "apple logo") | **Windows** ![windows official](https://cdn.emojidex.com/emoji/px16/windows_official.png "windows official") |
+| **Linux** 🐧<img src="images/ubuntu-logo.png" width="16" alt="ubuntu">  | **Mac**<img src="images/apple-logo-icon-14906.png" width="16" alt="apple logo"> | **Windows**<img src="images/windows.png" width="16" alt="windows official"> |
 |--------------|---------|-------------|
 | [![Linux](https://github.com/panchaBhuta/converter/actions/workflows/linux.yml/badge.svg)](https://github.com/panchaBhuta/converter/actions/workflows/linux.yml) | [![macOS](https://github.com/panchaBhuta/converter/actions/workflows/macos.yml/badge.svg)](https://github.com/panchaBhuta/converter/actions/workflows/macos.yml) | [![Windows](https://github.com/panchaBhuta/converter/actions/workflows/windows.yml/badge.svg)](https://github.com/panchaBhuta/converter/actions/workflows/windows.yml) |
 
@@ -16,28 +16,36 @@ later), is header-only and comes with a basic test suite.
 
 Supported Platforms/Compilers
 =============================
-Converter is implemented using C++20 with the intention of being portable. It's been tested on:
+Converter is implemented using C++20 with code portable across OS and it's supported compiler's.<br>
+
+Results of last run:
+|  🖥️ OS ➡️ <br> 🤖 Compiler ⬇️ | **Ubuntu 24.04** | **Ubuntu 22.04** | **macOS-14** | **macOS-13** | **macOS-12** | **Windows 10<br>VS 17 - 2022** | **Windows 10<br>VS 16 - 2019** |
+|------------|------------|------------------|--------------|--------------|--------------|-------------------------------|-------------------------------|
+| **g++ 14** | ✅ | - | ❌ | ✅ | ✅ | - | - |
+| **g++ 13** | ✅ (default) | ⚠ | ❌ | ❌ | ❌ | - | - |
+| **g++ 12** | ✅ | ✅ | ❌ | ✅ | ✅ | - | - |
+| **g++ 11** | - | ✅ (default) | - | - | ⚠ | - | - |
+| **clang++ (18,17,16)** | ✅ (clang++:18) | - | - | - | - | - | - |
+| **clang++ (15,14,13)** | - | ✅ (clang++:14) | - | - | - | - | - |
+| **AppleClang** | - | - | ❌ (15) | ✅ (15) | ✅ (14) | - | - |
+| **msvc 19** | - | - | - | - | - | ✅ (default) | ❌ (default) |
+| **clangCL** | - | - | - | - | - | ✅ (v17) | ✅ (v12) |
+| default Compiler | g++13 | g++11 | AppleClang 15 | AppleClang 15 | AppleClang 14 | msvc 19 | msvc 19 |
 
 
-|  🖥️ OS ➡️ <br> 🤖 Compiler ⬇️ | **Ubuntu 22.04** | **macOS-13** | **macOS-12** | **macOS-11** | **Windows 10<br>VS 17 - 2022** | **Windows 10<br>VS 16 - 2019** |
-|------------|------------------|--------------|--------------|--------------|-------------------------------|-------------------------------|
-| **g++ 13** | ✅ | ❌1 | ✅ | NA | - | - | - |
-| **g++ (11,12)** | ✅ (default:11) | ❌1 | ✅ | ✅ | - | - |
-| **clang++ 15** | ✅ | - | - | - | - | - |
-| **clang++ (**<span style="color:grey">12\*,13\#,14\#</span>**)** | ❌2 | - | - | - | - | - |
-| **AppleClang 15** | NA | ✅ | NA | NA | NA | NA |
-| **AppleClang 14** | NA | NA | ✅ | NA | NA | NA |
-| **msvc 19** | NA | NA | NA | NA | ✅ (default) | NA |
-| **clangCL 16** | - | - | - | - | ✅ | - |
-| **clangCL 12** | - | - | - | - | - | ✅ |
+<br>
+Previous successful runs (now failing for some reasons) :
+
+|  🖥️ OS ➡️ <br> 🤖 Compiler ⬇️ | **Ubuntu 22.04** | **macOS-13** | **macOS-12** | **⚠ macOS-11** |
+|------------|------------------|--------------|--------------|--------------|
+| **g++ 13** | ☑️⚠ | ❌1 | ☑️❌ | NA | - |
+| **g++ 12** | ^ | - | ^ | ☑️⚠ [12](https://github.com/panchaBhuta/converter/actions/runs/8329360121/job/22791476195) |
+| **g++ 11** | ^ | - | ☑️⚠ | ☑️⚠ [11](https://github.com/panchaBhuta/converter/actions/runs/8329360121/job/22791475491) |
+| **clang++ 12** | ☑️⚠ [12](https://github.com/panchaBhuta/converter/actions/runs/6291468380/job/17079862439) | - | - | - |
+
+⚠ : Withdrawn
 
 ❌1 : <span style="color:grey">macOS-13</span> : New linker breaks the build. Both Cmake and Linker needs an update for this fix.
-
-❌2 : <span style="color:grey">clang++ 12\*</span> : Last successful run with [Clang 12.0.1](https://github.com/panchaBhuta/converter/actions/runs/6291468380/job/17079862439) and `OS-id-version=Linux-6.2.0-1011-azure`. Newer Ubuntu-image OS-version stopped supporting Clang-12.
-
-❌2 : <span style="color:grey">clang++ 13\#</span> : Last successful run with [Clang 13.0.1](https://github.com/panchaBhuta/converter/actions/runs/6524732682/job/17716666880) and `OS-id-version=Linux-6.2.0-1012-azure`. **\<chorno>** headers stopped compiling in Newer Ubuntu-image OS-version. Refer [ubuntu-latest runners have an incompatible combination of clang and libstdc++](https://github.com/actions/runner-images/issues/8659).
-
-❌2 : <span style="color:grey">clang++ 14\#</span> : Last successful run with [Clang 14.0.0](https://github.com/panchaBhuta/converter/actions/runs/6524732682/job/17716666951) and `OS-id-version=Linux-6.2.0-1012-azure`. **\<chorno>** headers stopped compiling in Newer Ubuntu-image OS-version. Refer [ubuntu-latest runners have an incompatible combination of clang and libstdc++](https://github.com/actions/runner-images/issues/8659).
 
 
 [//]:  ❌
@@ -89,17 +97,17 @@ Precision Nomenclature ( for roundtrip conversions :: **string -> data-type -> s
 ✅ : Good. Minimal precision loss, best of the lot.  <br>
 ☑️ : Average. Precision loss is non-uniform, loss can be high for some FP values.
 
-|  🖥️ OS ➡️ <br> 🤖 Compiler ⬇️ | **Ubuntu 22.04** | **macOS-13** | **macOS-12** | **macOS-11** | **Windows 10<br>VS 17 - 2022** | **Windows 10<br>VS 16 - 2019** |
-|------------|------------------|--------------|--------------|--------------|-------------------------------|-------------------------------|
-| **g++ 13** | ⚔️ ✅ | ❌ | ⚔️ ✅ | NA | - | - |
-| **g++ (11,12)** | ⚔️ ✅ | ❌ | ⚔️ ✅ | ⚔️ ✅ | - | - |
-| **clang++ 15** | ⚔️ ✅ | - | - | - | - | - |
-| **clang++ (**<span style="color:grey">12\*,13\#,14\#</span>**)** | ❌ | - | - | - | - | - |
-| **AppleClang 15** | NA | 🛠️ ☑️ | ️️NA | NA | NA | NA |
-| **AppleClang 14** | NA | NA | 🛠️ ☑️ | NA | NA | NA |
-| **msvc 19** | NA | NA | NA | NA | ⚔️ ☑️ | NA |
-| **clangCL 16** | - | - | - | - | ⚔️ ☑️ | - |
-| **clangCL 12** | - | - | - | - | - | ⚔️ ☑️ |
+|  🖥️ OS ➡️ <br> 🤖 Compiler ⬇️ | **Ubuntu 24.04** | **Ubuntu 22.04** | **macOS-14** | **macOS-13** | **macOS-12** | **macOS-11** | **Windows 10<br>VS 17 - 2022** | **Windows 10<br>VS 16 - 2019** |
+|------------|--------------|--------------|--------------|--------------|--------------|--------------|-------------------------------|-------------------------------|
+| **g++ 14** | ⚔️ ✅ | - | ❌ | ⚔️ ✅ | ⚔️ ✅ | - | - | - |
+| **g++ 13** | ⚔️ ✅ | ⚠ | ❌ | ❌ | ❌ | - | - | - |
+| **g++ 12** | ⚔️ ✅ | ⚔️ ✅ | ❌ | ⚔️ ✅ | ⚔️ ✅ | ⚔️ ✅ | - | - |
+| **g++ 11** | - | ⚔️ ✅ | - | - | ⚠ | ⚔️ ✅ | - | - |
+| **clang++ (18,17,16)** | ⚔️ ✅ | - | - | - | - | - | - | - |
+| **clang++ (15,14,13)** | - | ⚔️ ✅ | - | - | - | - | - | - |
+| **AppleClang** | - | - | ❌ | 🛠️ ☑️ (15) | 🛠️ ☑️ (14) | - | - | - |
+| **msvc 19** | - | - | - | - | - | - | ⚔️ ☑️ | ❌ |
+| **clangCL** | - | - | - | - | - | - | ⚔️ ☑️ (17) | ⚔️ ☑️ (12) |
 
 
 ### Data Conversion Precision

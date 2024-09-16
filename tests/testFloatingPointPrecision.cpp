@@ -26,7 +26,7 @@
   #else
     // when compiler is AppleClang.
     // The macro __GNUC__is defined even for AppleClang compiler,
-    // hence not able to use system dependent macro her.
+    // hence not able to use system dependent macro here.
     // instead using application macros USE_FLOATINGPOINT_FROM_CHARS_1 and USE_FLOATINGPOINT_TO_CHARS_1.
         // macOS does not support 'std::from_chars()' and
         // 'std::to_chars()'. The fall back functions
