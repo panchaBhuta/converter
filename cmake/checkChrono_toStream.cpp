@@ -1,12 +1,12 @@
 #include <sstream>
 #include <string>
-#include <format>
 #include <cassert>
 
 //  ./manualBuild.sh cmake checkChrono_toStream -DUSE_CHRONO_TOSTREAM_1=1
 
 #if    USE_CHRONO_TOSTREAM_1 == 1
   #include <chrono>
+  #include <format>
   namespace datelib = std::chrono;
 #else  // if  USE_DATE_TOSTREAM_2 == 1
   #include <date/date.h>
