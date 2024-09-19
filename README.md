@@ -19,7 +19,7 @@ Supported Platforms/Compilers
 Converter is implemented using C++20 with code portable across OS and it's supported compiler's.<br>
 
 Results of last run:
-|  🖥️ OS ➡️ <br> 🤖 Compiler ⬇️ | **Ubuntu 24.04** | **Ubuntu 22.04** | **macOS-14** | **macOS-13** | **macOS-12** | **Windows 10<br>VS 17 - 2022** | **Windows 10<br>VS 16 - 2019** |
+|  <div style="width:150px">🖥️ OS ➡️ <br> 🤖 Compiler ⬇️ </div> | <div style="width:100px">**Ubuntu 24.04**</div> | <div style="width:100px">**Ubuntu 22.04**</div> | <div style="width:100px">**macOS-14**</div> | <div style="width:100px">**macOS-13**</div> | <div style="width:100px">**macOS-12**</div> | <div style="width:100px">**Windows 10<br>VS 17 - 2022**</div> | <div style="width:100px">**Windows 10<br>VS 16 - 2019**</div> |
 |------------|------------|------------------|--------------|--------------|--------------|-------------------------------|-------------------------------|
 | **g++ 14** | ✅ | - | ❌ | ✅ | ✅ | - | - |
 | **g++ 13** | ✅ (default) | ⚠ | ❌ | ❌ | ❌ | - | - |
@@ -36,7 +36,7 @@ Results of last run:
 <br>
 Previous successful runs (now failing for some reasons) :
 
-|  🖥️ OS ➡️ <br> 🤖 Compiler ⬇️ | **Ubuntu 22.04** | **macOS-13** | **macOS-12** | **⚠ macOS-11** |
+|  <div style="width:150px">🖥️ OS ➡️ <br> 🤖 Compiler ⬇️ </div> | <div style="width:100px">**Ubuntu 22.04**</div> | <div style="width:100px">**macOS-13**</div> | <div style="width:100px">**macOS-12**</div> | <div style="width:100px">**⚠ macOS-11**</div> |
 |------------|------------------|--------------|--------------|--------------|
 | **g++ 13** | ☑️⚠ | ❌1 | ☑️❌ | NA | - |
 | **g++ 12** | ^ | - | ^ | ☑️⚠ [12](https://github.com/panchaBhuta/converter/actions/runs/8329360121/job/22791476195) |
@@ -97,7 +97,7 @@ Precision Nomenclature ( for roundtrip conversions :: **string -> data-type -> s
 ✅ : Good. Minimal precision loss, best of the lot.  <br>
 ☑️ : Average. Precision loss is non-uniform, loss can be high for some FP values.
 
-|  🖥️ OS ➡️ <br> 🤖 Compiler ⬇️ | **Ubuntu 24.04** | **Ubuntu 22.04** | **macOS-14** | **macOS-13** | **macOS-12** | **macOS-11** | **Windows 10<br>VS 17 - 2022** | **Windows 10<br>VS 16 - 2019** |
+|  <div style="width:150px">🖥️ OS ➡️ <br> 🤖 Compiler ⬇️ </div> | <div style="width:100px">**Ubuntu 24.04**</div> | <div style="width:100px">**Ubuntu 22.04**</div> | <div style="width:100px">**macOS-14**</div> | <div style="width:100px">**macOS-13**</div> | <div style="width:100px">**macOS-12**</div> | <div style="width:100px">**macOS-11**</div> | <div style="width:100px">**Windows 10<br>VS 17 - 2022**</div> | <div style="width:100px">**Windows 10<br>VS 16 - 2019**</div> |
 |------------|--------------|--------------|--------------|--------------|--------------|--------------|-------------------------------|-------------------------------|
 | **g++ 14** | ⚔️ ✅ | - | ❌ | ⚔️ ✅ | ⚔️ ✅ | - | - | - |
 | **g++ 13** | ⚔️ ✅ | ⚠ | ❌ | ❌ | ❌ | - | - | - |
@@ -167,7 +167,7 @@ For _year_month_day -> string_ conversion, refers to call to ...<br>
 ⚔️ : `std::chrono::from_stream()` and `std::chrono::to_stream` are preffered.<br>
 🛠️ : `date::from_stream()` and `date::to_stream` are workarounds, if `std::chrono::*` functions are not supported.<br>
 
-|  🖥️ OS ➡️ <br> 🪄 conversion type ⬇️ | **Linux** 🐧![Ubuntu](https://cdn.emojidex.com/emoji/px16/Ubuntu.png "Ubuntu")  | **Mac** ![apple logo](https://cdn.emojidex.com/emoji/px16/apple_logo.png "apple logo") | **Windows** ![windows official](https://cdn.emojidex.com/emoji/px16/windows_official.png "windows official") |
+| <div style="width:200px"> 🖥️ OS ➡️ <br> 🪄 conversion type ⬇️ </div> | <div style="width:150px">**Linux** 🐧<img src="images/ubuntu-logo.png" width="16" alt="ubuntu"> </div> | <div style="width:150px">**Mac**<img src="images/apple-logo-icon-14906.png" width="16" alt="apple logo"> </div> | <div style="width:150px">**Windows**<img src="images/windows.png" width="16" alt="windows official"> </div> |
 |------------|--------------|---------|-------------|
 | **string -> year_month_day** | 🛠️ date::from_stream() | 🛠️ date::from_stream() | ⚔️ **std::chrono::from_stream()** |
 | **year_month_day -> string** | 🛠️ date::to_stream() | 🛠️ date::to_stream() | 🛠️ date::to_stream() |

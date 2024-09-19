@@ -130,14 +130,14 @@ macro(check_chrono_stream_functionality)
 
     if(COMPILE_RESULT_CHRONO_TOSTREAM)
         # for future reference, when <chrono> supports full functionality
-        message(STATUS "checkChrono_toStream[std::chrono::to_stream()] ++SUCCESS++")
+        message(STATUS "checkChrono_toStream[oss<<std::vformat()] ++SUCCESS++")
         message(STATUS "checkChrono_toStream[date::to_stream()] __SKIPPED__")
         message(STATUS "checkChrono_toStream[jugaad::to_stream()] __SKIPPED__")
         set(USE_CHRONO_TOSTREAM_1 ${e_ENABLE_FEATURE})
         set(USE_DATE_TOSTREAM_2   ${e_DISABLE_FEATURE})
         set(USE_JUGAAD_TOSTREAM_3 ${e_DISABLE_FEATURE})
     else()
-        message(STATUS "checkChrono_toStream[std::chrono::to_stream()] --FAILED--")
+        message(STATUS "checkChrono_toStream[oss<<std::vformat()] --FAILED--")
     endif()
 
     if(COMPILE_RESULT_CHRONO_FROMSTREAM   OR   COMPILE_RESULT_CHRONO_TOSTREAM)

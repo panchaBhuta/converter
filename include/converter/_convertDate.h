@@ -15,7 +15,7 @@
 
 #include <chrono>
 //#include <string_view>
-//#include <format>
+#include <format>
 #include <cstring>
 #include <string>
 #include <array>
@@ -589,11 +589,11 @@ namespace converter
       CONVERTER_DEBUG_LOG(dateClass << " for date2string input : YMD Y=" << (int(val.year())) \
                 << "  M=" << (unsigned(val.month())) << "  D=" << (unsigned(val.day())) );
 
-      // As of writing this code, no compiler supports chrono::to_stream() yet.
-      // This code here is for future reference once compiler starts supporting.
-      // refer https://omegaup.com/docs/cpp/en/cpp/chrono/local_t/to_stream.html
-      // no OS in particular
-      std::chrono::to_stream(oss, fmt, val, abbrev, offset_sec); // does not compile
+      //std::chrono::to_stream(oss, fmt, val, abbrev, offset_sec); // does not compile
+      std::string fmtV("{:");
+      fmtV += fmt;
+      fmtV += "}";
+      oss << std::vformat(oss.getloc(), fmtV, std::make_format_args(val));
 #elif USE_DATE_TOSTREAM_2  ==  e_ENABLE_FEATURE
       const std::string dateClass = "date::year_month_day";
       CONVERTER_DEBUG_LOG(dateClass << " for date2string input : YMD Y=" << (int(val.year())) \
