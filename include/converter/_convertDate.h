@@ -244,8 +244,8 @@ namespace converter
             } else {
               std::istringstream issY(token);
               S2T_FORMAT_YMD::streamUpdate(issY);
-              date::year year(0);
-              date::from_stream(issY, fmtToken.c_str(), year);
+              _dateLib::year year(0);
+              _dateLib::from_stream(issY, fmtToken.c_str(), year);
               iY = int(year);
             }
             hasYear = true;
@@ -259,8 +259,8 @@ namespace converter
             } else {
               std::istringstream issM(token);
               S2T_FORMAT_YMD::streamUpdate(issM);
-              date::month month(0);
-              date::from_stream(issM, fmtToken.c_str(), month);
+              _dateLib::month month(0);
+              _dateLib::from_stream(issM, fmtToken.c_str(), month);
               iM = unsigned(month);
             }
             hasMonth = true;
@@ -274,8 +274,8 @@ namespace converter
             } else {
               std::istringstream issD(token);
               S2T_FORMAT_YMD::streamUpdate(issD);
-              date::day day(0);
-              date::from_stream(issD, fmtToken.c_str(), day);
+              _dateLib::day day(0);
+              _dateLib::from_stream(issD, fmtToken.c_str(), day);
               iD = unsigned(day);
             }
             hasDay = true;
