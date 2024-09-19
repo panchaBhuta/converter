@@ -3,7 +3,7 @@
 #include <format>
 #include <cassert>
 
-//  ./manualBuild.sh cmake checkChrono_toStream -DUSE_CHRONO_TOSTREAM_1=1 -DUSE_DATELIB_TOSTREAM_2=0
+//  ./manualBuild.sh cmake checkChrono_toStream -DUSE_CHRONO_TOSTREAM_1=1
 
 #if    USE_CHRONO_TOSTREAM_1 == 1
   #include <chrono>
@@ -25,7 +25,7 @@ std::string FromYMD(const datelib::year_month_day& pYmd, std::string_view fmt)
     fmtV += fmt;
     fmtV += "}";
     oss << std::vformat(oss.getloc(), fmtV, std::make_format_args(pYmd));
-#elif  USE_DATELIB_TOSTREAM_2 == 1
+#else // if  USE_DATELIB_TOSTREAM_2 == 1
     using CS = std::chrono::seconds;
     std::string* abbrev  = nullptr;
     std::chrono::seconds* offset_sec = nullptr;

@@ -2,7 +2,7 @@
 #include <string>
 #include <cassert>
 
-//  ./manualBuild.sh cmake checkChrono_fromStream -DUSE_CHRONO_FROMSTREAM_1=1 -DUSE_DATELIB_TOSTREAM_2=0
+//  ./manualBuild.sh cmake checkChrono_fromStream -DUSE_CHRONO_FROMSTREAM_1=1
 
 #if    USE_CHRONO_FROMSTREAM_1 == 1
   #include <chrono>
