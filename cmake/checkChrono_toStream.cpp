@@ -13,7 +13,7 @@
   namespace datelib = date;
 #endif
 
-std::string FromYMD(const datelib::year_month_day& pYmd, std::string_view fmt)
+std::string FromYMD(const datelib::year_month_day& pYmd, std::string::value_type* fmt)
 {
     std::ostringstream oss;
 
@@ -39,6 +39,6 @@ int main()
 {
     std::string dateExp("2016-12-11");
     datelib::year_month_day ymd = datelib::year(2016)/12/11;
-    std::string dateCon = FromYMD(ymd, "%F");
+    std::string dateCon = FromYMD(ymd, const_cast<char*> ("%F"));
     assert(dateExp == dateCon);
 }
