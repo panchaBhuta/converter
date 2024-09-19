@@ -30,7 +30,7 @@ std::string FromYMD(const datelib::year_month_day& pYmd, std::string_view fmt)
     std::string* abbrev  = nullptr;
     std::chrono::seconds* offset_sec = nullptr;
     date::fields<CS> fds{pYmd};
-    date::to_stream(oss, fmt, fds, abbrev, offset_sec);  // TODO fmt
+    date::to_stream(oss, fmt, fds, abbrev, offset_sec);
 #endif
     return oss.str();
 }

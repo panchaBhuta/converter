@@ -15,7 +15,6 @@
 
 #include <chrono>
 //#include <string_view>
-#include <format>
 #include <cstring>
 #include <string>
 #include <array>
@@ -31,6 +30,9 @@
 #include <converter/_workaroundConfig.h>
 
 
+#if    USE_CHRONO_TOSTREAM_1 == e_ENABLE_FEATURE
+  #include <format>
+#endif
 #if  USE_DATE_FROMSTREAM_2 == e_ENABLE_FEATURE  ||  USE_DATE_TOSTREAM_2 == e_ENABLE_FEATURE
   #include <date/date.h>
 #endif

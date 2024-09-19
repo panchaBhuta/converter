@@ -45,11 +45,11 @@ jobs:
           #             macos-13 -> AppleClang-15 ,
           #             macos-14 -> AppleClang-15 ]
         compiler: [ default, g++-14, g++-13, g++-12 ]
-        exclude:
-          - os: macos-12
-            compiler : g++-13      #  https://github.com/panchaBhuta/converter/actions/runs/10863394822/job/30147499006
-          - os: macos-13
-            compiler : g++-13      #  https://github.com/panchaBhuta/converter/actions/runs/10863394822/job/30147499604
+        #exclude:
+        #  - os: macos-12
+        #    compiler : g++-13      #  https://github.com/panchaBhuta/converter/actions/runs/10863394822/job/30147499006
+        #  - os: macos-13
+        #    compiler : g++-13      #  https://github.com/panchaBhuta/converter/actions/runs/10863394822/job/30147499604
     runs-on: ${{matrix.os}}
     steps:
       - name: Checkout Repo
