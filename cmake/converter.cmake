@@ -104,7 +104,10 @@ macro(check_chrono_stream_functionality)
                 #CMAKE_FLAGS  "--std=gnu++2a -fconcepts"
                 COMPILE_DEFINITIONS "-DUSE_CHRONO_FROMSTREAM_1=${e_ENABLE_FEATURE}"
                 CXX_STANDARD "${CMAKE_CXX_STANDARD}"
-                CXX_STANDARD_REQUIRED True)
+                CXX_STANDARD_REQUIRED True
+                LOG_DESCRIPTION "compiler-check: checkChrono_fromStream.cpp : -DUSE_CHRONO_FROMSTREAM_1=${e_ENABLE_FEATURE}"
+                OUTPUT_VARIABLE TRY_COMPILE_OUTPUT)
+    message(STATUS ${TRY_COMPILE_OUTPUT})
 
     if(COMPILE_RESULT_CHRONO_FROMSTREAM)
         # for future reference, when <chrono> supports full functionality
@@ -126,7 +129,10 @@ macro(check_chrono_stream_functionality)
                 #CMAKE_FLAGS  "--std=gnu++2a -fconcepts"
                 COMPILE_DEFINITIONS "-DUSE_CHRONO_TOSTREAM_1=${e_ENABLE_FEATURE}"
                 CXX_STANDARD "${CMAKE_CXX_STANDARD}"
-                CXX_STANDARD_REQUIRED True)
+                CXX_STANDARD_REQUIRED True
+                LOG_DESCRIPTION "compiler-check: checkChrono_toStream.cpp : -DUSE_CHRONO_TOSTREAM_1=${e_ENABLE_FEATURE}"
+                OUTPUT_VARIABLE TRY_COMPILE_OUTPUT)
+    message(STATUS ${TRY_COMPILE_OUTPUT})
 
     if(COMPILE_RESULT_CHRONO_TOSTREAM)
         # for future reference, when <chrono> supports full functionality
@@ -177,7 +183,10 @@ macro(check_chrono_stream_functionality)
                                     #"-DLINK_DIRECTORIES=${${DATELIB}_BINARY_DIR}"
                         COMPILE_DEFINITIONS "-DUSE_CHRONO_FROMSTREAM_1=${e_DISABLE_FEATURE}"
                         CXX_STANDARD "${CMAKE_CXX_STANDARD}"
-                        CXX_STANDARD_REQUIRED True)
+                        CXX_STANDARD_REQUIRED True
+                        LOG_DESCRIPTION "compiler-check: checkChrono_fromStream.cpp : -DUSE_CHRONO_FROMSTREAM_1=${e_DISABLE_FEATURE}"
+                        OUTPUT_VARIABLE TRY_COMPILE_OUTPUT)
+            message(STATUS ${TRY_COMPILE_OUTPUT})
 
             if(COMPILE_RESULT_DATE_FROMSTREAM)
                 # ubuntu, mac - clang
@@ -206,7 +215,10 @@ macro(check_chrono_stream_functionality)
                         CMAKE_FLAGS  "-DINCLUDE_DIRECTORIES=${CMAKE_BINARY_DIR}/_deps/date-src/include/"
                         COMPILE_DEFINITIONS "-DUSE_CHRONO_TOSTREAM_1=${e_DISABLE_FEATURE}"
                         CXX_STANDARD "${CMAKE_CXX_STANDARD}"
-                        CXX_STANDARD_REQUIRED True)
+                        CXX_STANDARD_REQUIRED True
+                        LOG_DESCRIPTION "compiler-check: checkChrono_toStream.cpp : -DUSE_CHRONO_TOSTREAM_1=${e_DISABLE_FEATURE}"
+                        OUTPUT_VARIABLE TRY_COMPILE_OUTPUT)
+            message(STATUS ${TRY_COMPILE_OUTPUT})
 
             if(COMPILE_RESULT_DATE_TOSTREAM)
                 # ubuntu, mac - clang
@@ -265,7 +277,10 @@ macro(check_clang_string_workaround)  # NOTE setters should be in 'macro' and NO
                     #CMAKE_FLAGS  "--std=gnu++2a -fconcepts"
                     COMPILE_DEFINITIONS "-DUSE_CLANG_STRING_WORKAROUND_2=${e_DISABLE_FEATURE}"
                     CXX_STANDARD "${CMAKE_CXX_STANDARD}"
-                    CXX_STANDARD_REQUIRED True)
+                    CXX_STANDARD_REQUIRED True
+                    LOG_DESCRIPTION "compiler-check: check_clang_string.cpp : -DUSE_CLANG_STRING_WORKAROUND_2=${e_DISABLE_FEATURE}"
+                    OUTPUT_VARIABLE TRY_COMPILE_OUTPUT)
+        message(STATUS ${TRY_COMPILE_OUTPUT})
 
         if(COMPILE_RESULT_CLANG_STRING_DEFAULT)
             message(STATUS "check_clang_string :: default mode ++SUCCESS++")
@@ -283,7 +298,10 @@ macro(check_clang_string_workaround)  # NOTE setters should be in 'macro' and NO
                         #CMAKE_FLAGS  "--std=gnu++2a -fconcepts"
                         COMPILE_DEFINITIONS "-DUSE_CLANG_STRING_WORKAROUND_2=${e_ENABLE_FEATURE}"
                         CXX_STANDARD "${CMAKE_CXX_STANDARD}"
-                        CXX_STANDARD_REQUIRED True)
+                        CXX_STANDARD_REQUIRED True
+                        LOG_DESCRIPTION "compiler-check: check_clang_string.cpp : -DUSE_CLANG_STRING_WORKAROUND_2=${e_ENABLE_FEATURE}"
+                        OUTPUT_VARIABLE TRY_COMPILE_OUTPUT)
+            message(STATUS ${TRY_COMPILE_OUTPUT})
 
             if(COMPILE_RESULT_CLANG_STRING_WORKAROUND)
                 message(STATUS "check_clang_string :: workaround ++SUCCESS++")
@@ -313,7 +331,10 @@ macro(check_floatingPoint_elementaryStringConversions)
                 #CMAKE_FLAGS  "--std=gnu++2a -fconcepts"  not needed
                 #COMPILE_DEFINITIONS "-DUSE_FLOATINGPOINT_FROM_CHARS=${e_ENABLE_FEATURE}"  not needed
                 CXX_STANDARD "${CMAKE_CXX_STANDARD}"
-                CXX_STANDARD_REQUIRED True)
+                CXX_STANDARD_REQUIRED True
+                LOG_DESCRIPTION "compiler-check: check_floatingPoint_fromChars.cpp"
+                OUTPUT_VARIABLE TRY_COMPILE_OUTPUT)
+    message(STATUS ${TRY_COMPILE_OUTPUT})
 
     if(COMPILE_FLOATINGPOINT_FROM_CHARS)
         message(STATUS "check_floatingPoint_fromChars ::  ++SUCCESS++")
@@ -331,7 +352,10 @@ macro(check_floatingPoint_elementaryStringConversions)
                 #CMAKE_FLAGS  "--std=gnu++2a -fconcepts"   not needed
                 #COMPILE_DEFINITIONS "-DUSE_FLOATINGPOINT_FROM_CHARS=${e_ENABLE_FEATURE}"  not needed
                 CXX_STANDARD "${CMAKE_CXX_STANDARD}"
-                CXX_STANDARD_REQUIRED True)
+                CXX_STANDARD_REQUIRED True
+                LOG_DESCRIPTION "compiler-check: check_floatingPoint_toChars.cpp"
+                OUTPUT_VARIABLE TRY_COMPILE_OUTPUT)
+    message(STATUS ${TRY_COMPILE_OUTPUT})
 
     if(COMPILE_FLOATINGPOINT_TO_CHARS)
         message(STATUS "check_floatingPoint_toChars ::  ++SUCCESS++")

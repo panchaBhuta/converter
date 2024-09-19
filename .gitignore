@@ -6,5 +6,6 @@ build*/
 ### Linux ###
 *~
 *.swp
+*.ods#
 
 # refer   https://www.toptal.com/developers/gitignore/api/macos,windows,linux,cmake,c++,c,visualstudiocode

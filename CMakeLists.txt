@@ -33,6 +33,8 @@ converter_getversion(VERSION)
 #
 #]==================================================================================]
 
+variable_watch(__CMAKE_CXX_COMPILER_OUTPUT)
+
 project(converter
         VERSION "${VERSION}"
         DESCRIPTION "${PROJECT_DESCRIPTION}"
