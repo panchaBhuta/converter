@@ -98,7 +98,11 @@ int main()
                                                  ConvertFromVal_lDP<double>>("testUserDefinedConverter_lowerPrecision-5",
                  "2.1234567890123456789", 2.1234567890123456789, "2.1234567890123", getLowerDecimalPrecision<double>());  // 14 digits
     std::string expected_longDouble_1d123456789012345678901[] = { "3.1234567890123457",
+#if defined(__aarch64__) || defined(__arm__)
+                                                                  "3.1234567890123",
+#else
                                                                   "3.1234567890123457",
+#endif
                                                                   "3.1234567890123" };  // Windows
     checkRoundTripConversion_txt2Val2txt<long double, converter::ConvertFromStr<long double>,
                                                       ConvertFromVal_lDP<long double>>("testUserDefinedConverter_lowerPrecision-6",

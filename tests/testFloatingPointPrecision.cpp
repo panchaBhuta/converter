@@ -96,7 +96,11 @@ int main()
                  "1.1234567890123456789", 1.1234567890123456789,
                  expected_double_1d1234567890123456789[indexOS]);   // 15 digits
     std::string expected_longDouble_1d123456789012345678901[] = { "1.1234567890123456789",
+#if defined(__aarch64__) || defined(__arm__)
+                                                                  "1.12345678901234569",  // macos -14
+#else
                                                                   "1.12345678901234567889",
+#endif
                                                                   "1.1234567890123457" };  // Windows
     checkRoundTripConversion_txt2Val2txt<long double>("testFloatingPointPrecision-6",
                  "1.123456789012345678901", 1.123456789012345678901L,

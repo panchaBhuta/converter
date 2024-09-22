@@ -33,9 +33,9 @@ jobs:
         # https://github.com/actions/runner-images#available-images
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources  (os-labels : macos-12)
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software
-        os: [ macos-14-large, macos-13, macos-12 ]  #  macos-latest  ==  macos-14
-#  NOTE : macos-14 executes arm64 (instead of x64_64), which causes FLOATING POINT TESTS to FAIL
-#         https://github.com/panchaBhuta/converter/actions/runs/10863394822/
+        os: [ macos-14, macos-13, macos-12 ]  #  macos-latest  ==  macos-14
+#  NOTE : macos-14 executes arm64 (instead of x64_64), which lowers FLOATING POINT precision similar to Windows
+#         macos-14-large (x86_64) presently is not supported by github
         # https://github.com/actions/runner-images/blob/main/images/macos/macos-14-Readme.md#language-and-runtime
         # https://github.com/actions/runner-images/blob/main/images/macos/macos-13-Readme.md#language-and-runtime
         # https://github.com/actions/runner-images/blob/main/images/macos/macos-12-Readme.md#language-and-runtime
@@ -55,7 +55,7 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
       - name: Get Version
-        run: uname -a && cmake --version
+        run: uname -a && echo "------------" && cmake --version && echo "------------" && bash -c 'COMPILER="${{matrix.compiler}}"; if [ "${COMPILER}" == "default" ]; then COMPILER="clang"; fi; ${COMPILER}  -dM -E - < /dev/null | egrep -i "(apple|clang|version|major|minor)"'
       - name: Check Generators
         # https://stackoverflow.com/questions/25941536/what-is-a-cmake-generator
         run: cmake --help

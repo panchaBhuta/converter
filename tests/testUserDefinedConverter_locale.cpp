@@ -147,7 +147,11 @@ int main()
     checkRoundTripConversion_txt2Val2txt<double, ConvertFromStr_loc<double>, ConvertFromVal_loc<double>>("testUserDefinedConverter_locale-5",
                  "2,1234567890123456789", 2.1234567890123456789, "2,12345678901234569", std::numeric_limits<double>::digits10, ',', '.');
     std::string expected_longDouble_3d123456789012345678901[] = { "3,12345678901234567889",
+//#if defined(__aarch64__) || defined(__arm__)
+//                                                                  "3,12345678901234569",
+//#else
                                                                   "3,12345678901234567889",
+//#endif
                                                                   "3,12345678901234569" };  // Windows
     checkRoundTripConversion_txt2Val2txt<long double, ConvertFromStr_loc<long double>, ConvertFromVal_loc<long double>>("testUserDefinedConverter_locale-6",
                  "3,123456789012345678901", 3.123456789012345678901L,
