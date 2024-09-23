@@ -108,8 +108,12 @@ int main()
                                                       ConvertFromVal_lDP<long double>>("testUserDefinedConverter_lowerPrecision-6",
                  "3.123456789012345678901", 3.123456789012345678901L,
                  expected_longDouble_1d123456789012345678901[indexOS],
-                 ((defined(__aarch64__) || defined(__arm__)) || (indexOS==2)?14:16)
+#if defined(__aarch64__) || defined(__arm__)
+                 14
+#else
+                 (indexOS==2)?14:16
                  // getLowerDecimalPrecision<long double>() = 17 digits
+#endif
                 );
     checkRoundTripConversion_txt2Val2txt<double, converter::ConvertFromStr<double>,
                                                  ConvertFromVal_lDP<double>>("testUserDefinedConverter_lowerPrecision-7",

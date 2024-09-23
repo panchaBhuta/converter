@@ -6,7 +6,7 @@ Converter
 [//]: # (## Documentation is **NOT** updated to latest changes.)
 
 
-| **Linux** 🐧<img src="images/ubuntu-logo.png" width="16" alt="ubuntu">  | **Mac**<img src="images/apple-logo-icon-14906.png" width="16" alt="apple logo"> | **Windows**<img src="images/windows.png" width="16" alt="windows official"> |
+| **Linux** 🐧<img src="images/ubuntu-logo.png" width="16" alt="ubuntu">  | **Mac** <img src="images/apple-logo-icon-14906.png" width="16" alt="apple logo"> | **Windows** <img src="images/windows.png" width="16" alt="windows official"> |
 |--------------|---------|-------------|
 | [![Linux](https://github.com/panchaBhuta/converter/actions/workflows/linux.yml/badge.svg)](https://github.com/panchaBhuta/converter/actions/workflows/linux.yml) | [![macOS](https://github.com/panchaBhuta/converter/actions/workflows/macos.yml/badge.svg)](https://github.com/panchaBhuta/converter/actions/workflows/macos.yml) | [![Windows](https://github.com/panchaBhuta/converter/actions/workflows/windows.yml/badge.svg)](https://github.com/panchaBhuta/converter/actions/workflows/windows.yml) |
 
@@ -19,24 +19,24 @@ Supported Platforms/Compilers
 Converter is implemented using C++20 with code portable across OS and it's supported compiler's.<br>
 
 Results of last run:
-|  <div style="width:150px">🖥️&nbsp;OS&nbsp;➡️ <br> 🤖&nbsp;Compiler&nbsp;⬇️ </div> | <div style="width:100px">**Ubuntu&nbsp;24.04**</div> | <div style="width:100px">**Ubuntu&nbsp;22.04**</div> | <div style="width:100px">**macOS-14**</div> | <div style="width:100px">**macOS-13**</div> | <div style="width:100px">**macOS-12**</div> | <div style="width:100px">**Windows&nbsp;10<br>VS&nbsp;17&nbsp;-&nbsp;2022**</div> | <div style="width:100px">**Windows&nbsp;10<br>VS&nbsp;16&nbsp;-&nbsp;2019**</div> |
+| <nobr>🖥️ OS ➡️</nobr><br><nobr>🤖 Compiler ⬇️</nobr> | <nobr>**Ubuntu 24.04**<nobr> | <nobr>**Ubuntu 22.04**</nobr> | **macOS-14** | **macOS-13** | **macOS-12** | **<nobr>Windows 10</nobr><br><nobr>VS 17 - 2022</nobr>** | **<nobr>Windows 10</nobr><br><nobr>VS 16 - 2019</nobr>** |
 |------------|------------|------------------|--------------|--------------|--------------|-------------------------------|-------------------------------|
 | **g++ 14** | ✅ | - | ❌ | ✅ | ✅ | - | - |
 | **g++ 13** | ✅&nbsp;(default) | ⚠ | ❌ | ❌ | ❌ | - | - |
 | **g++ 12** | ✅ | ✅ | ❌ | ✅ | ✅ | - | - |
 | **g++ 11** | - | ✅&nbsp;(default) | - | - | ⚠ | - | - |
-| **clang++&nbsp;(18,17,16)** | ✅&nbsp;(clang++:18) | - | - | - | - | - | - |
-| **clang++&nbsp;(15,14,13)** | - | ✅&nbsp;(clang++:14) | - | - | - | - | - |
+| <nobr>**clang++ (18,17,16)**</nobr> | ✅&nbsp;(clang++:18) | - | - | - | - | - | - |
+| <nobr>**clang++ (15,14,13)**</nobr> | - | ✅&nbsp;(clang++:14) | - | - | - | - | - |
 | **AppleClang** | - | - | ❌&nbsp;(15) | ✅&nbsp;(15) | ✅&nbsp;(14) | - | - |
 | **msvc 19** | - | - | - | - | - | ✅&nbsp;(default) | ❌&nbsp;(default) |
 | **clangCL** | - | - | - | - | - | ✅&nbsp;(v17) | ✅&nbsp;(v12) |
-| default Compiler | g++13 | g++11 | AppleClang&nbsp;15 | AppleClang&nbsp;15 | AppleClang&nbsp;14 | msvc&nbsp;19 | msvc&nbsp;19 |
+| default&nbsp;Compiler | g++13 | g++11 | AppleClang&nbsp;15 | AppleClang&nbsp;15 | AppleClang&nbsp;14 | msvc&nbsp;19 | msvc&nbsp;19 |
 
 
 <br>
 Previous successful runs (now failing for some reasons) :
 
-|  <div style="width:150px">🖥️&nbsp;OS&nbsp;➡️ <br> 🤖&nbsp;Compiler&nbsp;⬇️ </div> | <div style="width:100px">**Ubuntu&nbsp;22.04**</div> | <div style="width:100px">**macOS-13**</div> | <div style="width:100px">**macOS-12**</div> | <div style="width:100px">**⚠&nbsp;macOS-11**</div> |
+|  <nobr>🖥️ OS ➡️</nobr><br><nobr>🤖 Compiler ⬇️</nobr> | <nobr>**Ubuntu 22.04**</nobr> | **macOS-13** | **macOS-12** | **⚠&nbsp;macOS-11** |
 |------------|------------------|--------------|--------------|--------------|
 | **g++ 13** | ☑️⚠ | ❌1 | ☑️❌ | NA | - |
 | **g++ 12** | ^ | - | ^ | ☑️⚠ [12](https://github.com/panchaBhuta/converter/actions/runs/8329360121/job/22791476195) |
@@ -97,17 +97,17 @@ Precision Nomenclature ( for roundtrip conversions :: **string -> data-type -> s
 ✅ : Good. Minimal precision loss, best of the lot.  <br>
 ☑️ : Average. Precision loss is non-uniform, loss can be high for some FP values.
 
-|  <div style="width:150px">🖥️&nbsp;OS&nbsp;➡️ <br> 🤖&nbsp;Compiler&nbsp;⬇️ </div> | <div style="width:100px">**Ubuntu&nbsp;24.04**</div> | <div style="width:100px">**Ubuntu&nbsp;22.04**</div> | <div style="width:100px">**macOS-14**</div> | <div style="width:100px">**macOS-13**</div> | <div style="width:100px">**macOS-12**</div> | <div style="width:100px">**macOS-11**</div> | <div style="width:100px">**Windows&nbsp;10<br>VS&nbsp;17&nbsp;-&nbsp;2022**</div> | <div style="width:100px">**Windows&nbsp;10<br>VS&nbsp;16&nbsp;-&nbsp;2019**</div> |
+| <nobr>🖥️ OS ➡️</nobr><br><nobr>🤖 Compiler ⬇️</nobr> | <nobr>**Ubuntu 24.04**</nobr> | <nobr>**Ubuntu 22.04**</nobr> | **macOS-14** | **macOS-13** | **macOS-12** | **macOS-11** | **<nobr>Windows 10</nobr><br><nobr>VS 17 - 2022</nobr>** | **<nobr>Windows 10</nobr><br><nobr>VS 16 - 2019</nobr>** |
 |------------|--------------|--------------|--------------|--------------|--------------|--------------|-------------------------------|-------------------------------|
 | **g++ 14** | ⚔️ ✅ | - | ❌ | ⚔️ ✅ | ⚔️ ✅ | - | - | - |
 | **g++ 13** | ⚔️ ✅ | ⚠ | ❌ | ❌ | ❌ | - | - | - |
 | **g++ 12** | ⚔️ ✅ | ⚔️ ✅ | ❌ | ⚔️ ✅ | ⚔️ ✅ | ⚔️ ✅ | - | - |
 | **g++ 11** | - | ⚔️ ✅ | - | - | ⚠ | ⚔️ ✅ | - | - |
-| **clang++&nbsp;(18,17,16)** | ⚔️ ✅ | - | - | - | - | - | - | - |
-| **clang++&nbsp;(15,14,13)** | - | ⚔️ ✅ | - | - | - | - | - | - |
-| **AppleClang** | - | - | ❌ | 🛠️ ☑️ (15) | 🛠️ ☑️ (14) | - | - | - |
-| **msvc 19** | - | - | - | - | - | - | ⚔️ ☑️ | ❌ |
-| **clangCL** | - | - | - | - | - | - | ⚔️ ☑️ (17) | ⚔️ ☑️ (12) |
+| <nobr>**clang++ (18,17,16)**</nobr> | ⚔️ ✅ | - | - | - | - | - | - | - |
+| <nobr>**clang++ (15,14,13)**</nobr> | - | ⚔️ ✅ | - | - | - | - | - | - |
+| **AppleClang** | - | - | ❌ | 🛠️&nbsp;☑️&nbsp;(15) | 🛠️&nbsp;☑️&nbsp;(14) | - | - | - |
+| **msvc 19** | - | - | - | - | - | - | ⚔️&nbsp;☑️ | ❌ |
+| **clangCL** | - | - | - | - | - | - | ⚔️&nbsp;☑️ (17) | ⚔️&nbsp;☑️&nbsp;(12) |
 
 
 ### Data Conversion Precision
@@ -167,7 +167,7 @@ For _year_month_day -> string_ conversion, refers to call to ...<br>
 ⚔️ : `std::chrono::from_stream()` and `std::chrono::to_stream` are preffered.<br>
 🛠️ : `date::from_stream()` and `date::to_stream` are workarounds, if `std::chrono::*` functions are not supported.<br>
 
-| <div style="width:200px"> 🖥️&nbsp;OS&nbsp;➡️ <br> 🪄&nbsp;conversion&nbsp;type&nbsp;⬇️ </div> | <div style="width:150px">**Linux** 🐧<img src="images/ubuntu-logo.png" width="16" alt="ubuntu"> </div> | <div style="width:150px">**Mac**<img src="images/apple-logo-icon-14906.png" width="16" alt="apple logo"> </div> | <div style="width:150px">**Windows**<img src="images/windows.png" width="16" alt="windows official"> </div> |
+| <nobr>🖥️ OS ➡️</nobr><br><nobr>🪄 conversion type ⬇️</nobr> | **Linux** 🐧<img src="images/ubuntu-logo.png" width="16" alt="ubuntu"> | **Mac** <img src="images/apple-logo-icon-14906.png" width="16" alt="apple logo"> | **Windows** <img src="images/windows.png" width="16" alt="windows official"> |
 |------------|--------------|---------|-------------|
 | **string&nbsp;↣&nbsp;year_month_day** | 🛠️&nbsp;date::from_stream() | 🛠️&nbsp;date::from_stream() | ⚔️&nbsp;**std::chrono::from_stream()** |
 | **year_month_day&nbsp;↣&nbsp;string** | 🛠️&nbsp;date::to_stream() | 🛠️&nbsp;date::to_stream() | 🛠️&nbsp;date::to_stream() |
