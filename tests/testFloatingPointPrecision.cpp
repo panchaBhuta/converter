@@ -97,7 +97,7 @@ int main()
                  expected_double_1d1234567890123456789[indexOS]);   // 15 digits
     std::string expected_longDouble_1d123456789012345678901[] = { "1.1234567890123456789",
 #if defined(__aarch64__) || defined(__arm__)
-                                                                  "1.12345678901234569",  // macos -14
+                                                                  "1.12345678901234569",  // macos-14  ARM64
 #else
                                                                   "1.12345678901234567889",
 #endif
@@ -111,7 +111,11 @@ int main()
                  "9007199254740993", 9007199254740993.0, "9007199254740992");
                                                    //    "9007199254740993"
     std::string expected_longDouble_9007199254740993[] = { "9007199254740993",
+#if defined(__aarch64__) || defined(__arm__)
+                                                          "9007199254740992",  // macos-14  ARM64
+#else
                                                            "9007199254740993",
+#endif
                                                            "9007199254740992" }; // Windows
     checkRoundTripConversion_txt2Val2txt<long double>("testFloatingPointPrecision-8",
                  "9007199254740993", 9007199254740993.0L, expected_longDouble_9007199254740993[indexOS]);

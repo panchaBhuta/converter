@@ -99,7 +99,7 @@ int main()
                  "2.1234567890123456789", 2.1234567890123456789, "2.1234567890123", getLowerDecimalPrecision<double>());  // 14 digits
     std::string expected_longDouble_1d123456789012345678901[] = { "3.1234567890123457",
 #if defined(__aarch64__) || defined(__arm__)
-                                                                  "3.1234567890123",
+                                                                  "3.1234567890123", // macos-14 is arm64 based
 #else
                                                                   "3.1234567890123457",
 #endif
@@ -108,7 +108,7 @@ int main()
                                                       ConvertFromVal_lDP<long double>>("testUserDefinedConverter_lowerPrecision-6",
                  "3.123456789012345678901", 3.123456789012345678901L,
                  expected_longDouble_1d123456789012345678901[indexOS],
-                 ((indexOS==2)?14:16)
+                 ((defined(__aarch64__) || defined(__arm__)) || (indexOS==2)?14:16)
                  // getLowerDecimalPrecision<long double>() = 17 digits
                 );
     checkRoundTripConversion_txt2Val2txt<double, converter::ConvertFromStr<double>,

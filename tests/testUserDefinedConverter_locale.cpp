@@ -146,17 +146,25 @@ int main()
                  "1,123456789", 1.123456789f, "1,12345684", std::numeric_limits<float>::digits10, ',', '.');
     checkRoundTripConversion_txt2Val2txt<double, ConvertFromStr_loc<double>, ConvertFromVal_loc<double>>("testUserDefinedConverter_locale-5",
                  "2,1234567890123456789", 2.1234567890123456789, "2,12345678901234569", std::numeric_limits<double>::digits10, ',', '.');
+#if (defined(__aarch64__) || defined(__arm__))                                                \
+      && defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__) && defined(__clang_major__)   \
+      && (__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ >= 140000) && (__clang_major__ >= 15)
+                                                                  "3,12345678901234569",  // specific to MacOS-14 and default complier(AppleClang-15)
+#define ARM64_MACOS14ge_APPLECLANG15ge true
+#else
+#define ARM64_MACOS14ge_APPLECLANG15ge false
+#endif
     std::string expected_longDouble_3d123456789012345678901[] = { "3,12345678901234567889",
-//#if defined(__aarch64__) || defined(__arm__)
-//                                                                  "3,12345678901234569",
-//#else
+#if ARM64_MACOS14ge_APPLECLANG15ge
+                                                                  "3,12345678901234569",  // specific to MacOS-14 and default complier(AppleClang-15)
+#else
                                                                   "3,12345678901234567889",
-//#endif
+#endif
                                                                   "3,12345678901234569" };  // Windows
     checkRoundTripConversion_txt2Val2txt<long double, ConvertFromStr_loc<long double>, ConvertFromVal_loc<long double>>("testUserDefinedConverter_locale-6",
                  "3,123456789012345678901", 3.123456789012345678901L,
                  expected_longDouble_3d123456789012345678901[indexOS],
-                 ((indexOS==2)?17:std::numeric_limits<long double>::digits10), ',', '.');
+                 ((ARM64_MACOS14ge_APPLECLANG15ge || (indexOS==2))?17:std::numeric_limits<long double>::digits10), ',', '.');
 
     std::string expected_double_9007199254740993[] = { "9.007.199.254.740.992", //    "9.007.199.254.740.993"
                                                        "9007199254740992",      // MacOS
