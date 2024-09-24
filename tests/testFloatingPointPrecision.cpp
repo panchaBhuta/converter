@@ -19,20 +19,49 @@
   #define  TEMPLATE_UID  103
   const unsigned indexOS = 2;
 #elif defined(__APPLE__) && defined(__MACH__)
-  #if USE_FLOATINGPOINT_FROM_CHARS_1  ==  e_ENABLE_FEATURE && USE_FLOATINGPOINT_TO_CHARS_1  ==  e_ENABLE_FEATURE
-    // when compiler is GNU.
-    #define  TEMPLATE_UID  103
-    const unsigned indexOS = 0;
+  #if defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__) &&  \
+      __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ >= 140000
+    //  POST ARM64 era
+    #if defined(__aarch64__) || defined(__arm__)
+      //////  github :  macos-14
+      #if defined(__clang_major__)
+        // when compiler is AppleClang.
+        #define  TEMPLATE_UID  3
+        const unsigned indexOS = 1;
+      #else
+        // when compiler is GNU.
+        // macOS does not support 'std::from_chars()' and 'std::to_chars()'.
+        // The fall back functions induces variations in results when compared to other OS's.
+        #define  TEMPLATE_UID  103
+        const unsigned indexOS = 0;
+      #endif
+    #else
+      //////  github :  macos-14-large
+      #if defined(__clang_major__)
+        // when compiler is AppleClang.
+        #define  TEMPLATE_UID  3
+        const unsigned indexOS = 1;
+      #else
+        // when compiler is GNU.
+        // macOS does not support 'std::from_chars()' and 'std::to_chars()'.
+        // The fall back functions induces variations in results when compared to other OS's.
+        #define  TEMPLATE_UID  103
+        const unsigned indexOS = 0;
+      #endif
+    #endif
   #else
-    // when compiler is AppleClang.
-    // The macro __GNUC__is defined even for AppleClang compiler,
-    // hence not able to use system dependent macro here.
-    // instead using application macros USE_FLOATINGPOINT_FROM_CHARS_1 and USE_FLOATINGPOINT_TO_CHARS_1.
-        // macOS does not support 'std::from_chars()' and
-        // 'std::to_chars()'. The fall back functions
-        // induces variations in results when compared to other OS's.
-    #define  TEMPLATE_UID  3
-    const unsigned indexOS = 1;
+    //  PRE ARM64 era
+    #if defined(__clang_major__)
+      // when compiler is AppleClang.
+      #define  TEMPLATE_UID  3
+      const unsigned indexOS = 1;
+    #else
+      // when compiler is GNU.
+      // macOS does not support 'std::from_chars()' and 'std::to_chars()'.
+      // The fall back functions induces variations in results when compared to other OS's.
+      #define  TEMPLATE_UID  103
+      const unsigned indexOS = 0;
+    #endif
   #endif
 #else  // ubuntu and other OS's
   #define  TEMPLATE_UID  103
@@ -96,11 +125,7 @@ int main()
                  "1.1234567890123456789", 1.1234567890123456789,
                  expected_double_1d1234567890123456789[indexOS]);   // 15 digits
     std::string expected_longDouble_1d123456789012345678901[] = { "1.1234567890123456789",
-#if defined(__aarch64__) || defined(__arm__)
-                                                                  "1.12345678901234569",  // macos-14  ARM64
-#else
                                                                   "1.12345678901234567889",
-#endif
                                                                   "1.1234567890123457" };  // Windows
     checkRoundTripConversion_txt2Val2txt<long double>("testFloatingPointPrecision-6",
                  "1.123456789012345678901", 1.123456789012345678901L,

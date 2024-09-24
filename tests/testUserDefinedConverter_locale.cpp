@@ -149,10 +149,9 @@ int main()
 #if (defined(__aarch64__) || defined(__arm__))                                                \
       && defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__) && defined(__clang_major__)   \
       && (__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ >= 140000) && (__clang_major__ >= 15)
-                                                                  "3,12345678901234569",  // specific to MacOS-14 and default complier(AppleClang-15)
-#define ARM64_MACOS14ge_APPLECLANG15ge true
+  #define ARM64_MACOS14ge_APPLECLANG15ge true
 #else
-#define ARM64_MACOS14ge_APPLECLANG15ge false
+  #define ARM64_MACOS14ge_APPLECLANG15ge false
 #endif
     std::string expected_longDouble_3d123456789012345678901[] = { "3,12345678901234567889",
 #if ARM64_MACOS14ge_APPLECLANG15ge
