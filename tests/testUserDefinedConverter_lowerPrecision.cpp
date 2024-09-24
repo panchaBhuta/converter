@@ -9,6 +9,13 @@
 
 #include "unittest.h"
 #include "utilities.h"
+#include "osIdx_TemplateID.h"
+
+/*
+  refer   https://en.cppreference.com/w/cpp/types/numeric_limits/digits10
+*/
+
+extern const unsigned indexOS;
 
 
 template<converter::c_floating_point T>
@@ -54,29 +61,6 @@ int main()
 
   int rv = 0;
   try {
-
-// https://web.archive.org/web/20191012035921/http://nadeausoftware.com/articles/2012/01/c_c_tip_how_use_compiler_predefined_macros_detect_operating_system
-#if defined(WIN64) || defined(_WIN64) || defined(__WIN64) || defined(__WIN64__)
-    const unsigned indexOS = 2;
-#elif defined(__APPLE__) && defined(__MACH__)
-  #if USE_FLOATINGPOINT_FROM_CHARS_1  ==  e_ENABLE_FEATURE && USE_FLOATINGPOINT_TO_CHARS_1  ==  e_ENABLE_FEATURE
-    // when compiler is GNU.
-    #define  TEMPLATE_UID  103
-    const unsigned indexOS = 0;
-  #else
-    // when compiler is AppleClang.
-    // The macro __GNUC__is defined even for AppleClang compiler,
-    // hence not able to use system dependent macro her.
-    // instead using application macros USE_FLOATINGPOINT_FROM_CHARS_1 and USE_FLOATINGPOINT_TO_CHARS_1.
-        // macOS does not support 'std::from_chars()' and
-        // 'std::to_chars()'. The fall back functions
-        // induces variations in results when compared to other OS's.
-    const unsigned indexOS = 1;
-  #endif
-#else  // ubuntu and other OS's
-    const unsigned indexOS = 0;
-#endif
-
     checkRoundTripConversion_txt2Val2txt<float, converter::ConvertFromStr<float>,
                                                 ConvertFromVal_lDP<float>>("testUserDefinedConverter_lowerPrecision-1",
                  "8.589973e+9", 8.589973e9f, "8.59e+09",
@@ -98,9 +82,11 @@ int main()
                                                  ConvertFromVal_lDP<double>>("testUserDefinedConverter_lowerPrecision-5",
                  "2.1234567890123456789", 2.1234567890123456789, "2.1234567890123", getLowerDecimalPrecision<double>());  // 14 digits
     std::string expected_longDouble_1d123456789012345678901[] = { "3.1234567890123457",
-#if defined(__aarch64__) || defined(__arm__)
-                                                                  "3.1234567890123", // macos-14 is arm64 based
-#else
+#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG
+                                                                  "3.1234567890123",
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
+#else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
                                                                   "3.1234567890123457",
 #endif
                                                                   "3.1234567890123" };  // Windows
@@ -108,12 +94,17 @@ int main()
                                                       ConvertFromVal_lDP<long double>>("testUserDefinedConverter_lowerPrecision-6",
                  "3.123456789012345678901", 3.123456789012345678901L,
                  expected_longDouble_1d123456789012345678901[indexOS],
-#if defined(__aarch64__) || defined(__arm__)
+                 (indexOS==0)?16:(
+                 (indexOS==1)?
+#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG
                  14
-#else
-                 (indexOS==2)?14:16
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
+#else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
+                 16
                  // getLowerDecimalPrecision<long double>() = 17 digits
 #endif
+                 :14)
                 );
     checkRoundTripConversion_txt2Val2txt<double, converter::ConvertFromStr<double>,
                                                  ConvertFromVal_lDP<double>>("testUserDefinedConverter_lowerPrecision-7",

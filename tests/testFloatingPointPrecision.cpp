@@ -9,64 +9,13 @@
 
 #include "unittest.h"
 #include "utilities.h"
+#include "osIdx_TemplateID.h"
 
 /*
   refer   https://en.cppreference.com/w/cpp/types/numeric_limits/digits10
 */
 
-// https://web.archive.org/web/20191012035921/http://nadeausoftware.com/articles/2012/01/c_c_tip_how_use_compiler_predefined_macros_detect_operating_system
-#if defined(WIN64) || defined(_WIN64) || defined(__WIN64) || defined(__WIN64__)
-  #define  TEMPLATE_UID  103
-  const unsigned indexOS = 2;
-#elif defined(__APPLE__) && defined(__MACH__)
-  #if defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__) &&  \
-      __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ >= 140000
-    //  POST ARM64 era
-    #if defined(__aarch64__) || defined(__arm__)
-      //////  github :  macos-14
-      #if defined(__clang_major__)
-        // when compiler is AppleClang.
-        #define  TEMPLATE_UID  3
-        const unsigned indexOS = 1;
-      #else
-        // when compiler is GNU.
-        // macOS does not support 'std::from_chars()' and 'std::to_chars()'.
-        // The fall back functions induces variations in results when compared to other OS's.
-        #define  TEMPLATE_UID  103
-        const unsigned indexOS = 0;
-      #endif
-    #else
-      //////  github :  macos-14-large
-      #if defined(__clang_major__)
-        // when compiler is AppleClang.
-        #define  TEMPLATE_UID  3
-        const unsigned indexOS = 1;
-      #else
-        // when compiler is GNU.
-        // macOS does not support 'std::from_chars()' and 'std::to_chars()'.
-        // The fall back functions induces variations in results when compared to other OS's.
-        #define  TEMPLATE_UID  103
-        const unsigned indexOS = 0;
-      #endif
-    #endif
-  #else
-    //  PRE ARM64 era
-    #if defined(__clang_major__)
-      // when compiler is AppleClang.
-      #define  TEMPLATE_UID  3
-      const unsigned indexOS = 1;
-    #else
-      // when compiler is GNU.
-      // macOS does not support 'std::from_chars()' and 'std::to_chars()'.
-      // The fall back functions induces variations in results when compared to other OS's.
-      #define  TEMPLATE_UID  103
-      const unsigned indexOS = 0;
-    #endif
-  #endif
-#else  // ubuntu and other OS's
-  #define  TEMPLATE_UID  103
-  const unsigned indexOS = 0;
-#endif
+extern const unsigned indexOS;
 
 #if TEMPLATE_UID == 103
   template<converter::c_floating_point T>
@@ -125,7 +74,15 @@ int main()
                  "1.1234567890123456789", 1.1234567890123456789,
                  expected_double_1d1234567890123456789[indexOS]);   // 15 digits
     std::string expected_longDouble_1d123456789012345678901[] = { "1.1234567890123456789",
+#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG
+                                                                  "1.12345678901234569",
+#elif               MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU
+                                                                  "1.1234567890123457",
+#elif               MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
                                                                   "1.12345678901234567889",
+#else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
+                                                                  "1.1234567890123456789",
+#endif
                                                                   "1.1234567890123457" };  // Windows
     checkRoundTripConversion_txt2Val2txt<long double>("testFloatingPointPrecision-6",
                  "1.123456789012345678901", 1.123456789012345678901L,
@@ -136,9 +93,11 @@ int main()
                  "9007199254740993", 9007199254740993.0, "9007199254740992");
                                                    //    "9007199254740993"
     std::string expected_longDouble_9007199254740993[] = { "9007199254740993",
-#if defined(__aarch64__) || defined(__arm__)
-                                                          "9007199254740992",  // macos-14  ARM64
-#else
+#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG
+                                                          "9007199254740992",
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
+#else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
                                                            "9007199254740993",
 #endif
                                                            "9007199254740992" }; // Windows

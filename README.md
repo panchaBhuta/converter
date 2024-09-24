@@ -22,14 +22,14 @@ Results of last run:
 | <nobr>🖥️ OS ➡️</nobr><br><nobr>🤖 Compiler ⬇️</nobr> | **Ubuntu&nbsp;24.04** | **Ubuntu&nbsp;22.04** | **macOS-14** | **macOS-13** | **macOS-12** | **Windows&nbsp;10<br>VS&nbsp;17&nbsp;-&nbsp;2022** | **Windows&nbsp;10<br>VS&nbsp;16&nbsp;-&nbsp;2019** |
 |------------|------------|------------------|--------------|--------------|--------------|-------------------------------|-------------------------------|
 | **g++ 14** | ✅ | - | ❌ | ✅ | ✅ | - | - |
-| **g++ 13** | ✅&nbsp;(default) | ⚠ | ❌ | ❌ | ❌ | - | - |
+| **g++ 13** | ✅ (default) | ⚠ | ❌ | ❌ | ❌ | - | - |
 | **g++ 12** | ✅ | ✅ | ❌ | ✅ | ✅ | - | - |
-| **g++ 11** | - | ✅&nbsp;(default) | - | - | ⚠ | - | - |
-| **clang++ (18,17,16)** | ✅&nbsp;(clang++:18) | - | - | - | - | - | - |
-| **clang++ (15,14,13)** | - | ✅&nbsp;(clang++:14) | - | - | - | - | - |
-| **AppleClang** | - | - | ❌&nbsp;(15) | ✅&nbsp;(15) | ✅&nbsp;(14) | - | - |
-| **msvc 19** | - | - | - | - | - | ✅&nbsp;(default) | ❌&nbsp;(default) |
-| **clangCL** | - | - | - | - | - | ✅&nbsp;(v17) | ✅&nbsp;(v12) |
+| **g++ 11** | - | ✅ (default) | - | - | ⚠ | - | - |
+| **clang++ (18,17,16)** | ✅ (clang++:18) | - | - | - | - | - | - |
+| **clang++ (15,14,13)** | - | ✅ (clang++:14) | - | - | - | - | - |
+| **AppleClang** | - | - | ❌ (15) | ✅ (15) | ✅ (14) | - | - |
+| **msvc 19** | - | - | - | - | - | ✅ (default) | ❌ (default) |
+| **clangCL** | - | - | - | - | - | ✅ (v17) | ✅ (v12) |
 | default&nbsp;Compiler | g++13 | g++11 | AppleClang&nbsp;15 | AppleClang&nbsp;15 | AppleClang&nbsp;14 | msvc&nbsp;19 | msvc&nbsp;19 |
 
 
@@ -38,14 +38,16 @@ Previous successful runs (now failing for some reasons) :
 
 |  <nobr>🖥️ OS ➡️</nobr><br><nobr>🤖 Compiler ⬇️</nobr> | **Ubuntu&nbsp;22.04** | **macOS-13** | **macOS-12** | **⚠&nbsp;macOS-11** |
 |------------|------------------|--------------|--------------|--------------|
-| **g++ 13** | ☑️⚠ | ❌1 | ☑️❌ | NA | - |
+| **g++ 13** | ☑️⚠ | - | ☑️❌ | NA | - |
 | **g++ 12** | ^ | - | ^ | ☑️⚠ [12](https://github.com/panchaBhuta/converter/actions/runs/8329360121/job/22791476195) |
 | **g++ 11** | ^ | - | ☑️⚠ | ☑️⚠ [11](https://github.com/panchaBhuta/converter/actions/runs/8329360121/job/22791475491) |
 | **clang++ 12** | ☑️⚠ [12](https://github.com/panchaBhuta/converter/actions/runs/6291468380/job/17079862439) | - | - | - |
 
-⚠ : Withdrawn
+☑️ : Was working earlier.
 
-❌1 : <span style="color:grey">macOS-13</span> : New linker breaks the build. Both Cmake and Linker needs an update for this fix.
+⚠ : Now Withdrawn.
+
+❌ : Now Fails.
 
 
 [//]:  ❌

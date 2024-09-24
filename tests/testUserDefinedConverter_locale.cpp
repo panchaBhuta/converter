@@ -9,6 +9,13 @@
 
 #include "unittest.h"
 #include "utilities.h"
+#include "osIdx_TemplateID.h"
+
+/*
+  refer   https://en.cppreference.com/w/cpp/types/numeric_limits/digits10
+*/
+
+extern const unsigned indexOS;
 
 
 
@@ -107,28 +114,6 @@ int main()
 
   try {
 
-// https://sourceforge.net/p/predef/wiki/OperatingSystems/
-// https://web.archive.org/web/20191012035921/http://nadeausoftware.com/articles/2012/01/c_c_tip_how_use_compiler_predefined_macros_detect_operating_system
-#if defined(WIN64) || defined(_WIN64) || defined(__WIN64) || defined(__WIN64__)
-    const unsigned indexOS = 2;
-#elif defined(__APPLE__) && defined(__MACH__)
-  #if USE_FLOATINGPOINT_FROM_CHARS_1  ==  e_ENABLE_FEATURE && USE_FLOATINGPOINT_TO_CHARS_1  ==  e_ENABLE_FEATURE
-    // when compiler is GNU or clang, under macOS.
-    #define  TEMPLATE_UID  103
-    const unsigned indexOS = 0;
-  #else
-    // when compiler is AppleClang.
-    // The macro __GNUC__is defined even for AppleClang compiler,
-    // hence not able to use system dependent macro her.
-    // Instead using application macros USE_FLOATINGPOINT_FROM_CHARS_1 and USE_FLOATINGPOINT_TO_CHARS_1.
-    // macOS does not support 'std::from_chars()' and 'std::to_chars()'.
-    // The fall back functions induces variations in results when compared to other OS's.
-    const unsigned indexOS = 1;
-  #endif
-#else  // ubuntu and other OS's
-    const unsigned indexOS = 0;
-#endif
-
     checkRoundTripConversion_txt2Val2txt<float, ConvertFromStr_loc<float>, ConvertFromVal_loc<float>>("testUserDefinedConverter_locale-1",
                  "8,589973e+9", 8.589973e9f, "8,5899735e+09", std::numeric_limits<float>::digits10, ',', '.');
                                           // "8,589973e+9"
@@ -146,24 +131,14 @@ int main()
                  "1,123456789", 1.123456789f, "1,12345684", std::numeric_limits<float>::digits10, ',', '.');
     checkRoundTripConversion_txt2Val2txt<double, ConvertFromStr_loc<double>, ConvertFromVal_loc<double>>("testUserDefinedConverter_locale-5",
                  "2,1234567890123456789", 2.1234567890123456789, "2,12345678901234569", std::numeric_limits<double>::digits10, ',', '.');
-#if (defined(__aarch64__) || defined(__arm__))                                                \
-      && defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__) && defined(__clang_major__)   \
-      && (__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ >= 140000) && (__clang_major__ >= 15)
-  #define ARM64_MACOS14ge_APPLECLANG15ge true
-#else
-  #define ARM64_MACOS14ge_APPLECLANG15ge false
-#endif
+
     std::string expected_longDouble_3d123456789012345678901[] = { "3,12345678901234567889",
-#if ARM64_MACOS14ge_APPLECLANG15ge
-                                                                  "3,12345678901234569",  // specific to MacOS-14 and default complier(AppleClang-15)
-#else
                                                                   "3,12345678901234567889",
-#endif
                                                                   "3,12345678901234569" };  // Windows
     checkRoundTripConversion_txt2Val2txt<long double, ConvertFromStr_loc<long double>, ConvertFromVal_loc<long double>>("testUserDefinedConverter_locale-6",
                  "3,123456789012345678901", 3.123456789012345678901L,
                  expected_longDouble_3d123456789012345678901[indexOS],
-                 ((ARM64_MACOS14ge_APPLECLANG15ge || (indexOS==2))?17:std::numeric_limits<long double>::digits10), ',', '.');
+                 (indexOS==2?17:std::numeric_limits<long double>::digits10), ',', '.');
 
     std::string expected_double_9007199254740993[] = { "9.007.199.254.740.992", //    "9.007.199.254.740.993"
                                                        "9007199254740992",      // MacOS
