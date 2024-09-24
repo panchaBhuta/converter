@@ -83,8 +83,8 @@ int main()
                  "2.1234567890123456789", 2.1234567890123456789, "2.1234567890123", getLowerDecimalPrecision<double>());  // 14 digits
     std::string expected_longDouble_1d123456789012345678901[] = { "3.1234567890123457",
 #if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG
+        ||          MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU
                                                                   "3.1234567890123",
-//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU
 //#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
 #else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
                                                                   "3.1234567890123457",
@@ -97,8 +97,8 @@ int main()
                  (indexOS==0)?16:(
                  (indexOS==1)?
 #if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG
+        ||          MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU
                  14
-//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU
 //#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
 #else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
                  16
@@ -111,7 +111,13 @@ int main()
                  "9007199254740993", 9007199254740993.0, "9.007199254741e+15", getLowerDecimalPrecision<double>());
 
     std::string expected_longDouble_9007199254740993[] = { "9007199254740993",
+#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG
+                                                           "9.007199254741e+15",
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
+#else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
                                                            "9007199254740993",
+#endif
                                                            "9.007199254741e+15" }; // Windows
     checkRoundTripConversion_txt2Val2txt<long double, converter::ConvertFromStr<long double>,
                                                       ConvertFromVal_lDP<long double>>("testUserDefinedConverter_lowerPrecision-8",

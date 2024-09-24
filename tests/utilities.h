@@ -35,7 +35,8 @@ void checkRoundTripConversion_txt2Val2txt( const std::string& testID,
   unittest::ExpectEqual(T, valExpected, valConv);
 
   const std::string strRoundtripActual = TConvertFromVal::ToStr(valConv);
-  std::cout << "testID = " << testID << " , strInput = " << strInput << std::endl;
+  std::cout << "testID = " << testID << " , strInput = " << strInput << " : decimalPrecision = " << decimalPrecision << std::endl;
+  std::cout << "strRoundtripExpected = " << strRoundtripExpected << " : strRoundtripActual = " << strRoundtripActual << std::endl;
   unittest::ExpectEqual(std::string, strRoundtripExpected, strRoundtripActual);
 
   if(strInput.compare(strRoundtripActual)!=0)
@@ -109,7 +110,7 @@ void checkRoundTripConversion_txt2Val2txt( const std::string& testID,
       }
     } else if(decSep_input == std::string::npos  && decSep_actual == std::string::npos) {
       std::cout << "integer significant-digits check" << std::endl;
-      // both input and round-trip-string have decimal seperator
+      // both input and round-trip-string DONOT have decimal seperator
       // for e.g.: '8589973000'
       std::string significantDigits_input = _strInput.substr(0, static_cast<size_t>(decimalPrecision));
       std::string significantDigits_actual = _strRoundtripActual.substr(0, static_cast<size_t>(decimalPrecision));
