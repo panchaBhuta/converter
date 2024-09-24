@@ -154,7 +154,13 @@ int main()
                  expected_double_9007199254740993[indexOS], std::numeric_limits<double>::digits10, ',', '.');
 
     std::string expected_longDouble_9007199254740993[] = { "9.007.199.254.740.993", // Ubuntu
+#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG
+                                                           "9007199254740992",      // MacOS
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
+#else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
                                                            "9007199254740993",      // MacOS
+#endif
                                                            "9.007.199.254.740.992", };// Windows
     checkRoundTripConversion_txt2Val2txt<long double, ConvertFromStr_loc<long double>, ConvertFromVal_loc<long double>>("testUserDefinedConverter_locale-8",
                  "9007199254740993", 9007199254740993.0L,

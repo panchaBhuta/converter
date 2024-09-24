@@ -53,7 +53,7 @@ void checkRoundTripConversion_txt2Val2txt( const std::string& testID,
     std::string::size_type decSep_actual = _strRoundtripActual.find(decimalSeperator);
     if(decSep_input != std::string::npos  && decSep_actual != std::string::npos)
     {
-      std::cout << "fraction check" << std::endl;
+      std::cout << "################   fraction check     ############" << std::endl;
       // both input and round-trip-string have decimal seperator
       // for e.g.: '3.3123412e+38'
       if(decSep_input == decSep_actual)

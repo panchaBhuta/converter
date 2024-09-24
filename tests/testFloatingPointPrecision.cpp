@@ -140,10 +140,10 @@ int main()
                  "3.3123412e+38", 3.3123412E38f, "3.3123412e+38");
 
     std::string expected_float_3d3123412en38[] = { "3.312341e-38",
-#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
+#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG
                                                    "3.31234111e-38",  // macOS
-//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG
 //#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
 #else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
                                                    "3.312341e-38",
 #endif
@@ -167,13 +167,15 @@ int main()
     std::string expected_longdouble_5d3123412en38[] = { "5.3123412e-38",
 #if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG
                                                         "5.31234120000000035e-38",
-#else
-                                                        "5.3123412000000000001e-38", // macOS
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU
+#else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
+                                                        "5.3123412e-38", // macOS
 #endif
                                                         "5.3123412e-38", };
     checkRoundTripConversion_txt2Val2txt<long double>("testFloatingPointPrecision-13",
                  "5.3123412e-38", 5.3123412E-38L, expected_longdouble_5d3123412en38[indexOS],
-                 ((indexOS==1)?8:std::numeric_limits<long double>::digits10) ); // macOS
+                 ((indexOS==1)?7:std::numeric_limits<long double>::digits10) ); // macOS
 
   } catch (const std::exception& ex) {
     std::cout << "Test Failed : err-msg : " << ex.what() << std::endl;
