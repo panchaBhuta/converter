@@ -52,7 +52,7 @@ int main()
   try {
 
     std::string expected_float_8d589973ep9[] = { "8589973504",
-#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG
+#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG   \
             ||      MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
                                                  "8.5899735e+09",  // macOS
 //#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU
@@ -69,7 +69,13 @@ int main()
                  "8.589973e+9", 8.589973e9L, "8589973000");
 
     std::string expected_float_1d123456789[] = { "1.1234568",
+#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG
                                                  "1.12345684",   // macOS
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
+#else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
+                                                 "1.1234568",
+#endif
                                                  "1.1234568" };
     checkRoundTripConversion_txt2Val2txt<float>("testFloatingPointPrecision-4",
                  "1.123456789", 1.123456789f, expected_float_1d123456789[indexOS]);  // 6 digits

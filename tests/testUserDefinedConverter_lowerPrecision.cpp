@@ -82,7 +82,7 @@ int main()
                                                  ConvertFromVal_lDP<double>>("testUserDefinedConverter_lowerPrecision-5",
                  "2.1234567890123456789", 2.1234567890123456789, "2.1234567890123", getLowerDecimalPrecision<double>());  // 14 digits
     std::string expected_longDouble_1d123456789012345678901[] = { "3.1234567890123457",
-#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG
+#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG   \
         ||          MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU
                                                                   "3.1234567890123",
 //#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
@@ -96,7 +96,7 @@ int main()
                  expected_longDouble_1d123456789012345678901[indexOS],
                  (indexOS==0)?16:(
                  (indexOS==1)?
-#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG
+#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG   \
         ||          MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU
                  14
 //#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
