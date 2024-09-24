@@ -152,9 +152,9 @@ int main()
                  "3.3123412e-38", 3.3123412E-38f, expected_float_3d3123412en38[indexOS]);
 
     std::string expected_double_4d3123412en38[] = { "4.3123412e-38",
-#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG
+#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG    \
+       ||           MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
                                                     "4.31234119999999987e-38",  // macOS
-//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
 //#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU
 #else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
                                                     "4.3123412e-38",
@@ -165,9 +165,9 @@ int main()
                  ((indexOS==1)?7:std::numeric_limits<double>::digits10) ); // macOS
 
     std::string expected_longdouble_5d3123412en38[] = { "5.3123412e-38",
-#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG
+#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG    \
+       ||           MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
                                                         "5.31234120000000035e-38",
-//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG
 //#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU
 #else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
                                                         "5.3123412e-38", // macOS
