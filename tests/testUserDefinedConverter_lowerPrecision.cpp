@@ -111,9 +111,9 @@ int main()
                  "9007199254740993", 9007199254740993.0, "9.007199254741e+15", getLowerDecimalPrecision<double>());
 
     std::string expected_longDouble_9007199254740993[] = { "9007199254740993",
-#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG
+#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG    \
+      ||            MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU
                                                            "9.007199254741e+15",
-//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU
 //#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
 #else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
                                                            "9007199254740993",
