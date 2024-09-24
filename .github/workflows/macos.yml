@@ -74,7 +74,7 @@ jobs:
         #run: ctest -C Debug --output-on-failure -j
         run: ctest -C Debug --verbose
       - name: Install [Debug]
-        run: cmake --install "${{github.workspace}}/build-debug" --config Debug
+        run: sudo cmake --install "${{github.workspace}}/build-debug" --config Debug
       - name: Configure CMake (compiler=default) [Release]
         if: matrix.compiler == 'default'
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
@@ -87,6 +87,6 @@ jobs:
         working-directory: ${{github.workspace}}/build-release
         run: ctest -C Release --verbose
       - name: Install [Release]
-        run: cmake --install "${{github.workspace}}/build-release" --config Release
-      - name: Check Work-Arounds
+        run: sudo cmake --install "${{github.workspace}}/build-release" --config Release
+      - name: Check Work-Around-Flags
         run: grep define "${{github.workspace}}/build-release/include/converter/_workaroundConfig.h" | grep -v -e "^//" -e " e_[^ ]*_FEATURE "

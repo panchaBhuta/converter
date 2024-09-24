@@ -106,7 +106,7 @@ jobs:
         run: ctest -C Release --verbose
       - name: Install [Release]
         run: cmake --install "${{github.workspace}}/build-release" --config Release
-      - name: Check Work-Arounds
+      - name: Check Work-Around-Flags
         run: grep define "${{github.workspace}}/build-release/include/converter/_workaroundConfig.h" | grep -v -e "^//" -e " e_[^ ]*_FEATURE "
 
 
