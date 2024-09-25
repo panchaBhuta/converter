@@ -18,15 +18,15 @@ Supported Platforms/Compilers
 =============================
 Converter is implemented using C++20 with code portable across OS and it's supported compiler's.<br>
 
-Results of last run:
+Ubit-Test results of last run:
 | <nobr>🖥️ OS ➡️</nobr><br><nobr>🤖 Compiler ⬇️</nobr> | **Ubuntu&nbsp;24.04** | **Ubuntu&nbsp;22.04** | **macOS-14**<br>(ARM64) | **macOS-13** | **macOS-12** | **Windows&nbsp;10<br>VS&nbsp;17&nbsp;-&nbsp;2022** | **Windows&nbsp;10<br>VS&nbsp;16&nbsp;-&nbsp;2019** |
 |------------|------------|------------------|--------------|--------------|--------------|-------------------------------|-------------------------------|
 | **g++ 14** | ✅ | - | ✅ | ✅ | ✅ | - | - |
 | **g++ 13** | ✅ (default) | ⚠ | ✅ | ❌ | ❌ | - | - |
 | **g++ 12** | ✅ | ✅ | ✅ | ✅ | ✅ | - | - |
 | **g++ 11** | - | ✅ (default) | - | - | ⚠ | - | - |
-| **clang++ (18,17,16)** | ✅ (clang++:18) | - | - | - | - | - | - |
-| **clang++ (15,14,13)** | - | ✅ (clang++:14) | - | - | - | - | - |
+| **clang++<br>(18,17,16)** | ✅<br>(clang++:18) | - | - | - | - | - | - |
+| **clang++<br>(15,14,13)** | - | ✅<br>(clang++:14) | - | - | - | - | - |
 | **AppleClang&nbsp;(default)** | - | - | ✅ (15) | ✅ (15) | ✅ (14) | - | - |
 | **msvc 19** | - | - | - | - | - | ✅ (default) | ❌ (default) |
 | **clangCL** | - | - | - | - | - | ✅ (v17) | ✅ (v12) |
@@ -34,7 +34,7 @@ Results of last run:
 
 
 <br>
-Previous successful runs (now failing for some reasons) :
+Previous successful Unit-test runs (now failing for some reasons) :
 
 |  <nobr>🖥️ OS ➡️</nobr><br><nobr>🤖 Compiler ⬇️</nobr> | **Ubuntu&nbsp;22.04** | **macOS-13** | **macOS-12** | **⚠&nbsp;macOS-11** |
 |------------|------------------|--------------|--------------|--------------|
@@ -160,19 +160,33 @@ Date types
 
 As of writing this code, `std::chrono` is not fully supported by various OS's, in that case `converter` lib, calls [date](https://github.com/HowardHinnant/date) lib for conversions.<br>
 
-Below table shows, the underlying conversion function(i.e between `std::chrono::*_stream()` or `date::*_stream()`) used across different OS's. Different compilers on a particular OS doesn't have any impact on this selection.<br>
-For _string ↣ year_month_day_ conversion, refers to call to ...<br>
+Below table shows, the underlying conversion function(i.e between `std::chrono::*_stream()` or `date::*_stream()`) used across different OS's.<br>
+For _string ↣ year_month_day_ conversion, is handled by function ...<br>
 `std::chrono::year_month_day ConverterFromStr<std::chrono::year_month_day>::ToVal(const std::string&)`.<br>
-For _year_month_day ↣ string_ conversion, refers to call to ...<br>
+For _year_month_day ↣ string_ conversion, is handled by function ...<br>
 `std::string ConverterFromVal<std::chrono::year_month_day>::ToStr(const std::chrono::year_month_day&)`.<br>
 
-⚔️ : `std::chrono::from_stream()` and `std::chrono::to_stream` are preffered.<br>
-🛠️ : `date::from_stream()` and `date::to_stream` are workarounds, if `std::chrono::*` functions are not supported.<br>
-
-| <nobr>🖥️ OS ➡️</nobr><br><nobr>🪄 conversion type ⬇️</nobr> | **Linux** 🐧<img src="images/ubuntu-logo.png" width="16" alt="ubuntu"> | **Mac** <img src="images/apple-logo-icon-14906.png" width="16" alt="apple logo"> | **Windows** <img src="images/windows.png" width="16" alt="windows official"> |
+Available date conversions :
+| <nobr>🤖 Algo/LIB ➡️</nobr><br><nobr>⏱ conversion type ⬇️</nobr> | **std::chrono::**<br>prefered | **date::**<br>3rd party lib | **jugaad**<br>work around |
 |------------|--------------|---------|-------------|
-| **string&nbsp;↣&nbsp;year_month_day** | 🛠️&nbsp;date::from_stream() | 🛠️&nbsp;date::from_stream() | ⚔️&nbsp;**std::chrono::from_stream()** |
-| **year_month_day&nbsp;↣&nbsp;string** | 🛠️&nbsp;date::to_stream() | 🛠️&nbsp;date::to_stream() | 🛠️&nbsp;date::to_stream() |
+| **string&nbsp;↣&nbsp;year_month_day** | ♔&nbsp;std::chrono::from_stream() | ♘&nbsp;date::from_stream() | ♙&nbsp;hand-coded tokenizer |
+| **year_month_day&nbsp;↣&nbsp;string** | ♚&nbsp;std::ostringstream&nbsp;<<&nbsp;std::vformat() | ♞&nbsp;date::to_stream() | ♟&nbsp;hand-coded tokenizer |
+
+<br>
+
+Date-Conversions used across different OS/Compiler combinations :
+| <nobr>🖥️ OS ➡️</nobr><br><nobr>🤖 Compiler ⬇️</nobr> | **Ubuntu&nbsp;24.04** | **Ubuntu&nbsp;22.04** | **macOS-14**<br>(ARM64) | **macOS-13** | **macOS-12** | **macOS-11** | **Windows&nbsp;10<br>VS&nbsp;17&nbsp;-&nbsp;2022** | **Windows&nbsp;10<br>VS&nbsp;16&nbsp;-&nbsp;2019** |
+|------------|--------------|--------------|--------------|--------------|--------------|--------------|-------------------------------|-------------------------------|
+| **g++ 14** | ♔ ♚ | - | ♔ ♚ | ♔ ♚ | ♔ ♚ | - | - | - |
+| **g++ 13** | ♘ ♚ | ⚠ | ♘ ♚ | ❌ | ❌ | - | - | - |
+| **g++ 12** | ♘ ♞ | ♘ ♞ | ♘ ♞ | ♘ ♞ | ♘ ♞ | ♘ ♞ | - | - |
+| **g++ 11** | - | ♘ ♞ | - | - | ⚠ | ♘ ♞ | - | - |
+| **clang++ (18,17,16)** | ♔ ♚ | - | - | - | - | - | - | - |
+| **clang++ (15,14,13)** | - | ♘ ♞ | - | - | - | - | - | - |
+| **AppleClang&nbsp;(default)** | - | - | ♘&nbsp;♚&nbsp;(15) | ♘&nbsp;♞&nbsp;(15) | ♘&nbsp;♞&nbsp;(14) | - | - | - |
+| **msvc 19** | - | - | - | - | - | - | ♔&nbsp;♚ | ❌ |
+| **clangCL** | - | - | - | - | - | - | ♔&nbsp;♚&nbsp;(17) | ♔&nbsp;♚&nbsp;(12) |
+
 
 
 The default date format is _"%F"_ (i.e "%Y-%m-%d"). For configuring a different date format refer [testDateConversionFormat.cpp](tests/testDateConversionFormat.cpp).
