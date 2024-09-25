@@ -165,9 +165,10 @@ int main()
                  ((indexOS==1)?7:std::numeric_limits<double>::digits10) ); // macOS
 
     std::string expected_longdouble_5d3123412en38[] = { "5.3123412e-38",
-#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG    \
-       ||           MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
+#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG
                                                         "5.31234120000000035e-38",
+#elif                MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
+                                                        "5.3123412000000000001e-38",
 //#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU
 #else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
                                                         "5.3123412e-38", // macOS
