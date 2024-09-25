@@ -10,7 +10,7 @@ Converter
 |--------------|---------|-------------|
 | [![Linux](https://github.com/panchaBhuta/converter/actions/workflows/linux.yml/badge.svg)](https://github.com/panchaBhuta/converter/actions/workflows/linux.yml) | [![macOS](https://github.com/panchaBhuta/converter/actions/workflows/macos.yml/badge.svg)](https://github.com/panchaBhuta/converter/actions/workflows/macos.yml) | [![Windows](https://github.com/panchaBhuta/converter/actions/workflows/windows.yml/badge.svg)](https://github.com/panchaBhuta/converter/actions/workflows/windows.yml) |
 
-Converter is an easy-to-use C++ `text<->type` conversion library. It supports C++20 (and
+Converter is an easy-to-use C++ `text ↔ type` conversion library. It supports C++20 (and
 later), is header-only and comes with a basic test suite.
 
 
@@ -19,15 +19,15 @@ Supported Platforms/Compilers
 Converter is implemented using C++20 with code portable across OS and it's supported compiler's.<br>
 
 Results of last run:
-| <nobr>🖥️ OS ➡️</nobr><br><nobr>🤖 Compiler ⬇️</nobr> | **Ubuntu&nbsp;24.04** | **Ubuntu&nbsp;22.04** | **macOS-14** | **macOS-13** | **macOS-12** | **Windows&nbsp;10<br>VS&nbsp;17&nbsp;-&nbsp;2022** | **Windows&nbsp;10<br>VS&nbsp;16&nbsp;-&nbsp;2019** |
+| <nobr>🖥️ OS ➡️</nobr><br><nobr>🤖 Compiler ⬇️</nobr> | **Ubuntu&nbsp;24.04** | **Ubuntu&nbsp;22.04** | **macOS-14**<br>(ARM64) | **macOS-13** | **macOS-12** | **Windows&nbsp;10<br>VS&nbsp;17&nbsp;-&nbsp;2022** | **Windows&nbsp;10<br>VS&nbsp;16&nbsp;-&nbsp;2019** |
 |------------|------------|------------------|--------------|--------------|--------------|-------------------------------|-------------------------------|
-| **g++ 14** | ✅ | - | ❌ | ✅ | ✅ | - | - |
-| **g++ 13** | ✅ (default) | ⚠ | ❌ | ❌ | ❌ | - | - |
-| **g++ 12** | ✅ | ✅ | ❌ | ✅ | ✅ | - | - |
+| **g++ 14** | ✅ | - | ✅ | ✅ | ✅ | - | - |
+| **g++ 13** | ✅ (default) | ⚠ | ✅ | ❌ | ❌ | - | - |
+| **g++ 12** | ✅ | ✅ | ✅ | ✅ | ✅ | - | - |
 | **g++ 11** | - | ✅ (default) | - | - | ⚠ | - | - |
 | **clang++ (18,17,16)** | ✅ (clang++:18) | - | - | - | - | - | - |
 | **clang++ (15,14,13)** | - | ✅ (clang++:14) | - | - | - | - | - |
-| **AppleClang** | - | - | ❌ (15) | ✅ (15) | ✅ (14) | - | - |
+| **AppleClang&nbsp;(default)** | - | - | ✅ (15) | ✅ (15) | ✅ (14) | - | - |
 | **msvc 19** | - | - | - | - | - | ✅ (default) | ❌ (default) |
 | **clangCL** | - | - | - | - | - | ✅ (v17) | ✅ (v12) |
 | default&nbsp;Compiler | g++13 | g++11 | AppleClang&nbsp;15 | AppleClang&nbsp;15 | AppleClang&nbsp;14 | msvc&nbsp;19 | msvc&nbsp;19 |
@@ -95,19 +95,19 @@ Function Nomenclature:<br>
 ⚔️ : uses `std::from_chars()` and `std::to_chars()` for data conversion. <br>
 🛠️ : uses `std::from_string()` and `std::operator<<` workarounds, for data conversion. As complier doesn't support `std::*_chars()` functions. Precision is less compared to above approach. <br>
 
-Precision Nomenclature ( for roundtrip conversions :: **string -> data-type -> string**): <br>
+Precision Nomenclature ( for roundtrip conversions :: **string ↣ data-type ↣ string**): <br>
 ✅ : Good. Minimal precision loss, best of the lot.  <br>
 ☑️ : Average. Precision loss is non-uniform, loss can be high for some FP values.
 
-| <nobr>🖥️ OS ➡️</nobr><br><nobr>🤖 Compiler ⬇️</nobr> | **Ubuntu&nbsp;24.04** | **Ubuntu&nbsp;22.04** | **macOS-14** | **macOS-13** | **macOS-12** | **macOS-11** | **Windows&nbsp;10<br>VS&nbsp;17&nbsp;-&nbsp;2022** | **Windows&nbsp;10<br>VS&nbsp;16&nbsp;-&nbsp;2019** |
+| <nobr>🖥️ OS ➡️</nobr><br><nobr>🤖 Compiler ⬇️</nobr> | **Ubuntu&nbsp;24.04** | **Ubuntu&nbsp;22.04** | **macOS-14**<br>(ARM64) | **macOS-13** | **macOS-12** | **macOS-11** | **Windows&nbsp;10<br>VS&nbsp;17&nbsp;-&nbsp;2022** | **Windows&nbsp;10<br>VS&nbsp;16&nbsp;-&nbsp;2019** |
 |------------|--------------|--------------|--------------|--------------|--------------|--------------|-------------------------------|-------------------------------|
-| **g++ 14** | ⚔️ ✅ | - | ❌ | ⚔️ ✅ | ⚔️ ✅ | - | - | - |
-| **g++ 13** | ⚔️ ✅ | ⚠ | ❌ | ❌ | ❌ | - | - | - |
-| **g++ 12** | ⚔️ ✅ | ⚔️ ✅ | ❌ | ⚔️ ✅ | ⚔️ ✅ | ⚔️ ✅ | - | - |
+| **g++ 14** | ⚔️ ✅ | - | ⚔️ ☑️ | ⚔️ ✅ | ⚔️ ✅ | - | - | - |
+| **g++ 13** | ⚔️ ✅ | ⚠ | ⚔️ ☑️ | ❌ | ❌ | - | - | - |
+| **g++ 12** | ⚔️ ✅ | ⚔️ ✅ | ⚔️ ☑️ | ⚔️ ✅ | ⚔️ ✅ | ⚔️ ✅ | - | - |
 | **g++ 11** | - | ⚔️ ✅ | - | - | ⚠ | ⚔️ ✅ | - | - |
 | **clang++ (18,17,16)** | ⚔️ ✅ | - | - | - | - | - | - | - |
 | **clang++ (15,14,13)** | - | ⚔️ ✅ | - | - | - | - | - | - |
-| **AppleClang** | - | - | ❌ | 🛠️&nbsp;☑️&nbsp;(15) | 🛠️&nbsp;☑️&nbsp;(14) | - | - | - |
+| **AppleClang&nbsp;(default)** | - | - | 🛠️&nbsp;☑️&nbsp;(15) | 🛠️&nbsp;☑️&nbsp;(15) | 🛠️&nbsp;☑️&nbsp;(14) | - | - | - |
 | **msvc 19** | - | - | - | - | - | - | ⚔️&nbsp;☑️ | ❌ |
 | **clangCL** | - | - | - | - | - | - | ⚔️&nbsp;☑️ (17) | ⚔️&nbsp;☑️&nbsp;(12) |
 
@@ -144,7 +144,7 @@ precision loss happening at steps (2) and (3).
 The repeatability or read-write accuracy can only be achieved by using
 higher precision of that specified by precision accuracy for float.
 
-Refer [testFloatingPointPrecision.cpp](tests/testFloatingPointPrecision.cpp) for data-loss in **text -> data-type -> text**, conversion cycle.
+Refer [testFloatingPointPrecision.cpp](tests/testFloatingPointPrecision.cpp) for data-loss in **text ↣ data-type ↣ text**, conversion cycle.
 Refer [testUserDefinedConverter_lowerPrecision.cpp](tests/testUserDefinedConverter_lowerPrecision.cpp),  to see the effect of lowered Decimal-Precision when writing the data and then retriving it back.
 
 
@@ -161,9 +161,9 @@ Date types
 As of writing this code, `std::chrono` is not fully supported by various OS's, in that case `converter` lib, calls [date](https://github.com/HowardHinnant/date) lib for conversions.<br>
 
 Below table shows, the underlying conversion function(i.e between `std::chrono::*_stream()` or `date::*_stream()`) used across different OS's. Different compilers on a particular OS doesn't have any impact on this selection.<br>
-For _string -> year_month_day_ conversion, refers to call to ...<br>
+For _string ↣ year_month_day_ conversion, refers to call to ...<br>
 `std::chrono::year_month_day ConverterFromStr<std::chrono::year_month_day>::ToVal(const std::string&)`.<br>
-For _year_month_day -> string_ conversion, refers to call to ...<br>
+For _year_month_day ↣ string_ conversion, refers to call to ...<br>
 `std::string ConverterFromVal<std::chrono::year_month_day>::ToStr(const std::chrono::year_month_day&)`.<br>
 
 ⚔️ : `std::chrono::from_stream()` and `std::chrono::to_stream` are preffered.<br>
@@ -285,7 +285,7 @@ using ConvertFromVal_lDP = converter::ConvertFromVal<T, T2S_Format_ldp<T> >;
 
 Reading a String with Invalid Numbers (e.g. Empty string) as Numeric Data
 =========================================================================
-There are four ways to handle error during _string -> type_ conversion. This is achieved by enum `FailureS2Tprocess` and template `OnError`. Refer below.
+There are four ways to handle error during _string ↣ type_ conversion. This is achieved by enum `FailureS2Tprocess` and template `OnError`. Refer below.
 
 ```c++
   enum FailureS2Tprocess { THROW_ERROR = 0, SIGNAL_NAN = 1, QUIET_NAN = 2, VARIANT_NAN = 3 };

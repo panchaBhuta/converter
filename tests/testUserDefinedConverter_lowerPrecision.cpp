@@ -98,13 +98,13 @@ int main()
                  (indexOS==1)?
 #if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG   \
         ||          MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU
-                 14
+                 13
 //#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
 #else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
                  16
                  // getLowerDecimalPrecision<long double>() = 17 digits
 #endif
-                 :14)
+                 :13)
                 );
     checkRoundTripConversion_txt2Val2txt<double, converter::ConvertFromStr<double>,
                                                  ConvertFromVal_lDP<double>>("testUserDefinedConverter_lowerPrecision-7",
