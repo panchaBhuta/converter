@@ -250,7 +250,7 @@ macro(check_chrono_stream_functionality)
         endif()
     endif()
 
-    #[==[   uncomment for testing purpose
+    #[==[   uncomment for testing purpose :: enabled JUGAAD
                 set(USE_CHRONO_FROMSTREAM_1 ${e_DISABLE_FEATURE})
                 set(USE_DATE_FROMSTREAM_2   ${e_DISABLE_FEATURE})
                 set(USE_JUGAAD_FROMSTREAM_3 ${e_ENABLE_FEATURE})

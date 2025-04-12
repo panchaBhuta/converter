@@ -28,10 +28,6 @@
  *  "date" lib (ubuntu, macOS -> from_stream+to_stream)       OR
  *  as last resort calls an internal implementation 
  *  (msvc -> to_stream), which has limited formating support.
- * 
- *  Note there is no internal implementation provided yet for 'from_stream'
- *  and will result in compilation error if a particular OS does not support both
- *  "std::chrono::from_stream()" and "date::from_stream()" functionality.
  */
 #cmakedefine01  USE_CHRONO_FROMSTREAM_1
 #cmakedefine01  USE_DATE_FROMSTREAM_2

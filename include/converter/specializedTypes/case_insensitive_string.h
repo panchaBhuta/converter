@@ -18,7 +18,7 @@
 #include <iostream>
 
 // refer https://stackoverflow.com/a/2886589/2299954
-
+//       https://cplusplus.com/reference/string/char_traits/compare/
 namespace converter {
   struct ci_char_traits : public std::char_traits<char>
   {
@@ -27,9 +27,10 @@ namespace converter {
     static bool lt(char c1, char c2) { return toupper(c1) <  toupper(c2); }
 
     static int compare(const char* s1, const char* s2, size_t n) {
-      while( n-- != 0 ) {
-        if( toupper(*s1) < toupper(*s2) ) return -1;
-        if( toupper(*s1) > toupper(*s2) ) return 1;
+      while( n-- ) {
+        char us1 = toupper(*s1);
+        char us2 = toupper(*s2);
+        if (!std::char_traits<char>::eq(us1,us2)) return std::char_traits<char>::lt(us1,us2)?-1:1;
         ++s1; ++s2;
       }
       return 0;
@@ -111,7 +112,7 @@ operator+=(       std::basic_string<CharT, converter::ci_char_traits, Allocator>
 
 
 template<typename CharT, converter::c_NOT_ci_char_traits Traits, typename Allocator>
-inline auto
+inline bool
 operator==( const std::basic_string<CharT, Traits,                    Allocator>& str,
             const std::basic_string<CharT, converter::ci_char_traits, Allocator>& cistr)
 {
@@ -119,7 +120,7 @@ operator==( const std::basic_string<CharT, Traits,                    Allocator>
   return chk == cistr;
 }
 template<typename CharT, converter::c_NOT_ci_char_traits Traits, typename Allocator>
-inline auto
+inline bool
 operator==( const std::basic_string<CharT, converter::ci_char_traits, Allocator>& cistr,
             const std::basic_string<CharT, Traits,                    Allocator>& str)
 {
