@@ -29,10 +29,10 @@ jobs:
     name: Build
     env:
       osComplier:
-        "ubuntu-24.04"     : [ g++-12, g++-13, g++-14,         clang++-16, clang++-17, clang++-18 ]
-        "ubuntu-24.04-arm" : [ g++-12, g++-13, g++-14,         clang++-16, clang++-17, clang++-18 ]
-        "ubuntu-22.04"     : [ g++-10, g++-11, g++-12,         clang++-13, clang++-14, clang++-15 ]
-        "ubuntu-22.04-arm" : [ g++-10, g++-11, g++-12, g++-13, clang++-13, clang++-14, clang++-15 ]
+        "ubuntu-24.04"     : [ default, clang++ ] #[ g++-12, g++-13, g++-14,         clang++-16, clang++-17, clang++-18 ]
+        "ubuntu-24.04-arm" : [ default, clang++ ] #[ g++-12, g++-13, g++-14,         clang++-16, clang++-17, clang++-18 ]
+        "ubuntu-22.04"     : [ default, clang++ ] #[ g++-10, g++-11, g++-12,         clang++-13, clang++-14, clang++-15 ]
+        "ubuntu-22.04-arm" : [ default, clang++ ] #[ g++-10, g++-11, g++-12, g++-13, clang++-13, clang++-14, clang++-15 ]
     strategy:
       fail-fast: false
       matrix:
@@ -47,13 +47,18 @@ jobs:
           #  clang++  ==  clang++-14
         #compiler: [ default, g++-12, clang++-12, clang++-13, clang++-14 ]  :: clang++-12
         #compiler: [ g++-14 ]  # cannot be empty list
-        compiler: env.osComplier[${{matrix.os}}]
+        compilerIndex: [ 0, 1, 2, 3, 4, 5 ]
+        include:
+          - os: ubuntu-24.04-arm
+            compilerIndex : 6
     runs-on: ${{matrix.os}}
     steps:
+      env :
+        compilerList : ${{ env.osComplier[${{matrix.os}}] }}
       - name: Checkout Repo
         uses: actions/checkout@v4
       - name: Get Version
-        run: uname -a && echo "------------" && cmake --version && echo "------------" && bash -c 'COMPILER="${{matrix.compiler}}"; if [ "${COMPILER}" == "default" ]; then COMPILER="g++"; fi; ${COMPILER}  -dM -E - < /dev/null | egrep -i "(apple|mach|gnu|clang|version|major|minor)"'
+        run: uname -a && echo "------------" && cmake --version && echo "------------" && bash -c 'COMPILER="${{compilerList[${{matrix.compilerIndex}}]}}"; if [ "${COMPILER}" == "default" ]; then COMPILER="g++"; fi; ${COMPILER}  -dM -E - < /dev/null | egrep -i "(apple|mach|gnu|clang|version|major|minor)"'
       - name: Check Generators
         # https://stackoverflow.com/questions/25941536/what-is-a-cmake-generator
         run: cmake --help
@@ -64,7 +69,7 @@ jobs:
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug
       - name: Configure CMake (compiler=NOT-default) [Debug]
         if: matrix.compiler != 'default'
-        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=${{compilerList[${{matrix.compilerIndex}}]}}
       - name: Build [Debug]
         run: cmake --build "${{github.workspace}}/build-debug" --config Debug -j$(nproc)
       - name: Test [Debug]
@@ -76,7 +81,7 @@ jobs:
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release
       - name: Configure CMake (compiler=NOT-default) [Release]
         if: matrix.compiler != 'default'
-        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=${{compilerList[${{matrix.compilerIndex}}]}}
       - name: Build [Release]
         run: cmake --build "${{github.workspace}}/build-release" --config Release -j$(nproc)
       - name: Test [Release]
