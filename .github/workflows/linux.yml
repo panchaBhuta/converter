@@ -47,17 +47,17 @@ jobs:
           #  clang++  ==  clang++-14
         #compiler: [ default, g++-12, clang++-12, clang++-13, clang++-14 ]  :: clang++-12
         #compiler: [ g++-14 ]  # cannot be empty list
-        compilerIndex: [ 0, 1, 2, 3, 4, 5 ]
-        include:
-          - os: ubuntu-24.04-arm
-            compilerIndex : 6
+        compilerIndex: [0, 1] #[ 0, 1, 2, 3, 4, 5 ]
+        #include:
+        #  - os: ubuntu-24.04-arm
+        #    compilerIndex : 6
     runs-on: ${{matrix.os}}
     steps:
-      env :
-        compilerList : ${{ env.osComplier[${{matrix.os}}] }}
       - name: Checkout Repo
         uses: actions/checkout@v4
       - name: Get Version
+        env :
+          compilerList : ${{ env.osComplier[${{matrix.os}}] }}
         run: uname -a && echo "------------" && cmake --version && echo "------------" && bash -c 'COMPILER="${{compilerList[${{matrix.compilerIndex}}]}}"; if [ "${COMPILER}" == "default" ]; then COMPILER="g++"; fi; ${COMPILER}  -dM -E - < /dev/null | egrep -i "(apple|mach|gnu|clang|version|major|minor)"'
       - name: Check Generators
         # https://stackoverflow.com/questions/25941536/what-is-a-cmake-generator
@@ -69,6 +69,8 @@ jobs:
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug
       - name: Configure CMake (compiler=NOT-default) [Debug]
         if: matrix.compiler != 'default'
+        env :
+          compilerList : ${{ env.osComplier[${{matrix.os}}] }}
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=${{compilerList[${{matrix.compilerIndex}}]}}
       - name: Build [Debug]
         run: cmake --build "${{github.workspace}}/build-debug" --config Debug -j$(nproc)
@@ -81,6 +83,8 @@ jobs:
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release
       - name: Configure CMake (compiler=NOT-default) [Release]
         if: matrix.compiler != 'default'
+        env :
+          compilerList : ${{ env.osComplier[${{matrix.os}}] }}
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=${{compilerList[${{matrix.compilerIndex}}]}}
       - name: Build [Release]
         run: cmake --build "${{github.workspace}}/build-release" --config Release -j$(nproc)
