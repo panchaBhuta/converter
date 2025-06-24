@@ -59,7 +59,7 @@ jobs:
         env :
           compilerList : ${{ env.osComplier[ matrix.os ] }}
           compiler : ${{ env.compilerList[ matrix.compilerIndex ] }}
-        run: uname -a && echo "------------" && cmake --version && echo "------------" && bash -c 'COMPILER="${{compiler}}"; if [ "${COMPILER}" == "default" ]; then COMPILER="g++"; fi; ${COMPILER}  -dM -E - < /dev/null | egrep -i "(apple|mach|gnu|clang|version|major|minor)"'
+        run: uname -a && echo "------------" && cmake --version && echo "------------" && bash -c 'COMPILER="${{env.compiler}}"; if [ "${COMPILER}" == "default" ]; then COMPILER="g++"; fi; ${COMPILER}  -dM -E - < /dev/null | egrep -i "(apple|mach|gnu|clang|version|major|minor)"'
       - name: Check Generators
         # https://stackoverflow.com/questions/25941536/what-is-a-cmake-generator
         run: cmake --help
@@ -73,7 +73,7 @@ jobs:
           compilerList : ${{ env.osComplier[ matrix.os ] }}
           compiler : ${{ env.compilerList[ matrix.compilerIndex ] }}
         if: matrix.compiler != 'default'
-        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=${{compiler}}
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=${{env.compiler}}
       - name: Build [Debug]
         run: cmake --build "${{github.workspace}}/build-debug" --config Debug -j$(nproc)
       - name: Test [Debug]
@@ -88,7 +88,7 @@ jobs:
           compilerList : ${{ env.osComplier[ matrix.os ] }}
           compiler : ${{ env.compilerList[ matrix.compilerIndex ] }}
         if: matrix.compiler != 'default'
-        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=${{compiler}}
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=${{env.compiler}}
       - name: Build [Release]
         run: cmake --build "${{github.workspace}}/build-release" --config Release -j$(nproc)
       - name: Test [Release]
