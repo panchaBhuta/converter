@@ -34,7 +34,7 @@ jobs:
         # https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories  (os-labels : macos-12)
         # https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software-for-github-owned-images
         #os: [ macos-15-large, macos-15-xlarge, macos-14-large, macos-14-xlarge, macos-13-large, macos-13-xlarge ]  #  macos-latest  ==  macos-14 == macos-14-xlarge
-        os: [ macos-15, macos-14, macos-13 ]  #  macos-latest  ==  macos-1?
+        os: [ macos-15-large, macos-15, macos-14, macos-13 ]  #  macos-latest  ==  macos-1?
 #  NOTE : macos-*        : executes arm64 (instead of x64_64), which lowers FLOATING POINT precision similar to Windows
 #         macos-*-large  : x86_64
 #         macos-*-xlarge : arm64 lowers FLOATING POINT precision similar to Windows
