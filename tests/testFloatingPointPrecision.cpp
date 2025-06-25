@@ -91,15 +91,21 @@ int main()
     checkRoundTripConversion_txt2Val2txt<double>("testFloatingPointPrecision-5",
                  "2.1234567890123456789", 2.1234567890123456789,
                  expected_double_2d1234567890123456789[indexOS]);   // 15 digits
-    std::string expected_longDouble_3d123456789012345678901[] = { "3.1234567890123456789",
+
+    std::string expected_longDouble_3d123456789012345678901[] = {
+#if                 UBUNTU_ARRAY_IDX  ==  UBUNTU_ARM64
+                                                                  "3.123456789012345678901",  // 33 arm64
+#else
+                                                                  "3.1234567890123456789",    // 15 default
+#endif
 #if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG
-                                                                  "3.12345678901234569",
+                                                                  "3.12345678901234569",      // 15 default
 #elif               MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU
-                                                                  "3.1234567890123457",
+                                                                  "3.1234567890123457",       // 15 g++ [ 14, 13, 12 ]
 #elif               MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
-                                                                  "3.12345678901234567889",
+                                                                  "3.12345678901234567889",   // 18 default
 #else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
-                                                                  "3.1234567890123456789",
+                                                                  "3.1234567890123456789",    // 18 g++ [ 14, 13, 12 ]
 #endif
                                                                   "3.1234567890123457" };  // Windows
     checkRoundTripConversion_txt2Val2txt<long double>("testFloatingPointPrecision-6",

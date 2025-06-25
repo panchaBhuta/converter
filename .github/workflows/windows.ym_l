@@ -82,6 +82,8 @@ jobs:
         # https://cmake.org/cmake/help/latest/guide/user-interaction/index.html
         if: matrix.toolset_compiler.toolset == 1
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug  -T "${{matrix.toolset_compiler.compiler}}"
+      - name: Check Work-Around-Flags
+        run: grep define "${{github.workspace}}/build-release/include/converter/_workaroundConfig.h" | grep -v -e "^//" -e " e_[^ ]*_FEATURE "
       - name: Build [Debug]
         run: cmake --build "${{github.workspace}}/build-debug" --config Debug -j   -- -m -nologo -verbosity:quiet
       - name: Test [Debug]
@@ -106,7 +108,5 @@ jobs:
         run: ctest -C Release --verbose
       - name: Install [Release]
         run: cmake --install "${{github.workspace}}/build-release" --config Release
-      - name: Check Work-Around-Flags
-        run: grep define "${{github.workspace}}/build-release/include/converter/_workaroundConfig.h" | grep -v -e "^//" -e " e_[^ ]*_FEATURE "
 
 

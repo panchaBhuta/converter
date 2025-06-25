@@ -4,12 +4,17 @@
 #define MACH_POST_MACOS14_ARM_GNU   2
 #define MACH_POST_MACOS14_ARM_CLANG 3
 
+#define UBUNTU_X86_64  0
+#define UBUNTU_ARM64   1
+
+// https://sourceforge.net/p/predef/wiki/Architectures/
 // https://sourceforge.net/p/predef/wiki/OperatingSystems/
 // https://web.archive.org/web/20191012035921/http://nadeausoftware.com/articles/2012/01/c_c_tip_how_use_compiler_predefined_macros_detect_operating_system
 #if defined(WIN64) || defined(_WIN64) || defined(__WIN64) || defined(__WIN64__)
   const unsigned indexOS = 2;
   #define  TEMPLATE_UID  103
   #define MACH_MACOS_ARRAY_IDX     MACH_PRE_MACOS14_GNU
+  #define UBUNTU_ARRAY_IDX UBUNTU_X86_64
 #elif defined(__APPLE__) && defined(__MACH__)
   const unsigned indexOS = 1;
   #if defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__) &&  \
@@ -58,8 +63,20 @@
       #define MACH_MACOS_ARRAY_IDX     MACH_PRE_MACOS14_GNU
     #endif
   #endif
-#else  // ubuntu and other OS's
+  #define UBUNTU_ARRAY_IDX UBUNTU_X86_64
+#elif defined(__linux__) // ubuntu
   const unsigned indexOS = 0;
   #define  TEMPLATE_UID  103
   #define MACH_MACOS_ARRAY_IDX     MACH_PRE_MACOS14_GNU
+  #if defined(__aarch64__)
+    // ARM64
+    #define UBUNTU_ARRAY_IDX UBUNTU_ARM64
+  #else
+    #define UBUNTU_ARRAY_IDX UBUNTU_X86_64
+  #endif
+#else // other OS's
+  const unsigned indexOS = 0;
+  #define  TEMPLATE_UID  103
+  #define MACH_MACOS_ARRAY_IDX     MACH_PRE_MACOS14_GNU
+  #define UBUNTU_ARRAY_IDX UBUNTU_X86_64
 #endif
