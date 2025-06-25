@@ -34,7 +34,8 @@ jobs:
         # https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories  (os-labels : macos-12)
         # https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software-for-github-owned-images
         #os: [ macos-15-large, macos-15-xlarge, macos-14-large, macos-14-xlarge, macos-13-large, macos-13-xlarge ]  #  macos-latest  ==  macos-14 == macos-14-xlarge
-        os: [ macos-15-large, macos-15, macos-14, macos-14-xlarge, macos-13 ]  #  macos-latest  ==  macos-1?
+        #  NOTE :: macos-**-large and macos-**-xlarge are chargeable hence NOT added here
+        os: [ macos-15, macos-14, macos-13 ]  #  macos-latest  ==  macos-1?
 #  NOTE : macos-*        : executes arm64 (instead of x64_64), which lowers FLOATING POINT precision similar to Windows
 #         macos-*-large  : x86_64
 #         macos-*-xlarge : arm64 lowers FLOATING POINT precision similar to Windows
@@ -64,7 +65,7 @@ jobs:
         if: matrix.compiler != 'default'
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON  -DCONVERTER_TEST_OS_VERSION=${{matrix.os}} -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
       - name: Check Work-Around-Flags
-        run: grep define "${{github.workspace}}/build-release/include/converter/_workaroundConfig.h" | grep -v -e "^//" -e " e_[^ ]*_FEATURE "
+        run: grep define "${{github.workspace}}/build-debug/include/converter/_workaroundConfig.h" | grep -v -e "^//" -e " e_[^ ]*_FEATURE "
       - name: Show compile commands [Debug]
         run: cat build-debug/compile_commands.json
       - name: Build [Debug]
