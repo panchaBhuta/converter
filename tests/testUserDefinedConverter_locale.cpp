@@ -104,7 +104,7 @@ int main()
   }
   catch (const std::exception& ex)
   {
-    std::cout << "locale " << de_Loc << " not available (" << ex.what()
+    std::cout << "############## WARNING : locale " << de_Loc << " not available (" << ex.what()
               << "), skipping test.\n";
     // pass test for systems without locale present. for ci testing, make.sh
     // ensures that the necessary locale is installed.
@@ -118,11 +118,18 @@ int main()
                  "8,589973e+9", 8.589973e9f, "8,5899735e+09", std::numeric_limits<float>::digits10, ',', '.');
                                           // "8,589973e+9"
 
-    std::string expected_8589973ep9[] = { "8.589.973.000",
-                                          "8589973000",
+    std::string expected_8589973ep9[] = { "8.589.973.000",    // linux
+#if   MACH_MACOS_ARRAY_IDX  >  MACH_PRE_MACOS14_CLANG && \
+      defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__) &&  \
+      __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ >= 150000
+                                          "8.589.973.000",
+#else
+                                          "Locale-Not-Supported",
+#endif
                                           "8.589.973.000", }; // Windows
     checkRoundTripConversion_txt2Val2txt<double, ConvertFromStr_loc<double>, ConvertFromVal_loc<double>>("testUserDefinedConverter_locale-2",
                  "8,589973e+9", 8.589973e9, expected_8589973ep9[indexOS], std::numeric_limits<double>::digits10, ',', '.');
+    
     checkRoundTripConversion_txt2Val2txt<long double, ConvertFromStr_loc<long double>, ConvertFromVal_loc<long double>>("testUserDefinedConverter_locale-3",
                  "8,589973e+9", 8.589973e9L, expected_8589973ep9[indexOS], std::numeric_limits<long double>::digits10, ',', '.');
 
@@ -132,7 +139,12 @@ int main()
     checkRoundTripConversion_txt2Val2txt<double, ConvertFromStr_loc<double>, ConvertFromVal_loc<double>>("testUserDefinedConverter_locale-5",
                  "2,1234567890123456789", 2.1234567890123456789, "2,12345678901234569", std::numeric_limits<double>::digits10, ',', '.');
 
-    std::string expected_longDouble_3d123456789012345678901[] = { "3,12345678901234567889",
+    std::string expected_longDouble_3d123456789012345678901[] = {
+#if                 UBUNTU_ARRAY_IDX  ==  UBUNTU_ARM64
+                                                                  "3,12345678901234567890099999999999986",  // 33 arm64
+#else //            UBUNTU_ARRAY_IDX  ==  UBUNTU_X86_64
+                                                                  "3,12345678901234567889",   // 18 default
+#endif
 #if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG
                                                                   "3,12345678901234569",
 //#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU

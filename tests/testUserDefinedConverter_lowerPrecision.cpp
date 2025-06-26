@@ -81,7 +81,13 @@ int main()
     checkRoundTripConversion_txt2Val2txt<double, converter::ConvertFromStr<double>,
                                                  ConvertFromVal_lDP<double>>("testUserDefinedConverter_lowerPrecision-5",
                  "2.1234567890123456789", 2.1234567890123456789, "2.1234567890123", getLowerDecimalPrecision<double>());  // 14 digits
-    std::string expected_longDouble_1d123456789012345678901[] = { "3.1234567890123457",
+
+    std::string expected_longDouble_1d123456789012345678901[] = {
+#if                 UBUNTU_ARRAY_IDX  ==  UBUNTU_ARM64
+                                                                  "3.123456789012345678901",  // 16 arm64
+#else //            UBUNTU_ARRAY_IDX  ==  UBUNTU_X86_64
+                                                                  "3.1234567890123457",       // 16 default
+#endif
 #if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG   \
         ||          MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU
                                                                   "3.1234567890123",

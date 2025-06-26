@@ -95,7 +95,7 @@ int main()
     std::string expected_longDouble_3d123456789012345678901[] = {
 #if                 UBUNTU_ARRAY_IDX  ==  UBUNTU_ARM64
                                                                   "3.123456789012345678901",  // 33 arm64
-#else
+#else //            UBUNTU_ARRAY_IDX  ==  UBUNTU_X86_64
                                                                   "3.1234567890123456789",    // 15 default
 #endif
 #if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG
