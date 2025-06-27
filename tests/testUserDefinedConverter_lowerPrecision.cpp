@@ -89,9 +89,9 @@ int main()
                                                                   "3.1234567890123457",       // 16 default
 #endif
 #if                 MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_CLANG   \
-        ||          MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_GNU
+        ||          MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_GNU     \
+        ||          MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_CLANG
                                                                   "3.1234567890123",
-//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_CLANG
 //#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_GNU
 //#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
 #else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
@@ -105,7 +105,8 @@ int main()
                  (indexOS==0)?16:(
                  (indexOS==1)?
 #if                 MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_CLANG   \
-        ||          MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_GNU
+        ||          MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_GNU     \
+        ||          MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_CLANG
                  13
 //#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_CLANG
 //#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_GNU

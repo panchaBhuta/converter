@@ -326,7 +326,7 @@ macro(check_floatingPoint_elementaryStringConversions)
     try_compile(COMPILE_FLOATINGPOINT_FROM_CHARS
                 SOURCE_FROM_FILE    check_floatingPoint_fromChars.cpp
                                     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/check_floatingPoint_fromChars.cpp"
-                CMAKE_FLAGS "$<${linux_host_with_gcc_like_cxx}:--std=gnu++2a>"
+                CMAKE_FLAGS "$<${linux_host_with_gcc_like_cxx}:--std=gnu++2a>" # i.e C++20
                 CMAKE_FLAGS "$<${linux_host_with_gcc_cxx}:-fconcepts>"
                 #CMAKE_FLAGS  "--std=gnu++2a -fconcepts"  not needed
                 #COMPILE_DEFINITIONS "-DUSE_FLOATINGPOINT_FROM_CHARS=${e_ENABLE_FEATURE}"  not needed
