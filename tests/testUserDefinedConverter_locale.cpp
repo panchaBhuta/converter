@@ -181,7 +181,6 @@ int main()
 #if                 MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_CLANG
                                                            "9007199254740992",      // MacOS
 #elif               MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_CLANG
-                    MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_GNU
                                                            "9.007.199.254.740.992",
 //#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_GNU
 //#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_GNU
