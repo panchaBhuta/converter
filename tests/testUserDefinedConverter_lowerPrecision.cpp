@@ -123,7 +123,8 @@ int main()
 
     std::string expected_longDouble_9007199254740993[] = { "9007199254740993",
 #if                 MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_CLANG    \
-      ||            MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_GNU
+      ||            MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_GNU      \
+      ||            MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_CLANG
                                                            "9.007199254741e+15",
 //#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_CLANG
 //#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_GNU

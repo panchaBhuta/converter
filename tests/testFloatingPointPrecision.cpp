@@ -104,7 +104,8 @@ int main()
 #else //            UBUNTU_ARRAY_IDX  ==  UBUNTU_X86_64
                                                                   "3.1234567890123456789",    // 15 default
 #endif
-#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_CLANG
+#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_CLANG    \
+            ||      MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_CLANG
                                                                   "3.12345678901234569",      // 15 default
 #elif               MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_GNU
                                                                   "3.1234567890123457",       // 15 g++ [ 14, 13, 12 ]

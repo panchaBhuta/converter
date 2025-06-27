@@ -180,9 +180,10 @@ int main()
     std::string expected_longDouble_9007199254740993[] = { "9.007.199.254.740.993", // Ubuntu
 #if                 MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_CLANG
                                                            "9007199254740992",      // MacOS
-#elif               MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_CLANG  || \
+#elif               MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_CLANG
                     MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_GNU
-                                                           "9.007.199.254.740.993",
+                                                           "9.007.199.254.740.992",
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_GNU
 //#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_GNU
 //#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
 #else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
