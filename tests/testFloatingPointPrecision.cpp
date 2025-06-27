@@ -52,10 +52,12 @@ int main()
   try {
 
     std::string expected_float_8d589973ep9[] = { "8589973504",
-#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG   \
+#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_CLANG   \
             ||      MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
                                                  "8.5899735e+09",  // macOS
-//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_CLANG
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_GNU
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_GNU
 #else  // default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
                                                  "8589973504",
 #endif
@@ -69,10 +71,12 @@ int main()
                  "8.589973e+9", 8.589973e9L, "8589973000");
 
     std::string expected_float_1d123456789[] = { "1.1234568",
-#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG   \
+#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_CLANG   \
      ||             MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
                                                  "1.12345684",   // macOS
-//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_CLANG
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_GNU
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_GNU
 #else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
                                                  "1.1234568",
 #endif
@@ -80,10 +84,12 @@ int main()
     checkRoundTripConversion_txt2Val2txt<float>("testFloatingPointPrecision-4",
                  "1.123456789", 1.123456789f, expected_float_1d123456789[indexOS]);  // 6 digits
     std::string expected_double_2d1234567890123456789[] = { "2.1234567890123457",
-#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG   \
+#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_CLANG   \
       ||            MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
                                                             "2.12345678901234569",   // macOS
-//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_CLANG
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_GNU
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_GNU
 #else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
                                                             "2.1234567890123457",
 #endif
@@ -98,12 +104,14 @@ int main()
 #else //            UBUNTU_ARRAY_IDX  ==  UBUNTU_X86_64
                                                                   "3.1234567890123456789",    // 15 default
 #endif
-#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG
+#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_CLANG
                                                                   "3.12345678901234569",      // 15 default
-#elif               MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU
+#elif               MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_GNU
                                                                   "3.1234567890123457",       // 15 g++ [ 14, 13, 12 ]
 #elif               MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
                                                                   "3.12345678901234567889",   // 18 default
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_CLANG
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_GNU
 #else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
                                                                   "3.1234567890123456789",    // 18 g++ [ 14, 13, 12 ]
 #endif
@@ -117,9 +125,11 @@ int main()
                  "9007199254740993", 9007199254740993.0, "9007199254740992");
                                                    //    "9007199254740993"
     std::string expected_longDouble_9007199254740993[] = { "9007199254740993",
-#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG    \
-      ||            MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU
+#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_CLANG    \
+      ||            MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_GNU
                                                           "9007199254740992",
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_CLANG
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_GNU
 //#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
 #else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
                                                            "9007199254740993",
@@ -130,10 +140,12 @@ int main()
 
 
     std::string expected_float_3d3123[] = { "3.3123",
-#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG    \
+#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_CLANG    \
        ||           MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
                                             "3.31229997",  // macOS
-//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_CLANG
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_GNU
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_GNU
 #else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
                                             "3.3123",
 #endif
@@ -146,10 +158,12 @@ int main()
                  "3.3123412e+38", 3.3123412E38f, "3.3123412e+38");
 
     std::string expected_float_3d3123412en38[] = { "3.312341e-38",
-#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG    \
+#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_CLANG    \
        ||           MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
                                                    "3.31234111e-38",  // macOS
-//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_CLANG
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_GNU
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_GNU
 #else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
                                                    "3.312341e-38",
 #endif
@@ -158,10 +172,12 @@ int main()
                  "3.3123412e-38", 3.3123412E-38f, expected_float_3d3123412en38[indexOS]);
 
     std::string expected_double_4d3123412en38[] = { "4.3123412e-38",
-#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG    \
+#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_CLANG    \
        ||           MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
                                                     "4.31234119999999987e-38",  // macOS
-//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_CLANG
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_GNU
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_GNU
 #else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
                                                     "4.3123412e-38",
 #endif
@@ -171,11 +187,13 @@ int main()
                  ((indexOS==1)?7:std::numeric_limits<double>::digits10) ); // macOS
 
     std::string expected_longdouble_5d3123412en38[] = { "5.3123412e-38",
-#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG
+#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_CLANG
                                                         "5.31234120000000035e-38",
 #elif                MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
                                                         "5.3123412000000000001e-38",
-//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_CLANG
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_GNU
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_GNU
 #else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
                                                         "5.3123412e-38", // macOS
 #endif

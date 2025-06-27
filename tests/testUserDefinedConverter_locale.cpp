@@ -27,7 +27,7 @@ extern const unsigned indexOS;
  * $ locale -a                                     # check again
  * $ sudo locale-gen de_DE
  * $ sudo update-locale
- * 
+ *
  * refer ::: https://askubuntu.com/questions/76013/how-do-i-add-locale-to-ubuntu-server
  */
 
@@ -119,17 +119,15 @@ int main()
                                           // "8,589973e+9"
 
     std::string expected_8589973ep9[] = { "8.589.973.000",    // linux
-#if   MACH_MACOS_ARRAY_IDX  >  MACH_PRE_MACOS14_CLANG && \
-      defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__) &&  \
-      __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ >= 150000
+#if   MACH_MACOS_ARRAY_IDX  >=  MACH_MACOS15_ARM_GNU
                                           "8.589.973.000",
 #else
-                                          "Locale-Not-Supported",
+                                          "8589973000",  // Locale-Not-Supported
 #endif
                                           "8.589.973.000", }; // Windows
     checkRoundTripConversion_txt2Val2txt<double, ConvertFromStr_loc<double>, ConvertFromVal_loc<double>>("testUserDefinedConverter_locale-2",
                  "8,589973e+9", 8.589973e9, expected_8589973ep9[indexOS], std::numeric_limits<double>::digits10, ',', '.');
-    
+
     checkRoundTripConversion_txt2Val2txt<long double, ConvertFromStr_loc<long double>, ConvertFromVal_loc<long double>>("testUserDefinedConverter_locale-3",
                  "8,589973e+9", 8.589973e9L, expected_8589973ep9[indexOS], std::numeric_limits<long double>::digits10, ',', '.');
 
@@ -142,12 +140,16 @@ int main()
     std::string expected_longDouble_3d123456789012345678901[] = {
 #if                 UBUNTU_ARRAY_IDX  ==  UBUNTU_ARM64
                                                                   "3,12345678901234567890099999999999986",  // 33 arm64
+                                                                // 3,12345678901234567890099999999999
+                                                                //                       12345678901234567890
 #else //            UBUNTU_ARRAY_IDX  ==  UBUNTU_X86_64
                                                                   "3,12345678901234567889",   // 18 default
 #endif
-#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG
+#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_CLANG
                                                                   "3,12345678901234569",
-//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_CLANG
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_GNU
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_GNU
 //#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
 #else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
                                                                   "3,12345678901234567889",
@@ -156,19 +158,32 @@ int main()
     checkRoundTripConversion_txt2Val2txt<long double, ConvertFromStr_loc<long double>, ConvertFromVal_loc<long double>>("testUserDefinedConverter_locale-6",
                  "3,123456789012345678901", 3.123456789012345678901L,
                  expected_longDouble_3d123456789012345678901[indexOS],
-                 (indexOS==2?17:std::numeric_limits<long double>::digits10), ',', '.');
+                 (indexOS==2?17:  // windows
+#if                 UBUNTU_ARRAY_IDX  ==  UBUNTU_ARM64
+                  20  // overriding 33
+#else //            UBUNTU_ARRAY_IDX  ==  UBUNTU_X86_64 and all MACOS
+                  std::numeric_limits<long double>::digits10
+#endif
+                 ), ',', '.');
 
     std::string expected_double_9007199254740993[] = { "9.007.199.254.740.992", //    "9.007.199.254.740.993"
-                                                       "9007199254740992",      // MacOS
+#if                 MACH_MACOS_ARRAY_IDX  >= MACH_MACOS15_ARM_GNU
+                                                       "9.007.199.254.740.992", // MacOS-15 onwards
+#else
+                                                       "9007199254740992",      // MacOS-14 upto
+#endif
                                                        "9.007.199.254.740.992", };// Windows
     checkRoundTripConversion_txt2Val2txt<double, ConvertFromStr_loc<double>, ConvertFromVal_loc<double>>("testUserDefinedConverter_locale-7",
                  "9007199254740993", 9007199254740993.0,
                  expected_double_9007199254740993[indexOS], std::numeric_limits<double>::digits10, ',', '.');
 
     std::string expected_longDouble_9007199254740993[] = { "9.007.199.254.740.993", // Ubuntu
-#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_CLANG
+#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_CLANG
                                                            "9007199254740992",      // MacOS
-//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_POST_MACOS14_ARM_GNU
+#elif               MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_CLANG  || \
+                    MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_GNU
+                                                           "9.007.199.254.740.993",
+//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_GNU
 //#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
 #else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
                                                            "9007199254740993",      // MacOS
