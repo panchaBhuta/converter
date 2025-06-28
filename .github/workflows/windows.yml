@@ -53,7 +53,7 @@ jobs:
         #      # ClangCl == 'Clang 12'
         #    toolset_compiler : { compiler: ClangCl, toolset: 1 }
     runs-on: ${{matrix.os}}
-    default:
+    defaults:
       - name: select shell - msys2
         if: matrix.toolset_compiler.compiler == 'g++'
         run:
