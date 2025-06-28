@@ -45,20 +45,18 @@ jobs:
           # g++-13  == 'MSVC 19'
           # clang   == 'MSVC 19'
           # ClangCl == 'Clang 16'
-        toolset_compiler: [ { compiler: default, toolset: -1 },
-                            { compiler: ClangCl, toolset:  1 },
-                            { compiler: g++,     toolset:  0 } ]
+        toolset_compiler: [ { compiler: default, toolset: -1, cmdShell: bash },
+                            { compiler: ClangCl, toolset:  1, cmdShell: bash },
+                            { compiler: g++,     toolset:  0, cmdShell: "msys2 {0}" } ]
         #include:
         #  - os: windows-2019
         #      # ClangCl == 'Clang 12'
         #    toolset_compiler : { compiler: ClangCl, toolset: 1 }
     runs-on: ${{matrix.os}}
     defaults:
-      name: select shell msys2
-      if: matrix.toolset_compiler.compiler == 'g++'
       run:
         #  override shell when using g++
-        shell: msys2 {0}
+        shell: ${{matrix.toolset_compiler.cmdShell}}
     steps:
       - name: Setup msbuild
         if: matrix.toolset_compiler.compiler != 'g++'
