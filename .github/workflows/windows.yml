@@ -54,11 +54,11 @@ jobs:
         #    toolset_compiler : { compiler: ClangCl, toolset: 1 }
     runs-on: ${{matrix.os}}
     defaults:
-      - name: select shell msys2
-        if: matrix.toolset_compiler.compiler == 'g++'
-        run:
-          #  override shell when using g++
-          shell: msys2 {0}
+      name: select shell msys2
+      if: matrix.toolset_compiler.compiler == 'g++'
+      run:
+        #  override shell when using g++
+        shell: msys2 {0}
     steps:
       - name: Setup msbuild
         if: matrix.toolset_compiler.compiler != 'g++'
