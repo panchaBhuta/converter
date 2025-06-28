@@ -18,7 +18,41 @@ Supported Platforms/Compilers
 =============================
 Converter is implemented using C++20 with code portable across OS and it's supported compiler's.<br>
 
-Ubit-Test results of last run:
+Unit-Test results of last run across multiple OS-versions and Compiler-versions :
+
+| <nobr>🤖 Compiler ➡️</nobr><br><nobr>🖥️ OS ⬇️</nobr> | **g++** | **clang++** | **AppleClang** | **msvc** | **clangCL** | default&nbsp;Compiler |
+|------------|------------|------------------|--------------|--------------|--------------|--------------|
+| **Ubuntu&nbsp;24.04** | 14, 13, 12<br>✅ ✅ ✅ | 18, 17, 16<br>✅ ✅ ✅ | - | - | - | default: g++-13<br>clang: clang++-18 |
+| **Ubuntu&nbsp;24.04**<br>(ARM64) | 14, 13, 12<br>✅ ✅ ✅ | 18, 17, 16<br>✅ ✅ ✅ | - | - | - | default: g++-13<br>clang: clang++-18 |
+| **Ubuntu&nbsp;22.04** | 13, 12, 11<br>❌&nbsp;&nbsp;✅ ✅ | 15, 14, 13, 12<br>✅ ✅ ✅&nbsp;&nbsp;⚠️ | - | - | - | default: g++-11<br>clang: clang++-14 |
+| **Ubuntu&nbsp;22.04**<br>(ARM64) | 13, 12, 11<br>✅ ✅ ✅ | 15, 14, 13<br>✅&nbsp;&nbsp;✖️&nbsp;&nbsp;✖️ | - | - | - | default: g++-11<br>clang: clang++-14 |
+| **macOS-15**<br>(ARM64) | 14, 13, 12<br>✖️&nbsp;&nbsp;✖️&nbsp;&nbsp;✖️ | - | 16<br>✅ | - | - | AppleClang&nbsp;16 |
+| **macOS-14**<br>(ARM64) | 14, 13, 12<br>✅ ✅ ✅ | - | 15<br>✅ | - | - | AppleClang&nbsp;15 |
+| **macOS-13**<br>(x86_64) | 14, 13, 12<br>✅ ✅ ✅ | - | 15<br>✅ | - | - | AppleClang&nbsp;15 |
+| **macOS-12🦖** | 14, 13, 12, 11<br>✔️&nbsp;&nbsp;✖️&nbsp;&nbsp;✔️ ⚠️ | - | 14<br>✔️ | - | - | AppleClang&nbsp;14 |
+| **macOS-11🦖** | 12, 11<br>✔️&nbsp;&nbsp;✔️ | - | 14<br>✔️ | - | - | AppleClang&nbsp;14 |
+| **Windows&nbsp;10<br>VS&nbsp;17&nbsp;-&nbsp;2025** | - | - | - | 19<br>✅ | 19<br>✅ | msvc 19 |
+| **Windows&nbsp;10<br>VS&nbsp;17&nbsp;-&nbsp;2022** | - | - | - | 19<br>✅ | 19<br>✅ | msvc 19 |
+| **Windows&nbsp;10<br>VS&nbsp;16&nbsp;-&nbsp;2019** | - | - | - | - | 16<br>✅ | - |
+
+<br>
+
+[//]: # (for special characters , refer :: https://www.vertex42.com/ExcelTips/unicode-symbols.html)
+
+✅ : Tests success on last execution.
+
+🦖 : OS now Withdrawn.
+
+⚠️ : Was working earlier. Compiler later got removed from runner image.
+
+✔️ : Was working earlier. OS withdrawn, hence tests not repeatable on github.
+
+❌ : Was working earlier. Latest run fails.
+
+✖️ : Compilation failure.
+
+<br>
+
 | <nobr>🖥️ OS ➡️</nobr><br><nobr>🤖 Compiler ⬇️</nobr> | **Ubuntu&nbsp;24.04** | **Ubuntu&nbsp;22.04** | **macOS-14**<br>(ARM64) | **macOS-13** | **macOS-12** | **Windows&nbsp;10<br>VS&nbsp;17&nbsp;-&nbsp;2022** | **Windows&nbsp;10<br>VS&nbsp;16&nbsp;-&nbsp;2019** |
 |------------|------------|------------------|--------------|--------------|--------------|-------------------------------|-------------------------------|
 | **g++ 14** | ✅ | - | ✅ | ✅ | ✅ | - | - |
@@ -48,9 +82,6 @@ Previous successful Unit-test runs (now failing for some reasons) :
 ⚠ : Now Withdrawn.
 
 ❌ : Now Fails.
-
-
-[//]: # (for special characters , refer :: https://www.vertex42.com/ExcelTips/unicode-symbols.html)
 
 
 Installation

@@ -33,7 +33,8 @@ jobs:
         # https://github.com/actions/runner-images#available-images
         # https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories  (os-labels : windows-2022)
         # https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software-for-github-owned-images
-        os: [windows-2025, windows-2022]  #  windows-latest  ==  windows-2022
+        #   os: [windows-2025, windows-2022]  #  windows-latest  ==  windows-2022
+        os: [windows-2025, windows-2022, windows-2019]  #  windows-latest  ==  windows-2022
         # https://cmake.org/cmake/help/latest/manual/cmake.1.html#cmdoption-cmake-T
         # CMake compiler option doesn't work for Visual Studio project :: https://youtrack.jetbrains.com/issue/CPP-17314
         # https://github.com/actions/runner-images/blob/main/images/win/Windows2022-Readme.md#tools
@@ -45,15 +46,34 @@ jobs:
           # clang   == 'MSVC 19'
           # ClangCl == 'Clang 16'
         toolset_compiler: [ { compiler: default, toolset: -1 },
-                            { compiler: ClangCl, toolset:  1 } ]
-        include:
-          - os: windows-2019
-              # ClangCl == 'Clang 12'
-            toolset_compiler : { compiler: ClangCl, toolset: 1 }
+                            { compiler: ClangCl, toolset:  1 },
+                            { compiler: g++,     toolset:  0 } ]
+        #include:
+        #  - os: windows-2019
+        #      # ClangCl == 'Clang 12'
+        #    toolset_compiler : { compiler: ClangCl, toolset: 1 }
     runs-on: ${{matrix.os}}
+    default:
+      - name: select shell - msys2
+        if: matrix.toolset_compiler.compiler == 'g++'
+        run:
+          #  override shell when using g++
+          shell: msys2 {0}
     steps:
-      - name: Add msbuild to PATH
+      - name: Setup msbuild
+        if: matrix.toolset_compiler.compiler != 'g++'
         uses: microsoft/setup-msbuild@v2
+      - name : Setup msys2
+        if: matrix.toolset_compiler.compiler == 'g++'
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          path-type: minimal
+          update: true
+          install: >-
+            base-devel git
+          pacboy: >-
+            python:p python-pip:p gcc:p cmake:p g++:p
       - name: Checkout Repo
         uses: actions/checkout@v4
       - name: Get Version
