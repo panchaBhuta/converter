@@ -71,7 +71,7 @@ jobs:
           install: >-
             base-devel git
           pacboy: >-
-            python:p python-pip:p gcc:p cmake:p g++:p
+            python:p python-pip:p gcc:p cmake:p
       - name: Checkout Repo
         uses: actions/checkout@v4
       - name: Get Version
