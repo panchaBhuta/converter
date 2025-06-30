@@ -524,10 +524,13 @@ macro(converter_build)
     #target_include_directories(converter INTERFACE
     #    "$<$<BOOL:${CMAKE_HOST_UNIX}>:/opt/include/$<CXX_COMPILER_ID>>")
 
+    set(MSYSTEM_VALUE "$<${windows_os}:$<IF:$<BOOL:$ENV{MSYSTEM}>,MSYSTEM_${MSYSTEM_VALUE},MSYSTEM_NOTSET>>")
+                    #                 "$<IF:condition            ,true_string             ,false_string>")
     target_compile_definitions(converter INTERFACE
         $<$<CONFIG:Debug>:DEBUG_BUILD>
         $<$<CONFIG:Release>:RELEASE_BUILD>
-	    FLAG_CONVERTER_debug_log=$<BOOL:${OPTION_CONVERTER_debug_log}>)
+        FLAG_CONVERTER_debug_log=$<BOOL:${OPTION_CONVERTER_debug_log}>
+        "${MSYSTEM_VALUE}")
     #[==================================================================================[
     # refer https://cmake.org/cmake/help/v3.27/manual/cmake-generator-expressions.7.html#genex:COMPILE_LANG_AND_ID
     # This specifies the use of different compile definitions based on both the compiler id and compilation language.

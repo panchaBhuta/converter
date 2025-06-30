@@ -69,6 +69,7 @@ add_unit_test(testTupleConversions)
 
 add_unit_test(testCIstring)
 
+add_unit_test(testPlatform)
 
 #[======================[
 # perf tests
