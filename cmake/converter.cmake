@@ -19,7 +19,7 @@ set(clang_like_cxx "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang>")
 set(gcc_cxx "$<COMPILE_LANG_AND_ID:CXX,GNU>")
 set(gcc_like_cxx "$<OR:$<COMPILE_LANG_AND_ID:CXX,GNU,LCC>,${clang_like_cxx}>")
 set(msvc_cxx "$<COMPILE_LANG_AND_ID:CXX,MSVC>")
-set(windows_os "$<BOOL:${WIN32}>")
+set(windows_os "$<BOOL:${WIN64}>")
 
 
 set(e_DISABLE_FEATURE    0)
