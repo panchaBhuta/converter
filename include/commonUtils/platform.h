@@ -5,21 +5,21 @@
 // platform.h
 // By Gabriel Staples
 // Apr. 2025
-// 
-// From: 
+//
+// From:
 // 1. https://stackoverflow.com/a/79228659/4561887
 // 2. https://github.com/ElectricRCAircraftGuy/eRCaGuy_Linux_Windows_CMake_Sockets_MSYS2/blob/main/src/platform.h
-// 
-// Print out some messages at compile time to show which platform we are 
+//
+// Print out some messages at compile time to show which platform we are
 // compiling on.
-// - This helps us debug so we can get the correct static asserts on sizes 
-//   for the various platforms on which we compile. 
-// - See also: 
+// - This helps us debug so we can get the correct static asserts on sizes
+//   for the various platforms on which we compile.
+// - See also:
 //   1. https://sourceforge.net/p/predef/wiki/OperatingSystems/
-// 
-// Note that on my 64-bit x86-64 computer, the sizes of types are the same on 
+//
+// Note that on my 64-bit x86-64 computer, the sizes of types are the same on
 // `__CYGWIN__` (using the base MSYS2 terminal) on Windows as they are on
-// `__gnu_linux__` on Linux. 
+// `__gnu_linux__` on Linux.
 
 #pragma once
 
@@ -133,9 +133,9 @@
 #endif
 
 // Custom `MSYSTEM_*` definitions added by me directly via CMakeLists.txt.
-// - This is based on the fact that possible `MSYSTEM` environment variable 
+// - This is based on the fact that possible `MSYSTEM` environment variable
 //   values set by the MSYS2 terminal environment on Windows include:
-//  
+//
 //   1. MSYS
 //   2. MINGW32
 //   3. MINGW64
@@ -143,7 +143,7 @@
 //   5. CLANG64
 //   6. CLANG32
 //   7. CLANGARM64
-// 
+//
 // - See my answer here: https://stackoverflow.com/a/79201770/4561887
 
 //   also refer https://sourceforge.net/p/msys2/discussion/general/thread/b7dfdac8/#3939
@@ -170,7 +170,10 @@
     #pragma message("environment on MSYSTEM_CLANGARM64")
 #endif
 #ifdef MSYSTEM_NOTSET
-    #pragma message("environment on MSYSTEM_NOTSET (ie: unlisted Linux based)")
+    #pragma message("environment on MSYSTEM_NOTSET")
+#endif
+#ifdef MSYSTEM_NOTAPPLICABLE_NonWindowsOS
+    #pragma message("environment on MSYSTEM_NOTAPPLICABLE_NonWindowsOS")
 #endif
 
 

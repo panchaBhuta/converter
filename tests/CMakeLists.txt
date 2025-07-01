@@ -47,6 +47,8 @@ endmacro(add_perf_test)
 
 
 # Unit tests
+add_unit_test(testPlatform)
+
 add_unit_test(testDefaultTemplateInstantiation)
 add_unit_test(testAllTemplateInstantiation)
 add_unit_test(testBasicConversions)
@@ -69,7 +71,6 @@ add_unit_test(testTupleConversions)
 
 add_unit_test(testCIstring)
 
-add_unit_test(testPlatform)
 
 #[======================[
 # perf tests

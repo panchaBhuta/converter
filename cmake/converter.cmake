@@ -524,8 +524,18 @@ macro(converter_build)
     #target_include_directories(converter INTERFACE
     #    "$<$<BOOL:${CMAKE_HOST_UNIX}>:/opt/include/$<CXX_COMPILER_ID>>")
 
-    set(MSYSTEM_VALUE "$<${windows_os}:$<IF:$<BOOL:$ENV{MSYSTEM}>,MSYSTEM_${MSYSTEM_VALUE},MSYSTEM_NOTSET>>")
-                    #                 "$<IF:condition            ,true_string             ,false_string>")
+    set(ENV_MSYSTEM "$ENV{MSYSTEM}")
+    message(STATUS "ENV_MSYSTEM=${ENV_MSYSTEM}  , windows_os=${windows_os}")
+    if(${windows_os})
+        if("$<BOOL:${ENV_MSYSTEM}>")
+            set(MSYSTEM_VALUE "MSYSTEM_${ENV_MSYSTEM}")
+        else()
+            set(MSYSTEM_VALUE "MSYSTEM_NOTSET")
+        endif()
+    else()
+        set(MSYSTEM_VALUE "MSYSTEM_NOTAPPLICABLE_NonWindowsOS")
+    endif()
+    message(STATUS "MSYSTEM_VALUE=${MSYSTEM_VALUE}")
     target_compile_definitions(converter INTERFACE
         $<$<CONFIG:Debug>:DEBUG_BUILD>
         $<$<CONFIG:Release>:RELEASE_BUILD>

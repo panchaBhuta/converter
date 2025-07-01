@@ -17,6 +17,9 @@
   #define  TEMPLATE_UID  103
   #define MACH_MACOS_ARRAY_IDX     MACH_PRE_MACOS14_GNU
   #define UBUNTU_ARRAY_IDX UBUNTU_X86_64
+  #if defined(MSYSTEM_MINGW64) || defined(MSYSTEM_UCRT64) || defined(MSYSTEM_CLANG64) || defined(MSYSTEM_CLANGARM64)
+    #define ENVIRONMENT_MSYS2_64
+  #endif
 
 #elif defined(__APPLE__) && defined(__MACH__)
   const unsigned indexOS = 1;
