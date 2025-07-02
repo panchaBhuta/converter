@@ -15,6 +15,7 @@
 #pragma once
 
 #include <string>
+#include <string>
 #include <iostream>
 
 // refer https://stackoverflow.com/a/2886589/2299954
@@ -28,8 +29,8 @@ namespace converter {
 
     static int compare(const char* s1, const char* s2, size_t n) {
       while( n-- ) {
-        char us1 = toupper(*s1);
-        char us2 = toupper(*s2);
+        char us1 = static_cast<char>(std::toupper(*s1));
+        char us2 = static_cast<char>(std::toupper(*s2));
         if (!std::char_traits<char>::eq(us1,us2)) return std::char_traits<char>::lt(us1,us2)?-1:1;
         ++s1; ++s2;
       }
@@ -37,8 +38,8 @@ namespace converter {
     }
 
     static const char* find(const char* s, int n, char a) {
-      char ua = toupper(a);
-      while( n-- > 0 && toupper(*s) != ua ) {
+      char ua = static_cast<char>(std::toupper(a));
+      while( n-- > 0 && static_cast<char>(std::toupper(*s)) != ua ) {
         ++s;
       }
       return s;
