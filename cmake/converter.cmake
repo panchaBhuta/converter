@@ -546,15 +546,26 @@ macro(converter_build)
 
     set(ENV_MSYSTEM "$ENV{MSYSTEM}")
     add_custom_target(genexdebug9 ALL COMMAND ${CMAKE_COMMAND} -E echo "ENV_MSYSTEM=${ENV_MSYSTEM}  , windows_os=${windows_os}")
-    if(${windows_os})
-        if("$<BOOL:${ENV_MSYSTEM}>")
-            set(MSYSTEM_VALUE "MSYSTEM_${ENV_MSYSTEM}")
-        else()
-            set(MSYSTEM_VALUE "MSYSTEM_NOTSET")
-        endif()
-    else()
-        set(MSYSTEM_VALUE "MSYSTEM_NOTAPPLICABLE_NonWindowsOS")
-    endif()
+    # IMPORTANT : below code doesn't work as expected as "if($<BOOL:${windows_os})" is evaluated
+    #             during Configure time, during which windows_os and WIN32 among other variables
+    #             would evaluate to BOOL=false. Thus, MSYSTEM_VALUE="MSYSTEM_NOTAPPLICABLE_NonWindowsOS"
+    #             gets set incorrectly in configure time itself(instead of compile time).
+    #             These variables(WIN32 etc) are set later during Compile time, but then this if
+    #             condition doen't get evaluted.
+    #             For MSYSTEM_VALUE to be correctly evaluted we need to set it thru generator-expressions.
+    #if($<BOOL:${windows_os})
+    #    message(STATUS "windows_os=true")
+    #    if($<BOOL:${ENV_MSYSTEM}>)
+    #        set(MSYSTEM_VALUE "MSYSTEM_${ENV_MSYSTEM}")
+    #    else()
+    #        set(MSYSTEM_VALUE "MSYSTEM_NOTSET")
+    #    endif()
+    #else()
+    #    message(STATUS "windows_os=false")
+    #    set(MSYSTEM_VALUE "MSYSTEM_NOTAPPLICABLE_NonWindowsOS")
+    #endif()
+    set(MSYSTEM_VALUE_WIN32 "$<IF:$<BOOL:${ENV_MSYSTEM}>,MSYSTEM_${ENV_MSYSTEM},MSYSTEM_NOTSET>")
+    set(MSYSTEM_VALUE "$<IF:$<BOOL:${windows_os}>,${MSYSTEM_VALUE_WIN32},MSYSTEM_NOTAPPLICABLE_NonWindowsOS>")
     add_custom_target(genexdebug10 ALL COMMAND ${CMAKE_COMMAND} -E echo "MSYSTEM_VALUE=${MSYSTEM_VALUE}")
     target_compile_definitions(converter INTERFACE
         $<$<CONFIG:Debug>:DEBUG_BUILD>
