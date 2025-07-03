@@ -20,9 +20,9 @@ on:
   #BUILD_TYPE: Release
 
 
-defaults:
-  run:
-    shell: bash
+#defaults:
+#  run:
+#    shell: bash
 
 jobs:
   build-windows:
@@ -47,6 +47,7 @@ jobs:
           # ClangCl == 'Clang 16'
         toolset_compiler: [ { compiler: default, toolset: -1, cmdShell: bash },
                             { compiler: ClangCl, toolset:  1, cmdShell: bash },
+                            # https://github.com/ArchieAtkinson/CppTemplate
                             { compiler: g++,     toolset:  0, cmdShell: "msys2 {0}" } ]
         #include:
         #  - os: windows-2019
@@ -55,7 +56,7 @@ jobs:
     runs-on: ${{matrix.os}}
     defaults:
       run:
-        #  override shell when using g++
+        #  msys2 shell when using g++ else bash
         shell: ${{matrix.toolset_compiler.cmdShell}}
     steps:
       - name: Setup msbuild
