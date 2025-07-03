@@ -116,15 +116,17 @@ int main()
 #else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
                                                                   "3.1234567890123456789",    // 18 g++ [ 14, 13, 12 ]
 #endif
-//#ifdef              ENVIRONMENT_MSYS2_64
-//                                                                  "3.123456789012345691"  // Windows (MSYS2)
-//#else
-                                                                  "3.1234567890123457"    // Windows (MSVC or Clang)
-//#endif
+#ifdef              ENVIRONMENT_MSYS2_64
+                                                                  "3.123456789012345691"  // Windows (MSYS2)
+#else
+//                                                                  "3.1234567890123457"    // Windows (MSVC or Clang)
+                                                                  "3.123456789012345691"    // Windows (MSVC or Clang)
+#endif
                                                                 };
     checkRoundTripConversion_txt2Val2txt<long double>("testFloatingPointPrecision-6",
                  "3.123456789012345678901", 3.123456789012345678901L,
-                 expected_longDouble_3d123456789012345678901[indexOS]);  //18 digits
+                 expected_longDouble_3d123456789012345678901[indexOS],
+                 (indexOS==2)?16:18);
 
 
     checkRoundTripConversion_txt2Val2txt<double>("testFloatingPointPrecision-7",

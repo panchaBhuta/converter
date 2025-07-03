@@ -94,10 +94,10 @@ jobs:
         # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idif
         if: matrix.toolset_compiler.compiler == 'default'
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug
-      - name: Configure CMake (compiler=${{matrix.toolset_compiler.compiler}}) [Debug]
+      - name: Configure CMake (compiler=g++) [Debug]
         if: matrix.toolset_compiler.toolset == 0
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=${{matrix.toolset_compiler.compiler}}
-      - name: Configure CMake (toolset_compiler=${{matrix.toolset_compiler.compiler}}) [Debug]
+      - name: Configure CMake (toolset_compiler=clang) [Debug]
         # https://cmake.org/cmake/help/latest/guide/user-interaction/index.html
         if: matrix.toolset_compiler.toolset == 1
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug  -T "${{matrix.toolset_compiler.compiler}}"
