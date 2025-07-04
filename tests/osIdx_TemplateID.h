@@ -17,7 +17,7 @@
   #define  TEMPLATE_UID  103
   #define MACH_MACOS_ARRAY_IDX     MACH_PRE_MACOS14_GNU
   #define UBUNTU_ARRAY_IDX UBUNTU_X86_64
-  #if define(COMPILER_GNU) && \
+  #if defined(COMPILER_GNU) && \
       ( defined(BUILD_ENV_MINGW) || defined(BUILD_ENV_MSYS) || defined(BUILD_ENV_CYGWIN) )
     // bash environment on windows while using compiler MSVC and ClangCL, defines MSYSTEM=MINGW64
     // Hence we consider MSYSTEM value only when COMPILER=GNU

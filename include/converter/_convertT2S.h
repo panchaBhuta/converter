@@ -449,7 +449,6 @@ namespace converter
 
     static const int template_uid = -5;
 
-    // TODO unit tests
     /**
      * @brief   Converts char value to string.
      * @param   val                 input string.
@@ -458,9 +457,9 @@ namespace converter
     inline static std::string
     ToStr(const CH& val)
     {
-      // https://stackoverflow.com/questions/27720553/conversion-of-wchar-t-to-string
-      std::basic_string<CH> ssVal(&val,1);
-      return std::string(ssVal.begin(),ssVal.end());
+      std::string ssVal("_");
+      ssVal.at(0) = std::static_cast<char>(CH(val));
+      return ssVal;
     }
   };
 
