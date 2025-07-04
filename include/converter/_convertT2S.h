@@ -458,7 +458,7 @@ namespace converter
     ToStr(const CH& val)
     {
       std::string ssVal("_");
-      ssVal.at(0) = std::static_cast<char>(CH(val));
+      ssVal.at(0) = static_cast<char>(CH(val));
       return ssVal;
     }
   };
