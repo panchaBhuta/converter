@@ -116,7 +116,7 @@ int main()
 #else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
                                                                   "3.1234567890123456789",    // 18 g++ [ 14, 13, 12 ]
 #endif
-#ifdef              ENVIRONMENT_MSYS2_64
+#ifdef              BUILD_ENV_MSYS2_GNU
                                                                   "3.123456789012345691"  // Windows (MSYS2)
 #else
                                                                   "3.1234567890123457"    // Windows (MSVC or Clang)

@@ -97,7 +97,7 @@ int main()
 #else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
                                                                   "3.1234567890123457",
 #endif
-#ifdef              ENVIRONMENT_MSYS2_64
+#ifdef              BUILD_ENV_MSYS2_GNU
                                                                   "3.123456789012345691"  // Windows (MSYS2)
 #else
                                                                   "3.1234567890123"       // Windows (MSVC or Clang)
@@ -120,7 +120,7 @@ int main()
                  16
                  // getLowerDecimalPrecision<long double>() = 17 digits
 #endif
-                 :16)
+                 :13)
                 );
     checkRoundTripConversion_txt2Val2txt<double, converter::ConvertFromStr<double>,
                                                  ConvertFromVal_lDP<double>>("testUserDefinedConverter_lowerPrecision-7",

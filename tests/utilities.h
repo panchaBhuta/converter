@@ -31,7 +31,7 @@ void checkRoundTripConversion_txt2Val2txt( const std::string& testID,
             int decimalPrecision = std::numeric_limits<T>::digits10,
             char decimalSeperator = '.', char currencySeperator = '_')
 {
-  std::cout << "testID = " << testID << " , strInput = " << strInput << std::endl;
+  std::cout << "#############  testID = " << testID << " , strInput = " << strInput << std::endl;
   std::cout << "decimalPrecision = " << decimalPrecision << " : std::numeric_limits<T>::digits10 = " << std::numeric_limits<T>::digits10 << std::endl;
   const T valConv = TConvertFromStr::ToVal(strInput);
   std::cout << "valExpected = " << valExpected << " : valConv = " << valConv << std::endl;
@@ -55,7 +55,7 @@ void checkRoundTripConversion_txt2Val2txt( const std::string& testID,
     std::string::size_type decSep_actual = _strRoundtripActual.find(decimalSeperator);
     if(decSep_input != std::string::npos  && decSep_actual != std::string::npos)
     {
-      std::cout << "################   fraction check     ############" << std::endl;
+      std::cout << "+++++++++++++   fraction check     ++++++++++++++" << std::endl;
       // both input and round-trip-string have decimal seperator
       // for e.g.: '3.3123412e+38'
       if(decSep_input == decSep_actual)
