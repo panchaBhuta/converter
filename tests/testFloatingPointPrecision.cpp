@@ -119,8 +119,7 @@ int main()
 #ifdef              ENVIRONMENT_MSYS2_64
                                                                   "3.123456789012345691"  // Windows (MSYS2)
 #else
-//                                                                  "3.1234567890123457"    // Windows (MSVC or Clang)
-                                                                  "3.123456789012345691"    // Windows (MSVC or Clang)
+                                                                  "3.1234567890123457"    // Windows (MSVC or Clang)
 #endif
                                                                 };
     checkRoundTripConversion_txt2Val2txt<long double>("testFloatingPointPrecision-6",

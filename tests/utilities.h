@@ -31,11 +31,13 @@ void checkRoundTripConversion_txt2Val2txt( const std::string& testID,
             int decimalPrecision = std::numeric_limits<T>::digits10,
             char decimalSeperator = '.', char currencySeperator = '_')
 {
+  std::cout << "testID = " << testID << " , strInput = " << strInput << std::endl;
+  std::cout << "decimalPrecision = " << decimalPrecision << " : std::numeric_limits<T>::digits10 = " << std::numeric_limits<T>::digits10 << std::endl;
   const T valConv = TConvertFromStr::ToVal(strInput);
+  std::cout << "valExpected = " << valExpected << " : valConv = " << valConv << std::endl;
   unittest::ExpectEqual(T, valExpected, valConv);
 
   const std::string strRoundtripActual = TConvertFromVal::ToStr(valConv);
-  std::cout << "testID = " << testID << " , strInput = " << strInput << " : decimalPrecision = " << decimalPrecision << std::endl;
   std::cout << "strRoundtripExpected = " << strRoundtripExpected << " : strRoundtripActual = " << strRoundtripActual << std::endl;
   unittest::ExpectEqual(std::string, strRoundtripExpected, strRoundtripActual);
 
