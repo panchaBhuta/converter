@@ -128,7 +128,7 @@ int main()
                    // On Windows : MSYS2 env : GNU compiler
                    //  3.123456789012345678901L is actually rounded off to      3.1234567890123456788878, but ...
                    // "3.123456789012345678901" is converted to (string -> FP)  3.1234567890123456912477
-                 3.1234567890123456912477L  // Windows (MSYS2) : BIG RED FLAG here
+                 3.1234567890123456912477L,  // Windows (MSYS2) : BIG RED FLAG here
 #else
                  3.123456789012345678901L,
 #endif
