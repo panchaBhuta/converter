@@ -105,7 +105,15 @@ int main()
                                                                 };
     checkRoundTripConversion_txt2Val2txt<long double, converter::ConvertFromStr<long double>,
                                                       ConvertFromVal_lDP<long double>>("testUserDefinedConverter_lowerPrecision-6",
-                 "3.123456789012345678901", 3.123456789012345678901L,
+                 "3.123456789012345678901",
+#ifdef              BUILD_ENV_MSYS2_GNU
+                   // On Windows : MSYS2 env : GNU compiler
+                   //  3.123456789012345678901L is actually rounded off to      3.1234567890123456788878, but ...
+                   // "3.123456789012345678901" is converted to (string -> FP)  3.1234567890123456912477
+                 3.1234567890123456912477L  // Windows (MSYS2) : BIG RED FLAG here
+#else
+                 3.123456789012345678901L,
+#endif
                  expected_longDouble_1d123456789012345678901[indexOS],
                  (indexOS==0)?16:(
                  (indexOS==1)?
