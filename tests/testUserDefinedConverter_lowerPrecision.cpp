@@ -98,7 +98,7 @@ int main()
                                                                   "3.1234567890123457",
 #endif
 #ifdef              BUILD_ENV_MSYS2_GNU
-                                                                  "3.123456789012345691"  // Windows (MSYS2)
+                                                                  "3.1234567890123457"  // Windows (MSYS2)
 #else
                                                                   "3.1234567890123"       // Windows (MSVC or Clang)
 #endif
