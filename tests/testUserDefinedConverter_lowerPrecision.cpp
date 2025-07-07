@@ -163,7 +163,12 @@ int main()
                  9007199254740993.0L,
 #endif
                  expected_longDouble_9007199254740993[indexOS],
-                 getLowerDecimalPrecision<long double>());
+#ifdef              BUILD_ENV_MSYS2_GNU
+                 getLowerDecimalPrecision<long double>(), '.', '_', false
+#else
+                 getLowerDecimalPrecision<long double>()
+#endif
+                 );
 
 
     checkRoundTripConversion_txt2Val2txt<float, converter::ConvertFromStr<float>,

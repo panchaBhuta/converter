@@ -227,7 +227,13 @@ int main()
 #endif
                                                         "5.3123412e-38", };
     checkRoundTripConversion_txt2Val2txt<long double>("testFloatingPointPrecision-13",
-                 "5.3123412e-38", 5.3123412E-38L, expected_longdouble_5d3123412en38[indexOS],
+                 "5.3123412e-38",
+#ifdef              BUILD_ENV_MSYS2_GNU
+                 5.3123412000000003544036e-38,  // Windows (MSYS2)
+#else
+                 5.3123412E-38L,
+#endif
+                 expected_longdouble_5d3123412en38[indexOS],
                  ((indexOS==1)?7:std::numeric_limits<long double>::digits10) ); // macOS
 
   } catch (const std::exception& ex) {
