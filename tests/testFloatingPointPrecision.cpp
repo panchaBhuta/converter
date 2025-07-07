@@ -234,7 +234,7 @@ int main()
     checkRoundTripConversion_txt2Val2txt<long double>("testFloatingPointPrecision-13",
                  "5.3123412e-38",
 #ifdef              BUILD_ENV_MSYS2_GNU
-                 5.3123412000000003544036e-38,  // Windows (MSYS2) : BIG RED FLAG here
+                 5.3123412000000003544036E-38L,  // Windows (MSYS2) : BIG RED FLAG here
 #else
                  5.3123412E-38L,
 #endif
