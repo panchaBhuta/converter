@@ -225,11 +225,16 @@ int main()
 #else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
                                                         "5.3123412e-38", // macOS
 #endif
-                                                        "5.3123412e-38", };
+#ifdef              BUILD_ENV_MSYS2_GNU
+                                                        "5.3123412000000003544e-38"  // Windows (MSYS2) : BIG RED FLAG here
+#else
+                                                        "5.3123412e-38"
+#endif
+                                                       };
     checkRoundTripConversion_txt2Val2txt<long double>("testFloatingPointPrecision-13",
                  "5.3123412e-38",
 #ifdef              BUILD_ENV_MSYS2_GNU
-                 5.3123412000000003544036e-38,  // Windows (MSYS2)
+                 5.3123412000000003544036e-38,  // Windows (MSYS2) : BIG RED FLAG here
 #else
                  5.3123412E-38L,
 #endif
