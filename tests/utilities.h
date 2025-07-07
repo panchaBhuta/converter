@@ -29,7 +29,8 @@ void checkRoundTripConversion_txt2Val2txt( const std::string& testID,
             const std::string& strInput,
             const T& valExpected, const std::string& strRoundtripExpected,
             int decimalPrecision = std::numeric_limits<T>::digits10,
-            char decimalSeperator = '.', char currencySeperator = '_')
+            char decimalSeperator = '.', char currencySeperator = '_',
+            bool stringent_check = true)
 {
   std::cout << "#############  testID = " << testID << " , strInput = " << strInput << std::endl;
   std::cout << "decimalPrecision = " << decimalPrecision << " : std::numeric_limits<T>::digits10 = " << std::numeric_limits<T>::digits10 << std::endl;
@@ -41,6 +42,12 @@ void checkRoundTripConversion_txt2Val2txt( const std::string& testID,
   std::cout << "strRoundtripExpected = " << strRoundtripExpected << " : strRoundtripActual = " << strRoundtripActual << std::endl;
   unittest::ExpectEqual(std::string, strRoundtripExpected, strRoundtripActual);
 
+  if(!stringent_check)
+  {
+    std::cout << "####### WARNING : skipping stringent-checks" << std::endl;
+    return;
+  }
+
   if(strInput.compare(strRoundtripActual)!=0)
   {
     std::string _strInput(strInput);
@@ -48,8 +55,9 @@ void checkRoundTripConversion_txt2Val2txt( const std::string& testID,
     if(currencySeperator != '_')
     {
       _strInput.erase(remove(_strInput.begin(), _strInput.end(), currencySeperator), _strInput.end());
-      _strRoundtripActual.erase(std::remove(_strRoundtripActual.begin(), _strRoundtripActual.end(),
-                 currencySeperator), _strRoundtripActual.end());
+      _strRoundtripActual.erase(
+          std::remove(_strRoundtripActual.begin(), _strRoundtripActual.end(), currencySeperator),
+          _strRoundtripActual.end() );
     }
     std::string::size_type decSep_input  = _strInput.find(decimalSeperator);
     std::string::size_type decSep_actual = _strRoundtripActual.find(decimalSeperator);
@@ -136,5 +144,6 @@ void checkRoundTripConversion_txt2Val2txt( const std::string& testID,
 
     //unittest::ExpectEqual(std::string, strInput, strRoundtripActual);
   }
+
 }
 

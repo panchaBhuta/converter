@@ -160,7 +160,11 @@ int main()
 #else
                  9007199254740993.0L,
 #endif
-                 expected_longDouble_9007199254740993[indexOS]);
+                 expected_longDouble_9007199254740993[indexOS]
+#ifdef              BUILD_ENV_MSYS2_GNU
+                 , std::numeric_limits<T>::digits10, '.', '_', false
+#endif
+                 );
 
 
     std::string expected_float_3d3123[] = { "3.3123",

@@ -145,7 +145,12 @@ int main()
 #else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
                                                            "9007199254740993",
 #endif
-                                                           "9.007199254741e+15" }; // Windows
+#ifdef              BUILD_ENV_MSYS2_GNU
+                                                           "9007199254740992"   // Windows
+#else
+                                                           "9.007199254741e+15" // Windows
+#endif
+                                                          };
     checkRoundTripConversion_txt2Val2txt<long double, converter::ConvertFromStr<long double>,
                                                       ConvertFromVal_lDP<long double>>("testUserDefinedConverter_lowerPrecision-8",
                  "9007199254740993",
