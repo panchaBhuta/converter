@@ -162,7 +162,7 @@ int main()
 #endif
                  expected_longDouble_9007199254740993[indexOS]
 #ifdef              BUILD_ENV_MSYS2_GNU
-                 , std::numeric_limits<T>::digits10, '.', '_', false
+                 , std::numeric_limits<long double>::digits10, '.', '_', false
 #endif
                  );
 
