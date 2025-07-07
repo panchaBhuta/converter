@@ -239,7 +239,11 @@ int main()
                  5.3123412E-38L,
 #endif
                  expected_longdouble_5d3123412en38[indexOS],
-                 ((indexOS==1)?7:std::numeric_limits<long double>::digits10) ); // macOS
+                 ((indexOS==1)?7:std::numeric_limits<long double>::digits10) // macOS
+#ifdef              BUILD_ENV_MSYS2_GNU
+                 , '.', '_', false
+#endif
+                 );
 
   } catch (const std::exception& ex) {
     std::cout << "Test Failed : err-msg : " << ex.what() << std::endl;
