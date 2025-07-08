@@ -136,9 +136,9 @@ int main()
                  (indexOS==2)?16:   // windows
                   ( (indexOS==1)?      // macos
 #if MACH_MACOS_ARRAY_IDX >= MACH_MACOS14_ARM_GNU
-                    18
-#else
                     16
+#else
+                    18
 #endif
                   :18 ) );               // ubuntu
 
