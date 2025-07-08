@@ -133,7 +133,14 @@ int main()
                  3.123456789012345678901L,
 #endif
                  expected_longDouble_3d123456789012345678901[indexOS],
-                 (indexOS==2)?16:18);
+                 (indexOS==2)?16:   // windows
+                  ( (indexOS==1)?      // macos
+#if MACH_MACOS_ARRAY_IDX >= MACH_MACOS14_ARM_GNU
+                    18
+#else
+                    16
+#endif
+                  :18 ) );               // ubuntu
 
 
     checkRoundTripConversion_txt2Val2txt<double>("testFloatingPointPrecision-7",

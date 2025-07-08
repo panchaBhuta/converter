@@ -54,7 +54,9 @@ void checkRoundTripConversion_txt2Val2txt( const std::string& testID,
     std::string _strRoundtripActual(strRoundtripActual);
     if(currencySeperator != '_')
     {
-      _strInput.erase(remove(_strInput.begin(), _strInput.end(), currencySeperator), _strInput.end());
+      _strInput.erase(
+          std::remove(_strInput.begin(), _strInput.end(), currencySeperator),
+          _strInput.end());
       _strRoundtripActual.erase(
           std::remove(_strRoundtripActual.begin(), _strRoundtripActual.end(), currencySeperator),
           _strRoundtripActual.end() );
