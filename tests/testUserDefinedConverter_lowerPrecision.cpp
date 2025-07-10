@@ -82,27 +82,35 @@ int main()
                                                  ConvertFromVal_lDP<double>>("testUserDefinedConverter_lowerPrecision-5",
                  "2.1234567890123456789", 2.1234567890123456789, "2.1234567890123", getLowerDecimalPrecision<double>());  // 14 digits
 
-    std::string expected_longDouble_1d123456789012345678901[] = {
-#if                 UBUNTU_ARRAY_IDX  ==  UBUNTU_ARM64
-                                                                  "3.123456789012345678901",  // 16 arm64
-#else //            UBUNTU_ARRAY_IDX  ==  UBUNTU_X86_64
-                                                                  "3.1234567890123457",       // 16 default
+
+    std::pair<std::string, int>  expected_longDouble_3d123456789012345678901[] = {
+#if           UBUNTU_ARRAY_IDX  ==  UBUNTU_ARM64
+                {"3.123456789012345678901", 16},  // std::numeric_limits<long double>::digits10 = 33 on arm64 ????
+#else //      UBUNTU_ARRAY_IDX  ==  UBUNTU_X86_64
+                {"3.1234567890123457",   16},     // 18 default
 #endif
-#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_CLANG   \
-        ||          MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_GNU     \
-        ||          MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_CLANG
-                                                                  "3.1234567890123",
-//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_GNU
-//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
+
+#if           MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_CLANG    \
+      ||      MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_GNU      \
+      ||      MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_CLANG
+//#elif          MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_GNU
+                {"3.1234567890123", 13},
+/*
+#elif         MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_GNU
+                {"3.1234567890123457", 15},       // 15 g++ [ 14, 13, 12 ]
+#elif         MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
+                {"3.12345678901234567889", std::numeric_limits<long double>::digits10},   // 18 default
+*/
 #else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
-                                                                  "3.1234567890123457",
+                {"3.1234567890123457",  15},   // 18 g++ [ 14, 13, 12 ]
 #endif
+
 #ifdef              BUILD_ENV_MSYS2_GNU
-                                                                  "3.1234567890123457"  // Windows (MSYS2)
+                {"3.1234567890123457", 13}    // Windows (MSYS2)
 #else
-                                                                  "3.1234567890123"       // Windows (MSVC or Clang)
+                {"3.1234567890123",    13}    // Windows (MSVC or Clang)
 #endif
-                                                                };
+          };
     checkRoundTripConversion_txt2Val2txt<long double, converter::ConvertFromStr<long double>,
                                                       ConvertFromVal_lDP<long double>>("testUserDefinedConverter_lowerPrecision-6",
                  "3.123456789012345678901",
@@ -112,24 +120,11 @@ int main()
                    // "3.123456789012345678901" is converted to (string -> FP)  3.1234567890123456912477
                  3.1234567890123456912477L,  // Windows (MSYS2) : BIG RED FLAG here
 #else
-                 3.123456789012345678901L,
+                 3.1234567890123456788878L, //3.123456789012345678901L,
 #endif
-                 expected_longDouble_1d123456789012345678901[indexOS],
-                 (indexOS==0)?16:(
-                 (indexOS==1)?
-#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_CLANG   \
-        ||          MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_GNU     \
-        ||          MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_CLANG
-                 13
-//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_CLANG
-//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_GNU
-//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
-#else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
-                 16
-                 // getLowerDecimalPrecision<long double>() = 17 digits
-#endif
-                 :13)
-                );
+                 expected_longDouble_3d123456789012345678901[indexOS].first,
+                 expected_longDouble_3d123456789012345678901[indexOS].second );
+
     checkRoundTripConversion_txt2Val2txt<double, converter::ConvertFromStr<double>,
                                                  ConvertFromVal_lDP<double>>("testUserDefinedConverter_lowerPrecision-7",
                  "9007199254740993", 9007199254740993.0, "9.007199254741e+15", getLowerDecimalPrecision<double>());

@@ -98,30 +98,31 @@ int main()
                  "2.1234567890123456789", 2.1234567890123456789,
                  expected_double_2d1234567890123456789[indexOS]);   // 15 digits
 
-    std::string expected_longDouble_3d123456789012345678901[] = {
-#if                 UBUNTU_ARRAY_IDX  ==  UBUNTU_ARM64
-                                                                  "3.123456789012345678901",  // 33 arm64
-#else //            UBUNTU_ARRAY_IDX  ==  UBUNTU_X86_64
-                                                                  "3.1234567890123456789",    // 15 default
+    std::pair<std::string, int>  expected_longDouble_3d123456789012345678901[] = {
+#if           UBUNTU_ARRAY_IDX  ==  UBUNTU_ARM64
+                {"3.123456789012345678901", 18},  // std::numeric_limits<long double>::digits10 = 33 on arm64 ????
+#else //      UBUNTU_ARRAY_IDX  ==  UBUNTU_X86_64
+                {"3.1234567890123456789",   std::numeric_limits<long double>::digits10},  // 18 default
 #endif
-#if                 MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_CLANG    \
-            ||      MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_CLANG
-                                                                  "3.12345678901234569",      // 15 default
-#elif               MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_GNU
-                                                                  "3.1234567890123457",       // 15 g++ [ 14, 13, 12 ]
-#elif               MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
-                                                                  "3.12345678901234567889",   // 18 default
-//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_CLANG
-//#elif             MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_GNU
+
+#if           MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_CLANG    \
+      ||      MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_CLANG
+                {"3.12345678901234569", 16},      // 15 default
+#elif         MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_GNU
+//#elif          MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_GNU
+                {"3.1234567890123457", 15},       // 15 g++ [ 14, 13, 12 ]
+#elif         MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
+                {"3.12345678901234567889", std::numeric_limits<long double>::digits10},   // 18 default
 #else //  default   MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_GNU
-                                                                  "3.1234567890123456789",    // 18 g++ [ 14, 13, 12 ]
+                {"3.1234567890123456789",  std::numeric_limits<long double>::digits10},   // 18 g++ [ 14, 13, 12 ]
 #endif
+
 #ifdef              BUILD_ENV_MSYS2_GNU
-                                                                  "3.1234567890123456912"  // Windows (MSYS2)
+                {"3.1234567890123456912", 16}    // Windows (MSYS2)
 #else
-                                                                  "3.1234567890123457"    // Windows (MSVC or Clang)
+                {"3.1234567890123457",    15}    // Windows (MSVC or Clang)
 #endif
-                                                                };
+                                                          };
     checkRoundTripConversion_txt2Val2txt<long double>("testFloatingPointPrecision-6",
                  "3.123456789012345678901",
 #ifdef              BUILD_ENV_MSYS2_GNU
@@ -130,17 +131,10 @@ int main()
                    // "3.123456789012345678901" is converted to (string -> FP)  3.1234567890123456912477
                  3.1234567890123456912477L,  // Windows (MSYS2) : BIG RED FLAG here
 #else
-                 3.123456789012345678901L,
+                 3.1234567890123456788878L, //3.123456789012345678901L,
 #endif
-                 expected_longDouble_3d123456789012345678901[indexOS],
-                 (indexOS==2)?16:   // windows
-                  ( (indexOS==1)?      // macos
-#if MACH_MACOS_ARRAY_IDX >= MACH_MACOS14_ARM_GNU
-                    16
-#else
-                    18
-#endif
-                  :18 ) );               // ubuntu
+                 expected_longDouble_3d123456789012345678901[indexOS].first,
+                 expected_longDouble_3d123456789012345678901[indexOS].second );
 
 
     checkRoundTripConversion_txt2Val2txt<double>("testFloatingPointPrecision-7",

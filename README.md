@@ -20,20 +20,20 @@ Converter is implemented using C++20 with code portable across OS and it's suppo
 
 Unit-Test results of last run across multiple OS-versions and Compiler-versions :
 
-| <nobr>🤖 Compiler ➡️</nobr><br><nobr>🖥️ OS ⬇️</nobr> | **g++** | **clang++** | **AppleClang** | **msvc** | **clangCL** | default&nbsp;Compiler |
+| <nobr>🤖&nbsp;Compiler&nbsp;➡️</nobr><br><nobr>🖥️ OS ⬇️</nobr> | **g++** | **clang++** | **AppleClang** | **msvc** | **clangCL** | default&nbsp;Compiler |
 |------------|------------|------------------|--------------|--------------|--------------|--------------|
 | **Ubuntu&nbsp;24.04** | 14, 13, 12<br>✅ ✅ ✅ | 18, 17, 16<br>✅ ✅ ✅ | - | - | - | default: g++-13<br>clang: clang++-18 |
 | **Ubuntu&nbsp;24.04**<br>(ARM64) | 14, 13, 12<br>✅ ✅ ✅ | 18, 17, 16<br>✅ ✅ ✅ | - | - | - | default: g++-13<br>clang: clang++-18 |
-| **Ubuntu&nbsp;22.04** | 13, 12, 11<br>❌&nbsp;&nbsp;✅ ✅ | 15, 14, 13, 12<br>✅ ✅ ✅&nbsp;&nbsp;⚠️ | - | - | - | default: g++-11<br>clang: clang++-14 |
+| **Ubuntu&nbsp;22.04** | 13, 12, 11<br>❌&nbsp;&nbsp;✅ ✅ | 15, 14, 13, 12<br>✅&nbsp;&nbsp;✅&nbsp;&nbsp;✅&nbsp;&nbsp;⚠️ | - | - | - | default: g++-11<br>clang: clang++-14 |
 | **Ubuntu&nbsp;22.04**<br>(ARM64) | 13, 12, 11<br>✅ ✅ ✅ | 15, 14, 13<br>✅&nbsp;&nbsp;✖️&nbsp;&nbsp;✖️ | - | - | - | default: g++-11<br>clang: clang++-14 |
 | **macOS-15**<br>(ARM64) | 14, 13, 12<br>✖️&nbsp;&nbsp;✖️&nbsp;&nbsp;✖️ | - | 16<br>✅ | - | - | AppleClang&nbsp;16 |
 | **macOS-14**<br>(ARM64) | 14, 13, 12<br>✅ ✅ ✅ | - | 15<br>✅ | - | - | AppleClang&nbsp;15 |
 | **macOS-13**<br>(x86_64) | 14, 13, 12<br>✅ ✅ ✅ | - | 15<br>✅ | - | - | AppleClang&nbsp;15 |
-| **macOS-12🦖** | 14, 13, 12, 11<br>✔️&nbsp;&nbsp;✖️&nbsp;&nbsp;✔️ ⚠️ | - | 14<br>✔️ | - | - | AppleClang&nbsp;14 |
+| **macOS-12🦖** | 14, 13, 12, 11<br>✔️&nbsp;&nbsp;✖️&nbsp;&nbsp;✔️&nbsp;&nbsp;⚠️ | - | 14<br>✔️ | - | - | AppleClang&nbsp;14 |
 | **macOS-11🦖** | 12, 11<br>✔️&nbsp;&nbsp;✔️ | - | 14<br>✔️ | - | - | AppleClang&nbsp;14 |
-| **Windows&nbsp;10<br>VS&nbsp;17&nbsp;-&nbsp;2025** | - | - | - | 19<br>✅ | 19<br>✅ | msvc 19 |
-| **Windows&nbsp;10<br>VS&nbsp;17&nbsp;-&nbsp;2022** | - | - | - | 19<br>✅ | 19<br>✅ | msvc 19 |
-| **Windows&nbsp;10<br>VS&nbsp;16&nbsp;-&nbsp;2019** | - | - | - | - | 16<br>✅ | - |
+| **Windows&nbsp;10<br>VS&nbsp;17&nbsp;-&nbsp;2025** | 15<br>✅ | - | - | 19<br>✅ | 19<br>✅ | msvc 19 |
+| **Windows&nbsp;10<br>VS&nbsp;17&nbsp;-&nbsp;2022** | 15<br>✅ | - | - | 19<br>✅ | 19<br>✅ | msvc 19 |
+| **Windows&nbsp;10<br>VS&nbsp;16&nbsp;-&nbsp;2019🦖** | 15<br>✔️ | - | - | - | 12<br>✔️ | - |
 
 <br>
 
@@ -41,7 +41,7 @@ Unit-Test results of last run across multiple OS-versions and Compiler-versions 
 
 ✅ : Tests success on last execution.
 
-🦖 : OS now Withdrawn.
+🦖 : OS runner image now Withdrawn.
 
 ⚠️ : Was working earlier. Compiler later got removed from runner image.
 
@@ -52,36 +52,6 @@ Unit-Test results of last run across multiple OS-versions and Compiler-versions 
 ✖️ : Compilation failure.
 
 <br>
-
-| <nobr>🖥️ OS ➡️</nobr><br><nobr>🤖 Compiler ⬇️</nobr> | **Ubuntu&nbsp;24.04** | **Ubuntu&nbsp;22.04** | **macOS-14**<br>(ARM64) | **macOS-13** | **macOS-12** | **Windows&nbsp;10<br>VS&nbsp;17&nbsp;-&nbsp;2022** | **Windows&nbsp;10<br>VS&nbsp;16&nbsp;-&nbsp;2019** |
-|------------|------------|------------------|--------------|--------------|--------------|-------------------------------|-------------------------------|
-| **g++ 14** | ✅ | - | ✅ | ✅ | ✅ | - | - |
-| **g++ 13** | ✅ (default) | ⚠ | ✅ | ❌ | ❌ | - | - |
-| **g++ 12** | ✅ | ✅ | ✅ | ✅ | ✅ | - | - |
-| **g++ 11** | - | ✅ (default) | - | - | ⚠ | - | - |
-| **clang++<br>(18,17,16)** | ✅<br>(clang++:18) | - | - | - | - | - | - |
-| **clang++<br>(15,14,13)** | - | ✅<br>(clang++:14) | - | - | - | - | - |
-| **AppleClang&nbsp;(default)** | - | - | ✅ (15) | ✅ (15) | ✅ (14) | - | - |
-| **msvc 19** | - | - | - | - | - | ✅ (default) | ❌ (default) |
-| **clangCL** | - | - | - | - | - | ✅ (v17) | ✅ (v12) |
-| default&nbsp;Compiler | g++13 | g++11 | AppleClang&nbsp;15 | AppleClang&nbsp;15 | AppleClang&nbsp;14 | msvc&nbsp;19 | msvc&nbsp;19 |
-
-
-<br>
-Previous successful Unit-test runs (now failing for some reasons) :
-
-|  <nobr>🖥️ OS ➡️</nobr><br><nobr>🤖 Compiler ⬇️</nobr> | **Ubuntu&nbsp;22.04** | **macOS-13** | **macOS-12** | **⚠&nbsp;macOS-11** |
-|------------|------------------|--------------|--------------|--------------|
-| **g++ 13** | ☑️⚠ | - | ☑️❌ | NA | - |
-| **g++ 12** | ^ | - | ^ | ☑️⚠ [12](https://github.com/panchaBhuta/converter/actions/runs/8329360121/job/22791476195) |
-| **g++ 11** | ^ | - | ☑️⚠ | ☑️⚠ [11](https://github.com/panchaBhuta/converter/actions/runs/8329360121/job/22791475491) |
-| **clang++ 12** | ☑️⚠ [12](https://github.com/panchaBhuta/converter/actions/runs/6291468380/job/17079862439) | - | - | - |
-
-☑️ : Was working earlier.
-
-⚠ : Now Withdrawn.
-
-❌ : Now Fails.
 
 
 Installation
@@ -129,6 +99,23 @@ Function Nomenclature:<br>
 Precision Nomenclature ( for roundtrip conversions :: **string ↣ data-type ↣ string**): <br>
 ✅ : Good. Minimal precision loss, best of the lot.  <br>
 ☑️ : Average. Precision loss is non-uniform, loss can be high for some FP values.
+
+| <nobr>🤖&nbsp;Compiler&nbsp;➡️</nobr><br><nobr>🖥️ OS ⬇️</nobr> | **g++** | **clang++** | **AppleClang** | **msvc** | **clangCL** |
+|------------|------------|------------------|--------------|--------------|--------------|
+| **Ubuntu&nbsp;24.04** | 14, 13, 12<br>⚔️ ⚔️ ⚔️<br>✅ ✅ ✅ | 18, 17, 16<br>⚔️ ⚔️ ⚔️<br>✅ ✅ ✅ | - | - | - |
+| **Ubuntu&nbsp;24.04**<br>(ARM64) | 14, 13, 12<br>⚔️ ⚔️ ⚔️<br>✅ ✅ ✅ | 18, 17, 16<br>⚔️ ⚔️ ⚔️<br>✅ ✅ ✅ | - | - | - |
+| **Ubuntu&nbsp;22.04** | 13, 12, 11<br>❌ ⚔️ ⚔️<br>❌&nbsp;&nbsp;✅ ✅ | 15, 14, 13, 12<br>⚔️ ⚔️ ⚔️&nbsp;&nbsp;&nbsp;⚠️<br>✅&nbsp;&nbsp;✅&nbsp;&nbsp;✅&nbsp;&nbsp;⚠️ | - | - | - |
+| **Ubuntu&nbsp;22.04**<br>(ARM64) | 13, 12, 11<br>⚔️ ⚔️ ⚔️<br>✅ ✅ ✅ | 15, 14, 13<br>⚔️&nbsp;&nbsp;✖️&nbsp;&nbsp;✖️<br>✅&nbsp;&nbsp;✖️&nbsp;&nbsp;✖️ | - | - | - |
+| **macOS-15**<br>(ARM64) | 14, 13, 12<br>✖️&nbsp;&nbsp;✖️&nbsp;&nbsp;✖️<br>✖️&nbsp;&nbsp;✖️&nbsp;&nbsp;✖️ | - | 16<br>✅ | - | - |
+| **macOS-14**<br>(ARM64) | 14, 13, 12<br>✅ ✅ ✅ | - | 15<br>✅ | - | - |
+| **macOS-13**<br>(x86_64) | 14, 13, 12<br>✅ ✅ ✅ | - | 15<br>✅ | - | - |
+| **macOS-12🦖** | 14, 13, 12, 11<br>✔️&nbsp;&nbsp;✖️&nbsp;&nbsp;✔️&nbsp;&nbsp;⚠️ | - | 14<br>✔️ | - | - |
+| **macOS-11🦖** | 12, 11<br>✔️&nbsp;&nbsp;✔️ | - | 14<br>✔️ | - | - |
+| **Windows&nbsp;10<br>VS&nbsp;17&nbsp;-&nbsp;2025** | 15<br>✅ | - | - | 19<br>✅ | 19<br>✅ |
+| **Windows&nbsp;10<br>VS&nbsp;17&nbsp;-&nbsp;2022** | 15<br>✅ | - | - | 19<br>✅ | 19<br>✅ |
+| **Windows&nbsp;10<br>VS&nbsp;16&nbsp;-&nbsp;2019🦖** | 15<br>✔️ | - | - | - | 12<br>✔️ |
+
+<br>
 
 | <nobr>🖥️ OS ➡️</nobr><br><nobr>🤖 Compiler ⬇️</nobr> | **Ubuntu&nbsp;24.04** | **Ubuntu&nbsp;22.04** | **macOS-14**<br>(ARM64) | **macOS-13** | **macOS-12** | **macOS-11** | **Windows&nbsp;10<br>VS&nbsp;17&nbsp;-&nbsp;2022** | **Windows&nbsp;10<br>VS&nbsp;16&nbsp;-&nbsp;2019** |
 |------------|--------------|--------------|--------------|--------------|--------------|--------------|-------------------------------|-------------------------------|
