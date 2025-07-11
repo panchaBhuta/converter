@@ -18,8 +18,6 @@ macro(add_unit_test testname)
     FILE(GLOB sources ${testname}*.cpp)
     add_executable(${testname} ${sources})
     add_test(NAME ${testname} COMMAND "${PROJECT_BINARY_DIR}/tests/${testname}")
-    target_compile_definitions(${testname} PUBLIC
-	         CONVERTER_TEST_MACOS_13=$<STREQUAL:"${CONVERTER_TEST_OS_VERSION}","macos-13">)
     target_link_libraries(${testname} converter) # donot specify PUBLIC here,
     # executable ${testname} has to have transitive association to all its dependencies(aka library chain)
     # refer   https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#target-usage-requirements

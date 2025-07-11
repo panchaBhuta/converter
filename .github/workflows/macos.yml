@@ -35,7 +35,7 @@ jobs:
         # https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software-for-github-owned-images
         #os: [ macos-15-large, macos-15-xlarge, macos-14-large, macos-14-xlarge, macos-13-large, macos-13-xlarge ]  #  macos-latest  ==  macos-14 == macos-14-xlarge
         #  NOTE :: macos-**-large and macos-**-xlarge are chargeable hence NOT added here
-        os: [ macos-15, macos-14, macos-13 ]  #  macos-latest  ==  macos-1?
+        os: [ macos-15, macos-14, macos-13 ]  #  macos-latest  ==  macos-14
 #  NOTE : macos-*        : executes arm64 (instead of x64_64), which lowers FLOATING POINT precision similar to Windows
 #         macos-*-large  : x86_64
 #         macos-*-xlarge : arm64 lowers FLOATING POINT precision similar to Windows
@@ -47,7 +47,7 @@ jobs:
           #             macos-12 -> AppleClang-14 ,
           #             macos-13 -> AppleClang-15 ,
           #             macos-14 -> AppleClang-15 ,
-	  #             macos-15 -> AppleClang-??? ]
+	  #             macos-15 -> AppleClang-16 ]
         compiler: [ default, g++-14, g++-13, g++-12 ]
         exclude: [ # skipping a fix for g++-N compilers. refer thread https://github.com/iains/gcc-14-branch/issues/11
                    { os: macos-15, compiler: g++-14 },

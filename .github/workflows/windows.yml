@@ -48,6 +48,7 @@ jobs:
         toolset_compiler: [ { compiler: default, toolset: -1, cmdShell: bash },
                             { compiler: ClangCl, toolset:  1, cmdShell: bash },
                             # https://github.com/ArchieAtkinson/CppTemplate
+                            # https://github.com/scikit-build/scikit-build-core/blob/main/.github/workflows/ci.yml
                             { compiler: g++,     toolset:  0, cmdShell: "msys2 {0}" } ]
         #include:
         #  - os: windows-2019

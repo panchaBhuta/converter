@@ -15,7 +15,6 @@
 #pragma once
 
 #include <string>
-#include <string>
 #include <iostream>
 
 // refer https://stackoverflow.com/a/2886589/2299954
@@ -56,7 +55,9 @@ namespace converter {
     *  https://stackoverflow.com/questions/5195512/namespaces-and-operator-resolution
     *  refer URL^  for   "Namespaces and operator resolution"  for eg: 'operator<<'
   */
-  template<typename CharT, converter::c_NOT_ci_char_traits Traits, typename Allocator>
+  template<typename CharT, // = char,
+           converter::c_NOT_ci_char_traits Traits, // = std::char_traits<CharT>,
+           typename Allocator> // = std::allocator<CharT> >
   inline std::basic_ostream<CharT, Traits>&
   operator<<(       std::basic_ostream<CharT, Traits>& os,
               const std::basic_string<CharT, converter::ci_char_traits, Allocator>& cistr)

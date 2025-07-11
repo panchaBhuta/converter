@@ -100,19 +100,7 @@ int main()
 #if USE_FLOATINGPOINT_FROM_CHARS_1  ==  e_ENABLE_FEATURE
     // Only for compilers which are not 'AppleClang' , ( even macOS with g++/clang compilers)
     static_assert(converter::ConvertFromStr<float>::template_uid ==  103);
-  #if (defined(CONVERTER_TEST_MACOS_13) && CONVERTER_TEST_MACOS_13 == 1) && \
-      (defined(__GNUC__) && __GNUC__ == 11)
-    // WARNING : DEPENDENT on system-locale, the comma-seperator in '0,101' is a BUG in (macOS-13:g++-11) combination.
-    //           The underlying call to 'std::from_chars(...)' function should be independent of C-locale,
-    //           should is true for other `OS:compiler` combinations except `macOS-13:g++-11`.
-    //           `macOS-13:g++-11` combination is dependent on C-locale. Refer test failure below URL for details...
-    //        https://github.com/panchaBhuta/converter/actions/runs/6473173855/job/17575327365
-    unittest::ExpectEqual(float, converter::ConvertFromStr<float>::ToVal("0,101"), 0.101f);  //  <<  comma
-  #else
-    // this is the EXPECTED outcome
-    // independent of system-locale
     unittest::ExpectEqual(float, converter::ConvertFromStr<float>::ToVal("0.102"), 0.102f);
-  #endif
 #else
     // Only for compiler 'AppleClang' , (i.e OS is macOS)
     static_assert(converter::ConvertFromStr<float>::template_uid ==  3);
