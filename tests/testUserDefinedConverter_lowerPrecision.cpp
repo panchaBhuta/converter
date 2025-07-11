@@ -85,7 +85,7 @@ int main()
 
     std::tuple<long double, std::string, int>  expected_longDouble_3d123456789012345678901[] = {
 #if           UBUNTU_ARRAY_IDX  ==  UBUNTU_ARM64
-                {3.1234567890123456789009999999999998574L, "3.1234567890123456789009999999999998574",
+                {3.1234567890123456789009999999999998574L, "3.123456789012345678901",
                         std::numeric_limits<long double>::digits10},  //  = 33 on arm64 ???? That's strange
 #else //      UBUNTU_ARRAY_IDX  ==  UBUNTU_X86_64
                 {3.1234567890123456788878L, "3.1234567890123457", 16},  // 18 default
