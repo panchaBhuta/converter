@@ -23,7 +23,11 @@
     // Hence we consider MSYSTEM value only when COMPILER=GNU
     #if defined(MSYSTEM_MINGW64) || defined(MSYSTEM_UCRT64) || defined(MSYSTEM_CLANG64) || defined(MSYSTEM_CLANGARM64)
       #define BUILD_ENV_MSYS2_GNU
+    #else
+      #error "Not a hosted implementation : Windows with MSYSTEM not being set"
     #endif
+  #else
+    #define BUILD_ENV_WINDOWS_MSVC_OR_CLANG
   #endif
 
 #elif defined(__APPLE__) && defined(__MACH__)
