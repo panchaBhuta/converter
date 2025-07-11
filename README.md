@@ -117,18 +117,6 @@ Precision Nomenclature ( for roundtrip conversions :: **string ↣ data-type ↣
 
 <br>
 
-| <nobr>🖥️ OS ➡️</nobr><br><nobr>🤖 Compiler ⬇️</nobr> | **Ubuntu&nbsp;24.04** | **Ubuntu&nbsp;22.04** | **macOS-14**<br>(ARM64) | **macOS-13** | **macOS-12** | **macOS-11** | **Windows&nbsp;10<br>VS&nbsp;17&nbsp;-&nbsp;2022** | **Windows&nbsp;10<br>VS&nbsp;16&nbsp;-&nbsp;2019** |
-|------------|--------------|--------------|--------------|--------------|--------------|--------------|-------------------------------|-------------------------------|
-| **g++ 14** | ⚔️ ✅ | - | ⚔️ ☑️ | ⚔️ ✅ | ⚔️ ✅ | - | - | - |
-| **g++ 13** | ⚔️ ✅ | ⚠ | ⚔️ ☑️ | ❌ | ❌ | - | - | - |
-| **g++ 12** | ⚔️ ✅ | ⚔️ ✅ | ⚔️ ☑️ | ⚔️ ✅ | ⚔️ ✅ | ⚔️ ✅ | - | - |
-| **g++ 11** | - | ⚔️ ✅ | - | - | ⚠ | ⚔️ ✅ | - | - |
-| **clang++ (18,17,16)** | ⚔️ ✅ | - | - | - | - | - | - | - |
-| **clang++ (15,14,13)** | - | ⚔️ ✅ | - | - | - | - | - | - |
-| **AppleClang&nbsp;(default)** | - | - | 🛠️&nbsp;☑️&nbsp;(15) | 🛠️&nbsp;☑️&nbsp;(15) | 🛠️&nbsp;☑️&nbsp;(14) | - | - | - |
-| **msvc 19** | - | - | - | - | - | - | ⚔️&nbsp;☑️ | ❌ |
-| **clangCL** | - | - | - | - | - | - | ⚔️&nbsp;☑️ (17) | ⚔️&nbsp;☑️&nbsp;(12) |
-
 
 ### Data Conversion Precision
 
@@ -185,27 +173,31 @@ For _year_month_day ↣ string_ conversion, is handled by function ...<br>
 `std::string ConverterFromVal<std::chrono::year_month_day>::ToStr(const std::chrono::year_month_day&)`.<br>
 
 Available date conversions :
-| <nobr>🤖 Algo/LIB ➡️</nobr><br><nobr>⏱ conversion type ⬇️</nobr> | **std::chrono::**<br>prefered | **date::**<br>3rd party lib | **jugaad**<br>work around |
-|------------|--------------|---------|-------------|
-| **string&nbsp;↣&nbsp;year_month_day** | ♔&nbsp;std::chrono::from_stream() | ♘&nbsp;date::from_stream() | ♙&nbsp;hand-coded tokenizer |
-| **year_month_day&nbsp;↣&nbsp;string** | ♚&nbsp;std::ostringstream&nbsp;<<&nbsp;std::vformat() | ♞&nbsp;date::to_stream() | ♟&nbsp;hand-coded tokenizer |
+| <nobr>⏱ conversion type ➡️</nobr><br><nobr>🤖 Algo/LIB ⬇️</nobr> | **string&nbsp;↣&nbsp;year_month_day** | **year_month_day&nbsp;↣&nbsp;string** |
+|------------|--------------|---------|
+| **std::chrono::**<br>prefered | ♔&nbsp;std::chrono::from_stream() | ♚&nbsp;std::ostringstream&nbsp;<<&nbsp;std::vformat() |
+| **date::**<br>3rd party lib | ♘&nbsp;date::from_stream() | ♞&nbsp;date::to_stream() |
+| **jugaad**<br>work around | ♙&nbsp;hand-coded tokenizer | ♟&nbsp;hand-coded tokenizer |
 
 <br>
 
 Date-Conversions used across different OS/Compiler combinations :
-| <nobr>🖥️ OS ➡️</nobr><br><nobr>🤖 Compiler ⬇️</nobr> | **Ubuntu&nbsp;24.04** | **Ubuntu&nbsp;22.04** | **macOS-14**<br>(ARM64) | **macOS-13** | **macOS-12** | **macOS-11** | **Windows&nbsp;10<br>VS&nbsp;17&nbsp;-&nbsp;2022** | **Windows&nbsp;10<br>VS&nbsp;16&nbsp;-&nbsp;2019** |
-|------------|--------------|--------------|--------------|--------------|--------------|--------------|-------------------------------|-------------------------------|
-| **g++ 14** | ♔ ♚ | - | ♔ ♚ | ♔ ♚ | ♔ ♚ | - | - | - |
-| **g++ 13** | ♘ ♚ | ⚠ | ♘ ♚ | ❌ | ❌ | - | - | - |
-| **g++ 12** | ♘ ♞ | ♘ ♞ | ♘ ♞ | ♘ ♞ | ♘ ♞ | ♘ ♞ | - | - |
-| **g++ 11** | - | ♘ ♞ | - | - | ⚠ | ♘ ♞ | - | - |
-| **clang++ (18,17,16)** | ♔ ♚ | - | - | - | - | - | - | - |
-| **clang++ (15,14,13)** | - | ♘ ♞ | - | - | - | - | - | - |
-| **AppleClang&nbsp;(default)** | - | - | ♘&nbsp;♚&nbsp;(15) | ♘&nbsp;♞&nbsp;(15) | ♘&nbsp;♞&nbsp;(14) | - | - | - |
-| **msvc 19** | - | - | - | - | - | - | ♔&nbsp;♚ | ❌ |
-| **clangCL** | - | - | - | - | - | - | ♔&nbsp;♚&nbsp;(17) | ♔&nbsp;♚&nbsp;(12) |
+| <nobr>🤖&nbsp;Compiler&nbsp;➡️</nobr><br><nobr>🖥️ OS ⬇️</nobr> | **g++** | **clang++** | **AppleClang** | **msvc** | **clangCL** |
+|------------|------------|------------------|--------------|--------------|--------------|
+| **Ubuntu&nbsp;24.04** | 14 ♔ ♚<br>13 ♘ ♚<br>12 ♘ ♞ | 18 ♔ ♚<br>17 ♔ ♚<br>16 ♔ ♚ | - | - | - |
+| **Ubuntu&nbsp;24.04**<br>(ARM64) | 14 ♔ ♚<br>13 ♘ ♚<br>12 ♘ ♞ | 18 ♔ ♚<br>17 ♔ ♚<br>16 ♔ ♚ | - | - | - |
+| **Ubuntu&nbsp;22.04** | 13 ❌ ❌<br>12 ♘ ♞<br>11 ♘ ♞<br>&nbsp; | 15 ♘ ♞<br>14 ♘ ♞<br>13 ♘ ♞<br>12 ⚠️ ⚠️ | - | - | - |
+| **Ubuntu&nbsp;22.04**<br>(ARM64) | 13 ♘ ♚<br>12 ♘ ♞<br>11 ♘ ♞ | 15 ♘ ♚<br>14 ✖️ ✖️<br>13 ✖️ ✖️ | - | - | - |
+| **macOS-15**<br>(ARM64) | 14 ✖️ ✖️<br>13 ✖️ ✖️<br>12 ✖️ ✖️| - | 16 ♘ ♚ | - | - |
+| **macOS-14**<br>(ARM64) | 14 ♔ ♚<br>13 ♘ ♚<br>12 ♘ ♞ | - | 15 ♘ ♚ | - | - |
+| **macOS-13**<br>(x86_64) | 14 ♔ ♚<br>13 ♘ ♚<br>12 ♘ ♞ | - | 15 ♘ ♞ | - | - |
+| **macOS-12🦖**<br>(x86_64) | 14 ♔ ♚<br>13 ✖️ ✖️<br>12 ♘ ♞<br>11 ⚠️ ⚠️ | - | 14 ♘ ♞ | - | - |
+| **macOS-11🦖**<br>(x86_64) | 12 ♘ ♞<br>11 ♘ ♞ | - | 14 ✖️ ✖️ | - | - |
+| **Windows&nbsp;10<br>VS&nbsp;17&nbsp;-&nbsp;2025** | 15 ♔ ♚ | - | - | 19 ♔ ♚ | 19 ♔ ♚ |
+| **Windows&nbsp;10<br>VS&nbsp;17&nbsp;-&nbsp;2022** | 15 ♔ ♚ | - | - | 19 ♔ ♚ | 19 ♔ ♚ |
+| **Windows&nbsp;10<br>VS&nbsp;16&nbsp;-&nbsp;2019🦖** | 15 ♔ ♚ | - | - | - | 12 ♔ ♚ |
 
-
+<br>
 
 The default date format is _"%F"_ (i.e "%Y-%m-%d"). For configuring a different date format refer [testDateConversionFormat.cpp](tests/testDateConversionFormat.cpp).
 
