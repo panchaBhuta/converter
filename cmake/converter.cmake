@@ -38,12 +38,12 @@ function(converter_cmake_variables_config)
 
     # https://gitlab.kitware.com/cmake/community/-/wikis/doc/tutorials/How-To-Write-Platform-Checks
     # Build-time values
-    add_custom_target(genexdebug1 ALL COMMAND ${CMAKE_COMMAND} -E echo "**** ${_CNV_OS_FLAGS_}")
-    add_custom_target(genexdebug2 ALL COMMAND ${CMAKE_COMMAND} -E echo "**** ${_CNV_OS_NAME_}")
-    add_custom_target(genexdebug3 ALL COMMAND ${CMAKE_COMMAND} -E echo "**** ${_CNV_SYSTEM_PROCESSOR_}")
-    add_custom_target(genexdebug4 ALL COMMAND ${CMAKE_COMMAND} -E echo "**** ${_CNV_CXX_COMPILER_}")
-    add_custom_target(genexdebug5 ALL COMMAND ${CMAKE_COMMAND} -E echo "**** ${_CNV_BUILD_ENV_}")
-    add_custom_target(genexdebug6 ALL COMMAND ${CMAKE_COMMAND} -E echo "**** ${_CNV_ENV_MSYSTEM_}")
+    add_custom_target(genexdebug_converter_1 ALL COMMAND ${CMAKE_COMMAND} -E echo "**** ${_CNV_OS_FLAGS_}")
+    add_custom_target(genexdebug_converter_2 ALL COMMAND ${CMAKE_COMMAND} -E echo "**** ${_CNV_OS_NAME_}")
+    add_custom_target(genexdebug_converter_3 ALL COMMAND ${CMAKE_COMMAND} -E echo "**** ${_CNV_SYSTEM_PROCESSOR_}")
+    add_custom_target(genexdebug_converter_4 ALL COMMAND ${CMAKE_COMMAND} -E echo "**** ${_CNV_CXX_COMPILER_}")
+    add_custom_target(genexdebug_converter_5 ALL COMMAND ${CMAKE_COMMAND} -E echo "**** ${_CNV_BUILD_ENV_}")
+    add_custom_target(genexdebug_converter_6 ALL COMMAND ${CMAKE_COMMAND} -E echo "**** ${_CNV_ENV_MSYSTEM_}")
 endfunction()
 
 
@@ -55,12 +55,12 @@ set(apple_os     "$<BOOL:${APPLE}>")    # is TRUE on Apple systems. Note this do
 set(windows_os   "$<BOOL:${WIN32}>")    # is TRUE on Windows. Prior to 2.8.4 this included CygWin
 set(unix_os      "$<AND:$<BOOL:${UNIX}>,$<NOT:$<OR:${apple_os},${windows_os}>>>")
                                         # is TRUE on all UNIX-like OS's, excluding Apple OS X and CygWin (on Windows)
-add_custom_target(genexdebug7 ALL COMMAND ${CMAKE_COMMAND} -E echo "**** OS: unix_like_os=${unix_like_os} , unix_os=${unix_os} , apple_os=${apple_os} , windows_os=${windows_os}")
+add_custom_target(genexdebug_converter_7 ALL COMMAND ${CMAKE_COMMAND} -E echo "**** OS: unix_like_os=${unix_like_os} , unix_os=${unix_os} , apple_os=${apple_os} , windows_os=${windows_os}")
 
 set(mingw_build_env    "$<BOOL:${MINGW}>")    # is TRUE when using the MinGW compiler in Windows
 set(msys_build_env     "$<BOOL:${MSYS}>")     # is TRUE when using the MSYS developer environment in Windows
 set(cygwin_build_env   "$<BOOL:${CYGWIN}>")   # is TRUE on Windows when using the CygWin version of cmake
-add_custom_target(genexdebug8 ALL COMMAND ${CMAKE_COMMAND} -E echo "**** ENV-flag: mingw_build_env=${mingw_build_env} , msys_build_env=${msys_build_env} , cygwin_build_env=${cygwin_build_env}")
+add_custom_target(genexdebug_converter_8 ALL COMMAND ${CMAKE_COMMAND} -E echo "**** ENV-flag: mingw_build_env=${mingw_build_env} , msys_build_env=${msys_build_env} , cygwin_build_env=${cygwin_build_env}")
 
 set(clang_cxx "$<COMPILE_LANG_AND_ID:CXX,Clang>")
 set(clang_like_cxx "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang>")
@@ -69,7 +69,7 @@ set(gcc_like_cxx "$<OR:$<COMPILE_LANG_AND_ID:CXX,GNU,LCC>,${clang_like_cxx}>")
 set(msvc_cxx "$<COMPILE_LANG_AND_ID:CXX,MSVC>")
 message(STATUS "++++ COMPILE_LANG_AND_ID=${COMPILE_LANG_AND_ID}")
 # COMPILE_LANG_AND_ID can't be called in add_custom_target()
-#add_custom_target(genexdebug9 ALL COMMAND ${CMAKE_COMMAND} -E echo "**** ENV: clang_cxx=${clang_cxx} , clang_like_cxx=${clang_like_cxx} , gcc_cxx=${gcc_cxx} , gcc_like_cxx=${gcc_like_cxx} , msvc_cxx=${msvc_cxx}")
+#add_custom_target(genexdebug_converter_9 ALL COMMAND ${CMAKE_COMMAND} -E echo "**** ENV: clang_cxx=${clang_cxx} , clang_like_cxx=${clang_like_cxx} , gcc_cxx=${gcc_cxx} , gcc_like_cxx=${gcc_like_cxx} , msvc_cxx=${msvc_cxx}")
 
 
 set(e_DISABLE_FEATURE    0)
@@ -575,7 +575,7 @@ macro(converter_build)
     #    "$<$<BOOL:${CMAKE_HOST_UNIX}>:/opt/include/$<CXX_COMPILER_ID>>")
 
     set(ENV_MSYSTEM "$ENV{MSYSTEM}")
-    add_custom_target(genexdebug10 ALL COMMAND ${CMAKE_COMMAND} -E echo "**** ENV_MSYSTEM=${ENV_MSYSTEM}  , windows_os=${windows_os}")
+    add_custom_target(genexdebug_converter_10 ALL COMMAND ${CMAKE_COMMAND} -E echo "**** ENV_MSYSTEM=${ENV_MSYSTEM}  , windows_os=${windows_os}")
     # IMPORTANT : below code doesn't work as expected as "if($<BOOL:${windows_os})" is evaluated
     #             during Configure time, during which windows_os and WIN32 among other variables
     #             would evaluate to BOOL=false. Thus, MSYSTEM_VALUE="MSYSTEM_NOTAPPLICABLE_NonWindowsOS"
@@ -596,7 +596,7 @@ macro(converter_build)
     #endif()
     set(MSYSTEM_VALUE_WIN32 "$<IF:$<BOOL:${ENV_MSYSTEM}>,MSYSTEM_${ENV_MSYSTEM},MSYSTEM_NOTSET>")
     set(MSYSTEM_VALUE "$<IF:$<BOOL:${windows_os}>,${MSYSTEM_VALUE_WIN32},MSYSTEM_NOTAPPLICABLE_NonWindowsOS>")
-    add_custom_target(genexdebug11 ALL COMMAND ${CMAKE_COMMAND} -E echo "**** MSYSTEM_VALUE=${MSYSTEM_VALUE}")
+    add_custom_target(genexdebug_converter_11 ALL COMMAND ${CMAKE_COMMAND} -E echo "**** MSYSTEM_VALUE=${MSYSTEM_VALUE}")
     target_compile_definitions(converter INTERFACE
         $<$<CONFIG:Debug>:DEBUG_BUILD>
         $<$<CONFIG:Release>:RELEASE_BUILD>
