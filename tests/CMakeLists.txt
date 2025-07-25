@@ -15,8 +15,9 @@
 macro(add_unit_test testname)
   if(CMAKE_BUILD_TYPE MATCHES "Debug")
   #if(BUILD_TESTING)
-    FILE(GLOB sources ${testname}*.cpp)
-    add_executable(${testname} ${sources})
+    FILE(GLOB sourcesExe  ${testname}.cpp ${ARGN})
+    # ARGN here contains list of additional cpp files(includes the extension) if any
+    add_executable(${testname} ${sourcesExe})
     add_test(NAME ${testname} COMMAND "${PROJECT_BINARY_DIR}/tests/${testname}")
     target_link_libraries(${testname} converter) # donot specify PUBLIC here,
     # executable ${testname} has to have transitive association to all its dependencies(aka library chain)
@@ -30,8 +31,9 @@ endmacro(add_unit_test)
 # Test macro add_perf_test
 macro(add_perf_test testname)
   if(CMAKE_BUILD_TYPE MATCHES "Release")
-    FILE(GLOB sources ${testname}*.cpp)
-    add_executable(${testname} ${sources})
+    FILE(GLOB sourcesExe  ${testname}.cpp ${ARGN})
+    # ARGN here contains list of additional cpp files(includes the extension) if any
+    add_executable(${testname} ${sourcesExe})
     add_test(NAME ${testname} COMMAND "${PROJECT_BINARY_DIR}/tests/${testname}")
     target_link_libraries(${testname} converter) # donot specify PUBLIC here,
     # executable ${testname} has to have transitive association to all its dependencies(aka library chain)

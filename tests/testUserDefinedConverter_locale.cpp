@@ -114,9 +114,12 @@ int main()
 
   try {
 
-    checkRoundTripConversion_txt2Val2txt<float, ConvertFromStr_loc<float>, ConvertFromVal_loc<float>>("testUserDefinedConverter_locale-1",
-                 "8,589973e+9", 8.589973e9f, "8,5899735e+09", std::numeric_limits<float>::digits10, ',', '.');
-                                          // "8,589973e+9"
+    unittest::checkRoundTripConversion_txt2Val2txt
+          <float, ConvertFromStr_loc<float>, ConvertFromVal_loc<float>>
+          ( "testUserDefinedConverter_locale-1",
+            "8,589973e+9", 8.589973e9f, "8,5899735e+09",
+            __FILE__, __LINE__,
+            std::numeric_limits<float>::digits10, ',', '.'); // "8,589973e+9"
 
     std::string expected_8589973ep9[] = { "8.589.973.000",    // linux
 #if   MACH_MACOS_ARRAY_IDX  >=  MACH_MACOS15_ARM_GNU
@@ -125,17 +128,33 @@ int main()
                                           "8589973000",  // Locale-Not-Supported
 #endif
                                           "8.589.973.000", }; // Windows
-    checkRoundTripConversion_txt2Val2txt<double, ConvertFromStr_loc<double>, ConvertFromVal_loc<double>>("testUserDefinedConverter_locale-2",
-                 "8,589973e+9", 8.589973e9, expected_8589973ep9[indexOS], std::numeric_limits<double>::digits10, ',', '.');
+    unittest::checkRoundTripConversion_txt2Val2txt
+          <double, ConvertFromStr_loc<double>, ConvertFromVal_loc<double>>
+          ( "testUserDefinedConverter_locale-2",
+            "8,589973e+9", 8.589973e9, expected_8589973ep9[indexOS],
+            __FILE__, __LINE__,
+            std::numeric_limits<double>::digits10, ',', '.');
 
-    checkRoundTripConversion_txt2Val2txt<long double, ConvertFromStr_loc<long double>, ConvertFromVal_loc<long double>>("testUserDefinedConverter_locale-3",
-                 "8,589973e+9", 8.589973e9L, expected_8589973ep9[indexOS], std::numeric_limits<long double>::digits10, ',', '.');
+    unittest::checkRoundTripConversion_txt2Val2txt
+          <long double, ConvertFromStr_loc<long double>, ConvertFromVal_loc<long double>>
+          ( "testUserDefinedConverter_locale-3",
+            "8,589973e+9", 8.589973e9L, expected_8589973ep9[indexOS],
+            __FILE__, __LINE__,
+            std::numeric_limits<long double>::digits10, ',', '.');
 
 
-    checkRoundTripConversion_txt2Val2txt<float, ConvertFromStr_loc<float>, ConvertFromVal_loc<float>>("testUserDefinedConverter_locale-4",
-                 "1,123456789", 1.123456789f, "1,12345684", std::numeric_limits<float>::digits10, ',', '.');
-    checkRoundTripConversion_txt2Val2txt<double, ConvertFromStr_loc<double>, ConvertFromVal_loc<double>>("testUserDefinedConverter_locale-5",
-                 "2,1234567890123456789", 2.1234567890123456789, "2,12345678901234569", std::numeric_limits<double>::digits10, ',', '.');
+    unittest::checkRoundTripConversion_txt2Val2txt
+          <float, ConvertFromStr_loc<float>, ConvertFromVal_loc<float>>
+          ( "testUserDefinedConverter_locale-4",
+            "1,123456789", 1.123456789f, "1,12345684",
+            __FILE__, __LINE__,
+            std::numeric_limits<float>::digits10, ',', '.');
+    unittest::checkRoundTripConversion_txt2Val2txt
+          <double, ConvertFromStr_loc<double>, ConvertFromVal_loc<double>>
+          ( "testUserDefinedConverter_locale-5",
+            "2,1234567890123456789", 2.1234567890123456789, "2,12345678901234569",
+            __FILE__, __LINE__,
+            std::numeric_limits<double>::digits10, ',', '.');
 
     std::string expected_longDouble_3d123456789012345678901[] = {
 #if                 UBUNTU_ARRAY_IDX  ==  UBUNTU_ARM64
@@ -155,9 +174,12 @@ int main()
                                                                   "3,12345678901234567889",
 #endif
                                                                   "3,12345678901234569" };  // Windows
-    checkRoundTripConversion_txt2Val2txt<long double, ConvertFromStr_loc<long double>, ConvertFromVal_loc<long double>>("testUserDefinedConverter_locale-6",
-                 "3,123456789012345678901", 3.123456789012345678901L,
-                 expected_longDouble_3d123456789012345678901[indexOS],
+    unittest::checkRoundTripConversion_txt2Val2txt
+          <long double, ConvertFromStr_loc<long double>, ConvertFromVal_loc<long double>>
+          ( "testUserDefinedConverter_locale-6",
+            "3,123456789012345678901", 3.123456789012345678901L,
+            expected_longDouble_3d123456789012345678901[indexOS],
+            __FILE__, __LINE__,
                  (indexOS==2?17:  // windows
 #if                 UBUNTU_ARRAY_IDX  ==  UBUNTU_ARM64
                   20  // overriding 33
@@ -173,9 +195,13 @@ int main()
                                                        "9007199254740992",      // MacOS-14 upto
 #endif
                                                        "9.007.199.254.740.992", };// Windows
-    checkRoundTripConversion_txt2Val2txt<double, ConvertFromStr_loc<double>, ConvertFromVal_loc<double>>("testUserDefinedConverter_locale-7",
-                 "9007199254740993", 9007199254740993.0,
-                 expected_double_9007199254740993[indexOS], std::numeric_limits<double>::digits10, ',', '.');
+    unittest::checkRoundTripConversion_txt2Val2txt
+          <double, ConvertFromStr_loc<double>, ConvertFromVal_loc<double>>
+          ( "testUserDefinedConverter_locale-7",
+            "9007199254740993", 9007199254740993.0,
+            expected_double_9007199254740993[indexOS],
+            __FILE__, __LINE__,
+            std::numeric_limits<double>::digits10, ',', '.');
 
     std::string expected_longDouble_9007199254740993[] = { "9.007.199.254.740.993", // Ubuntu
 #if                 MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_CLANG
@@ -189,25 +215,43 @@ int main()
                                                            "9007199254740993",      // MacOS
 #endif
                                                            "9.007.199.254.740.992", };// Windows
-    checkRoundTripConversion_txt2Val2txt<long double, ConvertFromStr_loc<long double>, ConvertFromVal_loc<long double>>("testUserDefinedConverter_locale-8",
-                 "9007199254740993", 9007199254740993.0L,
-                 expected_longDouble_9007199254740993[indexOS], std::numeric_limits<long double>::digits10, ',', '.');
+    unittest::checkRoundTripConversion_txt2Val2txt
+          <long double, ConvertFromStr_loc<long double>, ConvertFromVal_loc<long double>>
+          ( "testUserDefinedConverter_locale-8",
+            "9007199254740993", 9007199254740993.0L,
+            expected_longDouble_9007199254740993[indexOS],
+            __FILE__, __LINE__,
+            std::numeric_limits<long double>::digits10, ',', '.');
 
 
-    checkRoundTripConversion_txt2Val2txt<float, ConvertFromStr_loc<float>, ConvertFromVal_loc<float>>("testUserDefinedConverter_locale-9",
-                 "3,3123", 3.3123f, "3,31229997",
+    unittest::checkRoundTripConversion_txt2Val2txt
+          <float, ConvertFromStr_loc<float>, ConvertFromVal_loc<float>>
+          ( "testUserDefinedConverter_locale-9",
+            "3,3123", 3.3123f, "3,31229997",
                               //    "3,3123"
-                 4, //std::numeric_limits<float>::digits10  = 6
-                 ',', '.');
-    checkRoundTripConversion_txt2Val2txt<float, ConvertFromStr_loc<float>, ConvertFromVal_loc<float>>("testUserDefinedConverter_locale-10",
-                 "3,3123412e+38", 3.3123412E38f, "3,3123412e+38", std::numeric_limits<float>::digits10, ',', '.');
-    checkRoundTripConversion_txt2Val2txt<float, ConvertFromStr_loc<float>, ConvertFromVal_loc<float>>("testUserDefinedConverter_locale-11",
-                 "3,3123412e-38", 3.3123412E-38f, "3,31234111e-38", std::numeric_limits<float>::digits10, ',', '.');
-    checkRoundTripConversion_txt2Val2txt<double, ConvertFromStr_loc<double>, ConvertFromVal_loc<double>>("testUserDefinedConverter_locale-12",
-                 "4,3123412e-38", 4.3123412E-38, "4,31234119999999987e-38",
+            __FILE__, __LINE__,
+            4, //std::numeric_limits<float>::digits10  = 6
+            ',', '.');
+    unittest::checkRoundTripConversion_txt2Val2txt
+          <float, ConvertFromStr_loc<float>, ConvertFromVal_loc<float>>
+          ( "testUserDefinedConverter_locale-10",
+            "3,3123412e+38", 3.3123412E38f, "3,3123412e+38",
+            __FILE__, __LINE__,
+            std::numeric_limits<float>::digits10, ',', '.');
+    unittest::checkRoundTripConversion_txt2Val2txt
+          <float, ConvertFromStr_loc<float>, ConvertFromVal_loc<float>>
+          ( "testUserDefinedConverter_locale-11",
+            "3,3123412e-38", 3.3123412E-38f, "3,31234111e-38",
+            __FILE__, __LINE__,
+            std::numeric_limits<float>::digits10, ',', '.');
+    unittest::checkRoundTripConversion_txt2Val2txt
+          <double, ConvertFromStr_loc<double>, ConvertFromVal_loc<double>>
+          ( "testUserDefinedConverter_locale-12",
+            "4,3123412e-38", 4.3123412E-38, "4,31234119999999987e-38",
                                               // "4,3123412e-38"
-                 7, // std::numeric_limits<double>::digits10 = 15
-                 ',', '.');
+            __FILE__, __LINE__,
+            7, // std::numeric_limits<double>::digits10 = 15
+            ',', '.');
 
 
     unittest::ExpectEqual(char, convertS2T_stream<char>::ToVal("C"), 'C');

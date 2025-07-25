@@ -62,26 +62,38 @@ int main()
 
   int rv = 0;
   try {
-    checkRoundTripConversion_txt2Val2txt<float, converter::ConvertFromStr<float>,
-                                                ConvertFromVal_lDP<float>>("testUserDefinedConverter_lowerPrecision-1",
-                 "8.589973e+9", 8.589973e9f, "8.59e+09",
-                 2 // getLowerDecimalPrecision<float>() = 5
-                );
-    checkRoundTripConversion_txt2Val2txt<double, converter::ConvertFromStr<double>,
-                                                 ConvertFromVal_lDP<double>>("testUserDefinedConverter_lowerPrecision-2",
-                 "8.589973e+9", 8.589973e9, "8589973000", getLowerDecimalPrecision<double>());
-    checkRoundTripConversion_txt2Val2txt<long double, converter::ConvertFromStr<long double>, ConvertFromVal_lDP<long double>>("testUserDefinedConverter_lowerPrecision-3",
-                 "8.589973e+9", 8.589973e9L, "8589973000", getLowerDecimalPrecision<long double>());
+    unittest::checkRoundTripConversion_txt2Val2txt
+          <float, converter::ConvertFromStr<float>, ConvertFromVal_lDP<float>>
+          ( "testUserDefinedConverter_lowerPrecision-1",
+            "8.589973e+9", 8.589973e9f, "8.59e+09",
+            __FILE__, __LINE__,
+            2); // getLowerDecimalPrecision<float>() = 5
+    unittest::checkRoundTripConversion_txt2Val2txt
+          <double, converter::ConvertFromStr<double>, ConvertFromVal_lDP<double>>
+          ( "testUserDefinedConverter_lowerPrecision-2",
+            "8.589973e+9", 8.589973e9, "8589973000",
+            __FILE__, __LINE__,
+            getLowerDecimalPrecision<double>());
+    unittest::checkRoundTripConversion_txt2Val2txt
+          <long double, converter::ConvertFromStr<long double>, ConvertFromVal_lDP<long double>>
+          ( "testUserDefinedConverter_lowerPrecision-3",
+            "8.589973e+9", 8.589973e9L, "8589973000",
+            __FILE__, __LINE__,
+            getLowerDecimalPrecision<long double>());
 
 
-    checkRoundTripConversion_txt2Val2txt<float, converter::ConvertFromStr<float>,
-                                                ConvertFromVal_lDP<float>>("testUserDefinedConverter_lowerPrecision-4",
-                 "1.123456789", 1.123456789f, "1.1235",
-                 4  //  getLowerDecimalPrecision<float>()) = 5 digits
-                );
-    checkRoundTripConversion_txt2Val2txt<double, converter::ConvertFromStr<double>,
-                                                 ConvertFromVal_lDP<double>>("testUserDefinedConverter_lowerPrecision-5",
-                 "2.1234567890123456789", 2.1234567890123456789, "2.1234567890123", getLowerDecimalPrecision<double>());  // 14 digits
+    unittest::checkRoundTripConversion_txt2Val2txt
+          <float, converter::ConvertFromStr<float>, ConvertFromVal_lDP<float>>
+          ( "testUserDefinedConverter_lowerPrecision-4",
+            "1.123456789", 1.123456789f, "1.1235",
+            __FILE__, __LINE__,
+            4); //  getLowerDecimalPrecision<float>()) = 5 digits
+    unittest::checkRoundTripConversion_txt2Val2txt
+          <double, converter::ConvertFromStr<double>, ConvertFromVal_lDP<double>>
+          ( "testUserDefinedConverter_lowerPrecision-5",
+            "2.1234567890123456789", 2.1234567890123456789, "2.1234567890123",
+            __FILE__, __LINE__,
+            getLowerDecimalPrecision<double>());  // 14 digits
 
     std::tuple<long double, std::string, int>  expected_longDouble_3d123456789012345678901[] = {
 #if           UBUNTU_ARRAY_IDX  ==  UBUNTU_ARM64
@@ -117,16 +129,21 @@ int main()
                 {3.1234567890123456912L, "3.1234567890123", 13}          // 15 Windows (MSVC or Clang)
 #endif
                                                           };
-    checkRoundTripConversion_txt2Val2txt<long double, converter::ConvertFromStr<long double>,
-                                                      ConvertFromVal_lDP<long double>>("testUserDefinedConverter_lowerPrecision-6",
-                 "3.123456789012345678901",
-                 std::get<0>(expected_longDouble_3d123456789012345678901[indexOS]),
-                 std::get<1>(expected_longDouble_3d123456789012345678901[indexOS]),
-                 std::get<2>(expected_longDouble_3d123456789012345678901[indexOS]));
+    unittest::checkRoundTripConversion_txt2Val2txt
+          <long double, converter::ConvertFromStr<long double>, ConvertFromVal_lDP<long double>>
+          ( "testUserDefinedConverter_lowerPrecision-6",
+            "3.123456789012345678901",
+            std::get<0>(expected_longDouble_3d123456789012345678901[indexOS]),
+            std::get<1>(expected_longDouble_3d123456789012345678901[indexOS]),
+            __FILE__, __LINE__,
+            std::get<2>(expected_longDouble_3d123456789012345678901[indexOS]));
 
-    checkRoundTripConversion_txt2Val2txt<double, converter::ConvertFromStr<double>,
-                                                 ConvertFromVal_lDP<double>>("testUserDefinedConverter_lowerPrecision-7",
-                 "9007199254740993", 9007199254740993.0, "9.007199254741e+15", getLowerDecimalPrecision<double>());
+    unittest::checkRoundTripConversion_txt2Val2txt
+          <double, converter::ConvertFromStr<double>, ConvertFromVal_lDP<double>>
+          ( "testUserDefinedConverter_lowerPrecision-7",
+            "9007199254740993", 9007199254740993.0, "9.007199254741e+15",
+            __FILE__, __LINE__,
+            getLowerDecimalPrecision<double>());
 
     std::string expected_longDouble_9007199254740993[] = { "9007199254740993",
 #if                 MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_CLANG    \
@@ -145,38 +162,52 @@ int main()
                                                            "9.007199254741e+15" // Windows
 #endif
                                                           };
-    checkRoundTripConversion_txt2Val2txt<long double, converter::ConvertFromStr<long double>,
-                                                      ConvertFromVal_lDP<long double>>("testUserDefinedConverter_lowerPrecision-8",
-                 "9007199254740993",
+    unittest::checkRoundTripConversion_txt2Val2txt
+          <long double, converter::ConvertFromStr<long double>, ConvertFromVal_lDP<long double>>
+          ( "testUserDefinedConverter_lowerPrecision-8",
+            "9007199254740993",
 #ifdef              BUILD_ENV_MSYS2_GNU
-                   // On Windows : MSYS2 env : GNU compiler
-                   //  9007199254740993.0L is stays same                 9007199254740993, but ...
-                   // "9007199254740993" is converted to (string -> FP)  9007199254740992
-                 9007199254740992.0L,  // Windows (MSYS2) : BIG RED FLAG here
+              // On Windows : MSYS2 env : GNU compiler
+              //  9007199254740993.0L is stays same                 9007199254740993, but ...
+              // "9007199254740993" is converted to (string -> FP)  9007199254740992
+            9007199254740992.0L,  // Windows (MSYS2) : BIG RED FLAG here
 #else
-                 9007199254740993.0L,
+            9007199254740993.0L,
 #endif
-                 expected_longDouble_9007199254740993[indexOS],
+            expected_longDouble_9007199254740993[indexOS],
+            __FILE__, __LINE__,
 #ifdef              BUILD_ENV_MSYS2_GNU
-                 getLowerDecimalPrecision<long double>(), '.', '_', false
+            getLowerDecimalPrecision<long double>(), '.', '_', false
 #else
-                 getLowerDecimalPrecision<long double>()
+            getLowerDecimalPrecision<long double>()
 #endif
-                 );
+            );
 
 
-    checkRoundTripConversion_txt2Val2txt<float, converter::ConvertFromStr<float>,
-                                                ConvertFromVal_lDP<float>>("testUserDefinedConverter_lowerPrecision-9",
-                 "3.3123", 3.3123f, "3.3123", getLowerDecimalPrecision<float>());
-    checkRoundTripConversion_txt2Val2txt<float, converter::ConvertFromStr<float>,
-                                                ConvertFromVal_lDP<float>>("testUserDefinedConverter_lowerPrecision-10",
-                 "3.3123412e+38", 3.3123412E38f, "3.3123e+38", getLowerDecimalPrecision<float>());
-    checkRoundTripConversion_txt2Val2txt<float, converter::ConvertFromStr<float>,
-                                                ConvertFromVal_lDP<float>>("testUserDefinedConverter_lowerPrecision-11",
-                 "3.3123412e-38", 3.3123412E-38f, "3.3123e-38", getLowerDecimalPrecision<float>());
-    checkRoundTripConversion_txt2Val2txt<double, converter::ConvertFromStr<double>,
-                                                 ConvertFromVal_lDP<double>>("testUserDefinedConverter_lowerPrecision-12",
-                 "3.3123412e-38", 3.3123412E-38, "3.3123412e-38", getLowerDecimalPrecision<double>());
+    unittest::checkRoundTripConversion_txt2Val2txt
+          <float, converter::ConvertFromStr<float>, ConvertFromVal_lDP<float>>
+          ( "testUserDefinedConverter_lowerPrecision-9",
+            "3.3123", 3.3123f, "3.3123",
+            __FILE__, __LINE__,
+            getLowerDecimalPrecision<float>());
+    unittest::checkRoundTripConversion_txt2Val2txt
+          <float, converter::ConvertFromStr<float>, ConvertFromVal_lDP<float>>
+          ( "testUserDefinedConverter_lowerPrecision-10",
+            "3.3123412e+38", 3.3123412E38f, "3.3123e+38",
+            __FILE__, __LINE__,
+            getLowerDecimalPrecision<float>());
+    unittest::checkRoundTripConversion_txt2Val2txt
+          <float, converter::ConvertFromStr<float>, ConvertFromVal_lDP<float>>
+          ( "testUserDefinedConverter_lowerPrecision-11",
+            "3.3123412e-38", 3.3123412E-38f, "3.3123e-38",
+            __FILE__, __LINE__,
+            getLowerDecimalPrecision<float>());
+    unittest::checkRoundTripConversion_txt2Val2txt
+          <double, converter::ConvertFromStr<double>, ConvertFromVal_lDP<double>>
+          ( "testUserDefinedConverter_lowerPrecision-12",
+            "3.3123412e-38", 3.3123412E-38, "3.3123412e-38",
+            __FILE__, __LINE__,
+            getLowerDecimalPrecision<double>());
 
   } catch (const std::exception& ex) {
     std::cout << "Test Failed : err-msg : " << ex.what() << std::endl;

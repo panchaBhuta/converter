@@ -1,150 +1,205 @@
+#pragma once
+
 #include <iostream>
 #include <cmath>
 #include <typeinfo>
 #include <algorithm>
 
+
 #include "unittest.h"
 
-#include <converter/converter.h>
+
+#define STRING2VALUECHECK( t, testID, strInput, valStrConv, valExpected,   \
+                           strRoundtripActual)                             \
+            checkRoundTrip_txt2Val2txt<t>(                                 \
+              testID, strInput, valStrConv, valExpected,                   \
+              strRoundtripActual, strInput,                                \
+              __FILE__, __LINE__)
 
 
-#pragma once
+#define CHECKROUNDTRIP( t, testID, strInput, valExpected,   \
+                        strRoundtripExpected)               \
+            checkRoundTripConversion_txt2Val2txt<t>(        \
+              testID, strInput, valExpected,                \
+              strRoundtripExpected,                         \
+              __FILE__, __LINE__)
 
-template<typename T>
-inline std::string getTypeName();
 
-template<>
-inline std::string getTypeName<float>() { return "float"; }
-template<>
-inline std::string getTypeName<double>() { return "double"; }
-template<>
-inline std::string getTypeName<long double>() { return "long_double"; }
-
-#define GETTYPENAME(T) getTypeName<T>(#T)
-
-template<typename T,
-         typename TConvertFromStr = converter::ConvertFromStr<T>,
-         typename TConvertFromVal = converter::ConvertFromVal<T> >
-void checkRoundTripConversion_txt2Val2txt( const std::string& testID,
-            const std::string& strInput,
-            const T& valExpected, const std::string& strRoundtripExpected,
-            int decimalPrecision = std::numeric_limits<T>::digits10,
-            char decimalSeperator = '.', char currencySeperator = '_',
-            bool stringent_check = true)
+namespace unittest
 {
-  std::cout << "#############  testID = " << testID << " , strInput = " << strInput << std::endl;
-  std::cout << "decimalPrecision = " << decimalPrecision << " : std::numeric_limits<T>::digits10 = " << std::numeric_limits<T>::digits10 << std::endl;
-  const T valConv = TConvertFromStr::ToVal(strInput);
-  std::cout << "valExpected = " << valExpected << " : valConv = " << valConv << std::endl;
-  unittest::ExpectEqual(T, valExpected, valConv);
+  template<typename T>
+  inline std::string getTypeName();
 
-  const std::string strRoundtripActual = TConvertFromVal::ToStr(valConv);
-  std::cout << "strRoundtripExpected = " << strRoundtripExpected << " : strRoundtripActual = " << strRoundtripActual << std::endl;
-  unittest::ExpectEqual(std::string, strRoundtripExpected, strRoundtripActual);
+  template<>
+  inline std::string getTypeName<float>() { return "float"; }
+  template<>
+  inline std::string getTypeName<double>() { return "double"; }
+  template<>
+  inline std::string getTypeName<long double>() { return "long_double"; }
 
-  if(!stringent_check)
+
+  template<c_floating_point T>
+  void checkRoundTrip_txt2Val2txt( const std::string& testID,
+              const std::string& strInput,
+              const T valStrConv, const T valExpected,
+              const std::string& strRoundtripActual,
+              const std::string& strRoundtripExpected,
+              const std::string& filePath, int lineNo,
+              int decimalPrecision = std::numeric_limits<T>::digits10,
+              char decimalSeperator = '.', char currencySeperator = '_',
+              bool stringent_check = true)
   {
-    std::cout << "####### WARNING : skipping stringent-checks" << std::endl;
-    return;
-  }
+    std::cout.setf(std::ios::left, std::ios::adjustfield);
+    std::cout << std::setprecision(30); //decimalPrecision + 20);
+    std::cout << "#############  testID = " << testID << std::endl;
+    std::cout << "decimalPrecision = " << decimalPrecision<< " : std::numeric_limits<"
+              << getTypeName<T>() << ">::digits10 = " << std::numeric_limits<T>::digits10 << std::endl;
+    std::cout << "          strInput = ";
+    std::cout.width(33);
+    std::cout << strInput << std::endl;
+    std::cout << "        valStrConv = ";
+    std::cout.width(33);
+    std::cout << valStrConv <<         " :          valExpected = " << valExpected << std::endl;
+    unittest::ExpectEqualFun<T>(valExpected, valStrConv, "valExpected", "valStrConv", filePath, lineNo);
 
-  if(strInput.compare(strRoundtripActual)!=0)
-  {
-    std::string _strInput(strInput);
-    std::string _strRoundtripActual(strRoundtripActual);
-    if(currencySeperator != '_')
+    std::cout << "strRoundtripActual = ";
+  //std::cout << "strCellStoreActual = ";
+    std::cout.width(33);
+    std::cout << strRoundtripActual << " : strRoundtripExpected = " << strRoundtripExpected << std::endl;
+
+    if(!stringent_check)
     {
-      _strInput.erase(
-          std::remove(_strInput.begin(), _strInput.end(), currencySeperator),
-          _strInput.end());
-      _strRoundtripActual.erase(
-          std::remove(_strRoundtripActual.begin(), _strRoundtripActual.end(), currencySeperator),
-          _strRoundtripActual.end() );
-    }
-    std::string::size_type decSep_input  = _strInput.find(decimalSeperator);
-    std::string::size_type decSep_actual = _strRoundtripActual.find(decimalSeperator);
-    if(decSep_input != std::string::npos  && decSep_actual != std::string::npos)
-    {
-      std::cout << "+++++++++++++   fraction check     ++++++++++++++" << std::endl;
-      // both input and round-trip-string have decimal seperator
-      // for e.g.: '3.3123412e+38'
-      if(decSep_input == decSep_actual)
-      {
-        // floating-point number(s) of both input and round-trip-string, their fraction part in the the same magnitude range
-        // for e.g.: '3.3123412e+38' the fraction part here is '3.3123412'
-        std::string significantDigits_input = _strInput.substr(0, static_cast<size_t>(decimalPrecision)+1); // +1 for decimal-character
-        std::string significantDigits_actual = _strRoundtripActual.substr(0, static_cast<size_t>(decimalPrecision)+1); // +1 for decimal-character
-
-        std::cout << "significant digits check" << std::endl;
-        unittest::ExpectEqual(std::string, significantDigits_input, significantDigits_actual);
-
-        std::istringstream iss_input(_strInput);
-        std::string exponentInputStr;
-        bool inputHasExponent = false;
-        int inputExponent = 0;
-        if(std::getline(iss_input, exponentInputStr, 'e') &&
-           std::getline(iss_input, exponentInputStr, 'e'))  // getline() called twice since 2nd token is exponent
-        {
-          inputHasExponent = true;
-          std::istringstream expInput_iss(exponentInputStr);
-          expInput_iss >> inputExponent;
-        }
-
-        std::istringstream iss_actual(_strRoundtripActual);
-        std::string exponentActualStr;
-        bool actualHasExponent = false;
-        int actualExponent = 0;
-        if(std::getline(iss_actual, exponentActualStr, 'e') &&
-           std::getline(iss_actual, exponentActualStr, 'e'))  // getline() called twice since 2nd token is exponent
-        {
-          actualHasExponent = true;
-          std::istringstream expActual_iss(exponentInputStr);
-          expActual_iss >> actualExponent;
-        }
-
-        if(inputHasExponent == actualHasExponent)
-        {
-          if(inputHasExponent)
-          {
-            std::cout << "exponent check" << std::endl;
-            unittest::ExpectEqual(int, inputExponent, actualExponent);
-          } else {
-            std::cout << "no exponent component on input and converted string" << std::endl;
-          }
-          return;
-        } else {
-          std::cout << "exponent component mismatch: _strInput=" << _strInput << std::endl;
-          std::cout << "exponent component mismatch: _strRoundtripActual=" << _strRoundtripActual << std::endl;
-        }
-      } else {
-        std::cout << "decimal position mismatch between _strInput=" << _strInput
-                  << " and _strRoundtripActual=" << _strRoundtripActual << std::endl;
-      }
-    } else if(decSep_input == std::string::npos  && decSep_actual == std::string::npos) {
-      std::cout << "integer significant-digits check" << std::endl;
-      // both input and round-trip-string DONOT have decimal seperator
-      // for e.g.: '8589973000'
-      std::string significantDigits_input = _strInput.substr(0, static_cast<size_t>(decimalPrecision));
-      std::string significantDigits_actual = _strRoundtripActual.substr(0, static_cast<size_t>(decimalPrecision));
-
-      unittest::ExpectEqual(std::string, significantDigits_input, significantDigits_actual);
+      std::cout << "####### WARNING : skipping stringent-checks" << std::endl;
       return;
     }
 
-    std::ostringstream ossConv;
-    //ossConv << "valConv{without-precision}=" << valConv << std::endl;
-    ossConv << std::setprecision(std::numeric_limits<T>::digits10 + 5);
-    ////oss << std::setprecision(LDBL_DIG + 5);
-    //ossConv << "valConv{with-precision}=" << valConv << std::endl;
-    ossConv << valConv;
+    if(strRoundtripExpected.compare(strRoundtripActual)!=0)
+    {
+      std::string _strRoundtripExpected(strRoundtripExpected);
+      std::string _strRoundtripActual(strRoundtripActual);
 
-    std::cout << std::setprecision(LDBL_DIG + 5); // << std::boolalpha;
-    std::cout << testID << " :: roundtrip conversion value does not match for type=" << getTypeName<T>() << " ..." << std::endl;
-    std::cout << "      input-text{" << strInput      << "} -> valConv{" << ossConv.str() << "}" << std::endl;
-    std::cout << "         valConv{" << ossConv.str() << "} -> roundtrip-text{" << strRoundtripActual << "}" << std::endl;
-    std::cout << "      input-text{" << strInput << "} != roundtrip-text{" << strRoundtripActual << "}" << std::endl;
+      if( (!_strRoundtripExpected.empty()) &&
+          ( _strRoundtripExpected.back() == 'f' || _strRoundtripExpected.back() == 'L' ) )
+      {
+        _strRoundtripExpected.pop_back();  // remove trailing 'f' or 'L' if any
+      }
 
-    //unittest::ExpectEqual(std::string, strInput, strRoundtripActual);
+      if(currencySeperator != '_')
+      {
+        _strRoundtripExpected.erase(
+            std::remove(_strRoundtripExpected.begin(), _strRoundtripExpected.end(), currencySeperator),
+            _strRoundtripExpected.end());
+        _strRoundtripActual.erase(
+            std::remove(_strRoundtripActual.begin(), _strRoundtripActual.end(), currencySeperator),
+            _strRoundtripActual.end() );
+      }
+      std::string::size_type decSep_expected  = _strRoundtripExpected.find(decimalSeperator);
+      std::string::size_type decSep_actual    = _strRoundtripActual.find(decimalSeperator);
+      if(decSep_expected != std::string::npos  && decSep_actual != std::string::npos)
+      {
+        std::cout << "+++++++++++++   fraction check     ++++++++++++++" << std::endl;
+        // both input and round-trip-string have decimal seperator
+        // for e.g.: '3.3123412e+38'
+        if(decSep_expected == decSep_actual)
+        {
+          // floating-point number(s) of both input and round-trip-string, their fraction part in the the same magnitude range
+          // for e.g.: '3.3123412e+38' the fraction part here is '3.3123412'
+          std::string significantDigits_expected = _strRoundtripExpected.substr(0, static_cast<size_t>(decimalPrecision)+1); // +1 for decimal-character
+          std::string significantDigits_actual   = _strRoundtripActual.substr(0, static_cast<size_t>(decimalPrecision)+1); // +1 for decimal-character
+
+          std::cout << "significant digits check : significantDigits_expected=" << significantDigits_expected
+                    << " : significantDigits_actual=" << significantDigits_actual << std::endl;
+          unittest::ExpectEqualFun<std::string>(significantDigits_expected, significantDigits_actual,
+                "significantDigits_expected", "significantDigits_actual", filePath, lineNo);
+
+          std::istringstream iss_expected(_strRoundtripExpected);
+          std::string exponentExpectedStr;
+          bool expectedHasExponent = false;
+          int expectedExponent = 0;
+          if(std::getline(iss_expected, exponentExpectedStr, 'e') &&
+             std::getline(iss_expected, exponentExpectedStr, 'e'))  // getline() called twice since 2nd token is exponent
+          {
+            expectedHasExponent = true;
+            std::istringstream expExpected_iss(exponentExpectedStr);
+            expExpected_iss >> expectedExponent;
+          }
+
+          std::istringstream iss_actual(_strRoundtripActual);
+          std::string exponentActualStr;
+          bool actualHasExponent = false;
+          int actualExponent = 0;
+          if(std::getline(iss_actual, exponentActualStr, 'e') &&
+             std::getline(iss_actual, exponentActualStr, 'e'))  // getline() called twice since 2nd token is exponent
+          {
+            actualHasExponent = true;
+            std::istringstream expActual_iss(exponentActualStr);
+            expActual_iss >> actualExponent;
+          }
+
+          if(expectedHasExponent == actualHasExponent)
+          {
+            if(expectedHasExponent)
+            {
+              std::cout << "exponent check : expectedExponent= " << expectedExponent
+                        << " : actualExponent= " << actualExponent << std::endl;
+              unittest::ExpectEqualFun<int>(expectedExponent, actualExponent, "expectedExponent", "actualExponent", filePath, lineNo);
+            } else {
+              std::cout << "no exponent component on input and converted string" << std::endl;
+            }
+            return;
+          } else {
+            std::cout << "exponent component mismatch: _strRoundtripExpected=" << _strRoundtripExpected << std::endl;
+            std::cout << "exponent component mismatch:   _strRoundtripActual=" << _strRoundtripActual << std::endl;
+          }
+        } else {
+          std::cout << "decimal position mismatch between _strRoundtripExpected=" << _strRoundtripExpected
+                    << " and _strRoundtripActual=" << _strRoundtripActual << std::endl;
+        }
+      } else if(decSep_expected == std::string::npos  && decSep_actual == std::string::npos) {
+        std::cout << "integer significant-digits check" << std::endl;
+        // both input and round-trip-string DONOT have decimal seperator
+        // for e.g.: '8589973000'
+        std::string significantDigits_expected = _strRoundtripExpected.substr(0, static_cast<size_t>(decimalPrecision));
+        std::string significantDigits_actual = _strRoundtripActual.substr(0, static_cast<size_t>(decimalPrecision));
+
+        unittest::ExpectEqualFun<std::string>(significantDigits_expected, significantDigits_actual,
+              "significantDigits_expected", "significantDigits_actual", filePath, lineNo);
+        return;
+      }
+
+      std::ostringstream ossConv;
+      ossConv << std::setprecision(30); //std::numeric_limits<T>::digits10 + 20);
+      ossConv << valStrConv;
+
+      std::cout << testID << " :: WARNING :: roundtrip conversion value does not match for type=" << getTypeName<T>() << " ..." << std::endl;
+      //std::cout << "      input-text{" << strRoundtripExpected      << "} -> valStrConv{" << ossConv.str() << "}" << std::endl;
+      //std::cout << "         valStrConv{" << ossConv.str() << "} -> roundtrip-text{" << strRoundtripActual << "}" << std::endl;
+      //std::cout << "      input-text{" << strRoundtripExpected << "} != roundtrip-text{" << strRoundtripActual << "}" << std::endl;
+
+      //unittest::ExpectEqual(std::string, strRoundtripExpected, strRoundtripActual);
+    }
+  }
+
+
+  template<converter::c_floating_point T,
+          typename TConvertFromStr = converter::ConvertFromStr<T>,
+          typename TConvertFromVal = converter::ConvertFromVal<T> >
+  void checkRoundTripConversion_txt2Val2txt( const std::string& testID,
+              const std::string& strInput,
+              //const T valStrConv,
+              const T valExpected,
+              //const std::string& strRoundtripActual,
+              const std::string& strRoundtripExpected,
+              const std::string& filePath, int lineNo,
+              int decimalPrecision = std::numeric_limits<T>::digits10,
+              char decimalSeperator = '.', char currencySeperator = '_',
+              bool stringent_check = true)
+  {
+    const T valStrConv = TConvertFromStr::ToVal(strInput);
+    const std::string strRoundtripActual = TConvertFromVal::ToStr(valStrConv);
+    checkRoundTrip_txt2Val2txt<T>(testID, strInput, valStrConv, valExpected,
+          strRoundtripActual, strRoundtripExpected, filePath, lineNo,
+          decimalPrecision, decimalSeperator, currencySeperator, stringent_check);
   }
 
 }

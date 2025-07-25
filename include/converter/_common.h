@@ -107,6 +107,12 @@ namespace converter
 */
   // ]=========]  concept :  char-types
 
+  template<typename T>
+  concept c_arithmetic = std::is_arithmetic_v<T>;
+
+  template<typename T>
+  concept c_integral = std::is_integral_v<T>;
+
 
   // [=========[  concept : integer-types 
   // std::integral is true for 'bool' and 'char'.

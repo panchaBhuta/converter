@@ -63,12 +63,12 @@ int main()
                                                  "8589973504",
 #endif
                                                  "8589973504", };
-    checkRoundTripConversion_txt2Val2txt<float>("testFloatingPointPrecision-1",
+    unittest::CHECKROUNDTRIP(float, "testFloatingPointPrecision-1", \
                  "8.589973e+9", 8.589973e9f, expected_float_8d589973ep9[indexOS]);
 
-    checkRoundTripConversion_txt2Val2txt<double>("testFloatingPointPrecision-2",
+    unittest::CHECKROUNDTRIP(double, "testFloatingPointPrecision-2", \
                  "8.589973e+9", 8.589973e9, "8589973000");
-    checkRoundTripConversion_txt2Val2txt<long double>("testFloatingPointPrecision-3",
+    unittest::CHECKROUNDTRIP(long double, "testFloatingPointPrecision-3", \
                  "8.589973e+9", 8.589973e9L, "8589973000");
 
     std::string expected_float_1d123456789[] = { "1.1234568",
@@ -82,7 +82,7 @@ int main()
                                                  "1.1234568",
 #endif
                                                  "1.1234568" };
-    checkRoundTripConversion_txt2Val2txt<float>("testFloatingPointPrecision-4",
+    unittest::CHECKROUNDTRIP(float, "testFloatingPointPrecision-4", \
                  "1.123456789", 1.123456789f, expected_float_1d123456789[indexOS]);  // 6 digits
     std::string expected_double_2d1234567890123456789[] = { "2.1234567890123457",
 #if                 MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG   \
@@ -95,8 +95,8 @@ int main()
                                                             "2.1234567890123457",
 #endif
                                                             "2.1234567890123457" };
-    checkRoundTripConversion_txt2Val2txt<double>("testFloatingPointPrecision-5",
-                 "2.1234567890123456789", 2.1234567890123456789,
+    unittest::CHECKROUNDTRIP(double, "testFloatingPointPrecision-5", \
+                 "2.1234567890123456789", 2.1234567890123456789,     \
                  expected_double_2d1234567890123456789[indexOS]);   // 15 digits
 
     std::tuple<long double, std::string, int>  expected_longDouble_3d123456789012345678901[] = {
@@ -133,15 +133,16 @@ int main()
                           std::numeric_limits<long double>::digits10}    // 15 Windows (MSVC or Clang)
 #endif
                                                           };
-    checkRoundTripConversion_txt2Val2txt<long double>("testFloatingPointPrecision-6",
-                 "3.123456789012345678901",
-                 std::get<0>(expected_longDouble_3d123456789012345678901[indexOS]),
-                 std::get<1>(expected_longDouble_3d123456789012345678901[indexOS]),
-                 std::get<2>(expected_longDouble_3d123456789012345678901[indexOS]));
+    unittest::checkRoundTripConversion_txt2Val2txt<long double>("testFloatingPointPrecision-6",
+                "3.123456789012345678901",
+                std::get<0>(expected_longDouble_3d123456789012345678901[indexOS]),
+                std::get<1>(expected_longDouble_3d123456789012345678901[indexOS]),
+                __FILE__, __LINE__,
+                std::get<2>(expected_longDouble_3d123456789012345678901[indexOS]));
 
 
-    checkRoundTripConversion_txt2Val2txt<double>("testFloatingPointPrecision-7",
-                 "9007199254740993", 9007199254740993.0, "9007199254740992");
+    unittest::CHECKROUNDTRIP(double, "testFloatingPointPrecision-7",          \
+                "9007199254740993", 9007199254740993.0, "9007199254740992");
                                                    //    "9007199254740993"
     std::string expected_longDouble_9007199254740993[] = { "9007199254740993",
 #if                 MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_CLANG    \
@@ -154,19 +155,20 @@ int main()
                                                            "9007199254740993",
 #endif
                                                            "9007199254740992" }; // Windows
-    checkRoundTripConversion_txt2Val2txt<long double>("testFloatingPointPrecision-8",
-                 "9007199254740993",
+    unittest::checkRoundTripConversion_txt2Val2txt<long double>("testFloatingPointPrecision-8",
+                "9007199254740993",
 #ifdef              BUILD_ENV_MSYS2_GNU
                    // On Windows : MSYS2 env : GNU compiler
                    //  9007199254740993.0L is stays same                 9007199254740993, but ...
                    // "9007199254740993" is converted to (string -> FP)  9007199254740992
-                 9007199254740992.0L,  // Windows (MSYS2) : BIG RED FLAG here
+                9007199254740992.0L,  // Windows (MSYS2) : BIG RED FLAG here
 #else
-                 9007199254740993.0L,
+                9007199254740993.0L,
 #endif
-                 expected_longDouble_9007199254740993[indexOS]
+                expected_longDouble_9007199254740993[indexOS],
+                __FILE__, __LINE__
 #ifdef              BUILD_ENV_MSYS2_GNU
-                 , std::numeric_limits<long double>::digits10, '.', '_', false
+                , std::numeric_limits<long double>::digits10, '.', '_', false
 #endif
                  );
 
@@ -182,11 +184,12 @@ int main()
                                             "3.3123",
 #endif
                                             "3.3123", };
-    checkRoundTripConversion_txt2Val2txt<float>("testFloatingPointPrecision-9",
-                 "3.3123", 3.3123f, expected_float_3d3123[indexOS],
-                 ((indexOS==1)?4:std::numeric_limits<float>::digits10) ); // macOS
+    unittest::checkRoundTripConversion_txt2Val2txt<float>("testFloatingPointPrecision-9",
+                "3.3123", 3.3123f, expected_float_3d3123[indexOS],
+                __FILE__, __LINE__,
+                ((indexOS==1)?4:std::numeric_limits<float>::digits10) ); // macOS
 
-    checkRoundTripConversion_txt2Val2txt<float>("testFloatingPointPrecision-10",
+    unittest::CHECKROUNDTRIP(float, "testFloatingPointPrecision-10",
                  "3.3123412e+38", 3.3123412E38f, "3.3123412e+38");
 
     std::string expected_float_3d3123412en38[] = { "3.312341e-38",
@@ -200,7 +203,7 @@ int main()
                                                    "3.312341e-38",
 #endif
                                                    "3.312341e-38", };
-    checkRoundTripConversion_txt2Val2txt<float>("testFloatingPointPrecision-11",
+    unittest::CHECKROUNDTRIP(float, "testFloatingPointPrecision-11",
                  "3.3123412e-38", 3.3123412E-38f, expected_float_3d3123412en38[indexOS]);
 
     std::string expected_double_4d3123412en38[] = { "4.3123412e-38",
@@ -214,9 +217,10 @@ int main()
                                                     "4.3123412e-38",
 #endif
                                                     "4.3123412e-38", };
-    checkRoundTripConversion_txt2Val2txt<double>("testFloatingPointPrecision-12",
-                 "4.3123412e-38", 4.3123412E-38, expected_double_4d3123412en38[indexOS],
-                 ((indexOS==1)?7:std::numeric_limits<double>::digits10) ); // macOS
+    unittest::checkRoundTripConversion_txt2Val2txt<double>("testFloatingPointPrecision-12",
+                "4.3123412e-38", 4.3123412E-38, expected_double_4d3123412en38[indexOS],
+                __FILE__, __LINE__,
+                ((indexOS==1)?7:std::numeric_limits<double>::digits10) ); // macOS
 
     std::string expected_longdouble_5d3123412en38[] = { "5.3123412e-38",
 #if                 MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
@@ -235,19 +239,20 @@ int main()
                                                         "5.3123412e-38"
 #endif
                                                        };
-    checkRoundTripConversion_txt2Val2txt<long double>("testFloatingPointPrecision-13",
-                 "5.3123412e-38",
+    unittest::checkRoundTripConversion_txt2Val2txt<long double>("testFloatingPointPrecision-13",
+                "5.3123412e-38",
 #ifdef              BUILD_ENV_MSYS2_GNU
-                 5.3123412000000003544036E-38L,  // Windows (MSYS2) : BIG RED FLAG here
+                5.3123412000000003544036E-38L,  // Windows (MSYS2) : BIG RED FLAG here
 #else
-                 5.3123412E-38L,
+                5.3123412E-38L,
 #endif
-                 expected_longdouble_5d3123412en38[indexOS],
-                 ((indexOS==1)?7:std::numeric_limits<long double>::digits10) // macOS
+                expected_longdouble_5d3123412en38[indexOS],
+                __FILE__, __LINE__,
+                ((indexOS==1)?7:std::numeric_limits<long double>::digits10) // macOS
 #ifdef              BUILD_ENV_MSYS2_GNU
-                 , '.', '_', false
+                , '.', '_', false
 #endif
-                 );
+                );
 
   } catch (const std::exception& ex) {
     std::cout << "Test Failed : err-msg : " << ex.what() << std::endl;
