@@ -47,7 +47,7 @@ jobs:
           #             macos-12 -> AppleClang-14 ,
           #             macos-13 -> AppleClang-15 ,
           #             macos-14 -> AppleClang-15 ,
-	  #             macos-15 -> AppleClang-16 ]
+          #             macos-15 -> AppleClang-16 ]
         compiler: [ default, g++-14, g++-13, g++-12 ]
         exclude: [ # skipping a fix for g++-N compilers. refer thread https://github.com/iains/gcc-14-branch/issues/11
                    { os: macos-15, compiler: g++-14 },
