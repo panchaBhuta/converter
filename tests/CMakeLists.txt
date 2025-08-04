@@ -1,7 +1,7 @@
 #
 # URL:      https://github.com/panchaBhuta/converter
 #
-# Copyright (c) 2023-2023 Gautam Dhar
+# Copyright (c) 2023-2025 Gautam Dhar
 # All rights reserved.
 #
 # converter is distributed under the BSD 3-Clause license, see LICENSE for details.
@@ -23,7 +23,6 @@ macro(add_unit_test testname)
     # executable ${testname} has to have transitive association to all its dependencies(aka library chain)
     # refer   https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#target-usage-requirements
     # refer   https://cmake.org/cmake/help/latest/command/target_link_libraries.html#libraries-for-a-target-and-or-its-dependents
-    # refer   https://cmake.org/cmake/help/latest/command/target_link_libraries.html#libraries-for-a-target-and-or-its-dependents
     set_target_properties(${testname} PROPERTIES  LINKER_LANGUAGE CXX)
   endif()
 endmacro(add_unit_test)
@@ -38,7 +37,6 @@ macro(add_perf_test testname)
     target_link_libraries(${testname} converter) # donot specify PUBLIC here,
     # executable ${testname} has to have transitive association to all its dependencies(aka library chain)
     # refer   https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#target-usage-requirements
-    # refer   https://cmake.org/cmake/help/latest/command/target_link_libraries.html#libraries-for-a-target-and-or-its-dependents
     # refer   https://cmake.org/cmake/help/latest/command/target_link_libraries.html#libraries-for-a-target-and-or-its-dependents
   endif()
 endmacro(add_perf_test)

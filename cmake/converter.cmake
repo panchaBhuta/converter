@@ -201,6 +201,7 @@ macro(check_chrono_stream_functionality)
     endif()
 
     if((NOT COMPILE_RESULT_CHRONO_FROMSTREAM)   OR   (NOT COMPILE_RESULT_CHRONO_TOSTREAM))
+        ########## datelib start  ###############
         set(DATELIB "date")  # local-variable
         # https://stackoverflow.com/questions/29892929/variables-set-with-parent-scope-are-empty-in-the-corresponding-child-scope-why
         #set(DATELIB ${DATELIB} PARENT_SCOPE)  # global-variable
@@ -210,7 +211,7 @@ macro(check_chrono_stream_functionality)
         include( FetchContent )
         FetchContent_Declare( ${DATELIB}
                               GIT_REPOSITORY https://github.com/HowardHinnant/date.git
-                              GIT_TAG        v3.0.1) # adjust tag/branch/commit as needed
+                              GIT_TAG        v3.0.4) # adjust tag/branch/commit as needed
         FetchContent_MakeAvailable(${DATELIB})
 
         #[==================[
@@ -220,6 +221,7 @@ macro(check_chrono_stream_functionality)
         #  add_subdirectory(${${DATELIB}_SOURCE_DIR} ${${DATELIB}_BINARY_DIR} EXCLUDE_FROM_ALL)
         endif()
         #]==================]
+        ########## datelib start  ###############
 
         if(NOT COMPILE_RESULT_CHRONO_FROMSTREAM)
             try_compile(COMPILE_RESULT_DATE_FROMSTREAM

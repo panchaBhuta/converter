@@ -1,7 +1,7 @@
 #
 # URL:      https://github.com/panchaBhuta/converter
 #
-# Copyright (c) 2023-2023 Gautam Dhar
+# Copyright (c) 2023-2025 Gautam Dhar
 # All rights reserved.
 #
 # converter is distributed under the BSD 3-Clause license, see LICENSE for details.
