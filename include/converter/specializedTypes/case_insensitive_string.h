@@ -2,9 +2,9 @@
  * case_insensitive_string.h
  *
  * URL:      https://github.com/panchaBhuta/converter
- * Version:  v1.2
+ * Version:  v1.4
  *
- * Copyright (c) 2023-2024 Gautam Dhar
+ * Copyright (c) 2023-2025 Gautam Dhar
  * All rights reserved.
  *
  * converter is distributed under the BSD 3-Clause license, see LICENSE for details.

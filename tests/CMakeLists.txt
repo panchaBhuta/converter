@@ -68,6 +68,7 @@ add_unit_test(testTupleConversions)
 ##add_unit_test(testInvalidComposition)
 
 add_unit_test(testCIstring)
+add_unit_test(testRegexString)
 
 
 #[======================[

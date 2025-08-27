@@ -2,7 +2,7 @@
  * converter.h
  *
  * URL:      https://github.com/panchaBhuta/converter
- * Version:  v1.3
+ * Version:  v1.4
  *
  * Copyright (c) 2023-2025 Gautam Dhar
  * All rights reserved.
@@ -31,8 +31,8 @@
 #include <stdexcept>
 
 #define CONVERTER_VERSION_MAJOR 1
-#define CONVERTER_VERSION_MINOR 3
-#define CONVERTER_VERSION_PATCH 29
+#define CONVERTER_VERSION_MINOR 4
+#define CONVERTER_VERSION_PATCH 30
 
 
 
