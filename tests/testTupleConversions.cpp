@@ -10,7 +10,7 @@
 
 #include <converter/converter.h>
 #include <converter/specializedTypes/date.h>
-#include <converter/specializedTypes/case_insensitive_string.h>
+#include <specializedTypes/case_insensitive_string.h>
 
 #include "unittest.h"
 
@@ -122,13 +122,13 @@ int main()
 #endif
 
 
-    std::tuple<std::string, converter::ci_string, std::string>
+    std::tuple<std::string, specializedTypes::ci_string, std::string>
       chkStrTuple { "PRIVATE", "limited", "CoMpAnY"};
 
     std::vector<std::string> inputStrVector {"PRIVATE", "limited", "CoMpAnY"};
-    conversionStringEqualCheck<std::string, converter::ci_string, std::string>
+    conversionStringEqualCheck<std::string, specializedTypes::ci_string, std::string>
         ("PRIVATE,limited,CoMpAnY", chkStrTuple);
-    conversionVectorEqualCheck<std::string, converter::ci_string, std::string>
+    conversionVectorEqualCheck<std::string, specializedTypes::ci_string, std::string>
         (inputStrVector, chkStrTuple);
 
 

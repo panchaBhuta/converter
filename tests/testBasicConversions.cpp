@@ -6,7 +6,7 @@
 
 #include <converter/converter.h>
 #include <converter/specializedTypes/date.h>
-#include <converter/specializedTypes/case_insensitive_string.h>
+#include <specializedTypes/case_insensitive_string.h>
 
 #include "unittest.h"
 
@@ -78,13 +78,13 @@ int main()
                     ),
             "2023-08-15");
 
-    converter::ci_string    caps{"SHIV SHANKAR"};
-    converter::ci_string    lowr{"shiv shankar"};
+    specializedTypes::ci_string    caps{"SHIV SHANKAR"};
+    specializedTypes::ci_string    lowr{"shiv shankar"};
     unittest::ExpectTrue(caps.compare(lowr) == 0);
-    unittest::ExpectEqual(std::string, converter::ConvertFromVal<converter::ci_string>::ToStr(caps), "SHIV SHANKAR");
-    unittest::ExpectEqual(std::string, converter::ConvertFromVal<converter::ci_string>::ToStr(lowr), "shiv shankar");
-    unittest::ExpectEqual(converter::ci_string, converter::ConvertFromStr<converter::ci_string>::ToVal("SHIV SHANKAR"), caps);
-    unittest::ExpectEqual(converter::ci_string, converter::ConvertFromStr<converter::ci_string>::ToVal("shiv shankar"), lowr);
+    unittest::ExpectEqual(std::string, converter::ConvertFromVal<specializedTypes::ci_string>::ToStr(caps), "SHIV SHANKAR");
+    unittest::ExpectEqual(std::string, converter::ConvertFromVal<specializedTypes::ci_string>::ToStr(lowr), "shiv shankar");
+    unittest::ExpectEqual(specializedTypes::ci_string, converter::ConvertFromStr<specializedTypes::ci_string>::ToVal("SHIV SHANKAR"), caps);
+    unittest::ExpectEqual(specializedTypes::ci_string, converter::ConvertFromStr<specializedTypes::ci_string>::ToVal("shiv shankar"), lowr);
 
     /**
      * NOTE : Before adding conversion tests here, check tests for template-instantiation in

@@ -98,15 +98,22 @@ namespace specializedTypes
     std::string _value;
     const static std::regex _regex_pattern;
   };
+}
 
   /*
     *  https://stackoverflow.com/questions/5195512/namespaces-and-operator-resolution
     *  refer URL^  for   "Namespaces and operator resolution"  for eg: 'operator<<'
   */
   // Definition of the overloaded operator<<
-  template<CompTimeStr CTS>   // CTS = const std::string& pattern
-  inline std::ostream& operator<<(std::ostream& os, const RegexString<CTS>& obj)
+  template<specializedTypes::CompTimeStr CTS>   // CTS = const std::string& pattern
+  inline std::ostream& operator<<(
+              std::ostream& os,
+              const specializedTypes::RegexString<CTS>& obj)
   {
     return (os << obj.get());
   }
+
+namespace specializedTypes
+{
+  using ::operator<<;
 }

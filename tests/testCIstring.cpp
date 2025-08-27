@@ -6,7 +6,7 @@
 
 #include <converter/converter.h>
 #include <converter/specializedTypes/date.h>
-#include <converter/specializedTypes/case_insensitive_string.h>
+#include <specializedTypes/case_insensitive_string.h>
 
 #include "unittest.h"
 
@@ -22,8 +22,8 @@ int main()
 {
   int rv = 0;
   try {
-    converter::ci_string    cistr{"+ci_string"};
-    unittest::ExpectEqual(converter::ci_string, cistr, "+Ci_STrING");
+    specializedTypes::ci_string    cistr{"+ci_string"};
+    unittest::ExpectEqual(specializedTypes::ci_string, cistr, "+Ci_STrING");
     unittest::ExpectTrue( cistr == "+Ci_STrING" );
     unittest::ExpectTrue( cistr != "+Ci_STrING___" );
     conversionEqualCheck(cistr, "+ci_string");
@@ -32,17 +32,17 @@ int main()
     std::string  str_cistr = str + cistr;
     unittest::ExpectEqual(std::string, str_cistr, "+string+ci_string");
 
-    converter::ci_string    cistr_str = cistr + str;
-    unittest::ExpectEqual(converter::ci_string, cistr_str, "+ci_string+string");
+    specializedTypes::ci_string    cistr_str = cistr + str;
+    unittest::ExpectEqual(specializedTypes::ci_string, cistr_str, "+ci_string+string");
 
 
 
-    converter::ci_string    cistr2{"ci_string"};
+    specializedTypes::ci_string    cistr2{"ci_string"};
     cistr2 += std::string{"+=string"};
-    unittest::ExpectEqual(converter::ci_string, cistr2, "ci_string+=string");
+    unittest::ExpectEqual(specializedTypes::ci_string, cistr2, "ci_string+=string");
 
     std::string  str3{"string"};
-    str3 += converter::ci_string{"+=ci_string"};
+    str3 += specializedTypes::ci_string{"+=ci_string"};
     unittest::ExpectEqual(std::string, str3, "string+=ci_string");
 
   } catch (const std::exception& ex) {

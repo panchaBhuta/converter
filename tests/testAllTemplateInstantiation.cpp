@@ -6,7 +6,7 @@
 
 #include <converter/converter.h>
 #include <converter/specializedTypes/date.h>
-#include <converter/specializedTypes/case_insensitive_string.h>
+#include <specializedTypes/case_insensitive_string.h>
 
 #include "unittest.h"
 
@@ -410,7 +410,7 @@ int main()
   checkFormatInstance_Float<long double>();
   //checkFormatInstance_General<std::string>();
   static_assert(std::is_same_v<std::string, typename converter::S2T_Format_WorkAround<std::string, converter::FailureS2Tprocess::THROW_ERROR>::return_type>);
-  static_assert(std::is_same_v<converter::ci_string, typename converter::S2T_Format_WorkAround<converter::ci_string, converter::FailureS2Tprocess::THROW_ERROR>::return_type>);
+  static_assert(std::is_same_v<specializedTypes::ci_string, typename converter::S2T_Format_WorkAround<specializedTypes::ci_string, converter::FailureS2Tprocess::THROW_ERROR>::return_type>);
   checkFormatInstance_General<char>();
   checkFormatInstance_General<signed char>();
   checkFormatInstance_General<unsigned char>();
@@ -438,10 +438,10 @@ int main()
                                 std::string(*)(const std::string&)>);
   static_assert(std::is_same_v< decltype(&converter::ConvertFromVal<std::string, converter::T2S_Format_WorkAround>::ToStr),
                                 std::string(*)(const std::string&)>);
-  static_assert(std::is_same_v< decltype(&converter::ConvertFromStr<converter::ci_string, converter::S2T_Format_WorkAround<converter::ci_string, converter::FailureS2Tprocess::THROW_ERROR>>::ToVal),
-                                converter::ci_string(*)(const std::string&)>);
-  static_assert(std::is_same_v< decltype(&converter::ConvertFromVal<converter::ci_string, converter::T2S_Format_WorkAround>::ToStr),
-                                std::string(*)(const converter::ci_string&)>);
+  static_assert(std::is_same_v< decltype(&converter::ConvertFromStr<specializedTypes::ci_string, converter::S2T_Format_WorkAround<specializedTypes::ci_string, converter::FailureS2Tprocess::THROW_ERROR>>::ToVal),
+                                specializedTypes::ci_string(*)(const std::string&)>);
+  static_assert(std::is_same_v< decltype(&converter::ConvertFromVal<specializedTypes::ci_string, converter::T2S_Format_WorkAround>::ToStr),
+                                std::string(*)(const specializedTypes::ci_string&)>);
   checkFunctionInstance_char<char>();
   checkFunctionInstance_char<signed char>();
   checkFunctionInstance_char<unsigned char>();
