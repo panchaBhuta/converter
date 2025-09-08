@@ -5,7 +5,7 @@
 #include <iomanip>
 
 #include <converter/converter.h>
-#include <converter/specializedTypes/date.h>
+#include <specializedTypes/date.h>
 #include <specializedTypes/case_insensitive_string.h>
 
 #include "unittest.h"
@@ -99,11 +99,11 @@ void checkConversionFunctionInstance()
 #endif
 
 
-    using t_fmtdbY = converter::format_year_month_day<converter::dbY_fmt,
-                                                      converter::FailureS2Tprocess::THROW_ERROR>;
+    using t_fmtdbY = specializedTypes::format_year_month_day< converter::dbY_fmt,
+                                                              converter::FailureS2Tprocess::THROW_ERROR >;
 
-    using t_fmtYMD = converter::format_year_month_day<converter::defYMDfmt,
-                                                      converter::FailureS2Tprocess::THROW_ERROR>;
+    using t_fmtYMD = specializedTypes::format_year_month_day< converter::defYMDfmt,
+                                                              converter::FailureS2Tprocess::THROW_ERROR>;
 
 int main()
 {
@@ -165,7 +165,7 @@ int main()
   static_assert(converter::is_formatYMDiss< converter::S2T_Format_StreamYMD< converter::defYMDfmt > >::value);
   static_assert(converter::is_formatYMDoss< converter::T2S_Format_StreamYMD< converter::defYMDfmt > >::value);
 
-  
+
   // check for default S2T_FORMAT and default T2S_FORMAT types
   checkDefaultFormatInstance_Integer<short>();
   checkDefaultFormatInstance_Integer<int>();

@@ -5,7 +5,8 @@
 #include <iomanip>
 
 #include <converter/converter.h>
-#include <converter/specializedTypes/date.h>
+#include <specializedTypes/CompTimeStr.h>
+#include <specializedTypes/date.h>
 #include <specializedTypes/case_insensitive_string.h>
 
 #include "unittest.h"
@@ -355,7 +356,7 @@ void checkFunctionInstance_bool()
   Format_StreamUserLocale_Process2<T>();
 }
 
-template<typename T, const char* formatDATE = converter::defYMDfmt>
+template<typename T, specializedTypes::CompTimeStr formatDATE = converter::defYMDfmt>
 void checkFunctionInstance_date()
 {
   using t_vNaD = std::variant<T, std::string>;
@@ -370,12 +371,12 @@ void checkFunctionInstance_date()
                                 std::string(*)(const t_vNaD&)>);
 }
 
-template<const char* formatDATE>
+template<specializedTypes::CompTimeStr formatDATE>
 void checkFunctionInstance_formatDate()
 {
-  using t_tNaD = converter::format_year_month_day<formatDATE, converter::FailureS2Tprocess::THROW_ERROR>;
+  using t_tNaD = specializedTypes::format_year_month_day<formatDATE, converter::FailureS2Tprocess::THROW_ERROR>;
 
-  using t_vNaD = std::variant< converter::format_year_month_day<formatDATE, converter::FailureS2Tprocess::VARIANT_NAN>,
+  using t_vNaD = std::variant< specializedTypes::format_year_month_day<formatDATE, converter::FailureS2Tprocess::VARIANT_NAN>,
                                std::string>;
 
   static_assert(std::is_same_v< decltype(&converter::ConvertFromStr<t_tNaD,

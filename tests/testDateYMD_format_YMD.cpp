@@ -6,11 +6,11 @@
 #include <sstream>
 
 #include <converter/converter.h>
-#include <converter/specializedTypes/date.h>
+#include <specializedTypes/date.h>
 
 #include "unittest.h"
 
-using t_fmtYMD = converter::format_year_month_day<converter::defYMDfmt, converter::FailureS2Tprocess::THROW_ERROR>;
+using t_fmtYMD = specializedTypes::format_year_month_day<converter::defYMDfmt, converter::FailureS2Tprocess::THROW_ERROR>;
 
 template <typename T>
 void conversionEqualCheck(const T& val, const std::string& vStr)

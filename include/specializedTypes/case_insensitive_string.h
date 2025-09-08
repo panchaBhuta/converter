@@ -17,7 +17,7 @@
 #include <string>
 #include <iostream>
 
-#include <converter/specializedTypes/_case_insensitive_string.h>
+#include <converter/specializedHelper/_case_insensitive_string.h>
 
 namespace specializedTypes {
   using ci_string  =  std::basic_string<char, converter::ci_char_traits, std::string::allocator_type>;

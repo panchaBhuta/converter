@@ -16,7 +16,7 @@ later), is header-only and comes with a basic test suite.
 
 Supported Platforms/Compilers
 =============================
-Converter is implemented using C++20 with code portable across OS and it's supported compiler's.<br>
+Converter is implemented using C++20 with code portable across multiple OS's and it's supported compiler's.<br>
 
 Unit-Test results of last run across multiple OS-versions and Compiler-versions :
 
@@ -82,8 +82,12 @@ particular its [CMakeLists.txt](examples/cmake-add-subdirectory/CMakeLists.txt).
 
 Supported Data Types for Conversion
 ===================================
-Floating-types, Integer-types, char-types, bool, `std::chrono::year_month_day` are the various types supported.<br>
-Special types `ci_string` (i.e case-insensitive string) and `format_year_month_day<format-info>` (date-type with built-in format needed during string-conversion). <br>
+Floating-types, Integer-types, char-types, bool, `std::chrono::year_month_day` are the various types supported.<br><br>
+Special types :<br>
+- `specializedTypes::ci_string` (case-insensitive string)
+- `specializedTypes::RegexString` (string matching a regular expression)
+- `specializedTypes::format_year_month_day<format-info>`<br>(date-type with built-in format needed during string-conversion).
+
 Use `T ConvertFromStr<T>::ToVal(const std::string&)` for `std::string` to T conversions.<br>
 Use `std::string ConvertFromVal<T>::ToStr(const T&)` for T to `std::string` conversions.<br>
 The Default convertion functions, maps to best available converter functions (for a type) provided by _std_ library.
@@ -375,7 +379,7 @@ Above Template-specializaton can be used for all types(integer, floating, bool) 
 
 Special types
 =============
-1. date-type `converter::format_year_month_day< const char* dateFMT,  converter::FailureS2Tprocess PROCESS_ERR >`
+1. date-type `specializedTypes::format_year_month_day< const char* dateFMT,  converter::FailureS2Tprocess PROCESS_ERR >`
 -----------------------------------------------------------------------------------------------------------------
 Use case for this type: For `std::tuple<std::chrono::year_month_day,int,float,...>` conversion read-from string OR write-to string, the default conversion format for type `std::chrono::year_month_day` is "%Y-%m-%d". If date-format "%d-%b-%Y" is needed, then read-from and write-to conversions would need different type-list as indicate in comments of code-block below. Also refer [testTupleConversions.cpp](tests/testTupleConversions.cpp) for working code.
 
@@ -409,9 +413,13 @@ Instead same conversion-list across declarations and conversion is a better appr
 
 For usage code, refer [testDateYMD_format_dbY.cpp](tests/testDateYMD_format_dbY.cpp) and [testDateYMD_format_YMD.cpp](tests/testDateYMD_format_YMD.cpp)
 
-2. Case-Insensitive String  `ci_string`
+2. Case-Insensitive String  `specializedTypes::ci_string`
 ---------------------------------------
-`ci_string` type which does a case-insentive comparision. This is based on std::basic_string<...> with a different TypeTraits then that used by `std::string`. Refer [case_insensitive_string.h](include/converter/specializedTypes/case_insensitive_string.h) and [testCIstring.cpp](tests/testCIstring.cpp).
+`specializedTypes::ci_string` type which does a case-insentive comparision. This is based on std::basic_string<...> with a different TypeTraits then that used by `std::string`. Refer [case_insensitive_string.h](include/specializedTypes/case_insensitive_string.h) and [testCIstring.cpp](tests/testCIstring.cpp).
+
+3. RegexString String  `specializedTypes::RegexString`
+---------------------------------------
+`specializedTypes::RegexString` type which does a case-insentive comparision. Regular-expression uses std::regex_match(...). Refer [RegexString.h](include/specializedTypes/RegexString.h) and [testRegexString.cpp](tests/testRegexString.cpp).
 
 
 Architecture Components and Overview
@@ -479,5 +487,5 @@ https://github.com/panchaBhuta/converter/tree/master
 
 Keywords
 ========
-c++, c++20, converter, string to type, type to string, single header library.
+c++, c++20, converter, string to type, type to string, header library.
 

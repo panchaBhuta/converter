@@ -9,7 +9,7 @@
 #include <iostream>
 
 #include <converter/converter.h>
-#include <converter/specializedTypes/date.h>
+#include <specializedTypes/date.h>
 #include <specializedTypes/case_insensitive_string.h>
 
 #include "unittest.h"
@@ -88,8 +88,8 @@ void conversionStringEqualCheck(const std::string& rowStrInput, const std::tuple
 #endif
 
 
-using t_fmtdbY = converter::format_year_month_day<converter::dbY_fmt, converter::FailureS2Tprocess::THROW_ERROR>;
-using t_fmtYMD = converter::format_year_month_day<converter::defYMDfmt, converter::FailureS2Tprocess::THROW_ERROR>;
+using t_fmtdbY = specializedTypes::format_year_month_day<converter::dbY_fmt, converter::FailureS2Tprocess::THROW_ERROR>;
+using t_fmtYMD = specializedTypes::format_year_month_day<converter::defYMDfmt, converter::FailureS2Tprocess::THROW_ERROR>;
 
 
 

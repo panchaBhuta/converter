@@ -2,9 +2,9 @@
  * _convertDate.h
  *
  * URL:      https://github.com/panchaBhuta/converter
- * Version:  v1.2
+ * Version:  v1.4
  *
- * Copyright (c) 2023-2023 Gautam Dhar
+ * Copyright (c) 2023-2025 Gautam Dhar
  * All rights reserved.
  *
  * converter is distributed under the BSD 3-Clause license, see LICENSE for details.
@@ -28,6 +28,7 @@
 #include <converter/_convertT2S.h>
 
 #include <converter/_workaroundConfig.h>
+#include <specializedTypes/CompTimeStr.h>
 
 
 #if    USE_CHRONO_TOSTREAM_1 == e_ENABLE_FEATURE
@@ -58,11 +59,11 @@ namespace converter
   inline constexpr char defYMDfmt[] = "%F";  // string literal object with static storage duration; inline implies external linkage
 
 
-  template<c_iostream IOSS, const char* _ymdFormat = defYMDfmt> // %F -> "%Y-%m-%d"
+  template<c_iostream IOSS, specializedTypes::CompTimeStr _ymdFormat = defYMDfmt> // %F -> "%Y-%m-%d"
   struct Format_StreamYMD
   {
     using stream_type = IOSS;
-    constexpr static const char* ymdFormat = _ymdFormat;
+    constexpr static const char* ymdFormat = _ymdFormat.data;
 
     constexpr static inline
     std::enable_if_t< std::is_same_v<typename IOSS::char_type,char>, void>
@@ -73,7 +74,7 @@ namespace converter
 
   // [=============================================================[ S2T_FORMAT
   // [[============[[ Conversion formats
-  template < const char* formatYMD = defYMDfmt, // %F -> "%Y-%m-%d"
+  template < specializedTypes::CompTimeStr formatYMD = defYMDfmt, // %F -> "%Y-%m-%d"
              FailureS2Tprocess PROCESS_ERR = FailureS2Tprocess::THROW_ERROR >
   struct S2T_Format_StreamYMD : public Format_StreamYMD<std::istringstream, formatYMD>,
                                 public OnError<std::chrono::year_month_day, PROCESS_ERR> {};
@@ -152,7 +153,7 @@ namespace converter
      * @param   str                 input string representing date.
      * @param   fmt                 a format string of date-string.
      * @param   abbrev              if not null, pointer to an object that will hold the time zone abbreviation or name corresponding to the %Z specifier
-     * @param   offset              if not null, pointer to an object that will hold the offset from UTC corresponding to the %z specifier 
+     * @param   offset              if not null, pointer to an object that will hold the offset from UTC corresponding to the %z specifier
      * @returns 'year_month_day'.
      */
     inline static return_type
@@ -316,17 +317,17 @@ namespace converter
 
       static const std::map<std::string, unsigned> monthsIndex = {
         {"jan",  1}, {"january", 1},
-        {"feb",  2}, {"february", 1},
-        {"mar",  3}, {"march", 1},
-        {"apr",  4}, {"april", 1},
-        {"may",  5}, 
-        {"jun",  6}, {"june", 1},
-        {"jul",  7}, {"july", 1},
-        {"aug",  8}, {"august", 1},
-        {"sep",  9}, {"september", 1},
-        {"oct", 10}, {"october", 1},
-        {"nov", 11}, {"november", 1},
-        {"dec", 12}, {"december", 1},
+        {"feb",  2}, {"february", 2},
+        {"mar",  3}, {"march", 3},
+        {"apr",  4}, {"april", 4},
+        {"may",  5},
+        {"jun",  6}, {"june", 6},
+        {"jul",  7}, {"july", 7},
+        {"aug",  8}, {"august", 8},
+        {"sep",  9}, {"september", 9},
+        {"oct", 10}, {"october", 10},
+        {"nov", 11}, {"november", 11},
+        {"dec", 12}, {"december", 12},
       };
 
       std::string fmtStr(fmt);
@@ -419,7 +420,7 @@ namespace converter
   // [=============================================================[ T2S_FORMAT
 
   // [[============[[ Conversion formats
-  template < const char* formatYMD = defYMDfmt > // %F -> "%Y-%m-%d"
+  template < specializedTypes::CompTimeStr formatYMD = defYMDfmt > // %F -> "%Y-%m-%d"
   using T2S_Format_StreamYMD = Format_StreamYMD<std::ostringstream, formatYMD>;
   // ]]============]] Conversion formats
 
@@ -575,7 +576,7 @@ namespace converter
      * @param   val                 input 'year_month_day'.
      * @param   fmt                 a format string specifying the output string format.
      * @param   abbrev              if not null, pointer to an object that will hold the time zone abbreviation or name corresponding to the %Z specifier
-     * @param   offset_sec          if not null, pointer to an object that will hold the offset from UTC corresponding to the %z specifier 
+     * @param   offset_sec          if not null, pointer to an object that will hold the offset from UTC corresponding to the %z specifier
      * @returns string.
      */
     inline static std::string
@@ -646,7 +647,7 @@ namespace converter
         std::ostringstream eoss;
         eoss << _errMsg << " ::: ";
         try {
-          eoss << "year{" << int(val.year()) << "}-month{" << unsigned(val.month()) << "}-day{" 
+          eoss << "year{" << int(val.year()) << "}-month{" << unsigned(val.month()) << "}-day{"
           << unsigned(val.day()) << "}' : val.ok()=" << val.ok() << " format='" << fmt << "'  resultString='"
           << oss.str() << "'" << std::endl;
         } catch (...) {} // do-nothing on error

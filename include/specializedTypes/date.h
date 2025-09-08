@@ -17,8 +17,9 @@
 #include <string>
 
 #include <converter/converter.h>
+#include <specializedTypes/CompTimeStr.h>
 
-namespace converter {
+namespace specializedTypes {
 /*
   template <typename T>
   concept c_is_base_of_ymd_inclusive = std::is_base_of_v<std::chrono::year_month_day, T>;
@@ -34,12 +35,12 @@ namespace converter {
   /**
    * @brief     Template Class representing a CSV document.
    */
-  template < const char* dateFMT, // %F -> "%Y-%m-%d"
-             FailureS2Tprocess PROCESS_ERR >
+  template < specializedTypes::CompTimeStr dateFMT, // %F -> "%Y-%m-%d"
+             converter::FailureS2Tprocess PROCESS_ERR >
   struct format_year_month_day
   {
-    constexpr static const char* formatYMD = dateFMT;
-    constexpr static const FailureS2Tprocess errProcessing = PROCESS_ERR ;
+    constexpr static specializedTypes::CompTimeStr formatYMD = dateFMT;
+    constexpr static const converter::FailureS2Tprocess errProcessing = PROCESS_ERR ;
 
     constexpr format_year_month_day() : _ymd() {}
     constexpr format_year_month_day( const std::chrono::year& y,
@@ -97,18 +98,23 @@ namespace converter {
   };
   // ]=====================================]    format_year_month_day
 
+}
+
+
+namespace converter {
+
   // [=============================================================[ S2T_FORMAT
   // [[============[[ Conversion formats
-  template < const char* formatYMD, // %F -> "%Y-%m-%d"
+  template < specializedTypes::CompTimeStr formatYMD, // %F -> "%Y-%m-%d"
              FailureS2Tprocess PROCESS_ERR >
   struct S2T_Format_StreamFormatYMD : public Format_StreamYMD<std::istringstream, formatYMD>,
-                                      public OnError<format_year_month_day<formatYMD,PROCESS_ERR>, PROCESS_ERR> {};
+                                      public OnError<specializedTypes::format_year_month_day<formatYMD,PROCESS_ERR>, PROCESS_ERR> {};
   // ]]============]] Conversion formats
 
 
   // [[============[[ type - Default Conversion format
-  template<const char* formatYMD>
-  struct S2T_DefaultFormat<format_year_month_day<formatYMD, FailureS2Tprocess::THROW_ERROR>, void>
+  template<specializedTypes::CompTimeStr formatYMD>
+  struct S2T_DefaultFormat<specializedTypes::format_year_month_day<formatYMD, FailureS2Tprocess::THROW_ERROR>, void>
   {
     using type = S2T_Format_StreamFormatYMD<formatYMD, FailureS2Tprocess::THROW_ERROR>;
   };
@@ -121,15 +127,15 @@ namespace converter {
    * @tparam  dateFMT        date-format to read/write from string.
    * @tparam  PROCESS_ERR    enum defining the error handling process during string-to-date conversion.
    */
-  template< const char* dateFMT, // %F -> "%Y-%m-%d"
+  template< specializedTypes::CompTimeStr dateFMT, // %F -> "%Y-%m-%d"
             FailureS2Tprocess PROCESS_ERR >
-  struct ConvertFromStr< format_year_month_day      <dateFMT,PROCESS_ERR>,
-                         S2T_Format_StreamFormatYMD <dateFMT,PROCESS_ERR> >
+  struct ConvertFromStr< specializedTypes::format_year_month_day      <dateFMT,PROCESS_ERR>,
+                         S2T_Format_StreamFormatYMD                   <dateFMT,PROCESS_ERR> >
   {
     /**
      * @brief   'type' definition being declared for.
      */
-    using value_type  = format_year_month_day<dateFMT,PROCESS_ERR>;
+    using value_type  = specializedTypes::format_year_month_day<dateFMT,PROCESS_ERR>;
     /**
      * @brief   'type' definition returned by the convertor.
      */
@@ -140,7 +146,7 @@ namespace converter {
     inline static return_type //format_year_month_day<dateFMT,PROCESS_ERR>
     ToVal(const std::string& str)
     {
-      return format_year_month_day<dateFMT,PROCESS_ERR>(
+      return specializedTypes::format_year_month_day<dateFMT,PROCESS_ERR>(
             ConvertFromStr< std::chrono::year_month_day,
                             S2T_Format_StreamYMD <dateFMT,PROCESS_ERR> >::ToVal(str) );
     }
@@ -150,15 +156,15 @@ namespace converter {
 
   // [=============================================================[ T2S_FORMAT
   // [[============[[ Conversion formats
-  template < const char* formatYMD > // %F -> "%Y-%m-%d"
+  template < specializedTypes::CompTimeStr formatYMD > // %F -> "%Y-%m-%d"
   using T2S_Format_StreamFormatYMD = Format_StreamYMD<std::ostringstream, formatYMD>;
   // ]]============]] Conversion formats
 
 
 
   // [[============[[ type - Default Conversion format
-  template<const char* dateFMT>
-  struct T2S_DefaultFormat<format_year_month_day<dateFMT, FailureS2Tprocess::THROW_ERROR>, void>
+  template<specializedTypes::CompTimeStr dateFMT>
+  struct T2S_DefaultFormat<specializedTypes::format_year_month_day<dateFMT, FailureS2Tprocess::THROW_ERROR>, void>
   {
     using type = T2S_Format_StreamFormatYMD< dateFMT >;
   };
@@ -166,19 +172,19 @@ namespace converter {
   // ]=============================================================] T2S_FORMAT
 
   // [=============================================================[ ConvertFromVal
-  template< const char* dateFMT, // %F -> "%Y-%m-%d"
+  template< specializedTypes::CompTimeStr dateFMT, // %F -> "%Y-%m-%d"
             FailureS2Tprocess PROCESS_ERR >
-  struct ConvertFromVal< format_year_month_day<dateFMT,PROCESS_ERR>,
-                         T2S_Format_StreamFormatYMD <dateFMT> >
+  struct ConvertFromVal< specializedTypes::format_year_month_day<dateFMT,PROCESS_ERR>,
+                         T2S_Format_StreamFormatYMD             <dateFMT> >
   {
     /**
      * @brief   'type' definition being declared for.
      */
-    using value_type = format_year_month_day<dateFMT,PROCESS_ERR>;
+    using value_type = specializedTypes::format_year_month_day<dateFMT,PROCESS_ERR>;
     /**
      * @brief   'type' definition expected by the convertor.
      */
-    using input_type = format_year_month_day<dateFMT,PROCESS_ERR>;
+    using input_type = specializedTypes::format_year_month_day<dateFMT,PROCESS_ERR>;
 
     static const int template_uid = -10001;
 
@@ -188,55 +194,62 @@ namespace converter {
      * @returns string.
      */
     inline static std::string
-    ToStr(  const format_year_month_day<dateFMT,PROCESS_ERR>& val)
+    ToStr(  const specializedTypes::format_year_month_day<dateFMT,PROCESS_ERR>& val)
     {
       return ConvertFromVal<  std::chrono::year_month_day,
                               T2S_Format_StreamYMD< dateFMT > >::ToStr( val.getYMD() ); // %F -> "%Y-%m-%d"
     }
   };
   // ]=============================================================] ConvertFromVal
+}
 
 
 
+namespace specializedTypes {
   // [=====================================[    format_year_month_day
-  template < const char* dateFMT, // %F -> "%Y-%m-%d"
-             FailureS2Tprocess PROCESS_ERR >
+  template < CompTimeStr dateFMT, // %F -> "%Y-%m-%d"
+             converter::FailureS2Tprocess PROCESS_ERR >
   std::string format_year_month_day<dateFMT,PROCESS_ERR>::toStr() const
   {
     return
-    ConvertFromVal< format_year_month_day<dateFMT,PROCESS_ERR>,
-                    T2S_Format_StreamFormatYMD <dateFMT>
-                  >::ToStr(*this);
+    converter::ConvertFromVal<                 format_year_month_day <dateFMT,PROCESS_ERR>,
+                               converter::T2S_Format_StreamFormatYMD <dateFMT>
+                             >::ToStr(*this);
   };
 
 
-  template < const char* dateFMT, // %F -> "%Y-%m-%d"
-             FailureS2Tprocess PROCESS_ERR >
+  template < CompTimeStr dateFMT, // %F -> "%Y-%m-%d"
+             converter::FailureS2Tprocess PROCESS_ERR >
   void format_year_month_day<dateFMT,PROCESS_ERR>::fromStr(const std::string& dateStr)
   {
     _ymd =
-    ConvertFromStr< format_year_month_day<dateFMT,PROCESS_ERR>,
-                    S2T_Format_StreamFormatYMD <dateFMT,PROCESS_ERR>
-                  >::ToVal(dateStr).getYMD();
+    converter::ConvertFromStr<                 format_year_month_day <dateFMT,PROCESS_ERR>,
+                               converter::S2T_Format_StreamFormatYMD <dateFMT,PROCESS_ERR>
+                             >::ToVal(dateStr).getYMD();
   }
+}
 
+  /*
+    *  https://stackoverflow.com/questions/5195512/namespaces-and-operator-resolution
+    *  refer URL^  for   "Namespaces and operator resolution"  for eg: 'operator<<'
+  */
   template< class CharT, class Traits,
-            const char* dateFMT, // %F -> "%Y-%m-%d"
-            FailureS2Tprocess PROCESS_ERR >
+            specializedTypes::CompTimeStr   dateFMT, // %F -> "%Y-%m-%d"
+            converter::FailureS2Tprocess    PROCESS_ERR >
   std::basic_ostream<CharT, Traits>&
     operator<<( std::basic_ostream<CharT, Traits>& os,
-                const format_year_month_day<dateFMT,PROCESS_ERR>& fmtymd )
+                const specializedTypes::format_year_month_day<dateFMT,PROCESS_ERR>& fmtymd )
   {
     os << fmtymd.toStr().c_str();
     return os;
   }
 
   template< class CharT, class Traits,
-            const char* dateFMT, // %F -> "%Y-%m-%d"
-            FailureS2Tprocess PROCESS_ERR >
+            specializedTypes::CompTimeStr   dateFMT, // %F -> "%Y-%m-%d"
+            converter::FailureS2Tprocess    PROCESS_ERR >
   std::basic_istream<CharT, Traits>&
     operator>>( std::basic_istream<CharT, Traits>& is,
-                format_year_month_day<dateFMT,PROCESS_ERR>& fmtymd )
+                specializedTypes::format_year_month_day<dateFMT,PROCESS_ERR>& fmtymd )
   {
     std::basic_string<CharT, Traits> str;
     is >> str;
@@ -247,10 +260,10 @@ namespace converter {
 /*
  * use default, no need to explicitly provide
 
-  template < const char* dateFMT, // %F -> "%Y-%m-%d"
-             FailureS2Tprocess PROCESS_ERR >
-  constexpr bool operator==( const format_year_month_day<dateFMT,PROCESS_ERR>& x,
-                             const format_year_month_day<dateFMT,PROCESS_ERR>& y ) noexcept
+  template < specializedTypes::CompTimeStr   dateFMT, // %F -> "%Y-%m-%d"
+             converter::FailureS2Tprocess    PROCESS_ERR >
+  constexpr bool operator==( const specializedTypes::format_year_month_day<dateFMT,PROCESS_ERR>& x,
+                             const specializedTypes::format_year_month_day<dateFMT,PROCESS_ERR>& y ) noexcept
   {
     std::chrono::year_month_day& dx = x;
     std::chrono::year_month_day& dy = y;
@@ -258,11 +271,11 @@ namespace converter {
     return dx == dy;
   }
 
-  template < const char* dateFMT, // %F -> "%Y-%m-%d"
-             FailureS2Tprocess PROCESS_ERR >
+  template < specializedTypes::CompTimeStr   dateFMT, // %F -> "%Y-%m-%d"
+             converter::FailureS2Tprocess   PROCESS_ERR >
   constexpr std::strong_ordering
-    operator<=>( const format_year_month_day<dateFMT,PROCESS_ERR>& x,
-                 const format_year_month_day<dateFMT,PROCESS_ERR>& y ) noexcept
+    operator<=>( const specializedTypes::format_year_month_day<dateFMT,PROCESS_ERR>& x,
+                 const specializedTypes::format_year_month_day<dateFMT,PROCESS_ERR>& y ) noexcept
   {
     std::chrono::year_month_day& dx = x;
     std::chrono::year_month_day& dy = y;
@@ -272,4 +285,10 @@ namespace converter {
 */
   // ]=====================================]    format_year_month_day
 
+
+namespace specializedTypes {
+  using ::operator<<;
+  using ::operator>>;
+  //using ::operator==;
+  //using ::operator<=>;
 }

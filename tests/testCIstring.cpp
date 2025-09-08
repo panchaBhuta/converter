@@ -5,7 +5,7 @@
 #include <iostream>
 
 #include <converter/converter.h>
-#include <converter/specializedTypes/date.h>
+#include <specializedTypes/date.h>
 #include <specializedTypes/case_insensitive_string.h>
 
 #include "unittest.h"

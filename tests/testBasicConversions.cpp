@@ -5,7 +5,7 @@
 #include <iostream>
 
 #include <converter/converter.h>
-#include <converter/specializedTypes/date.h>
+#include <specializedTypes/date.h>
 #include <specializedTypes/case_insensitive_string.h>
 
 #include "unittest.h"
@@ -63,14 +63,14 @@ int main()
                                          std::chrono::day(15)
                                        ),
             "2023-08-15");
-    using t_fmtdbY = converter::format_year_month_day<converter::dbY_fmt, converter::FailureS2Tprocess::THROW_ERROR>;
+    using t_fmtdbY = specializedTypes::format_year_month_day<converter::dbY_fmt, converter::FailureS2Tprocess::THROW_ERROR>;
     conversionEqualCheck<t_fmtdbY>(
             t_fmtdbY( std::chrono::year(2023),
                       std::chrono::month(8),
                       std::chrono::day(15)
                     ),
             "15-Aug-2023");
-    using t_fmtYMD = converter::format_year_month_day<converter::defYMDfmt, converter::FailureS2Tprocess::THROW_ERROR>;
+    using t_fmtYMD = specializedTypes::format_year_month_day<converter::defYMDfmt, converter::FailureS2Tprocess::THROW_ERROR>;
     conversionEqualCheck<t_fmtYMD>(
             t_fmtYMD( std::chrono::year(2023),
                       std::chrono::month(8),
