@@ -2,9 +2,9 @@
  * _workaroundConfig.h
  *
  * URL:      https://github.com/panchaBhuta/converter
- * Version:  v1.2
+ * Version:  v1.4
  *
- * Copyright (c) 2023-2023 Gautam Dhar
+ * Copyright (c) 2023-2025 Gautam Dhar
  * All rights reserved.
  *
  * converter is distributed under the BSD 3-Clause license, see LICENSE for details.
@@ -66,3 +66,44 @@
  *   This doesn't effect the converter lib. The macro is used to toggle unit-tests.
  */
 #cmakedefine01  USE_THREE_WAY_COMPARISON
+
+
+/*
+ * on WINDOWS os, MSVC compiler; doesn't support :
+ *   1.     constexpr std::copy_n(...);
+ *   2.     consteval bool operator==(const CompTimeStr<N>& other);
+ */
+#cmakedefine01  USE_CONSTEXPR_STRING_COPYN
+#cmakedefine01  USE_CONSTEXPR_STRING_OPERATOREQUALITY
+
+#if USE_CONSTEXPR_STRING_COPYN == e_DISABLE_FEATURE
+#include <iterator>
+namespace workaround {
+  template<std::forward_iterator InputIt, class Size,
+           std::output_iterator<decltype(*std::declval<InputIt>())> OutputIt>
+  constexpr //< since C++20
+  OutputIt copy_n(InputIt first, Size count, OutputIt result)
+  {
+    if (count > 0)
+    {
+      *result = *first;
+      ++result;
+      for (Size i = 1; i != count; ++i, (void)++result)
+        *result = *++first;
+    }
+
+    return result;
+  }
+
+  template<std::forward_iterator InputIt1, std::forward_iterator InputIt2>
+  constexpr //< since C++20
+  bool equal(InputIt1 first1, InputIt1 last1, InputIt2 first2)
+  {
+    for (; first1 != last1; ++first1, ++first2)
+      if (!(*first1 == *first2))
+        return false;
+
+    return true;
+  }
+}
+#endif

@@ -421,8 +421,8 @@ macro(check_floatingPoint_elementaryStringConversions)
         set(USE_FLOATINGPOINT_FROM_CHARS_1   ${e_ENABLE_FEATURE})
         set(USE_FLOATINGPOINT_TO_CHARS_1   ${e_ENABLE_FEATURE})
     else()
-        message(STATUS "floatingPoint_fromChars algo ::  workaround-enabled")
-        message(STATUS "floatingPoint_toChars algo ::  workaround-enabled")
+        message(STATUS "WARNING :: floatingPoint_fromChars algo ::  workaround-enabled")
+        message(STATUS "WARNING :: floatingPoint_toChars algo ::  workaround-enabled")
         set(USE_FLOATINGPOINT_FROM_CHARS_1   ${e_DISABLE_FEATURE})
         set(USE_FLOATINGPOINT_TO_CHARS_1   ${e_DISABLE_FEATURE})
     endif()
@@ -434,7 +434,7 @@ endmacro()
 
 macro(check_three_way_comparison)
     try_compile(COMPILE_RESULT_THREE_WAY_COMPARISON
-                SOURCE_FROM_FILE    testDateYMD_format_dbY.cpp
+                SOURCE_FROM_FILE    check_three_way_comparison.cpp
                                     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/check_three_way_comparison.cpp"
                 CMAKE_FLAGS "$<${linux_host_with_gcc_like_cxx}:--std=gnu++2a>"
                 CMAKE_FLAGS "$<${linux_host_with_gcc_cxx}:-fconcepts>"
@@ -443,15 +443,61 @@ macro(check_three_way_comparison)
                 CXX_STANDARD_REQUIRED True)
 
     if(COMPILE_RESULT_THREE_WAY_COMPARISON)
-        message(STATUS "THREE-WAY COMPARISON supported")
+        message(STATUS "THREE-WAY COMPARISON SUPPORTED")
         set(USE_THREE_WAY_COMPARISON ${e_ENABLE_FEATURE})
     else()
         # AppleClang-14 doesnot support "<=>" operator
-        message(STATUS "THREE-WAY COMPARISON  NOT  supported !!!")
+        message(STATUS "WARNING :: THREE-WAY COMPARISON  NOT  supported !!!")
         set(USE_THREE_WAY_COMPARISON ${e_DISABLE_FEATURE})
     endif()
     #[===[  for testing purpose
         set(USE_THREE_WAY_COMPARISON ${e_ENABLE_FEATURE})
+    #]===]
+endmacro()
+
+macro(check_constexpr_string_copyN)
+    try_compile(COMPILE_RESULT_CONSTEXPR_STRING_COPYN
+                SOURCE_FROM_FILE    check_constexpr_string_copyN.cpp
+                                    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/check_constexpr_string_copyN.cpp"
+                CMAKE_FLAGS "$<${linux_host_with_gcc_like_cxx}:--std=gnu++2a>"
+                CMAKE_FLAGS "$<${linux_host_with_gcc_cxx}:-fconcepts>"
+                #CMAKE_FLAGS  "--std=gnu++2a -fconcepts"
+                CXX_STANDARD "${CMAKE_CXX_STANDARD}"
+                CXX_STANDARD_REQUIRED True)
+
+    if(COMPILE_RESULT_CONSTEXPR_STRING_COPYN)
+        message(STATUS "constexpr std::copy_n(...) SUPPORTED")
+        set(USE_CONSTEXPR_STRING_COPYN ${e_ENABLE_FEATURE})
+    else()
+        # MSVC doesn't support
+        message(STATUS "WARNING :: constexpr std::copy_n(...)  NOT  supported !!!")
+        set(USE_CONSTEXPR_STRING_COPYN ${e_DISABLE_FEATURE})
+    endif()
+    #[===[  for testing purpose
+        set(USE_CONSTEXPR_STRING_COPYN ${e_ENABLE_FEATURE})
+    #]===]
+endmacro()
+
+macro(check_constexpr_string_operatorEquality)
+    try_compile(COMPILE_RESULT_CONSTEXPR_STRING_OPERATOREQUALITY
+                SOURCE_FROM_FILE    check_constexpr_string_operatorEquality.cpp
+                                    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/check_constexpr_string_operatorEquality.cpp"
+                CMAKE_FLAGS "$<${linux_host_with_gcc_like_cxx}:--std=gnu++2a>"
+                CMAKE_FLAGS "$<${linux_host_with_gcc_cxx}:-fconcepts>"
+                #CMAKE_FLAGS  "--std=gnu++2a -fconcepts"
+                CXX_STANDARD "${CMAKE_CXX_STANDARD}"
+                CXX_STANDARD_REQUIRED True)
+
+    if(COMPILE_RESULT_CONSTEXPR_STRING_OPERATOREQUALITY)
+        message(STATUS "constexpr char[] == char[] SUPPORTED")
+        set(USE_CONSTEXPR_STRING_OPERATOREQUALITY ${e_ENABLE_FEATURE})
+    else()
+        # MSVC doesn't support
+        message(STATUS "WARNING :: constexpr char[] == char[]  NOT  supported !!!")
+        set(USE_CONSTEXPR_STRING_OPERATOREQUALITY ${e_DISABLE_FEATURE})
+    endif()
+    #[===[  for testing purpose
+        set(USE_CONSTEXPR_STRING_OPERATOREQUALITY ${e_ENABLE_FEATURE})
     #]===]
 endmacro()
 
@@ -479,7 +525,7 @@ macro(converter_check_cxx_compiler_flag_file_prefix_map)
             "-ffile-prefix-map=${CMAKE_CURRENT_SOURCE_DIR}${_path_separator}=")
     else()
         # as of writing this code, clang does not support option '-ffile-prefix-map=...'
-        message(STATUS "converter : compiler option '-ffile-prefix-map=old=new' NOT SUPPORTED")
+        message(STATUS "WARNING :: converter : compiler option '-ffile-prefix-map=old=new' NOT supported")
         string(LENGTH "${CMAKE_CURRENT_SOURCE_DIR}/" CONVERTER_SOURCE_PATH_SIZE)
         target_compile_definitions( converter INTERFACE
                                     CONVERTER_USE_FILEPREFIXMAP=0
