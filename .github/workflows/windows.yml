@@ -46,7 +46,7 @@ jobs:
           # clang   == 'MSVC 19'
           # ClangCl == 'Clang 16'
         toolset_compiler: [ { compiler: default, toolset: -1, cmdShell: bash, rawCompiler: msbuild },
-                            { compiler: ClangCl, toolset:  1, cmdShell: bash, rawCompiler: clang-cl },
+                            { compiler: ClangCl, toolset:  1, cmdShell: bash, rawCompiler: clang },
                             # https://github.com/ArchieAtkinson/CppTemplate
                             # https://github.com/scikit-build/scikit-build-core/blob/main/.github/workflows/ci.yml
                             { compiler: g++,     toolset:  0, cmdShell: "msys2 {0}", rawCompiler: g++ } ]
@@ -75,7 +75,7 @@ jobs:
           pacboy: >-
             python:p python-pip:p gcc:p cmake:p
       - name: Compiler(s) Version
-        run: echo "g++ --version"; g++ --version; echo ""; echo "clang++ --version"; clang++ --version; echo "${{matrix.toolset_compiler.rawCompiler}} --version"; ${{matrix.toolset_compiler.rawCompiler}} --version
+        run: echo "g++ --version"; g++ --version; echo ""; echo "clang --version"; clang --version; echo "${{matrix.toolset_compiler.rawCompiler}} --version"; ${{matrix.toolset_compiler.rawCompiler}} --version
       - name: Checkout Repo
         uses: actions/checkout@v4
       - name: Get Version
