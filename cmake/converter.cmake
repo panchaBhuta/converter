@@ -455,52 +455,6 @@ macro(check_three_way_comparison)
     #]===]
 endmacro()
 
-macro(check_constexpr_string_copyN)
-    try_compile(COMPILE_RESULT_CONSTEXPR_STRING_COPYN
-                SOURCE_FROM_FILE    check_constexpr_string_copyN.cpp
-                                    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/check_constexpr_string_copyN.cpp"
-                CMAKE_FLAGS "$<${linux_host_with_gcc_like_cxx}:--std=gnu++2a>"
-                CMAKE_FLAGS "$<${linux_host_with_gcc_cxx}:-fconcepts>"
-                #CMAKE_FLAGS  "--std=gnu++2a -fconcepts"
-                CXX_STANDARD "${CMAKE_CXX_STANDARD}"
-                CXX_STANDARD_REQUIRED True)
-
-    if(COMPILE_RESULT_CONSTEXPR_STRING_COPYN)
-        message(STATUS "constexpr std::copy_n(...) SUPPORTED")
-        set(USE_CONSTEXPR_STRING_COPYN ${e_ENABLE_FEATURE})
-    else()
-        # MSVC doesn't support
-        message(STATUS "WARNING :: constexpr std::copy_n(...)  NOT  supported !!!")
-        set(USE_CONSTEXPR_STRING_COPYN ${e_DISABLE_FEATURE})
-    endif()
-    #[===[  for testing purpose
-        set(USE_CONSTEXPR_STRING_COPYN ${e_ENABLE_FEATURE})
-    #]===]
-endmacro()
-
-macro(check_constexpr_string_operatorEquality)
-    try_compile(COMPILE_RESULT_CONSTEXPR_STRING_OPERATOREQUALITY
-                SOURCE_FROM_FILE    check_constexpr_string_operatorEquality.cpp
-                                    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/check_constexpr_string_operatorEquality.cpp"
-                CMAKE_FLAGS "$<${linux_host_with_gcc_like_cxx}:--std=gnu++2a>"
-                CMAKE_FLAGS "$<${linux_host_with_gcc_cxx}:-fconcepts>"
-                #CMAKE_FLAGS  "--std=gnu++2a -fconcepts"
-                CXX_STANDARD "${CMAKE_CXX_STANDARD}"
-                CXX_STANDARD_REQUIRED True)
-
-    if(COMPILE_RESULT_CONSTEXPR_STRING_OPERATOREQUALITY)
-        message(STATUS "constexpr char[] == char[] SUPPORTED")
-        set(USE_CONSTEXPR_STRING_OPERATOREQUALITY ${e_ENABLE_FEATURE})
-    else()
-        # MSVC doesn't support
-        message(STATUS "WARNING :: constexpr char[] == char[]  NOT  supported !!!")
-        set(USE_CONSTEXPR_STRING_OPERATOREQUALITY ${e_DISABLE_FEATURE})
-    endif()
-    #[===[  for testing purpose
-        set(USE_CONSTEXPR_STRING_OPERATOREQUALITY ${e_ENABLE_FEATURE})
-    #]===]
-endmacro()
-
 #[===========[
   Check if compiler supports '-fmacro-prefix-map=old=new'  option
   refer ::: https://fossies.org/linux/bareos/core/CMakeLists.txt

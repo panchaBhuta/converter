@@ -257,7 +257,7 @@ void checkFunctionInstance_Integer()
    * S2T : For Integer types , following params are not applicable
    *   FORMAT_TEMPLATE ->   S2T_Format_WorkAround<>
    *   PROCESS         ->   SIGNAL_NAN, QUIET_NAN
-   * 
+   *
    * T2S : For Integer types , following params are not applicable
    *   FORMAT_TEMPLATE ->   T2S_Format_WorkAround, T2S_Format_StreamDecimalPrecision<>,
    *                        T2S_Format_floating_StreamCombine<>
@@ -277,7 +277,7 @@ void checkFunctionInstance_Float()
    * S2T : For Integer types , following params are not applicable
    *   FORMAT_TEMPLATE ->   S2T_Format_WorkAround<>
    *   PROCESS         ->   {empty-list}
-   * 
+   *
    * T2S : For Integer types , following params are not applicable
    *   FORMAT_TEMPLATE ->   T2S_Format_WorkAround, T2S_Format_std_TtoS
   **/
@@ -325,7 +325,7 @@ void checkFunctionInstance_char()
    * S2T : For Integer types , following params are not applicable
    *   FORMAT_TEMPLATE ->   S2T_Format_std_StoT<>
    *   PROCESS         ->   SIGNAL_NAN, QUIET_NAN
-   * 
+   *
    * T2S : For Integer types , following params are not applicable
    *   FORMAT_TEMPLATE ->   T2S_Format_std_TtoS, T2S_Format_StreamDecimalPrecision<>,
    *                        T2S_Format_floating_StreamCombine<>
@@ -344,7 +344,7 @@ void checkFunctionInstance_bool()
    * S2T : For Integer types , following params are not applicable
    *   FORMAT_TEMPLATE ->   S2T_Format_std_StoT<>
    *   PROCESS         ->   SIGNAL_NAN, QUIET_NAN
-   * 
+   *
    * T2S : For Integer types , following params are not applicable
    *   FORMAT_TEMPLATE ->   T2S_Format_std_TtoS, T2S_Format_StreamDecimalPrecision<>,
    *                        T2S_Format_floating_StreamCombine<>
@@ -356,7 +356,7 @@ void checkFunctionInstance_bool()
   Format_StreamUserLocale_Process2<T>();
 }
 
-template<typename T, specializedTypes::CompTimeStr formatDATE = converter::defYMDfmt>
+template<typename T, const specializedTypes::CompTimeStr formatDATE = converter::defYMDfmt>
 void checkFunctionInstance_date()
 {
   using t_vNaD = std::variant<T, std::string>;
@@ -371,7 +371,8 @@ void checkFunctionInstance_date()
                                 std::string(*)(const t_vNaD&)>);
 }
 
-template<specializedTypes::CompTimeStr formatDATE>
+
+template<const specializedTypes::CompTimeStr formatDATE>
 void checkFunctionInstance_formatDate()
 {
   using t_tNaD = specializedTypes::format_year_month_day<formatDATE, converter::FailureS2Tprocess::THROW_ERROR>;

@@ -61,16 +61,7 @@ Also refer "Expression Templates"   ::    https://www.youtube.com/watch?v=IiVl5o
 #include <cstddef> // For std::size_t
 
 
-/*
- * on WINDOWS os, MSVC compiler; doesn't support :
- *   1.     constexpr std::copy_n(...);
- *   2.     consteval bool operator==(const CompTimeStr<N>& other);
- *
- * _workaroundConfig.h provides the workaround
- */
-#if USE_CONSTEXPR_STRING_COPYN == e_DISABLE_FEATURE
-#include <converter/_workaroundConfig.h>
-#endif
+
 
 namespace specializedTypes
 {
@@ -81,21 +72,13 @@ namespace specializedTypes
 
     consteval CompTimeStr(const char (&str)[N])
     {
-#if USE_CONSTEXPR_STRING_COPYN == e_ENABLE_FEATURE
       std::copy_n(str, N, data);
-#else
-      workaround::copy_n(str, N, data);
-#endif
     }
 
     // Add comparison operators if needed
     consteval bool operator==(const CompTimeStr<N>& other) const
     {
-#if USE_CONSTEXPR_STRING_COPYN == e_ENABLE_FEATURE
       return std::equal(data, data + N, other.data);
-#else
-      return workaround::equal(data, data + N, other.data);
-#endif
     }
 
   };
