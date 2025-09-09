@@ -9,6 +9,8 @@
 #include <specializedTypes/date.h>
 #include <specializedTypes/case_insensitive_string.h>
 
+#include <commonUtils/platform.h>  // for macro MSBUILD to negate lines that gives copilation-error on msbuild .exe
+
 #include "unittest.h"
 
 constexpr char de_Loc[] = "de_DE";
@@ -458,10 +460,14 @@ int main()
 
   checkFunctionInstance_date<std::chrono::year_month_day>();
   checkFunctionInstance_date<std::chrono::year_month_day, "%Y-%m-%d">();
+#if !defined(MSBUILD)
   checkFunctionInstance_date<std::chrono::year_month_day, converter::dbY_fmt>();
+#endif
   checkFunctionInstance_formatDate<"%Y-%m-%d">();
+#if !defined(MSBUILD)
   checkFunctionInstance_formatDate<converter::defYMDfmt>();
   checkFunctionInstance_formatDate<converter::dbY_fmt>();
+#endif
 
   /**
    *   In order to select right conversion algo, templates

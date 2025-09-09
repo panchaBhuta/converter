@@ -146,11 +146,24 @@
 #ifdef __llvm__
     #pragma message("COMPILER(used by clang, target-independent optimizer and code generator) based on __llvm__")
 #endif
-#if defined(_MSC_VER)
+#ifdef _MSC_VER
+    // refer -> https://learn.microsoft.com/en-us/cpp/overview/compiler-versions?view=msvc-170
     #pragma message("COMPILER (Microsoft Visual C++) based on _MSC_VER = " STRINGIZE(_MSC_VER))
 #endif
-#if defined(_MSC_BUILD)
+#ifdef _MSC_BUILD
     #pragma message("COMPILER (Microsoft Visual C++) based on _MSC_BUILD = " STRINGIZE(_MSC_BUILD))
+#endif
+#if defined(_MSC_VER) && !defined(__INTEL_COMPILER) && !defined(__clang__)
+    /*
+     * refer -> https://learn.microsoft.com/en-us/cpp/overview/compiler-versions?view=msvc-170
+     *   Intel's compiler also defines _MSC_VER and _MSC_FULL_VER on Windows.
+     *   You can exclude it by checking that __INTEL_COMPILER is not defined.
+     *
+     *   Clang also defines _MSC_VER and _MSC_FULL_VER when run as clang-cl.exe or when the
+     *   target tuple ends in -msvc. You can exclude it by checking that __clang__ is not defined.
+     */
+    #define MSBUILD
+    #pragma message("COMPILER (Microsoft Visual C++) defined ->  MSBUILD")
 #endif
 
 
