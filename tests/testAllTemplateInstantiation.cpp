@@ -432,6 +432,7 @@ int main()
   checkFunctionInstance_Integer<unsigned int>();
   checkFunctionInstance_Integer<unsigned long>();
   checkFunctionInstance_Integer<unsigned long long>();
+
   checkFunctionInstance_Float<float>();
   checkFunctionInstance_Float<double>();
   checkFunctionInstance_Float<long double>();
@@ -443,6 +444,7 @@ int main()
                                 specializedTypes::ci_string(*)(const std::string&)>);
   static_assert(std::is_same_v< decltype(&converter::ConvertFromVal<specializedTypes::ci_string, converter::T2S_Format_WorkAround>::ToStr),
                                 std::string(*)(const specializedTypes::ci_string&)>);
+
   checkFunctionInstance_char<char>();
   checkFunctionInstance_char<signed char>();
   checkFunctionInstance_char<unsigned char>();
@@ -450,9 +452,13 @@ int main()
   checkFunctionInstance_char<char8_t>();
   checkFunctionInstance_char<char16_t>();
   checkFunctionInstance_char<char32_t>();
+
   checkFunctionInstance_bool<bool>();
+
   checkFunctionInstance_date<std::chrono::year_month_day>();
+  checkFunctionInstance_date<std::chrono::year_month_day, "%Y-%m-%d">();
   checkFunctionInstance_date<std::chrono::year_month_day, converter::dbY_fmt>();
+  checkFunctionInstance_formatDate<"%Y-%m-%d">();
   checkFunctionInstance_formatDate<converter::defYMDfmt>();
   checkFunctionInstance_formatDate<converter::dbY_fmt>();
 

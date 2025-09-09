@@ -47,7 +47,7 @@ int main()
     conversionEqualCheck<char>('a',  "a");
     conversionEqualCheck<signed char>('b', "b");
     conversionEqualCheck<unsigned char>('c', "c");
-    conversionEqualCheck<wchar_t>('d',  "d");
+    conversionEqualCheck<wchar_t>('d',  "d"); /// MSVC Warning
 #if USE_CLANG_STRING_WORKS_1 == e_ENABLE_FEATURE || USE_CLANG_STRING_WORKAROUND_2 == e_ENABLE_FEATURE
     conversionEqualCheck<char8_t>('e',  "e");
     conversionEqualCheck<char16_t>('f',  "f");
