@@ -107,7 +107,7 @@ jobs:
       - name: Build compiler != g++ [Debug]
         if: matrix.toolset_compiler.compiler != 'g++'
         #  https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild-command-line-reference?view=vs-2022
-        run: cmake --build "${{github.workspace}}/build-debug" --config Debug -j$(nproc)   -- -m -nologo -verbosity:detailed
+        run: cmake --build "${{github.workspace}}/build-debug" --config Debug -j$(nproc)   -- -m -nologo -verbosity:normal
       - name: Build compiler == g++ [Debug]
         if: matrix.toolset_compiler.compiler == 'g++'
         run: cmake --build "${{github.workspace}}/build-debug" --config Debug -j$(nproc)
@@ -128,7 +128,7 @@ jobs:
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release  -T "${{matrix.toolset_compiler.compiler}}"
       - name: Build compiler != g++ [Release]
         if: matrix.toolset_compiler.compiler != 'g++'
-        run: cmake --build "${{github.workspace}}/build-release" --config Release -j$(nproc)   -- -m -nologo -verbosity:detailed
+        run: cmake --build "${{github.workspace}}/build-release" --config Release -j$(nproc)   -- -m -nologo -verbosity:normal
       - name: Build compiler == g++ [Release]
         if: matrix.toolset_compiler.compiler == 'g++'
         run: cmake --build "${{github.workspace}}/build-release" --config Release -j$(nproc)

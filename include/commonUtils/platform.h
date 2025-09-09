@@ -21,12 +21,18 @@
 // `__CYGWIN__` (using the base MSYS2 terminal) on Windows as they are on
 // `__gnu_linux__` on Linux.
 
+
+
+
+//  Refer:::    https://github.com/cpredef/predef?tab=readme-ov-file
+//    for macros across Standards, Compilers, libraries, Operating systems, Architectures
+
 #pragma once
 
 #define STRINGIZE2(s) #s
 #define STRINGIZE(s) STRINGIZE2(s)
 
-#pragma message(">>> Detecting your platform... <<<")
+#pragma message(">>>>>>>>> Detecting your platform... <<<<<<<<<")
 
 // Automatically defined by your compiler/OS/platform
 
@@ -49,6 +55,7 @@
 #endif
 #endif
 
+
 #ifdef linux
     #pragma message("OS based on the Linux kernel -> linux  :  Macro-Obsolete (it's not POSIX compliant)")
 #endif
@@ -60,24 +67,24 @@
 #endif
 
 #ifdef __GNU__
-    #pragma message("Compiling on __GNU__")
+    #pragma message("OS based on __GNU__")
 #endif
 #ifdef __gnu_linux__
-    #pragma message("Compiling on __gnu_linux__")
+    #pragma message("OS based on __gnu_linux__")
 #endif
 #ifdef __gnu_hurd__
-    #pragma message("Compiling on __gnu_hurd__")
+    #pragma message("OS based on __gnu_hurd__")
 #endif
 
 #ifdef __APPLE__
-    #pragma message("Apple-platform __APPLE__")
+    #pragma message("OS based on Apple-platform(MacOS) __APPLE__")
 #endif
 #ifdef __MACH__
-    #pragma message("MacOS __MACH__")
+    #pragma message("OS based on MacOS __MACH__")
 #endif
 #if defined(__APPLE__) && defined(__MACH__)
   #if defined(__clang_major__) && defined(__clang_minor__)
-      #pragma message("Compiling using Apple-Clang : __clang_major__(" STRINGIZE(__clang_major__) ").__clang_minor__(" STRINGIZE(__clang_minor__) ")" )
+      #pragma message("COMPILER is Apple-Clang : __clang_major__(" STRINGIZE(__clang_major__) ").__clang_minor__(" STRINGIZE(__clang_minor__) ")" )
   #endif
   #ifdef __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__
       #pragma message("__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ = " STRINGIZE(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__) )
@@ -89,48 +96,63 @@
 
 
 #ifdef WIN32
-    #pragma message("Compiling on WIN32")
+    #pragma message("OS based on WIN32")
 #endif
 #ifdef _WIN32
-    #pragma message("Compiling on _WIN32")
+    #pragma message("OS based on _WIN32")
 #endif
 #ifdef __WIN32
-    #pragma message("Compiling on __WIN32")
+    #pragma message("OS based on __WIN32")
 #endif
 #ifdef __WIN32__
-    #pragma message("Compiling on __WIN32__")
+    #pragma message("OS based on __WIN32__")
 #endif
 #ifdef WIN64
-    #pragma message("Compiling on WIN64")
+    #pragma message("OS based on WIN64")
 #endif
 #ifdef _WIN64
-    #pragma message("Compiling on _WIN64")
+    #pragma message("OS based on _WIN64")
 #endif
 #ifdef __WIN64
-    #pragma message("Compiling on __WIN64")
+    #pragma message("OS based on __WIN64")
 #endif
 #ifdef __WIN64__
-    #pragma message("Compiling on __WIN64__")
+    #pragma message("OS based on __WIN64__")
 #endif
 
 #ifdef __CYGWIN__
-    #pragma message("Compiling on __CYGWIN__")
+    #pragma message("Environment based on __CYGWIN__")
 #endif
 #ifdef __CYGWIN32__
-    #pragma message("Compiling on __CYGWIN32__")
-#endif
-#ifdef __MINGW32__
-    #pragma message("Compiling on __MINGW32__")
-#endif
-#ifdef __MINGW64__
-    #pragma message("Compiling on __MINGW64__")
+    #pragma message("Environment based on __CYGWIN32__")
 #endif
 #ifdef __MSYS__
-    #pragma message("Compiling on __MSYS__")
+    #pragma message("Environment based on __MSYS__")
+#endif
+
+
+#ifdef __MINGW32__
+    #pragma message("COMPILER toolchain(Windows OS) __MINGW32__")
+#endif
+#ifdef __MINGW64__
+    #pragma message("COMPILER toolchain(Windows OS) __MINGW64__")
 #endif
 #ifdef __GNUC__
-    #pragma message("Compiling on __GNUC__")
+    #pragma message("COMPILER based on __GNUC__ = " STRINGIZE(__GNUC__))
 #endif
+#ifdef __clang__
+    #pragma message("COMPILER based on __clang__")
+#endif
+#ifdef __llvm__
+    #pragma message("COMPILER(used by clang, target-independent optimizer and code generator) based on __llvm__")
+#endif
+#if defined(_MSC_VER)
+    #pragma message("COMPILER (Microsoft Visual C++) based on _MSC_VER = " STRINGIZE(_MSC_VER))
+#endif
+#if defined(_MSC_BUILD)
+    #pragma message("COMPILER (Microsoft Visual C++) based on _MSC_BUILD = " STRINGIZE(_MSC_BUILD))
+#endif
+
 
 // Custom `MSYSTEM_*` definitions added by me directly via CMakeLists.txt.
 // - This is based on the fact that possible `MSYSTEM` environment variable
@@ -177,27 +199,33 @@
 #endif
 
 
+#if defined(__cplusplus)
+	/* Language Standard */
+    #pragma message("Language Standard  -> __cplusplus = " STRINGIZE(__cplusplus))
+#endif
+
+
 //  Architectures
 //  https://sourceforge.net/p/predef/wiki/Architectures/
 
 // AMD64
 #ifdef __amd64__
-    #pragma message("architecture : __amd64__")
+    #pragma message("architecture(GNU C) : __amd64__")
 #endif
 #ifdef __amd64
-    #pragma message("architecture : __amd64")
+    #pragma message("architecture(GNU C) : __amd64")
 #endif
 #ifdef __x86_64__
-    #pragma message("architecture : __x86_64__")
+    #pragma message("architecture(GNU C) : __x86_64__")
 #endif
 #ifdef __x86_64
-    #pragma message("architecture : __x86_64")
+    #pragma message("architecture(GNU C) : __x86_64")
 #endif
 #ifdef _M_X64
-    #pragma message("architecture : _M_X64")
+    #pragma message("architecture(Visual C++) : _M_X64")
 #endif
 #ifdef _M_AMD64
-    #pragma message("architecture : _M_AMD64")
+    #pragma message("architecture(Visual C++) : _M_AMD64")
 #endif
 
 //  ARM
@@ -205,50 +233,52 @@
     #pragma message("architecture : __arm")
 #endif
 #ifdef __arm__
-    #pragma message("architecture : __arm__")
+    #pragma message("architecture(GNU C) : __arm__")
 #endif
 #ifdef _ARM
     #pragma message("architecture : _ARM")
 #endif
 #ifdef _M_ARM
-    #pragma message("architecture : _M_ARM = " STRINGIZE(_M_ARM) )
+    #pragma message("architecture(Visual C++) : _M_ARM = " STRINGIZE(_M_ARM) )
 #endif
 //  ARM64
 #ifdef __aarch64__
-    #pragma message("architecture : __aarch64__")
+    #pragma message("architecture(GNU C) : __aarch64__")
 #endif
-
+#ifdef _M_ARM64
+    #pragma message("architecture(Visual C++) : _M_ARM64")
+#endif
 
 // Intel x86
 #ifdef i386
-    #pragma message("architecture : i386")
+    #pragma message("architecture(GNU C) : i386")
 #endif
 #ifdef __i386
-    #pragma message("architecture : __i386")
+    #pragma message("architecture(GNU C) : __i386")
 #endif
 #ifdef __i386__
-    #pragma message("architecture : __i386__")
+    #pragma message("architecture(GNU C) : __i386__")
 #endif
 #ifdef __i486__
-    #pragma message("architecture : __i486__")
+    #pragma message("architecture(GNU C) : __i486__")
 #endif
 #ifdef __i586__
-    #pragma message("architecture : __i586__")
+    #pragma message("architecture(GNU C) : __i586__")
 #endif
 #ifdef __i686__
-    #pragma message("architecture : __i686__")
+    #pragma message("architecture(GNU C) : __i686__")
 #endif
 #ifdef _M_I86
-    #pragma message("architecture : _M_I86")
+    #pragma message("architecture(Visual C++) : _M_I86")
 #endif
 #ifdef _M_IX86
-    #pragma message("architecture : _M_IX86 = " STRINGIZE(_M_IX86) )
+    #pragma message("architecture(Visual C++) : _M_IX86 = " STRINGIZE(_M_IX86) )
 #endif
 #ifdef __X86__
     #pragma message("architecture : __X86__")
 #endif
 #ifdef _X86_
-    #pragma message("architecture : _X86_")
+    #pragma message("architecture(MinGW32) : _X86_")
 #endif
 #ifdef __I86__
     #pragma message("architecture : __I86__ = " STRINGIZE(__I86__) )
