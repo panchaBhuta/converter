@@ -60,12 +60,12 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
       - name: Get Version
-        run: uname -a && echo "------------" && cmake --version && echo "------------" && bash -c 'COMPILER="${{matrix.compiler}}"; if [ "${COMPILER}" == "default" ]; then COMPILER="clang"; fi; ${COMPILER}  -dM -E - < /dev/null | egrep -i "(apple|mach|gnu|clang|version|major|minor)"'
+        run: uname -a && echo "------------" && cmake --version && echo "------------" ; bash -c 'COMPILER="${{matrix.compiler}}"; if [ "${COMPILER}" == "default" ]; then COMPILER="clang"; fi; ${COMPILER}  -dM -E -xc /dev/null | egrep -i "(apple|mach|gnu|clang|llvm|linux|WIN|version|major|minor)"'
       - name: Check Generators
         # https://stackoverflow.com/questions/25941536/what-is-a-cmake-generator
         run: cmake --help
       - name: Compiler Macros Available
-        run: bash -c 'COMPILER="${{matrix.compiler}}"; if [ "${COMPILER}" == "default" ]; then COMPILER="clang"; fi; ${COMPILER}  -dM -E - < /dev/null'
+        run: bash -c 'COMPILER="${{matrix.compiler}}"; if [ "${COMPILER}" == "default" ]; then COMPILER="clang"; fi; ${COMPILER}  -dM -E -xc /dev/null'
       - name: Configure CMake (compiler=default) [Debug]
         if: matrix.compiler == 'default'
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON  -DCONVERTER_TEST_OS_VERSION=${{matrix.os}}

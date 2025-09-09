@@ -79,12 +79,12 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
       - name: Get Version
-        run: uname -a && echo "------------" && cmake --version && echo "------------" && $(${{matrix.toolset_compiler.rawCompiler}}  -dM -E - < NUL: | egrep -i "(apple|mach|gnu|clang|version|major|minor)")
+        run: uname -a && echo "------------" && cmake --version && echo "------------" ; ${{matrix.toolset_compiler.rawCompiler}}  -dM -E -xc NUL: | egrep -i "(apple|mach|gnu|clang|llvm|linux|WIN|version|major|minor)"
       - name: Check Generators
         # https://stackoverflow.com/questions/25941536/what-is-a-cmake-generator
         run: cmake --help
       - name: Compiler Macros Available
-        run: ${{matrix.toolset_compiler.rawCompiler}}  -dM -E - < NUL:
+        run: ${{matrix.toolset_compiler.rawCompiler}}  -dM -E -xc NUL:
       #- name: Check mingw64-binaries
         #run: ls -l /mnt/c/msys64/mingw64/bin && echo "##### 'whereis g++'" && whereis g++ && "##### 'g++ --version'" && g++ --version
         #run: echo "##### 'where g++'" && where g++
