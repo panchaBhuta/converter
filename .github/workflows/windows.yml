@@ -106,7 +106,7 @@ jobs:
         run: grep define "${{github.workspace}}/build-debug/include/converter/_workaroundConfig.h" | grep -v -e "^//" -e " e_[^ ]*_FEATURE "
       - name: Build compiler != g++ [Debug]
         if: matrix.toolset_compiler.compiler != 'g++'
-        run: cmake --build "${{github.workspace}}/build-debug" --config Debug -j$(nproc)   -- -m -nologo #-verbosity:quiet
+        run: cmake --build "${{github.workspace}}/build-debug" --config Debug -j$(nproc)   -- -m -nologo -verbosity -Wall
       - name: Build compiler == g++ [Debug]
         if: matrix.toolset_compiler.compiler == 'g++'
         run: cmake --build "${{github.workspace}}/build-debug" --config Debug -j$(nproc)
@@ -127,7 +127,7 @@ jobs:
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release  -T "${{matrix.toolset_compiler.compiler}}"
       - name: Build compiler != g++ [Release]
         if: matrix.toolset_compiler.compiler != 'g++'
-        run: cmake --build "${{github.workspace}}/build-release" --config Release -j$(nproc)   -- -m -nologo #-verbosity:quiet
+        run: cmake --build "${{github.workspace}}/build-release" --config Release -j$(nproc)   -- -m -nologo -verbosity -Wall
       - name: Build compiler == g++ [Release]
         if: matrix.toolset_compiler.compiler == 'g++'
         run: cmake --build "${{github.workspace}}/build-release" --config Release -j$(nproc)
