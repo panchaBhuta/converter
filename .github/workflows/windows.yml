@@ -45,11 +45,11 @@ jobs:
           # g++-13  == 'MSVC 19'
           # clang   == 'MSVC 19'
           # ClangCl == 'Clang 16'
-        toolset_compiler: [ { compiler: default, toolset: -1, cmdShell: bash, rawCompiler: msbuild },
-                            { compiler: ClangCl, toolset:  1, cmdShell: bash, rawCompiler: clang },
+        toolset_compiler: [ { compiler: default, toolset: -1, cmdShell: bash,        rawCompiler: msbuild.exe },      #  microsoft/setup-msbuild@v2
+                            { compiler: ClangCl, toolset:  1, cmdShell: bash,        rawCompiler: clang++ },          #  microsoft/setup-msbuild@v2
                             # https://github.com/ArchieAtkinson/CppTemplate
                             # https://github.com/scikit-build/scikit-build-core/blob/main/.github/workflows/ci.yml
-                            { compiler: g++,     toolset:  0, cmdShell: "msys2 {0}", rawCompiler: g++ } ]
+                            { compiler: g++,     toolset:  0, cmdShell: "msys2 {0}", rawCompiler: g++ } ]             #  msys2/setup-msys2@v2
         #include:
         #  - os: windows-2019
         #      # ClangCl == 'Clang 12'
@@ -61,10 +61,10 @@ jobs:
         shell: ${{matrix.toolset_compiler.cmdShell}}
     steps:
       - name: Setup msbuild
-        if: matrix.toolset_compiler.compiler != 'g++'
+        if: matrix.toolset_compiler.compiler != 'g++'    #  cmdShell: bash
         uses: microsoft/setup-msbuild@v2
       - name : Setup msys2
-        if: matrix.toolset_compiler.compiler == 'g++'
+        if: matrix.toolset_compiler.compiler == 'g++'    #  cmdShell: "msys2 {0}"
         uses: msys2/setup-msys2@v2
         with:
           msystem: UCRT64
@@ -74,8 +74,12 @@ jobs:
             base-devel git
           pacboy: >-
             python:p python-pip:p gcc:p cmake:p
-      - name: Compiler(s) Version
-        run: echo "g++ --version"; g++ --version; echo ""; echo "clang --version"; clang --version; echo "${{matrix.toolset_compiler.rawCompiler}} --version"; ${{matrix.toolset_compiler.rawCompiler}} --version
+      - name: Compiler Version  (compiler=default or clangCl)       ;   cmdShell: bash
+        if: matrix.toolset_compiler.compiler != 'g++'
+        run: echo "msbuild.exe --version"; msbuild.exe --version; echo ""; echo "clang++ --version"; clang++ --version;
+      - name: Compiler Version  (compiler=g++)   ;   cmdShell: "msys2 {0}"
+        if: matrix.toolset_compiler.compiler == 'g++'
+        run: echo "${{matrix.toolset_compiler.rawCompiler}} --version"; ${{matrix.toolset_compiler.rawCompiler}} --version
       - name: Checkout Repo
         uses: actions/checkout@v4
       - name: Get Version
@@ -103,7 +107,7 @@ jobs:
       - name: Configure CMake (compiler=g++) [Debug]
         if: matrix.toolset_compiler.toolset == 0
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=${{matrix.toolset_compiler.compiler}}
-      - name: Configure CMake (toolset_compiler=clang) [Debug]
+      - name: Configure CMake (toolset_compiler=clangCl) [Debug]
         # https://cmake.org/cmake/help/latest/guide/user-interaction/index.html
         if: matrix.toolset_compiler.toolset == 1
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug  -T "${{matrix.toolset_compiler.compiler}}"
@@ -125,10 +129,10 @@ jobs:
       - name: Configure CMake (compiler=default) [Release]
         if: matrix.toolset_compiler.compiler == 'default'
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release
-      - name: Configure CMake (compiler=${{matrix.toolset_compiler.compiler}}) [Release]
+      - name: Configure CMake (compiler=g++) [Release]
         if: matrix.toolset_compiler.toolset == 0
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=${{matrix.toolset_compiler.compiler}}
-      - name: Configure CMake (toolset_compiler=${{matrix.toolset_compiler.compiler}}) [Release]
+      - name: Configure CMake (toolset_compiler=clangCl) [Release]
         if: matrix.toolset_compiler.toolset == 1
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release  -T "${{matrix.toolset_compiler.compiler}}"
       - name: Build compiler != g++ [Release]

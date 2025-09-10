@@ -76,7 +76,7 @@ jobs:
     runs-on: ${{matrix.os}}
     steps:
       - name: Compiler(s) Version
-        run: echo "g++ --version"; g++ --version; echo ""; echo "clang++ --version"; clang++ --version; bash -c 'COMPILER="${{matrix.compiler}}"; if [ "${COMPILER}" == "default" ]; then COMPILER="g++"; fi; echo ""; echo "${COMPILER} --version"; ${COMPILER} --version'
+        run: echo "g++ --version"; g++ --version; echo ""; echo "clang++ --version"; clang++ --version; echo ""; bash -c 'COMPILER="${{matrix.compiler}}"; if [ "${COMPILER}" == "default" ]; then COMPILER="g++"; fi; echo ""; echo "${COMPILER} --version"; ${COMPILER} --version'
       - name: Checkout Repo
         uses: actions/checkout@v4
       - name: Get Version
