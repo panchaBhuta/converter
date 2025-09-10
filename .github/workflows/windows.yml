@@ -74,10 +74,10 @@ jobs:
             base-devel git
           pacboy: >-
             python:p python-pip:p gcc:p cmake:p
-      - name: Compiler Version  (compiler=default or clangCl)       ;   cmdShell: bash
+      - name: Compiler Version  (compiler=default or clangCl)    -   cmdShell( bash )
         if: matrix.toolset_compiler.compiler != 'g++'
         run: echo "msbuild.exe --version"; msbuild.exe --version; echo ""; echo "clang++ --version"; clang++ --version;
-      - name: Compiler Version  (compiler=g++)   ;   cmdShell: "msys2 {0}"
+      - name: Compiler Version  (compiler=g++)     -   cmdShell( "msys2 {0}" )
         if: matrix.toolset_compiler.compiler == 'g++'
         run: echo "${{matrix.toolset_compiler.rawCompiler}} --version"; ${{matrix.toolset_compiler.rawCompiler}} --version
       - name: Checkout Repo
