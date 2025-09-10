@@ -75,7 +75,7 @@ jobs:
             base-devel git
           pacboy: >-
             python:p python-pip:p gcc:p cmake:p
-      - name: Compiler Version  (compiler=default[msbuild.exe] and clangCl)    -   cmdShell( bash )
+      - name: Compiler Version  (compiler=default[msbuild.exe] OR clangCl)    -   cmdShell( bash )
         if: matrix.toolset_compiler.compiler != 'g++'
         run: echo "msbuild.exe --version"; msbuild.exe --version; echo ""; echo "clang++ --version"; clang++ --version;
       - name: Compiler Version  (compiler=g++)     -   cmdShell( "msys2 {0}" )
@@ -83,7 +83,11 @@ jobs:
         run: echo "${{matrix.toolset_compiler.rawCompiler}} --version"; ${{matrix.toolset_compiler.rawCompiler}} --version
       - name: Checkout Repo
         uses: actions/checkout@v4
-      - name: Get Version
+      - name: Get Version (compiler==default[msbuild.exe])
+        if: matrix.toolset_compiler.compiler == 'default'
+        run: uname -a && echo "------------" && cmake --version && echo "------------"
+      - name: Get Version (compiler=clangCl OR g++)
+        if: matrix.toolset_compiler.compiler != 'default'
         run: uname -a && echo "------------" && cmake --version && echo "------------"; ${{matrix.toolset_compiler.compilerMacros}} | egrep -i "(apple|mach|gnu|clang|llvm|linux|WIN|version|major|minor)"
       - name: Check Generators
         # https://stackoverflow.com/questions/25941536/what-is-a-cmake-generator
@@ -114,7 +118,7 @@ jobs:
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug  -T "${{matrix.toolset_compiler.compiler}}"
       - name: Check Work-Around-Flags
         run: grep define "${{github.workspace}}/build-debug/include/converter/_workaroundConfig.h" | grep -v -e "^//" -e " e_[^ ]*_FEATURE "
-      - name: Build compiler != g++ [Debug]
+      - name: Build compiler = msbuild.exe OR clangCl [Debug]
         if: matrix.toolset_compiler.compiler != 'g++'
         #  https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild-command-line-reference?view=vs-2022
         run: cmake --build "${{github.workspace}}/build-debug" --config Debug -j$(nproc)   -- -m -nologo -verbosity:normal
@@ -136,7 +140,7 @@ jobs:
       - name: Configure CMake (toolset_compiler=clangCl) [Release]
         if: matrix.toolset_compiler.toolset == 1
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release  -T "${{matrix.toolset_compiler.compiler}}"
-      - name: Build compiler != g++ [Release]
+      - name: Build compiler = msbuild.exe OR clangCl [Release]
         if: matrix.toolset_compiler.compiler != 'g++'
         run: cmake --build "${{github.workspace}}/build-release" --config Release -j$(nproc)   -- -m -nologo -verbosity:normal
       - name: Build compiler == g++ [Release]
