@@ -45,11 +45,11 @@ jobs:
           # g++-13  == 'MSVC 19'
           # clang   == 'MSVC 19'
           # ClangCl == 'Clang 16'
-        toolset_compiler: [ { compiler: default, toolset: -1, cmdShell: bash,        rawCompiler: msbuild.exe },      #  microsoft/setup-msbuild@v2
-                            { compiler: ClangCl, toolset:  1, cmdShell: bash,        rawCompiler: clang++ },          #  microsoft/setup-msbuild@v2
+        toolset_compiler: [ { compiler: default, toolset: -1, cmdShell: bash,        rawCompiler: msbuild.exe,  nullFile: "NUL:"      },      #  microsoft/setup-msbuild@v2
+                            { compiler: ClangCl, toolset:  1, cmdShell: bash,        rawCompiler: clang++,      nullFile: "/dev/null" },      #  microsoft/setup-msbuild@v2
                             # https://github.com/ArchieAtkinson/CppTemplate
                             # https://github.com/scikit-build/scikit-build-core/blob/main/.github/workflows/ci.yml
-                            { compiler: g++,     toolset:  0, cmdShell: "msys2 {0}", rawCompiler: g++ } ]             #  msys2/setup-msys2@v2
+                            { compiler: g++,     toolset:  0, cmdShell: "msys2 {0}", rawCompiler: g++,          nullFile: "/dev/null"  } ]    #  msys2/setup-msys2@v2
         #include:
         #  - os: windows-2019
         #      # ClangCl == 'Clang 12'
@@ -74,7 +74,7 @@ jobs:
             base-devel git
           pacboy: >-
             python:p python-pip:p gcc:p cmake:p
-      - name: Compiler Version  (compiler=default or clangCl)    -   cmdShell( bash )
+      - name: Compiler Version  (compiler=default[msbuild.exe] and clangCl)    -   cmdShell( bash )
         if: matrix.toolset_compiler.compiler != 'g++'
         run: echo "msbuild.exe --version"; msbuild.exe --version; echo ""; echo "clang++ --version"; clang++ --version;
       - name: Compiler Version  (compiler=g++)     -   cmdShell( "msys2 {0}" )
@@ -83,12 +83,12 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
       - name: Get Version
-        run: uname -a && echo "------------" && cmake --version && echo "------------"; ${{matrix.toolset_compiler.rawCompiler}}  -dM -E -xc /dev/null | egrep -i "(apple|mach|gnu|clang|llvm|linux|WIN|version|major|minor)"
+        run: uname -a && echo "------------" && cmake --version && echo "------------"; ${{matrix.toolset_compiler.rawCompiler}}  -dM -E -xc "${{matrix.toolset_compiler.nullFile}}" | egrep -i "(apple|mach|gnu|clang|llvm|linux|WIN|version|major|minor)"
       - name: Check Generators
         # https://stackoverflow.com/questions/25941536/what-is-a-cmake-generator
         run: cmake --help
       - name: Compiler Macros Available
-        run: ${{matrix.toolset_compiler.rawCompiler}}  -dM -E -xc "NUL:"
+        run: ${{matrix.toolset_compiler.rawCompiler}}  -dM -E -xc "${{matrix.toolset_compiler.nullFile}}"
       #- name: Check mingw64-binaries
         #run: ls -l /mnt/c/msys64/mingw64/bin && echo "##### 'whereis g++'" && whereis g++ && "##### 'g++ --version'" && g++ --version
         #run: echo "##### 'where g++'" && where g++
