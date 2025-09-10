@@ -83,7 +83,7 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
       - name: Get Version
-        run: uname -a && echo "------------" && cmake --version && echo "------------"; ${{matrix.toolset_compiler.rawCompiler}}  -dM -E -xc "${{matrix.toolset_compiler.nullFile}}" | egrep -i "(apple|mach|gnu|clang|llvm|linux|WIN|version|major|minor)"
+        run: uname -a && echo "------------" && cmake --version && echo "------------"; # ${{matrix.toolset_compiler.rawCompiler}}  -dM -E -xc "${{matrix.toolset_compiler.nullFile}}" | egrep -i "(apple|mach|gnu|clang|llvm|linux|WIN|version|major|minor)"
       - name: Check Generators
         # https://stackoverflow.com/questions/25941536/what-is-a-cmake-generator
         run: cmake --help
