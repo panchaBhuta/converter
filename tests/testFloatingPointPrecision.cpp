@@ -84,6 +84,7 @@ int main()
                                                  "1.1234568" };
     unittest::CHECKROUNDTRIP(float, "testFloatingPointPrecision-4", \
                  "1.123456789", 1.123456789f, expected_float_1d123456789[indexOS]);  // 6 digits
+
     std::string expected_double_2d1234567890123456789[] = { "2.1234567890123457",
 #if                 MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG   \
             ||      MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_CLANG   \
@@ -100,12 +101,16 @@ int main()
                  expected_double_2d1234567890123456789[indexOS]);   // 15 digits
 
     std::tuple<long double, std::string, int>  expected_longDouble_3d123456789012345678901[] = {
-#if           UBUNTU_ARRAY_IDX  ==  UBUNTU_ARM64
-                {3.1234567890123456789009999999999998574L, "3.123456789012345678901",
-                        std::numeric_limits<long double>::digits10},  //  = 33 on arm64 ???? That's strange
-#else //      UBUNTU_ARRAY_IDX  ==  UBUNTU_X86_64
-                {3.1234567890123456788878L, "3.1234567890123456789",
-                        std::numeric_limits<long double>::digits10},  // 18 default
+#ifdef          USE_VALGRIND
+                  {3.12345678901234569124767403991L, "3.12345678901234569", 16},
+#else
+  #if           UBUNTU_ARRAY_IDX  ==  UBUNTU_ARM64
+                  {3.1234567890123456789009999999999998574L, "3.123456789012345678901",
+                          std::numeric_limits<long double>::digits10},  //  = 33 on arm64 ???? That's strange
+  #else //      UBUNTU_ARRAY_IDX  ==  UBUNTU_X86_64
+                  {3.1234567890123456788878L, "3.1234567890123456789",
+                          std::numeric_limits<long double>::digits10},  // 18 default
+  #endif
 #endif
 
 #if           MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_CLANG    \
@@ -134,17 +139,22 @@ int main()
 #endif
                                                           };
     unittest::checkRoundTripConversion_txt2Val2txt<long double>("testFloatingPointPrecision-6",
-                "3.123456789012345678901",
-                std::get<0>(expected_longDouble_3d123456789012345678901[indexOS]),
-                std::get<1>(expected_longDouble_3d123456789012345678901[indexOS]),
+                "3.123456789012345678901",                                             // strInput
+                std::get<0>(expected_longDouble_3d123456789012345678901[indexOS]),     // valExpected
+                std::get<1>(expected_longDouble_3d123456789012345678901[indexOS]),     // strRoundtripExpected
                 __FILE__, __LINE__,
-                std::get<2>(expected_longDouble_3d123456789012345678901[indexOS]));
+                std::get<2>(expected_longDouble_3d123456789012345678901[indexOS]));    // decimalPrecision
 
 
     unittest::CHECKROUNDTRIP(double, "testFloatingPointPrecision-7",          \
                 "9007199254740993", 9007199254740993.0, "9007199254740992");
                                                    //    "9007199254740993"
-    std::string expected_longDouble_9007199254740993[] = { "9007199254740993",
+    std::string expected_longDouble_9007199254740993[] = {
+#ifdef              USE_VALGRIND
+                                                         "9007199254740992",
+#else
+                                                         "9007199254740993",
+#endif
 #if                 MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_CLANG    \
       ||            MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_GNU      \
       ||            MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_CLANG
@@ -157,7 +167,7 @@ int main()
                                                            "9007199254740992" }; // Windows
     unittest::checkRoundTripConversion_txt2Val2txt<long double>("testFloatingPointPrecision-8",
                 "9007199254740993",
-#ifdef              BUILD_ENV_MSYS2_GNU
+#if defined(BUILD_ENV_MSYS2_GNU) || defined(USE_VALGRIND)
                    // On Windows : MSYS2 env : GNU compiler
                    //  9007199254740993.0L is stays same                 9007199254740993, but ...
                    // "9007199254740993" is converted to (string -> FP)  9007199254740992
@@ -222,7 +232,12 @@ int main()
                 __FILE__, __LINE__,
                 ((indexOS==1)?7:std::numeric_limits<double>::digits10) ); // macOS
 
-    std::string expected_longdouble_5d3123412en38[] = { "5.3123412e-38",
+    std::string expected_longdouble_5d3123412en38[] = {
+#ifdef              USE_VALGRIND
+                                                        "5.3123412000000003544e-38",
+#else
+                                                        "5.3123412e-38",  // linux
+#endif
 #if                 MACH_MACOS_ARRAY_IDX  ==  MACH_PRE_MACOS14_CLANG
                                                         "5.3123412000000000001e-38",
 #elif               MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_CLANG  \
@@ -240,7 +255,7 @@ int main()
 #endif
                                                        };
     unittest::checkRoundTripConversion_txt2Val2txt<long double>("testFloatingPointPrecision-13",
-                "5.3123412e-38",
+               "5.3123412e-38",
 #ifdef              BUILD_ENV_MSYS2_GNU
                 5.3123412000000003544036E-38L,  // Windows (MSYS2) : BIG RED FLAG here
 #else

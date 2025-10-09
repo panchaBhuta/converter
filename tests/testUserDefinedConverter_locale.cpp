@@ -157,12 +157,16 @@ int main()
             std::numeric_limits<double>::digits10, ',', '.');
 
     std::string expected_longDouble_3d123456789012345678901[] = {
-#if                 UBUNTU_ARRAY_IDX  ==  UBUNTU_ARM64
-                                                                  "3,12345678901234567890099999999999986",  // 33 arm64
-                                                                // 3,12345678901234567890099999999999
-                                                                //                       12345678901234567890
-#else //            UBUNTU_ARRAY_IDX  ==  UBUNTU_X86_64
-                                                                  "3,12345678901234567889",   // 18 default
+#ifdef              USE_VALGRIND
+                                                                  "3,12345678901234569125",
+#else
+  #if                 UBUNTU_ARRAY_IDX  ==  UBUNTU_ARM64
+                                                                    "3,12345678901234567890099999999999986",  // 33 arm64
+                                                                  // 3,12345678901234567890099999999999
+                                                                  //                       12345678901234567890
+  #else //            UBUNTU_ARRAY_IDX  ==  UBUNTU_X86_64
+                                                                    "3,12345678901234567889",   // 18 default
+  #endif
 #endif
 #if                 MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_CLANG   \
           ||        MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_CLANG
@@ -203,7 +207,12 @@ int main()
             __FILE__, __LINE__,
             std::numeric_limits<double>::digits10, ',', '.');
 
-    std::string expected_longDouble_9007199254740993[] = { "9.007.199.254.740.993", // Ubuntu
+    std::string expected_longDouble_9007199254740993[] = {
+#ifdef          USE_VALGRIND
+                                                           "9.007.199.254.740.992",
+#else
+                                                           "9.007.199.254.740.993", // Ubuntu
+#endif
 #if                 MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_CLANG
                                                            "9007199254740992",      // MacOS
 #elif               MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_CLANG

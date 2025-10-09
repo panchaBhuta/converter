@@ -145,7 +145,12 @@ int main()
             __FILE__, __LINE__,
             getLowerDecimalPrecision<double>());
 
-    std::string expected_longDouble_9007199254740993[] = { "9007199254740993",
+    std::string expected_longDouble_9007199254740993[] = { 
+#ifdef              USE_VALGRIND
+                                                         "9007199254740992",
+#else
+                                                         "9007199254740993",
+#endif
 #if                 MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_CLANG    \
       ||            MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS14_ARM_GNU      \
       ||            MACH_MACOS_ARRAY_IDX  ==  MACH_MACOS15_ARM_CLANG
@@ -166,7 +171,7 @@ int main()
           <long double, converter::ConvertFromStr<long double>, ConvertFromVal_lDP<long double>>
           ( "testUserDefinedConverter_lowerPrecision-8",
             "9007199254740993",
-#ifdef              BUILD_ENV_MSYS2_GNU
+#if defined(BUILD_ENV_MSYS2_GNU) || defined(USE_VALGRIND)
               // On Windows : MSYS2 env : GNU compiler
               //  9007199254740993.0L is stays same                 9007199254740993, but ...
               // "9007199254740993" is converted to (string -> FP)  9007199254740992

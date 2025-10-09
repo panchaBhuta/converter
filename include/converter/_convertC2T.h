@@ -87,24 +87,19 @@ namespace converter
         " : 'T pConvertFromStr_POS_Cargs<T>::_toVal_args(const std::string& str, std::size_t* pos, auto format_args)'";
       if (ec == std::errc()) {
         return result;
-      } else if (ec == std::errc::invalid_argument) {
-        static const std::string errMsg = std::make_error_code(std::errc::invalid_argument).message() + funcName;
-        static const std::invalid_argument err(errMsg);
-        //std::cerr << errMsg << " :: str[" << str << "]" << std::endl;
-        CONVERTER_DEBUG_LOG( errMsg << "  str = '" << str << "'");
-        throw err;
-      } else if (ec == std::errc::result_out_of_range) {
-        static const std::string errMsg = std::make_error_code(std::errc::result_out_of_range).message() + funcName;
-        static const std::out_of_range err(errMsg);
-        //std::cerr << errMsg << " :: str[" << str << "]" << std::endl;
-        CONVERTER_DEBUG_LOG( errMsg << "  str = '" << str << "'");
-        throw err;
       } else {
-        static const std::string errMsg = std::make_error_code(ec).message() + funcName;
-        static const std::runtime_error err(errMsg);
+        const std::string errMsg = std::make_error_code(ec).message() + funcName;
         //std::cerr << errMsg << " :: str[" << str << "]" << std::endl;
         CONVERTER_DEBUG_LOG( errMsg << "  str = '" << str << "'");
-        throw err;
+        switch(ec)
+        {
+        case std::errc::invalid_argument:
+          throw std::invalid_argument(errMsg);
+        case std::errc::result_out_of_range:
+          throw std::out_of_range(errMsg);
+        default:
+          throw std::runtime_error(errMsg);
+        }
       }
     }
   };

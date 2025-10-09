@@ -76,12 +76,11 @@ namespace converter
          ) {
         return std::string(str.data(), pos);
       } else {
-        static const std::string funcName(" : 'std::string pConvertFromVal<T>::_toStr_args(const T& val, auto... format_args)'");
-        static const std::string errMsg = std::make_error_code(ec).message() + funcName;
-        static const std::runtime_error err(errMsg);
+        const std::string errMsg = std::make_error_code(ec).message() 
+                  + " : 'std::string pConvertFromVal<T>::_toStr_args(const T& val, auto... format_args)'";
         //std::cerr << errMsg << " :: T[" << val << "]" << std::endl;
         CONVERTER_DEBUG_LOG( errMsg ); //<< "  val = '" << val << "'");
-        throw err;
+        throw std::runtime_error(errMsg);
       }
     }
   };
