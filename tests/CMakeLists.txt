@@ -38,12 +38,10 @@ macro(add_unit_test testname)
     #            $<$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang>:COMPILING_CXX_WITH_CLANG>
     #            $<$<COMPILE_LANG_AND_ID:CXX,Intel>:COMPILING_CXX_WITH_INTEL>)
 
-    target_link_libraries(${testname} PRIVATE converter  # donot specify PUBLIC here,
+    target_link_libraries(${testname} converter) # donot specify PUBLIC here,
     # executable ${testname} has to have transitive association to all its dependencies(aka library chain)
     # refer   https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#target-usage-requirements
     # refer   https://cmake.org/cmake/help/latest/command/target_link_libraries.html#libraries-for-a-target-and-or-its-dependents
-                $<$<LINK_LANG_AND_ID:CXX,Clang,AppleClang>:libCXX_Clang>
-                $<$<LINK_LANG_AND_ID:CXX,Intel>:libCXX_Intel>)
 
     if(CMAKE_BUILD_TYPE MATCHES "Coverage")
       #refer   https://github.com/bilke/cmake-modules/blob/master/CodeCoverage.cmake
@@ -85,13 +83,10 @@ macro(add_perf_test testname)
     #            $<$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang>:COMPILING_CXX_WITH_CLANG>
     #            $<$<COMPILE_LANG_AND_ID:CXX,Intel>:COMPILING_CXX_WITH_INTEL>)
 
-    target_link_libraries(${testname} converter   # donot specify PUBLIC here,
+    target_link_libraries(${testname} converter)   # donot specify PUBLIC here,
     # executable ${testname} has to have transitive association to all its dependencies(aka library chain)
     # refer   https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#target-usage-requirements
     # refer   https://cmake.org/cmake/help/latest/command/target_link_libraries.html#libraries-for-a-target-and-or-its-dependents
-                $<$<LINK_LANG_AND_ID:CXX,Clang,AppleClang>:libCXX_Clang>
-                $<$<LINK_LANG_AND_ID:CXX,Intel>:libCXX_Intel>)
-
   endif()
 endmacro(add_perf_test)
 
