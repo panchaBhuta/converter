@@ -226,7 +226,7 @@ macro(check_chrono_stream_functionality)
         #  add_subdirectory(${${DATELIB}_SOURCE_DIR} ${${DATELIB}_BINARY_DIR} EXCLUDE_FROM_ALL)
         endif()
         #]==================]
-        ########## datelib start  ###############
+        ########## datelib end  ###############
 
         if(NOT COMPILE_RESULT_CHRONO_FROMSTREAM)
             try_compile(COMPILE_RESULT_DATE_FROMSTREAM
@@ -738,7 +738,7 @@ function(converter_install_logic)
         # with a target are included in the export.
         #]==================================================================================]
         install(TARGETS         converter
-                                #${DATELIB} donot add
+                                #${DATELIB}      donot add :  causes error when sourcing from local directory, difficult to debug
             EXPORT              ${targets_export_name}
                 FILE_SET        converter_headers
                 DESTINATION     ${CMAKE_INSTALL_INCLUDEDIR}
@@ -776,7 +776,7 @@ function(converter_install_logic)
         # Export targets or packages for outside projects to use them
         # directly from the current project's build tree, without installation.
         export(TARGETS converter
-                       ${DATELIB} # works even when commented
+                       #${DATELIB}      donot add : causes error when sourcing from github, in consumer projects(not in this project)
             NAMESPACE  converter::
             FILE       ${targets_export_name}.cmake)         # as per date/CMakeLists.txt
 
