@@ -481,7 +481,6 @@ namespace converter
 
     static const int template_uid = -6;
 
-    // TODO unit tests
     /**
      * @brief   Converts bool value to string.
      * @param   val                 input bool value.
@@ -516,7 +515,6 @@ namespace converter
 
     static constexpr const char* const compositeTemplate_uid = "variant_userDefinedFormat";
 
-    // TODO unit tests
     /**
      * @brief   Converts `variant<T, string>` value to string.
      *          If input variant has T then 'T->S' conversion is applied,

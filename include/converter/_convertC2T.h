@@ -124,7 +124,6 @@ namespace converter
 
     static const int template_uid = 102;
 
-    // TODO unit tests
     /**
      * @brief   Converts string holding a integer represenation to integer datatype.
      * @param   str                 input string.

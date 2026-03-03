@@ -13,6 +13,32 @@ if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.10)
 endif()
 
 
+function(get_macro_value HEADER_PATH MACRO_NAME RESULT_VAR)
+    # 1. Check if file exists first to avoid errors
+    if(NOT EXISTS "${HEADER_PATH}")
+        message(WARNING "Header file not found: ${HEADER_PATH}")
+        set(${RESULT_VAR} "NOTFOUND" PARENT_SCOPE)
+        return()
+    endif()
+
+    # 2. Search for the line containing the #define
+    # This regex looks for: #define <MACRO_NAME> <VALUE>
+    file(STRINGS "${HEADER_PATH}" MACRO_LINE 
+         REGEX "^#define[ \t]+${MACRO_NAME}[ \t]+")
+
+    if(MACRO_LINE)
+        # 3. Extract the value part specifically
+        # We replace the entire line with just the captured group ([^ \t\r\n]+)
+        string(REGEX REPLACE "^#define[ \t]+${MACRO_NAME}[ \t]+([^ \t\r\n]+).*" "\\1" 
+               VALUE "${MACRO_LINE}")
+        
+        set(${RESULT_VAR} "${VALUE}" PARENT_SCOPE)
+    else()
+        set(${RESULT_VAR} "NOTFOUND" PARENT_SCOPE)
+    endif()
+endfunction()
+
+
 
 
 function(converter_cmake_variables_config)
@@ -131,16 +157,85 @@ macro(converter_set_cxx_standard)
     #set(CMAKE_CXX_EXTENSIONS OFF)
 endmacro()
 
+function(fetch_DATELIB)
+    include( FetchContent )
+    FetchContent_Declare( ${DATELIB}
+                          GIT_REPOSITORY https://github.com/HowardHinnant/date.git
+                          GIT_TAG        v3.0.4) # adjust tag/branch/commit as needed
+    FetchContent_MakeAvailable(${DATELIB})
+
+    #[==================[
+    FetchContent_GetProperties( date ) #${DATELIB})
+    if(NOT ${DATELIB}_POPULATED)
+      FetchContent_Populate(${DATELIB})
+    #  add_subdirectory(${${DATELIB}_SOURCE_DIR} ${${DATELIB}_BINARY_DIR} EXCLUDE_FROM_ALL)
+    endif()
+    #]==================]
+endfunction()
 
 #    Check if chrono-lib stream conversion is supported
-macro(check_chrono_stream_functionality)
-    set(USE_CHRONO_FROMSTREAM_1 ${e_ENABLE_FEATURE})
-    set(USE_DATE_FROMSTREAM_2   ${e_DISABLE_FEATURE})
-    set(USE_JUGAAD_FROMSTREAM_3 ${e_DISABLE_FEATURE})
+function(check_chrono_stream_functionality)
+    get_macro_value( ${CMAKE_CURRENT_BINARY_DIR}/include/converter/_workaroundConfig.h
+                    "USE_CHRONO_FROMSTREAM_1"
+                     USE_CHRONO_FROMSTREAM_1)
+    message(STATUS "previous-build check for USE_CHRONO_FROMSTREAM_1 : ${USE_CHRONO_FROMSTREAM_1}")
 
-    set(USE_CHRONO_TOSTREAM_1   ${e_ENABLE_FEATURE})
-    set(USE_DATE_TOSTREAM_2     ${e_DISABLE_FEATURE})
-    set(USE_JUGAAD_TOSTREAM_3   ${e_DISABLE_FEATURE})
+    get_macro_value( ${CMAKE_CURRENT_BINARY_DIR}/include/converter/_workaroundConfig.h
+                    "USE_DATE_FROMSTREAM_2"
+                     USE_DATE_FROMSTREAM_2)
+    message(STATUS "previous-build check for USE_DATE_FROMSTREAM_2 : ${USE_DATE_FROMSTREAM_2}")
+
+    get_macro_value( ${CMAKE_CURRENT_BINARY_DIR}/include/converter/_workaroundConfig.h
+                    "USE_JUGAAD_FROMSTREAM_3"
+                     USE_JUGAAD_FROMSTREAM_3)
+    message(STATUS "previous-build check for USE_JUGAAD_FROMSTREAM_3 : ${USE_JUGAAD_FROMSTREAM_3}")
+
+    get_macro_value( ${CMAKE_CURRENT_BINARY_DIR}/include/converter/_workaroundConfig.h
+                    "USE_CHRONO_TOSTREAM_1"
+                     USE_CHRONO_TOSTREAM_1)
+    message(STATUS "previous-build check for USE_CHRONO_TOSTREAM_1 : ${USE_CHRONO_TOSTREAM_1}")
+
+    get_macro_value( ${CMAKE_CURRENT_BINARY_DIR}/include/converter/_workaroundConfig.h
+                    "USE_DATE_TOSTREAM_2"
+                     USE_DATE_TOSTREAM_2)
+    message(STATUS "previous-build check for USE_DATE_TOSTREAM_2 : ${USE_DATE_TOSTREAM_2}")
+
+    get_macro_value( ${CMAKE_CURRENT_BINARY_DIR}/include/converter/_workaroundConfig.h
+                    "USE_JUGAAD_TOSTREAM_3"
+                     USE_JUGAAD_TOSTREAM_3)
+    message(STATUS "previous-build check for USE_JUGAAD_TOSTREAM_3 : ${USE_JUGAAD_TOSTREAM_3}")
+
+    if(   (NOT USE_CHRONO_FROMSTREAM_1 STREQUAL "NOTFOUND") AND
+          (NOT USE_DATE_FROMSTREAM_2   STREQUAL "NOTFOUND") AND
+          (NOT USE_JUGAAD_FROMSTREAM_3 STREQUAL "NOTFOUND") AND
+          (NOT USE_CHRONO_TOSTREAM_1 STREQUAL "NOTFOUND") AND
+          (NOT USE_DATE_TOSTREAM_2   STREQUAL "NOTFOUND") AND
+          (NOT USE_JUGAAD_TOSTREAM_3 STREQUAL "NOTFOUND")   )
+        set(USE_CHRONO_FROMSTREAM_1 ${USE_CHRONO_FROMSTREAM_1} PARENT_SCOPE)
+        set(USE_DATE_FROMSTREAM_2   ${USE_DATE_FROMSTREAM_2}   PARENT_SCOPE)
+        set(USE_JUGAAD_FROMSTREAM_3 ${USE_JUGAAD_FROMSTREAM_3} PARENT_SCOPE)
+
+        set(USE_CHRONO_TOSTREAM_1   ${USE_CHRONO_TOSTREAM_1} PARENT_SCOPE)
+        set(USE_DATE_TOSTREAM_2     ${USE_DATE_TOSTREAM_2}   PARENT_SCOPE)
+        set(USE_JUGAAD_TOSTREAM_3   ${USE_JUGAAD_TOSTREAM_3} PARENT_SCOPE)
+
+        if( USE_DATE_FROMSTREAM_2 OR USE_DATE_TOSTREAM_2 )
+            set(DATELIB "date")  # local-variable
+            set(DATELIB ${DATELIB} PARENT_SCOPE)  # propagate to parent scope
+            message(STATUS "Using DATE_TIME-lib : <date/date.h> as per previous build checks USE_DATE_FROMSTREAM_2=${USE_DATE_FROMSTREAM_2} ; USE_DATE_TOSTREAM_2=${USE_DATE_TOSTREAM_2}")
+
+            fetch_DATELIB()
+        endif()
+        return()
+    endif()
+
+    set(USE_CHRONO_FROMSTREAM_1 ${e_ENABLE_FEATURE} PARENT_SCOPE)
+    set(USE_DATE_FROMSTREAM_2   ${e_DISABLE_FEATURE} PARENT_SCOPE)
+    set(USE_JUGAAD_FROMSTREAM_3 ${e_DISABLE_FEATURE} PARENT_SCOPE)
+
+    set(USE_CHRONO_TOSTREAM_1   ${e_ENABLE_FEATURE} PARENT_SCOPE)
+    set(USE_DATE_TOSTREAM_2     ${e_DISABLE_FEATURE} PARENT_SCOPE)
+    set(USE_JUGAAD_TOSTREAM_3   ${e_DISABLE_FEATURE} PARENT_SCOPE)
 
 
     # Platform check variables
@@ -169,9 +264,9 @@ macro(check_chrono_stream_functionality)
         message(STATUS "checkChrono_fromStream[std::chrono::from_stream()] ++SUCCESS++")
         message(STATUS "checkChrono_fromStream[date::from_stream()] __SKIPPED__")
         message(STATUS "checkChrono_fromStream[jugaad::from_stream()] __SKIPPED__")
-        set(USE_CHRONO_FROMSTREAM_1 ${e_ENABLE_FEATURE})
-        set(USE_DATE_FROMSTREAM_2   ${e_DISABLE_FEATURE})
-        set(USE_JUGAAD_FROMSTREAM_3 ${e_DISABLE_FEATURE})
+        set(USE_CHRONO_FROMSTREAM_1 ${e_ENABLE_FEATURE} PARENT_SCOPE)
+        set(USE_DATE_FROMSTREAM_2   ${e_DISABLE_FEATURE} PARENT_SCOPE)
+        set(USE_JUGAAD_FROMSTREAM_3 ${e_DISABLE_FEATURE} PARENT_SCOPE)
     else()
         message(STATUS "checkChrono_fromStream[std::chrono::from_stream()] --FAILED--")
     endif()
@@ -194,9 +289,9 @@ macro(check_chrono_stream_functionality)
         message(STATUS "checkChrono_toStream[oss<<std::vformat()] ++SUCCESS++")
         message(STATUS "checkChrono_toStream[date::to_stream()] __SKIPPED__")
         message(STATUS "checkChrono_toStream[jugaad::to_stream()] __SKIPPED__")
-        set(USE_CHRONO_TOSTREAM_1 ${e_ENABLE_FEATURE})
-        set(USE_DATE_TOSTREAM_2   ${e_DISABLE_FEATURE})
-        set(USE_JUGAAD_TOSTREAM_3 ${e_DISABLE_FEATURE})
+        set(USE_CHRONO_TOSTREAM_1 ${e_ENABLE_FEATURE} PARENT_SCOPE)
+        set(USE_DATE_TOSTREAM_2   ${e_DISABLE_FEATURE} PARENT_SCOPE)
+        set(USE_JUGAAD_TOSTREAM_3 ${e_DISABLE_FEATURE} PARENT_SCOPE)
     else()
         message(STATUS "checkChrono_toStream[oss<<std::vformat()] --FAILED--")
     endif()
@@ -208,24 +303,9 @@ macro(check_chrono_stream_functionality)
     if((NOT COMPILE_RESULT_CHRONO_FROMSTREAM)   OR   (NOT COMPILE_RESULT_CHRONO_TOSTREAM))
         ########## datelib start  ###############
         set(DATELIB "date")  # local-variable
-        # https://stackoverflow.com/questions/29892929/variables-set-with-parent-scope-are-empty-in-the-corresponding-child-scope-why
-        #set(DATELIB ${DATELIB} PARENT_SCOPE)  # global-variable
-        set_target_properties(converter PROPERTIES DATELIB ${DATELIB})  # global-variable
         message(STATUS "checking with DATE_TIME-lib : <${DATELIB}>")
 
-        include( FetchContent )
-        FetchContent_Declare( ${DATELIB}
-                              GIT_REPOSITORY https://github.com/HowardHinnant/date.git
-                              GIT_TAG        v3.0.4) # adjust tag/branch/commit as needed
-        FetchContent_MakeAvailable(${DATELIB})
-
-        #[==================[
-        FetchContent_GetProperties( date ) #${DATELIB})
-        if(NOT ${DATELIB}_POPULATED)
-          FetchContent_Populate(${DATELIB})
-        #  add_subdirectory(${${DATELIB}_SOURCE_DIR} ${${DATELIB}_BINARY_DIR} EXCLUDE_FROM_ALL)
-        endif()
-        #]==================]
+        fetch_DATELIB()
         ########## datelib end  ###############
 
         if(NOT COMPILE_RESULT_CHRONO_FROMSTREAM)
@@ -249,16 +329,16 @@ macro(check_chrono_stream_functionality)
                 # ubuntu, mac - clang
                 message(STATUS "checkChrono_fromStream[date::from_stream()] ++SUCCESS++")
                 message(STATUS "checkChrono_fromStream[jugaad::from_stream()] __SKIPPED__")
-                set(USE_CHRONO_FROMSTREAM_1 ${e_DISABLE_FEATURE})
-                set(USE_DATE_FROMSTREAM_2   ${e_ENABLE_FEATURE})
-                set(USE_JUGAAD_FROMSTREAM_3 ${e_DISABLE_FEATURE})
+                set(USE_CHRONO_FROMSTREAM_1 ${e_DISABLE_FEATURE} PARENT_SCOPE)
+                set(USE_DATE_FROMSTREAM_2   ${e_ENABLE_FEATURE} PARENT_SCOPE)
+                set(USE_JUGAAD_FROMSTREAM_3 ${e_DISABLE_FEATURE} PARENT_SCOPE)
             else()
                 message(STATUS "checkChrono_fromStream[date::from_stream()] --FAILED--")
                 message(STATUS "checkChrono_fromStream[jugaad::from_stream()] ##ENABLED##")
                 message(STATUS "WARNING: The jugaad-conversion enabled handles a limited sub-set of date-format specifiers.")
-                set(USE_CHRONO_FROMSTREAM_1 ${e_DISABLE_FEATURE})
-                set(USE_DATE_FROMSTREAM_2   ${e_DISABLE_FEATURE})
-                set(USE_JUGAAD_FROMSTREAM_3 ${e_ENABLE_FEATURE})
+                set(USE_CHRONO_FROMSTREAM_1 ${e_DISABLE_FEATURE} PARENT_SCOPE)
+                set(USE_DATE_FROMSTREAM_2   ${e_DISABLE_FEATURE} PARENT_SCOPE)
+                set(USE_JUGAAD_FROMSTREAM_3 ${e_ENABLE_FEATURE} PARENT_SCOPE)
             endif()
         endif()
 
@@ -281,27 +361,25 @@ macro(check_chrono_stream_functionality)
                 # ubuntu, mac - clang
                 message(STATUS "checkChrono_toStream[date::to_stream()] ++SUCCESS++")
                 message(STATUS "checkChrono_toStream[jugaad::to_stream()] __SKIPPED__")
-                set(USE_CHRONO_TOSTREAM_1 ${e_DISABLE_FEATURE})
-                set(USE_DATE_TOSTREAM_2   ${e_ENABLE_FEATURE})
-                set(USE_JUGAAD_TOSTREAM_3 ${e_DISABLE_FEATURE})
+                set(USE_CHRONO_TOSTREAM_1 ${e_DISABLE_FEATURE} PARENT_SCOPE)
+                set(USE_DATE_TOSTREAM_2   ${e_ENABLE_FEATURE} PARENT_SCOPE)
+                set(USE_JUGAAD_TOSTREAM_3 ${e_DISABLE_FEATURE} PARENT_SCOPE)
             else()
                 # msvc
                 message(STATUS "checkChrono_toStream[date::to_stream()] --FAILED--")
                 message(STATUS "checkChrono_toStream[jugaad::to_stream()] ##ENABLED##")
                 message(STATUS "WARNING: The jugaad-conversion enabled handles a limited sub-set of date-format specifiers.")
-                set(USE_CHRONO_TOSTREAM_1 ${e_DISABLE_FEATURE})
-                set(USE_DATE_TOSTREAM_2   ${e_DISABLE_FEATURE})
-                set(USE_JUGAAD_TOSTREAM_3 ${e_ENABLE_FEATURE})
+                set(USE_CHRONO_TOSTREAM_1 ${e_DISABLE_FEATURE} PARENT_SCOPE)
+                set(USE_DATE_TOSTREAM_2   ${e_DISABLE_FEATURE} PARENT_SCOPE)
+                set(USE_JUGAAD_TOSTREAM_3 ${e_ENABLE_FEATURE} PARENT_SCOPE)
             endif()
         endif()
 
         if(COMPILE_RESULT_DATE_FROMSTREAM   OR   COMPILE_RESULT_DATE_TOSTREAM)
             message(STATUS "Using DATE_TIME-lib : <date/date.h>")
+            set(DATELIB ${DATELIB} PARENT_SCOPE)  # propagate to parent scope
         else()
-            unset(DATELIB) # local-variable
-            if(INSTALL_INTERFACE)
-                unset(DATELIB PARENT_SCOPE) # global-variable
-            endif()
+            unset(DATELIB PARENT_SCOPE)  # propagate to parent scope
         endif()
 
         if(USE_JUGAAD_FROMSTREAM_3   OR   USE_JUGAAD_TOSTREAM_3)
@@ -310,22 +388,39 @@ macro(check_chrono_stream_functionality)
     endif()
 
     #[==[   uncomment for testing purpose :: enabled JUGAAD
-                set(USE_CHRONO_FROMSTREAM_1 ${e_DISABLE_FEATURE})
-                set(USE_DATE_FROMSTREAM_2   ${e_DISABLE_FEATURE})
-                set(USE_JUGAAD_FROMSTREAM_3 ${e_ENABLE_FEATURE})
-                set(USE_CHRONO_TOSTREAM_1 ${e_DISABLE_FEATURE})
-                set(USE_DATE_TOSTREAM_2   ${e_DISABLE_FEATURE})
-                set(USE_JUGAAD_TOSTREAM_3 ${e_ENABLE_FEATURE})
+                set(USE_CHRONO_FROMSTREAM_1 ${e_DISABLE_FEATURE} PARENT_SCOPE)
+                set(USE_DATE_FROMSTREAM_2   ${e_DISABLE_FEATURE} PARENT_SCOPE)
+                set(USE_JUGAAD_FROMSTREAM_3 ${e_ENABLE_FEATURE} PARENT_SCOPE)
+                set(USE_CHRONO_TOSTREAM_1   ${e_DISABLE_FEATURE} PARENT_SCOPE)
+                set(USE_DATE_TOSTREAM_2     ${e_DISABLE_FEATURE} PARENT_SCOPE)
+                set(USE_JUGAAD_TOSTREAM_3   ${e_ENABLE_FEATURE} PARENT_SCOPE)
     #]==]
 
-endmacro()
+endfunction()
 
 
 # Failure to compile std::u16string from libstdc++ 12.1 in c++20 mode #55560 
 # https://github.com/llvm/llvm-project/issues/55560
-macro(check_clang_string_workaround)  # NOTE setters should be in 'macro' and NOT in 'function'
-    set(USE_CLANG_STRING_WORKS_1       ${e_ENABLE_FEATURE})
-    set(USE_CLANG_STRING_WORKAROUND_2  ${e_DISABLE_FEATURE})
+function(check_clang_string_workaround)
+    get_macro_value( ${CMAKE_CURRENT_BINARY_DIR}/include/converter/_workaroundConfig.h
+                    "USE_CLANG_STRING_WORKS_1"
+                     USE_CLANG_STRING_WORKS_1)
+    message(STATUS "previous-build check for USE_CLANG_STRING_WORKS_1 : ${USE_CLANG_STRING_WORKS_1}")
+
+    get_macro_value( ${CMAKE_CURRENT_BINARY_DIR}/include/converter/_workaroundConfig.h
+                    "USE_CLANG_STRING_WORKAROUND_2"
+                     USE_CLANG_STRING_WORKAROUND_2)
+    message(STATUS "previous-build check for USE_CLANG_STRING_WORKAROUND_2 : ${USE_CLANG_STRING_WORKAROUND_2}")
+
+    if(   (NOT USE_CLANG_STRING_WORKS_1       STREQUAL "NOTFOUND") AND
+          (NOT USE_CLANG_STRING_WORKAROUND_2  STREQUAL "NOTFOUND")  )
+        set(USE_CLANG_STRING_WORKS_1      ${USE_CLANG_STRING_WORKS_1}      PARENT_SCOPE)
+        set(USE_CLANG_STRING_WORKAROUND_2 ${USE_CLANG_STRING_WORKAROUND_2} PARENT_SCOPE)
+        return()
+    endif()
+
+    set(USE_CLANG_STRING_WORKS_1       ${e_ENABLE_FEATURE} PARENT_SCOPE)
+    set(USE_CLANG_STRING_WORKAROUND_2  ${e_DISABLE_FEATURE} PARENT_SCOPE)
 
     if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
         try_compile(COMPILE_RESULT_CLANG_STRING_DEFAULT
@@ -344,8 +439,8 @@ macro(check_clang_string_workaround)  # NOTE setters should be in 'macro' and NO
         if(COMPILE_RESULT_CLANG_STRING_DEFAULT)
             message(STATUS "check_clang_string :: default mode ++SUCCESS++")
             message(STATUS "check_clang_string :: workaround   __SKIPPED__")
-            set(USE_CLANG_STRING_WORKS_1       ${e_ENABLE_FEATURE})
-            set(USE_CLANG_STRING_WORKAROUND_2  ${e_DISABLE_FEATURE})
+            set(USE_CLANG_STRING_WORKS_1       ${e_ENABLE_FEATURE} PARENT_SCOPE)
+            set(USE_CLANG_STRING_WORKAROUND_2  ${e_DISABLE_FEATURE} PARENT_SCOPE)
         else()
             message(STATUS "check_clang_string :: default mode --FAILED--")
 
@@ -364,24 +459,43 @@ macro(check_clang_string_workaround)  # NOTE setters should be in 'macro' and NO
 
             if(COMPILE_RESULT_CLANG_STRING_WORKAROUND)
                 message(STATUS "check_clang_string :: workaround ++SUCCESS++")
-                set(USE_CLANG_STRING_WORKS_1       ${e_DISABLE_FEATURE})
-                set(USE_CLANG_STRING_WORKAROUND_2  ${e_ENABLE_FEATURE})
+                set(USE_CLANG_STRING_WORKS_1       ${e_DISABLE_FEATURE} PARENT_SCOPE)
+                set(USE_CLANG_STRING_WORKAROUND_2  ${e_ENABLE_FEATURE} PARENT_SCOPE)
             else()
                 message(STATUS "check_clang_string :: workaround --FAILED--")
-                set(USE_CLANG_STRING_WORKS_1       ${e_DISABLE_FEATURE})
-                set(USE_CLANG_STRING_WORKAROUND_2  ${e_DISABLE_FEATURE})
+                set(USE_CLANG_STRING_WORKS_1       ${e_DISABLE_FEATURE} PARENT_SCOPE)
+                set(USE_CLANG_STRING_WORKAROUND_2  ${e_DISABLE_FEATURE} PARENT_SCOPE)
             endif()
         endif()
 
     else()
         message(STATUS "NON Clang compiler, default settings for USE_CLANG_STRING_")
     endif()
-endmacro()
+endfunction()
 
 # check if compiler supports "elementary string conversions" for floating-point types
 # https://en.cppreference.com/w/cpp/compiler_support/17#C.2B.2B17_library_features
-macro(check_floatingPoint_elementaryStringConversions)
-    set(USE_FLOATINGPOINT_FROM_CHARS_1  ${e_ENABLE_FEATURE})
+function(check_floatingPoint_elementaryStringConversions)
+    get_macro_value( ${CMAKE_CURRENT_BINARY_DIR}/include/converter/_workaroundConfig.h
+                    "USE_FLOATINGPOINT_FROM_CHARS_1"
+                     USE_FLOATINGPOINT_FROM_CHARS_1)
+    message(STATUS "previous-build check for USE_FLOATINGPOINT_FROM_CHARS_1 : ${USE_FLOATINGPOINT_FROM_CHARS_1}")
+
+    get_macro_value( ${CMAKE_CURRENT_BINARY_DIR}/include/converter/_workaroundConfig.h
+                    "USE_FLOATINGPOINT_TO_CHARS_1"
+                     USE_FLOATINGPOINT_TO_CHARS_1)
+    message(STATUS "previous-build check for USE_FLOATINGPOINT_TO_CHARS_1 : ${USE_FLOATINGPOINT_TO_CHARS_1}")
+
+    if(   (NOT USE_FLOATINGPOINT_FROM_CHARS_1  STREQUAL "NOTFOUND") AND
+          (NOT USE_FLOATINGPOINT_TO_CHARS_1    STREQUAL "NOTFOUND")  )
+        set(USE_FLOATINGPOINT_FROM_CHARS_1  ${USE_FLOATINGPOINT_FROM_CHARS_1}  PARENT_SCOPE)
+        set(USE_FLOATINGPOINT_TO_CHARS_1    ${USE_FLOATINGPOINT_TO_CHARS_1}    PARENT_SCOPE)
+        return()
+    endif()
+
+    set(USE_FLOATINGPOINT_FROM_CHARS_1  ${e_ENABLE_FEATURE} PARENT_SCOPE)
+    set(USE_FLOATINGPOINT_TO_CHARS_1    ${e_ENABLE_FEATURE} PARENT_SCOPE)
+
     try_compile(COMPILE_FLOATINGPOINT_FROM_CHARS
                 SOURCE_FROM_FILE    check_floatingPoint_fromChars.cpp
                                     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/check_floatingPoint_fromChars.cpp"
@@ -402,7 +516,6 @@ macro(check_floatingPoint_elementaryStringConversions)
     endif()
 
 
-    set(USE_FLOATINGPOINT_TO_CHARS_1  ${e_ENABLE_FEATURE})
     try_compile(COMPILE_FLOATINGPOINT_TO_CHARS
                 SOURCE_FROM_FILE    check_floatingPoint_toChars.cpp
                                     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/check_floatingPoint_toChars.cpp"
@@ -425,21 +538,31 @@ macro(check_floatingPoint_elementaryStringConversions)
     if(COMPILE_FLOATINGPOINT_FROM_CHARS AND COMPILE_FLOATINGPOINT_TO_CHARS)
         message(STATUS "floatingPoint_fromChars algo ::  default-ENABLED")
         message(STATUS "floatingPoint_toChars algo ::  default-ENABLED")
-        set(USE_FLOATINGPOINT_FROM_CHARS_1   ${e_ENABLE_FEATURE})
-        set(USE_FLOATINGPOINT_TO_CHARS_1   ${e_ENABLE_FEATURE})
+        set(USE_FLOATINGPOINT_FROM_CHARS_1   ${e_ENABLE_FEATURE} PARENT_SCOPE)
+        set(USE_FLOATINGPOINT_TO_CHARS_1     ${e_ENABLE_FEATURE} PARENT_SCOPE)
     else()
         message(STATUS "WARNING :: floatingPoint_fromChars algo ::  workaround-enabled")
         message(STATUS "WARNING :: floatingPoint_toChars algo ::  workaround-enabled")
-        set(USE_FLOATINGPOINT_FROM_CHARS_1   ${e_DISABLE_FEATURE})
-        set(USE_FLOATINGPOINT_TO_CHARS_1   ${e_DISABLE_FEATURE})
+        set(USE_FLOATINGPOINT_FROM_CHARS_1   ${e_DISABLE_FEATURE} PARENT_SCOPE)
+        set(USE_FLOATINGPOINT_TO_CHARS_1     ${e_DISABLE_FEATURE} PARENT_SCOPE)
     endif()
     #[===[  for testing purpose
-        set(USE_FLOATINGPOINT_FROM_CHARS_1   ${e_DISABLE_FEATURE})
-        set(USE_FLOATINGPOINT_TO_CHARS_1     ${e_DISABLE_FEATURE})
+        set(USE_FLOATINGPOINT_FROM_CHARS_1   ${e_DISABLE_FEATURE} PARENT_SCOPE)
+        set(USE_FLOATINGPOINT_TO_CHARS_1     ${e_DISABLE_FEATURE} PARENT_SCOPE)
     #]===]
-endmacro()
+endfunction()
 
-macro(check_three_way_comparison)
+function(check_three_way_comparison)
+    get_macro_value( ${CMAKE_CURRENT_BINARY_DIR}/include/converter/_workaroundConfig.h
+                    "USE_THREE_WAY_COMPARISON"
+                     USE_THREE_WAY_COMPARISON)
+    message(STATUS "previous-build check for USE_THREE_WAY_COMPARISON : ${USE_THREE_WAY_COMPARISON}")
+
+    if(NOT USE_THREE_WAY_COMPARISON STREQUAL "NOTFOUND")
+        set(USE_THREE_WAY_COMPARISON ${USE_THREE_WAY_COMPARISON} PARENT_SCOPE)
+        return()
+    endif()
+
     try_compile(COMPILE_RESULT_THREE_WAY_COMPARISON
                 SOURCE_FROM_FILE    check_three_way_comparison.cpp
                                     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/check_three_way_comparison.cpp"
@@ -451,16 +574,16 @@ macro(check_three_way_comparison)
 
     if(COMPILE_RESULT_THREE_WAY_COMPARISON)
         message(STATUS "THREE-WAY COMPARISON SUPPORTED")
-        set(USE_THREE_WAY_COMPARISON ${e_ENABLE_FEATURE})
+        set(USE_THREE_WAY_COMPARISON ${e_ENABLE_FEATURE} PARENT_SCOPE)
     else()
         # AppleClang-14 doesnot support "<=>" operator
         message(STATUS "WARNING :: THREE-WAY COMPARISON  NOT  supported !!!")
-        set(USE_THREE_WAY_COMPARISON ${e_DISABLE_FEATURE})
+        set(USE_THREE_WAY_COMPARISON ${e_DISABLE_FEATURE} PARENT_SCOPE)
     endif()
     #[===[  for testing purpose
-        set(USE_THREE_WAY_COMPARISON ${e_ENABLE_FEATURE})
+    set(USE_THREE_WAY_COMPARISON ${e_ENABLE_FEATURE})
     #]===]
-endmacro()
+endfunction()
 
 #[===========[
   Check if compiler supports '-fmacro-prefix-map=old=new'  option
@@ -511,9 +634,9 @@ macro(converter_enable_warnings)
     set(gcc_warnings "${gcc_warnings};-Wunreachable-code;-Wundef;-Wuninitialized;-Wold-style-cast;-Wwrite-strings")
     set(gcc_warnings "${gcc_warnings};-Wsign-conversion;-Weffc++")
     if(CMAKE_SYSTEM_NAME  EQUAL LINUX   AND   CMAKE_CXX_COMPILER_ID EQUAL Clang )
-      if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 13.0 OR CMAKE_CXX_COMPILER_VERSION VERSION_LESS 16.0)
-        set(gcc_warnings "${gcc_warnings};-Wno-defaulted-function-deleted")
-      endif()
+        if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 13.0 OR CMAKE_CXX_COMPILER_VERSION VERSION_LESS 16.0)
+            set(gcc_warnings "${gcc_warnings};-Wno-defaulted-function-deleted")
+        endif()
     endif()
 
     # https://cmake.org/cmake/help/v3.27/manual/cmake-generator-expressions.7.html
@@ -542,9 +665,14 @@ endmacro()
 
 # Helper function to configure, include, compile, link, build
 macro(converter_build)
-    configure_file(
-        ${CMAKE_CURRENT_SOURCE_DIR}/cmake/_workaroundConfig.h.in
-        ${CMAKE_CURRENT_BINARY_DIR}/include/converter/_workaroundConfig.h)
+    if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/include/converter/_workaroundConfig.h)
+        message(STATUS "Config file exists: ${CMAKE_CURRENT_BINARY_DIR}/include/converter/_workaroundConfig.h")
+    else()
+        message(STATUS "creating Config file: ${CMAKE_CURRENT_BINARY_DIR}/include/converter/_workaroundConfig.h")
+        configure_file(
+            ${CMAKE_CURRENT_SOURCE_DIR}/cmake/_workaroundConfig.h.in
+            ${CMAKE_CURRENT_BINARY_DIR}/include/converter/_workaroundConfig.h)
+    endif()
 
     #[==================================================================================[
     # refer https://cmake.org/cmake/help/v3.27/manual/cmake-buildsystem.7.html

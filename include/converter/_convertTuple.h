@@ -158,7 +158,6 @@ namespace converter
      */
     using return_type = typename std::tuple<typename t_S2Tconv_c<T_C>::return_type ...>;
 
-    // TODO unit test
     /**
      * @brief   Converts comma-seperated string to a 'tuple'.
      *          The input string has the format "ele0,ele1,ele2...".
@@ -192,7 +191,6 @@ namespace converter
   template< typename ... T_C >
   struct ConvertFromTuple
   {
-    // TODO unit test
     /**
      * @brief   Converts variable holding 'tuple' value to string.
      *          The output string has the format "ele0,ele1,ele2...".

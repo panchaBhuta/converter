@@ -419,7 +419,6 @@ namespace converter
 
     static const int template_uid = 2;
 
-    // TODO unit tests
     /**
      * @brief   Converts string holding a integer represenation to integer datatype.
      * @param   str                 input string.
@@ -526,7 +525,6 @@ namespace converter
 
     static const int template_uid = 3;
 
-    // TODO unit tests
     /**
      * @brief   Converts string holding a floating-number represenation to floating datatype.
      * @param   str                 input string.
@@ -645,7 +643,6 @@ namespace converter
 
     static const int template_uid = 5;
 
-    // TODO unit tests
     /**
      * @brief   Converts string holding char value.
      * @param   str                 input string.
@@ -690,7 +687,6 @@ namespace converter
 
     static const int template_uid = 6;
 
-    // TODO unit tests
     /**
      * @brief   Converts string holding bool value.
      * @param   str                 input string.
@@ -728,6 +724,7 @@ namespace converter
     using return_type = typename std::invoke_result_t< decltype(CONV_S2T),
                                                        const std::string& >;
 
+    // TODO unit tests
     inline static return_type
     ToVal(const std::string& str)
     {

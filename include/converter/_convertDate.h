@@ -147,7 +147,6 @@ namespace converter
       }
     }
 
-    // TODO unit tests
     /**
      * @brief   Converts string holding 'year_month_day' value. The string has the format "%F" -> "%Y-%m-%d"
      * @param   str                 input string representing date.
@@ -570,7 +569,6 @@ namespace converter
       return ToStr_args( val, T2S_FORMAT_YMD::ymdFormat); // %F -> "%Y-%m-%d"
     }
 
-    // TODO unit tests
     /**
      * @brief   Converts variable holding 'year_month_day' value to string. The string has the format "%F" -> "%Y-%m-%d"
      * @param   val                 input 'year_month_day'.
