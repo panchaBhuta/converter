@@ -52,8 +52,9 @@ namespace unittest
     std::cout.setf(std::ios::left, std::ios::adjustfield);
     std::cout << std::setprecision(30); //decimalPrecision + 20);
     std::cout << "#############  testID = " << testID << std::endl;
-    std::cout << "decimalPrecision = " << decimalPrecision<< " : std::numeric_limits<"
-              << getTypeName<T>() << ">::digits10 = " << std::numeric_limits<T>::digits10 << std::endl;
+    std::cout << "decimalPrecision = " << decimalPrecision << " ?==? std::numeric_limits<"
+              << getTypeName<T>() << ">::digits10 = " << std::numeric_limits<T>::digits10 << " :: "
+              << (decimalPrecision==std::numeric_limits<T>::digits10 ? " (matches)" : " (WARNING ::: does not match)") << std::endl;
     std::cout << "          strInput = ";
     std::cout.width(33);
     std::cout << strInput << std::endl;
@@ -197,6 +198,9 @@ namespace unittest
   {
     const T valStrConv = TConvertFromStr::ToVal(strInput);
     const std::string strRoundtripActual = TConvertFromVal::ToStr(valStrConv);
+    std::cout << "#############  testID = " << testID << "   Locale-conversion" << std::endl;
+    std::cout << "strInput = " << strInput << " -> " << " valStrConv = " << valStrConv;
+    std::cout << " -> strRoundtripActual = " << strRoundtripActual << std::endl;
     checkRoundTrip_txt2Val2txt<T>(testID, strInput, valStrConv, valExpected,
           strRoundtripActual, strRoundtripExpected, filePath, lineNo,
           decimalPrecision, decimalSeperator, currencySeperator, stringent_check);

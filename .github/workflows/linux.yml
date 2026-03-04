@@ -39,6 +39,9 @@ jobs:
         # https://github.com/actions/runner-images#available-images
         # https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories  (os-labels : ubuntu-22.04)
         # https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software-for-github-owned-images
+        # for ARM refer below
+        # https://github.com/actions/partner-runner-images
+        # https://github.com/actions/partner-runner-images/blob/main/images/arm-ubuntu-24-image.md
         os: [ ubuntu-24.04, ubuntu-22.04, ubuntu-24.04-arm, ubuntu-22.04-arm ]  #  ubuntu-latest  ==  ubuntu-24.04
         #  https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2204-Readme.md#installed-software
           #  GNU C++: 9.5.0, 10.5.0, 11.4.0, 12.3.0, 13.1.0
