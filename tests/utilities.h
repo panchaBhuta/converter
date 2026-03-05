@@ -37,6 +37,13 @@ namespace unittest
   template<>
   inline std::string getTypeName<long double>() { return "long_double"; }
 
+  class EndFunction
+  {
+    const std::string _testID;
+  public:
+    EndFunction(const std::string& testID) : _testID(testID) {}
+    ~EndFunction() { std::cout << "#############  end of testID = " << _testID << std::endl; }
+  };
 
   template<c_floating_point T>
   void checkRoundTrip_txt2Val2txt( const std::string& testID,
@@ -49,8 +56,11 @@ namespace unittest
               char decimalSeperator = '.', char currencySeperator = '_',
               bool stringent_check = true)
   {
+    EndFunction endFunction(testID);
+
     std::cout.setf(std::ios::left, std::ios::adjustfield);
     std::cout << std::setprecision(30); //decimalPrecision + 20);
+
     std::cout << "#############  testID = " << testID << std::endl;
     std::cout << "decimalPrecision = " << decimalPrecision << " ?==? std::numeric_limits<"
               << getTypeName<T>() << ">::digits10 = " << std::numeric_limits<T>::digits10 << " :: "
@@ -172,7 +182,7 @@ namespace unittest
       ossConv << std::setprecision(30); //std::numeric_limits<T>::digits10 + 20);
       ossConv << valStrConv;
 
-      std::cout << testID << " :: WARNING :: roundtrip conversion value does not match for type=" << getTypeName<T>() << " ..." << std::endl;
+      std::cout << testID << "####### WARNING :: roundtrip conversion value does not match for type=" << getTypeName<T>() << " ..." << std::endl;
       //std::cout << "      input-text{" << strRoundtripExpected      << "} -> valStrConv{" << ossConv.str() << "}" << std::endl;
       //std::cout << "         valStrConv{" << ossConv.str() << "} -> roundtrip-text{" << strRoundtripActual << "}" << std::endl;
       //std::cout << "      input-text{" << strRoundtripExpected << "} != roundtrip-text{" << strRoundtripActual << "}" << std::endl;
@@ -201,6 +211,7 @@ namespace unittest
     std::cout << "#############  testID = " << testID << "   Locale-conversion" << std::endl;
     std::cout << "strInput = " << strInput << " -> " << " valStrConv = " << valStrConv;
     std::cout << " -> strRoundtripActual = " << strRoundtripActual << std::endl;
+std::cout << "std::numeric_limits<" << getTypeName<T>() << ">::digits10=" << std::numeric_limits<long double>::digits10 << std::endl;
     checkRoundTrip_txt2Val2txt<T>(testID, strInput, valStrConv, valExpected,
           strRoundtripActual, strRoundtripExpected, filePath, lineNo,
           decimalPrecision, decimalSeperator, currencySeperator, stringent_check);

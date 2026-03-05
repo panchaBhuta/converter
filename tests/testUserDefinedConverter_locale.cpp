@@ -178,6 +178,8 @@ int main()
                                                                   "3,12345678901234567889",
 #endif
                                                                   "3,12345678901234569" };  // Windows
+
+std::cout << "std::numeric_limits<long double>::digits10=" << std::numeric_limits<long double>::digits10 << std::endl;
     unittest::checkRoundTripConversion_txt2Val2txt
           <long double, ConvertFromStr_loc<long double>, ConvertFromVal_loc<long double>>
           ( "testUserDefinedConverter_locale-6",
@@ -185,11 +187,13 @@ int main()
             expected_longDouble_3d123456789012345678901[indexOS],
             __FILE__, __LINE__,
                  (indexOS==2?17:  // windows
-#if                 UBUNTU_ARRAY_IDX  ==  UBUNTU_ARM64
-                  20  // overriding 33
-#else //            UBUNTU_ARRAY_IDX  ==  UBUNTU_X86_64 and all MACOS
-                  std::numeric_limits<long double>::digits10
+                    (indexOS==1?13:  // MACOS
+#if                   UBUNTU_ARRAY_IDX  ==  UBUNTU_ARM64
+                        20  // overriding 33
+#else //              UBUNTU_ARRAY_IDX  ==  UBUNTU_X86_64
+                        std::numeric_limits<long double>::digits10
 #endif
+                    )
                  ), ',', '.');
 
     std::string expected_double_9007199254740993[] = { "9.007.199.254.740.992", //    "9.007.199.254.740.993"
