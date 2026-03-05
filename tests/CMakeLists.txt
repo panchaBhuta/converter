@@ -104,7 +104,7 @@ add_unit_test(testIntegerNaN)
 
 add_unit_test(testFloatingPointPrecision)
 add_unit_test(testUserDefinedConverter_lowerPrecision)
-add_unit_test(testUserDefinedConverter_locale)
+add_unit_test(testUserDefinedConverter_LOCALE)
 add_unit_test(testFloatingPointLocale)
 
 add_unit_test(testDateConversions)

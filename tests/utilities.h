@@ -42,7 +42,7 @@ namespace unittest
     const std::string _testID;
   public:
     EndFunction(const std::string& testID) : _testID(testID) {}
-    ~EndFunction() { std::cout << "#############  end of testID = " << _testID << std::endl; }
+    ~EndFunction() { std::cout << "----------  end of testID = " << _testID << std::endl; }
   };
 
   template<c_floating_point T>
@@ -208,10 +208,9 @@ namespace unittest
   {
     const T valStrConv = TConvertFromStr::ToVal(strInput);
     const std::string strRoundtripActual = TConvertFromVal::ToStr(valStrConv);
-    std::cout << "#############  testID = " << testID << "   Locale-conversion" << std::endl;
+    std::cout << "#############  testID = " << testID << "   str->val->str" << std::endl;
     std::cout << "strInput = " << strInput << " -> " << " valStrConv = " << valStrConv;
     std::cout << " -> strRoundtripActual = " << strRoundtripActual << std::endl;
-std::cout << "std::numeric_limits<" << getTypeName<T>() << ">::digits10=" << std::numeric_limits<long double>::digits10 << std::endl;
     checkRoundTrip_txt2Val2txt<T>(testID, strInput, valStrConv, valExpected,
           strRoundtripActual, strRoundtripExpected, filePath, lineNo,
           decimalPrecision, decimalSeperator, currencySeperator, stringent_check);
