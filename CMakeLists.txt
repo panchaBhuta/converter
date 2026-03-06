@@ -89,8 +89,18 @@ message(STATUS "OPTION_CONVERTER_debug_log=${OPTION_CONVERTER_debug_log}")
 # option(OPTION_CONVERTER_debug_log  "Set to ON for debugging logs"   "$<AND:$<CONFIG:Debug>,$<CONVERTER_STANDALONE_PROJECT>>")
 #]===========]
 
+message(STATUS "is CONVERTER_STANDALONE_PROJECT=${CONVERTER_STANDALONE_PROJECT}")
 if (CONVERTER_STANDALONE_PROJECT)
     converter_set_cxx_standard()
+endif()
+
+# Ensure CMAKE_CXX_STANDARD is at least 17
+if (CMAKE_CXX_STANDARD LESS 17)
+    set(PREVIOUS_CXX_STANDARD ${CMAKE_CXX_STANDARD})
+    set(CMAKE_CXX_STANDARD 17)
+    message(STATUS "CMAKE_CXX_STANDARD adjusted to 17 (was ${PREVIOUS_CXX_STANDARD})")
+else()
+    message(STATUS "CMAKE_CXX_STANDARD is ${CMAKE_CXX_STANDARD} (meets minimum requirement of 17)")
 endif()
 
 

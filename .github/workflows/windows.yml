@@ -31,6 +31,7 @@ jobs:
       fail-fast: false
       matrix:
         # https://github.com/actions/runner-images#available-images
+        # https://github.com/actions/runner-images/tree/main/images/windows
         # https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories  (os-labels : windows-2022)
         # https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software-for-github-owned-images
         #   os: [windows-2025, windows-2022]  #  windows-latest  ==  windows-2022

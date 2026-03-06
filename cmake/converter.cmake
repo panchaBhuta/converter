@@ -154,13 +154,6 @@ macro(converter_set_cxx_standard)
         set(CMAKE_CXX_STANDARD 20)
     endif()
 
-    # Ensure CMAKE_CXX_STANDARD is at least 17
-    if (CMAKE_CXX_STANDARD LESS 17)
-        set(PREVIOUS_CXX_STANDARD ${CMAKE_CXX_STANDARD})
-        set(CMAKE_CXX_STANDARD 17)
-        message(STATUS "CMAKE_CXX_STANDARD adjusted to 17 (was ${PREVIOUS_CXX_STANDARD})")
-    endif()
-
     #set(CMAKE_CXX_EXTENSIONS OFF)
 endmacro()
 
