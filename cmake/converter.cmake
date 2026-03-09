@@ -148,10 +148,20 @@ macro(converter_set_cxx_standard)
     #              CONVERTER_CXX_STANDARD might be set on command line
     #              while invoking cmake !
     if (CONVERTER_CXX_STANDARD)
+        message(STATUS "CONVERTER_CXX_STANDARD=${CONVERTER_CXX_STANDARD}")
         set(CMAKE_CXX_STANDARD ${CONVERTER_CXX_STANDARD})
     else()
         #  --std=gnu++2a
         set(CMAKE_CXX_STANDARD 20)
+    endif()
+
+    # Ensure CMAKE_CXX_STANDARD is at least 20
+    if (CMAKE_CXX_STANDARD LESS 20)
+        set(PREVIOUS_CXX_STANDARD ${CMAKE_CXX_STANDARD})
+        set(CMAKE_CXX_STANDARD 20)
+        message(STATUS "CMAKE_CXX_STANDARD adjusted to 20 (was ${PREVIOUS_CXX_STANDARD})")
+    else()
+        message(STATUS "CMAKE_CXX_STANDARD is ${CMAKE_CXX_STANDARD} (meets minimum requirement of 20)")
     endif()
 
     #set(CMAKE_CXX_EXTENSIONS OFF)

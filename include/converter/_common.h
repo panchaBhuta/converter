@@ -4,7 +4,7 @@
  * URL:      https://github.com/panchaBhuta/converter
  * Version:  v1.0
  *
- * Copyright (c) 2023-2023 Gautam Dhar
+ * Copyright (c) 2023-2026 Gautam Dhar
  * All rights reserved.
  *
  * converter is distributed under the BSD 3-Clause license, see LICENSE for details.
@@ -12,6 +12,10 @@
  */
 
 #pragma once
+
+#include <charconv>
+#include <type_traits>
+
 
 /*
  *  NUMERIC_LOCALE : Number locales are specific settings for the 1000 separators and decimals.
@@ -21,7 +25,31 @@
  */
 namespace converter
 {
+  template <typename T>
+  struct always_false : std::false_type {};
+
   // [=============================================================[   common helpers
+  // [=========[  concept :  is std::from_chars supported
+  template<typename T>
+  concept c_isFromCharsEnable = requires(const char* first, const char* last, T& value) {
+      { std::from_chars(first, last, value) } -> std::same_as<std::from_chars_result>;
+      // https://en.cppreference.com/w/cpp/utility/from_chars.html
+  };
+
+
+  template <typename T, typename = void>
+  struct has_from_chars : std::false_type {};
+  template <typename T>
+  struct has_from_chars<T, std::void_t<
+    decltype(std::from_chars(
+        std::declval<const char*>(),
+        std::declval<const char*>(),
+        std::declval<T&>()
+    ))
+  >> : std::true_type {};
+  // ]=========]  concept :  is std::from_chars supported
+
+
   // [=========[  concept :  char-types
   //  refer https://www.codeproject.com/Articles/5348002/A-History-of-C-and-Cplusplus-Character-Data-Types
   template <typename T>
@@ -51,7 +79,7 @@ namespace converter
        /*
         *  C++20 introduces a new character type specifically for UTF-8 encoded character data: char8_t.
         *  It has the same size and sign as unsigned char but is distinct from it.
-        * 
+        *
         *  The upcoming C standard (probably C23) includes a proposal for char8_t, which is a typedef to unsigned char.
         */
   template <>
@@ -114,7 +142,7 @@ namespace converter
   concept c_integral = std::is_integral_v<T>;
 
 
-  // [=========[  concept : integer-types 
+  // [=========[  concept : integer-types
   // std::integral is true for 'bool' and 'char'.
   // Conversion for 'bool' and 'char' is different from other 'integral-s'.
   // Hence need for a 'concept' to segregate from 'bool' and 'char'
@@ -133,7 +161,7 @@ namespace converter
   // ]=========]  concept : integer-types
 
 
-  // [=========[  concept : floating_point-types 
+  // [=========[  concept : floating_point-types
   // Going with the flow, and just wrapping up floating_point
   template<typename T>
   concept c_floating_point = std::is_floating_point_v<T>;
@@ -145,7 +173,7 @@ namespace converter
 
   /*
    * Refer : https://stackoverflow.com/questions/18118408/what-is-the-difference-between-quiet-nan-and-signaling-nan
-   * 
+   *
    * Generally, the purpose of a signaling NaN (sNaN) is for debugging. For example, floating-point objects might be
    * initialized to sNaN. Then, if the program fails to one of them a value before using it, an exception will occur
    * when the program uses the sNaN in an arithmetic operation. A program will not produce an sNaN inadvertently;
@@ -157,7 +185,7 @@ namespace converter
 
   /*
    * Refer : https://stackoverflow.com/questions/18118408/what-is-the-difference-between-quiet-nan-and-signaling-nan
-   * 
+   *
    * In contrast, quiet NaN are for more normal programming. They can be produced by normal operations when there is no
    * numerical result (e.g., taking the square root of a negative number when the result must be real). Their purpose
    * is generally to allow arithmetic to proceed somewhat normally. E.g., you might have a huge array of numbers,
@@ -216,7 +244,7 @@ namespace converter
   template <typename ...Args>
   struct InferValueType<std::variant<Args...>> {
     using value_type = typename std::tuple_element_t< 0,
-                                                      std::tuple<Args...>  // 
+                                                      std::tuple<Args...>  //
                                                     >;
   };
   */

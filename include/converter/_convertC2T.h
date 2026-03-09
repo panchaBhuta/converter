@@ -4,7 +4,7 @@
  * URL:      https://github.com/panchaBhuta/converter
  * Version:  v1.0
  *
- * Copyright (c) 2023-2023 Gautam Dhar
+ * Copyright (c) 2023-2026 Gautam Dhar
  * All rights reserved.
  *
  * converter is distributed under the BSD 3-Clause license, see LICENSE for details.
@@ -13,12 +13,13 @@
 
 #pragma once
 
-#include <charconv>
+#include <type_traits>
+#include <cstdlib>
 #include <iterator>
 #include <stdexcept>
 #include <system_error>
 #include <string>
-	
+
 
 #include <converter/_common.h>
 
@@ -56,7 +57,7 @@ namespace converter
 
 
   // [=============================================================[ ConvertFromStr
- 
+
   /*
    * This a helper internal class, not meant to be called by upstream users.
    */
@@ -67,11 +68,16 @@ namespace converter
 
     /*
      * Function wrapper to query if the complete input string was read during conversion.
+     * Only compiles if T is a type for which 'std::from_chars' is supported.
+     * The 'format_args' are the arguments to be passed to 'std::from_chars
      */
     inline static T
     _toVal_args(const std::string& str, std::size_t* pos, auto format_args)
+      requires c_isFromCharsEnable<T>
+      // requires has_from_chars<T>::value
+      // requires requires(const char* first, const char* last, T& value) { { std::from_chars(first, last, value, format_args) } -> std::same_as<std::from_chars_result>; }
     {
-      CONVERTER_DEBUG_LOG("trace :: pConvertFromStr_POS_Cargs< T, PROCESS_ERR >::_toVal_args('" << str << "')");
+      CONVERTER_DEBUG_LOG("trace :: pConvertFromStr_POS_Cargs< T, PROCESS_ERR >::_toVal_args<c_isFromCharsEnable<T>>('" << str << "')");
       //  https://en.cppreference.com/w/cpp/utility/from_chars
       //  std::from_chars is locale-independent, non-allocating, and non-throwing
       T result{};
@@ -83,8 +89,8 @@ namespace converter
         (*pos) =  static_cast<size_t>(std::distance(str.data(), ptr));
       }
 
-      static const std::string funcName = 
-        " : 'T pConvertFromStr_POS_Cargs<T>::_toVal_args(const std::string& str, std::size_t* pos, auto format_args)'";
+      static const std::string funcName =
+        " : 'T pConvertFromStr_POS_Cargs<T>::_toVal_args<c_isFromCharsEnable<T>>(const std::string& str, std::size_t* pos, auto format_args)'";
       if (ec == std::errc()) {
         return result;
       } else {
@@ -101,6 +107,57 @@ namespace converter
           throw std::runtime_error(errMsg);
         }
       }
+    }
+
+    /*
+     * Function wrapper to query if the complete input string was read during conversion.
+     * Only compiles if T is a type for which 'std::from_chars' is NOT supported.
+     * The 'format_args' are the arguments skipped in this case, as 'std::from_chars' is not supported for T.
+     */
+    inline static T
+    _toVal_args(const std::string& str, std::size_t* pos, auto format_args)
+      requires (!c_isFromCharsEnable<T>)
+      // requires (!has_from_chars<T>::value)
+      // requires (!requires(const char* first, const char* last, T& value) { { std::from_chars(first, last, value, format_args) } -> std::same_as<std::from_chars_result>; })
+    {
+      CONVERTER_DEBUG_LOG("trace :: pConvertFromStr_POS_Cargs< T, PROCESS_ERR >::_toVal_args<!c_isFromCharsEnable<T>>('" << str << "')");
+
+      static const std::string funcName =
+        " : 'T pConvertFromStr_POS_Cargs<T>::_toVal_args<!c_isFromCharsEnable<T>>(const std::string& str, std::size_t* pos, auto format_args)'";
+
+      //  https://en.cppreference.com/w/cpp/string/byte/strtof
+      T (*strtoFPT)(const char* str, char** endptr);
+      T HUGE_VAL_T{};
+      if constexpr (std::is_same_v<T, float>) {
+        strtoFPT = std::strtof;
+        HUGE_VAL_T = HUGE_VALF;
+      } else if constexpr (std::is_same_v<T, double>) {
+        strtoFPT = std::strtod;
+        HUGE_VAL_T = HUGE_VAL;
+      } else if constexpr (std::is_same_v<T, long double>) {
+        strtoFPT = std::strtold;
+        HUGE_VAL_T = HUGE_VALL;
+      } else {
+        static_assert(always_false<T>::value, "Unsupported type for conversion");
+      }
+
+      char* endPtr = nullptr;
+      const char* startPtr = str.c_str();
+      const T result = strtoFPT(startPtr, &endPtr);
+      if (endPtr == startPtr) {
+        const std::string errMsg = "No conversion could be performed" + std::string(funcName);
+        CONVERTER_DEBUG_LOG( errMsg << "  str = '" << str << "'");
+        throw std::invalid_argument(errMsg);
+      }
+      if (result == HUGE_VAL_T || result == -HUGE_VAL_T) {
+        const std::string errMsg = "The converted value is out of range" + std::string(funcName);
+        CONVERTER_DEBUG_LOG( errMsg << "  str = '" << str << "'");
+        throw std::out_of_range(errMsg);
+      }
+      if(pos != nullptr) {
+        (*pos) = static_cast<size_t>(std::distance(startPtr, static_cast<const char*>(endPtr)));
+      }
+      return result;
     }
   };
 
@@ -128,7 +185,7 @@ namespace converter
      * @brief   Converts string holding a integer represenation to integer datatype.
      * @param   str                 input string.
      * @param   pos                 address of an integer to store the number of characters processed.
-     * @param   base                integer base to use: a value between 2 and 36 (inclusive). 
+     * @param   base                integer base to use: a value between 2 and 36 (inclusive).
      * @returns Numerical value if conversion succeeds.
      *          Else throws error on conversion failure.
      */
@@ -144,7 +201,7 @@ namespace converter
       CONVERTER_DEBUG_TRY_CATCH(std::runtime_error)
       CONVERTER_DEBUG_TRY_CATCH(std::exception)
     }
-  
+
     /**
      * @brief   Converts string holding a integer represenation to integer datatype.
      * @param   str                 input string.
@@ -206,7 +263,7 @@ namespace converter
       CONVERTER_DEBUG_TRY_CATCH(std::runtime_error)
       CONVERTER_DEBUG_TRY_CATCH(std::exception)
     }
-  
+
     /**
      * @brief   Converts string holding a floating-number represenation to floating datatype.
      * @param   str                 input string.
