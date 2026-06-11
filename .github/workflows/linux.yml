@@ -93,7 +93,7 @@ jobs:
             COMPILER="g++"
           fi
           echo ""
-          echo "${COMPILER} --version"; ${COMPILER} --version'
+          echo "${COMPILER} --version"; ${COMPILER} --version
 
       - name: Checkout Repo
         uses: actions/checkout@v4
