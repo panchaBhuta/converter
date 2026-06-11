@@ -93,7 +93,7 @@ jobs:
             COMPILER="g++"
           fi
           echo ""
-          echo "${COMPILER} --version"; ${COMPILER} --version
+          echo "default:: ${COMPILER} --version"; ${COMPILER} --version
 
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -123,6 +123,20 @@ jobs:
           echo "_OS,compiler,$(grep define  ${{github.workspace}}/build-debug/include/converter/_workaroundConfig.h | grep -v -e "^//" -e " e_[^ ]*_FEATURE " | sed "s/#define  //g" | cut -d' ' -f1 | tr '\n' ',' | sed 's/,$/\n/g')"  >>  ${{github.workspace}}/build-debug/workAroundFlags.csv
           echo "${{matrix.os}},${{matrix.compiler}},$(grep define  ${{github.workspace}}/build-debug/include/converter/_workaroundConfig.h | grep -v -e "^//" -e " e_[^ ]*_FEATURE " | sed "s/#define  //g" | cut -d' ' -f2 | tr '\n' ',' | sed 's/,$/\n/g')"  >>  ${{github.workspace}}/build-debug/workAroundFlags.csv
           sort -u  ${{github.workspace}}/build-debug/workAroundFlags.csv >  ${{github.workspace}}/doc/consolidateWorkAroundFlags.csv
+
+      - name: GIT Commit and Push Changes
+        run: |
+          # Configure Git using the standard GitHub Actions bot identity
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
+          # Only commit and push if there are actual changes to prevent workflow errors
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: automatically update consolidateWorkAroundFlags.csv [skip ci]"
+            git push
+          else
+            echo "No changes detected. Skipping commit."
+          fi
 
       - name: Build [Debug]
         run: cmake --build "${{github.workspace}}/build-debug" --config Debug -j$(nproc)
