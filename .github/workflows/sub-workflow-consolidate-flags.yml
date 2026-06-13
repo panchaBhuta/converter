@@ -53,9 +53,16 @@ jobs:
       - name: Consolidate Artifacts and Merge
         run: |
           echo "All three sub-workflows across OS's completed successfully!"
-          ls -R ${{github.workspace}}/build-debug/workAroundFlags/
-          sort -u  ${{github.workspace}}/build-debug/workAroundFlags/flag-*.csv >  ${{github.workspace}}/doc/consolidateWorkAroundFlags.csv
-          cat ${{github.workspace}}/doc/consolidateWorkAroundFlags.csv
+          ls -R "${{github.workspace}}/build-debug/workAroundFlags/"
+          # Enable nullglob so an unmatched glob expands to nothing instead of the literal pattern
+          shopt -s nullglob
+          files=("${{github.workspace}}/build-debug/workAroundFlags/flag-"*.csv)
+          if [ ${#files[@]} -gt 0 ]; then
+            sort -u "${files[@]}" > "${{github.workspace}}/doc/consolidateWorkAroundFlags.csv"
+            cat "${{github.workspace}}/doc/consolidateWorkAroundFlags.csv"
+          else
+            echo "No flag-*.csv files found in ${{github.workspace}}/build-debug/workAroundFlags/. Skipping consolidation."
+          fi
 
       - name: GIT Commit and Push Changes
         run: |
