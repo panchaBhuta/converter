@@ -59,7 +59,7 @@ jobs:
           pattern: artifact-*
           path: build-debug/workAroundFlags/
           merge-multiple: true
-          run-id: ${{ needs.linux-sub-workflow.outputs.run-id }}
+          #run-id: ${{ needs.linux-sub-workflow.outputs.run-id }}
         continue-on-error: true
 
       # Download artifacts from macOS sub-workflow run
@@ -69,7 +69,7 @@ jobs:
           pattern: artifact-*
           path: build-debug/workAroundFlags/
           merge-multiple: true
-          run-id: ${{ needs.macos-sub-workflow.outputs.run-id }}
+          #run-id: ${{ needs.macos-sub-workflow.outputs.run-id }}
         continue-on-error: true
 
       # Download artifacts from Windows sub-workflow run
@@ -79,12 +79,12 @@ jobs:
           pattern: artifact-*
           path: build-debug/workAroundFlags/
           merge-multiple: true
-          run-id: ${{ needs.windows-sub-workflow.outputs.run-id }}
+          #run-id: ${{ needs.windows-sub-workflow.outputs.run-id }}
         continue-on-error: true
 
       - name: List Downloaded Artifacts
         run: |
-          echo "Artifacts downloaded: "$(ls -l "${{github.workspace}}/build-debug/workAroundFlags/" | wc -l)
+          echo "Artifacts downloaded: "$(ls -l "${{github.workspace}}/build-debug/workAroundFlags/" | grep -v "^total " | wc -l)
           ls -R "${{github.workspace}}/build-debug/workAroundFlags/" || echo "No artifacts found"
 
       - name: Consolidate Artifacts and Merge
