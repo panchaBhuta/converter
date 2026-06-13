@@ -49,6 +49,11 @@ jobs:
           pattern: artifact-*      # Assumes your sub-workflows named artifacts like artifact-1, artifact-2, etc.
           path: ${{github.workspace}}/build-debug/workAroundFlags/
           merge-multiple: true     # Optional: Dumps all files into one folder without creating subdirectories
+          run-id: ${{github.run_id}}
+          # the consolidate-flags workflow runs in a separate workflow execution context,
+          # and by default, download-artifact can only access artifacts from the same workflow run.
+          # The github.run_id context variable will reference the parent workflow's run ID,
+          # allowing the consolidate-flags job to access artifacts uploaded by the linux, macos, and windows sub-workflows.
 
       - name: Consolidate Artifacts and Merge
         run: |
