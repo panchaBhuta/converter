@@ -1,19 +1,17 @@
 name: Windows
 
 on:
-  push:
-    branches: [ master, main ]
-    paths-ignore:
-      - 'docs/**'
-    tags-ignore:
-      - v*
-  pull_request:
-    branches: [ master, main ]
-    paths-ignore:
-      - 'docs/**'
-    tags-ignore:
-      - v*
+  workflow_call: # This makes the workflow reusable
+    #inputs:
+    #  compiler:
+    #    required: true
+    #    type: string
+    # also refer https://jurajsim.hashnode.dev/a-comparison-of-calling-vs-dispatching-workflows-in-github-actions
+
   workflow_dispatch:
+    # https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#workflow_dispatch
+    # To enable a workflow to be triggered manually, you need to configure the workflow_dispatch event
+
 
 #env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
@@ -117,8 +115,26 @@ jobs:
         # https://cmake.org/cmake/help/latest/guide/user-interaction/index.html
         if: matrix.toolset_compiler.toolset == 1
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug  -T "${{matrix.toolset_compiler.compiler}}"
+
       - name: Check Work-Around-Flags
-        run: grep define "${{github.workspace}}/build-debug/include/converter/_workaroundConfig.h" | grep -v -e "^//" -e " e_[^ ]*_FEATURE "
+        run: |
+          grep define "${{github.workspace}}/build-debug/include/converter/_workaroundConfig.h" | grep -v -e "^//" -e " e_[^ ]*_FEATURE "
+          FLAG_DIR="${{github.workspace}}/build-debug/workAroundFlags"
+          mkdir -p   ${FLAG_DIR}
+          FLAG_FILE="${FLAG_DIR}/flag-${{matrix.os}}-${{matrix.compiler}}.csv"
+          echo "_OS,compiler,$(grep define  ${{github.workspace}}/build-debug/include/converter/_workaroundConfig.h | grep -v -e "^//" -e " e_[^ ]*_FEATURE " | sed "s/#define  //g" | cut -d' ' -f1 | tr '\n' ',' | sed 's/,$/\n/g')"  >  ${FLAG_FILE}
+          echo "${{matrix.os}},${{matrix.compiler}},$(grep define  ${{github.workspace}}/build-debug/include/converter/_workaroundConfig.h | grep -v -e "^//" -e " e_[^ ]*_FEATURE " | sed "s/#define  //g" | cut -d' ' -f2 | tr '\n' ',' | sed 's/,$/\n/g')"  >>  ${FLAG_FILE}
+
+          sort -u  ${{github.workspace}}/build-debug/workAroundFlags.csv >  ${{github.workspace}}/doc/consolidateWorkAroundFlags.csv
+
+      - name: Upload Artifact from Sub-Workflow
+        uses: actions/upload-artifact@v7
+        with:
+          name: artifact-${{matrix.os}}-${{matrix.compiler}}
+          path: ${{github.workspace}}/build-debug/workAroundFlags/flag-${{matrix.os}}-${{matrix.compiler}}.csv
+          archive: false
+
+
       - name: Build compiler = msbuild.exe OR clangCl [Debug]
         if: matrix.toolset_compiler.compiler != 'g++'
         #  https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild-command-line-reference?view=vs-2022

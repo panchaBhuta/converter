@@ -1,0 +1,91 @@
+name: Consolidate Build Flags
+
+on:
+  workflow_call: # This makes the workflow reusable
+    #inputs:
+    #  compiler:
+    #    required: true
+    #    type: string
+    # also refer https://jurajsim.hashnode.dev/a-comparison-of-calling-vs-dispatching-workflows-in-github-actions
+
+  workflow_dispatch:
+    # https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#workflow_dispatch
+    # To enable a workflow to be triggered manually, you need to configure the workflow_dispatch event
+
+
+#env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  #BUILD_TYPE: Release
+
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  consolidate-flags:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Crucial for pushing changes back to github remote repository
+
+
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetches full history so git can switch and track branches safely
+
+
+      - name: Check Work-Around-Flags
+        run: |
+          FLAG_DIR="${{github.workspace}}/build-debug/workAroundFlags"
+          mkdir -p   ${FLAG_DIR}
+
+      # Download all artifacts matching a specific naming pattern
+      - name: Download All Sub-Workflow Artifacts
+        uses: actions/download-artifact@v8
+        with:
+          pattern: artifact-*      # Assumes your sub-workflows named artifacts like artifact-1, artifact-2, etc.
+          path: ${{github.workspace}}/build-debug/workAroundFlags/
+          merge-multiple: true     # Optional: Dumps all files into one folder without creating subdirectories
+
+      - name: Consolidate Artifacts and Merge
+        run: |
+          echo "All three sub-workflows across OS's completed successfully!"
+          sort -u  ${{github.workspace}}/build-debug/workAroundFlags/flag-*.csv >  ${{github.workspace}}/doc/consolidateWorkAroundFlags.csv
+          cat ${{github.workspace}}/doc/consolidateWorkAroundFlags.csv
+
+      - name: GIT Commit and Push Changes
+        run: |
+          PR_BRANCH="automation/build-flags"
+          TARGET_FILE="${{github.workspace}}/doc/consolidateWorkAroundFlags.csv"
+
+          # 1. Configure Git using the standard GitHub Actions bot identity
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+ 
+          # 2. Safely switch to the PR branch (create it locally if it only exists remotely, or create from scratch)
+          git fetch origin
+          if git show-ref --verify --quiet "refs/remotes/origin/$i{PR_BRANCH}"; then
+            echo "Branch exists on remote. Checking it out..."
+            git checkout -b "$PR_BRANCH" "origin/${PR_BRANCH}"
+            
+            # Pull the absolute latest updates from main into this branch to stay current
+            echo "Syncing PR branch with latest changes from main..."
+            git merge origin/main --no-edit
+          else
+            echo "Branch does not exist. Creating a new one from main..."
+            git checkout -b "$PR_BRANCH"
+          fi
+
+          git add  ${TARGET_FILE}
+          
+          # Only commit and push if there are actual changes to prevent workflow errors
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: automatically update consolidateWorkAroundFlags.csv [skip ci]"
+            git push origin "${PR_BRANCH}"
+          else
+            echo "No changes detected. Skipping commit."
+          fi
+

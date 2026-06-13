@@ -1,0 +1,40 @@
+name: Parent Workflow
+
+on:
+  push:
+    branches: [ master, main ]
+    paths-ignore:
+      - 'docs/**'
+    tags-ignore:
+      - v*
+  pull_request:
+    branches: [ master, main ]
+    paths-ignore:
+      - 'docs/**'
+    tags-ignore:
+      - v*
+  workflow_dispatch:
+    # https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#workflow_dispatch
+    # To enable a workflow to be triggered manually, you need to configure the workflow_dispatch event
+
+permissions:
+  contents: write
+
+jobs:
+  linux-sub-workflow:
+    uses: ./.github/workflows/sub-workflow-linux.yml
+    #with:
+    #  compiler: gcc
+
+  macos-sub-workflow:
+    uses: ./.github/workflows/sub-workflow-macos.yml
+
+  windows-sub-workflow:
+    uses: ./.github/workflows/sub-workflow-windows.yml
+
+  # 4. The main deployment job that waits for all three
+  consolidate-buildFlags-sub-workflow:
+    # Explicitly list all sub-workflow job keys in an array
+    needs: [linux-sub-workflow, macos-sub-workflow, windows-sub-workflow]
+    if: always() # Forces execution regardless of sub-workflow success/failure statuses
+    uses: ./.github/workflows/sub-workflow-consolidate-flags.yml
