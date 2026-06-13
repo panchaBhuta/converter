@@ -2,10 +2,10 @@ name: Consolidate Build Flags
 
 on:
   workflow_call: # This makes the workflow reusable
-    #inputs:
-    #  compiler:
-    #    required: true
-    #    type: string
+    inputs:
+      parent_run_id:
+        type: string
+        required: true
     # also refer https://jurajsim.hashnode.dev/a-comparison-of-calling-vs-dispatching-workflows-in-github-actions
 
   workflow_dispatch:
@@ -49,7 +49,7 @@ jobs:
           pattern: artifact-*      # Assumes your sub-workflows named artifacts like artifact-1, artifact-2, etc.
           path: ${{github.workspace}}/build-debug/workAroundFlags/
           merge-multiple: true     # Optional: Dumps all files into one folder without creating subdirectories
-          run-id: ${{github.run_id}}
+          run-id: ${{inputs.parent_run_id}}
           # the consolidate-flags workflow runs in a separate workflow execution context,
           # and by default, download-artifact can only access artifacts from the same workflow run.
           # The github.run_id context variable will reference the parent workflow's run ID,

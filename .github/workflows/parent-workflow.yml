@@ -38,3 +38,5 @@ jobs:
     needs: [linux-sub-workflow, macos-sub-workflow, windows-sub-workflow]
     if: always() # Forces execution regardless of sub-workflow success/failure statuses
     uses: ./.github/workflows/sub-workflow-consolidate-flags.yml
+    with:
+      parent_run_id: ${{github.run_id}}  # Pass the parent workflow's run ID
