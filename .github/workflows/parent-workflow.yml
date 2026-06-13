@@ -57,7 +57,7 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           pattern: artifact-*
-          path: ${{github.workspace}}/build-debug/workAroundFlags/
+          path: build-debug/workAroundFlags/
           merge-multiple: true
           run-id: ${{ needs.linux-sub-workflow.outputs.run-id }}
         continue-on-error: true
@@ -67,7 +67,7 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           pattern: artifact-*
-          path: ${{github.workspace}}/build-debug/workAroundFlags/
+          path: build-debug/workAroundFlags/
           merge-multiple: true
           run-id: ${{ needs.macos-sub-workflow.outputs.run-id }}
         continue-on-error: true
@@ -77,20 +77,18 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           pattern: artifact-*
-          path: ${{github.workspace}}/build-debug/workAroundFlags/
+          path: build-debug/workAroundFlags/
           merge-multiple: true
           run-id: ${{ needs.windows-sub-workflow.outputs.run-id }}
         continue-on-error: true
 
       - name: List Downloaded Artifacts
         run: |
-          echo "Artifacts downloaded:"
+          echo "Artifacts downloaded: "$(ls -l "${{github.workspace}}/build-debug/workAroundFlags/" | wc -l)
           ls -R "${{github.workspace}}/build-debug/workAroundFlags/" || echo "No artifacts found"
 
       - name: Consolidate Artifacts and Merge
         run: |
-          echo "All three sub-workflows across OS's completed successfully!"
-          ls -R "${{github.workspace}}/build-debug/workAroundFlags/"
           # Enable nullglob so an unmatched glob expands to nothing instead of the literal pattern
           shopt -s nullglob
           files=("${{github.workspace}}/build-debug/workAroundFlags/flag-"*.csv)

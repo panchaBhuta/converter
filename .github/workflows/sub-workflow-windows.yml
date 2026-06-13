@@ -133,7 +133,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: "artifact-${{matrix.os}}-${{matrix.toolset_compiler.compiler}}"
-          path: "${{github.workspace}}/build-debug/workAroundFlags/flag-${{matrix.os}}-${{matrix.toolset_compiler.compiler}}.csv"
+          path: "build-debug/workAroundFlags/flag-${{matrix.os}}-${{matrix.toolset_compiler.compiler}}.csv"
           archive: false
 
 

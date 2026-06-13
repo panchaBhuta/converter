@@ -91,7 +91,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: "artifact-${{matrix.os}}-${{matrix.compiler}}"
-          path: "${{github.workspace}}/build-debug/workAroundFlags/flag-${{matrix.os}}-${{matrix.compiler}}.csv"
+          path: "build-debug/workAroundFlags/flag-${{matrix.os}}-${{matrix.compiler}}.csv"
           archive: false
 
 
