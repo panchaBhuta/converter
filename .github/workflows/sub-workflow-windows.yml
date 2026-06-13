@@ -55,6 +55,9 @@ jobs:
         #      # ClangCl == 'Clang 12'
         #    toolset_compiler : { compiler: ClangCl, toolset: 1 }
     runs-on: ${{matrix.os}}
+    outputs:
+      run-id: ${{ github.run_id }}
+
     defaults:
       run:
         #  msys2 shell when using g++ else bash
@@ -81,7 +84,7 @@ jobs:
         if: matrix.toolset_compiler.compiler == 'g++'
         run: echo "${{matrix.toolset_compiler.rawCompiler}} --version"; ${{matrix.toolset_compiler.rawCompiler}} --version
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Get Version (compiler==default[msbuild.exe])
         if: matrix.toolset_compiler.compiler == 'default'
         run: uname -a && echo "------------" && cmake --version && echo "------------"

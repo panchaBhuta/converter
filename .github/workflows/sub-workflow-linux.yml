@@ -77,6 +77,8 @@ jobs:
           { os: ubuntu-22.04-arm, compiler: clang++-17 },
           { os: ubuntu-22.04-arm, compiler: clang++-18 } ]
     runs-on: ${{matrix.os}}
+    outputs:
+      run-id: ${{ github.run_id }}
 
 
     steps:
@@ -92,7 +94,7 @@ jobs:
           echo "default:: ${COMPILER} --version"; ${COMPILER} --version
 
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Get Version
         run: uname -a && echo "------------" && cmake --version && echo "------------" ; bash -c 'COMPILER="${{matrix.compiler}}"; if [ "${COMPILER}" == "default" ]; then COMPILER="g++"; fi; ${COMPILER}  -dM -E -x c++ /dev/null | egrep -i "(apple|mach|gnu|clang|llvm|linux|WIN|version|major|minor)"'
