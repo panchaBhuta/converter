@@ -53,6 +53,7 @@ jobs:
       - name: Consolidate Artifacts and Merge
         run: |
           echo "All three sub-workflows across OS's completed successfully!"
+          ls -R ${{github.workspace}}/build-debug/workAroundFlags/
           sort -u  ${{github.workspace}}/build-debug/workAroundFlags/flag-*.csv >  ${{github.workspace}}/doc/consolidateWorkAroundFlags.csv
           cat ${{github.workspace}}/doc/consolidateWorkAroundFlags.csv
 

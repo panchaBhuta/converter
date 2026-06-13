@@ -122,10 +122,10 @@ jobs:
           FLAG_DIR="${{github.workspace}}/build-debug/workAroundFlags"
           mkdir -p   ${FLAG_DIR}
           FLAG_FILE="${FLAG_DIR}/flag-${{matrix.os}}-${{matrix.compiler}}.csv"
-          echo "_OS,compiler,$(grep define  ${{github.workspace}}/build-debug/include/converter/_workaroundConfig.h | grep -v -e "^//" -e " e_[^ ]*_FEATURE " | sed "s/#define  //g" | cut -d' ' -f1 | tr '\n' ',' | sed 's/,$/\n/g')"  >  ${FLAG_FILE}
-          echo "${{matrix.os}},${{matrix.compiler}},$(grep define  ${{github.workspace}}/build-debug/include/converter/_workaroundConfig.h | grep -v -e "^//" -e " e_[^ ]*_FEATURE " | sed "s/#define  //g" | cut -d' ' -f2 | tr '\n' ',' | sed 's/,$/\n/g')"  >>  ${FLAG_FILE}
-
-          sort -u  ${{github.workspace}}/build-debug/workAroundFlags.csv >  ${{github.workspace}}/doc/consolidateWorkAroundFlags.csv
+          echo "_OS,compiler,"$(grep define  "${{github.workspace}}/build-debug/include/converter/_workaroundConfig.h" | grep -v -e "^//" -e " e_[^ ]*_FEATURE " | sed "s/#define  //g" | cut -d' ' -f1 | tr '\n' ',' | sed 's/,$/\n/g')
+          echo "${{matrix.os}},${{matrix.compiler}},"$(grep define  "${{github.workspace}}/build-debug/include/converter/_workaroundConfig.h" | grep -v -e "^//" -e " e_[^ ]*_FEATURE " | sed "s/#define  //g" | cut -d' ' -f2 | tr '\n' ',' | sed 's/,$/\n/g')
+          echo "_OS,compiler,"$(grep define  "${{github.workspace}}/build-debug/include/converter/_workaroundConfig.h" | grep -v -e "^//" -e " e_[^ ]*_FEATURE " | sed "s/#define  //g" | cut -d' ' -f1 | tr '\n' ',' | sed 's/,$/\n/g')  >  "${FLAG_FILE}"
+          echo "${{matrix.os}},${{matrix.compiler}},"$(grep define  "${{github.workspace}}/build-debug/include/converter/_workaroundConfig.h" | grep -v -e "^//" -e " e_[^ ]*_FEATURE " | sed "s/#define  //g" | cut -d' ' -f2 | tr '\n' ',' | sed 's/,$/\n/g')  >>  "${FLAG_FILE}"
 
       - name: Upload Artifact from Sub-Workflow
         uses: actions/upload-artifact@v7
