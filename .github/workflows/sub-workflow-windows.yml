@@ -134,7 +134,6 @@ jobs:
         with:
           name: "artifact-${{matrix.os}}-${{matrix.toolset_compiler.compiler}}"
           path: "build-debug/workAroundFlags/flag-${{matrix.os}}-${{matrix.toolset_compiler.compiler}}.csv"
-          archive: false
 
 
       - name: Build compiler = msbuild.exe OR clangCl [Debug]

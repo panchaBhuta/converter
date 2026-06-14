@@ -127,7 +127,6 @@ jobs:
         with:
           name: "artifact-${{matrix.os}}-${{matrix.compiler}}"
           path: "build-debug/workAroundFlags/flag-${{matrix.os}}-${{matrix.compiler}}.csv"
-          archive: false
 
 
       - name: Build [Debug]

@@ -40,12 +40,13 @@ jobs:
       contents: write  # Crucial for pushing changes back to github remote repository
 
 
-    
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v6
         with:
           fetch-depth: 0 # Fetches full history so git can switch and track branches safely
+
 
       - name: Create Work-Around-Flags Directory
         run: |
@@ -76,7 +77,7 @@ jobs:
       - name: Download Windows Sub-Workflow Artifacts
         uses: actions/download-artifact@v8
         with:
-          pattern: artifact-*
+          #pattern: artifact-*
           path: build-debug/workAroundFlags/
           merge-multiple: true
           #run-id: ${{ needs.windows-sub-workflow.outputs.run-id }}

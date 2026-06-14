@@ -77,6 +77,7 @@ jobs:
       - name: Configure CMake (compiler=NOT-default) [Debug]
         if: matrix.compiler != 'default'
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON  -DCONVERTER_TEST_OS_VERSION=${{matrix.os}} -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
+
       - name: Check Work-Around-Flags
         run: |
           grep define "${{github.workspace}}/build-debug/include/converter/_workaroundConfig.h" | grep -v -e "^//" -e " e_[^ ]*_FEATURE "
@@ -92,7 +93,6 @@ jobs:
         with:
           name: "artifact-${{matrix.os}}-${{matrix.compiler}}"
           path: "build-debug/workAroundFlags/flag-${{matrix.os}}-${{matrix.compiler}}.csv"
-          archive: false
 
 
       - name: Show compile commands [Debug]
