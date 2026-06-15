@@ -31,11 +31,9 @@
  */
 #cmakedefine01  USE_CHRONO_FROMSTREAM_1
 #cmakedefine01  USE_DATE_FROMSTREAM_2
-#cmakedefine01  USE_JUGAAD_FROMSTREAM_3
 
 #cmakedefine01  USE_CHRONO_TOSTREAM_1
 #cmakedefine01  USE_DATE_TOSTREAM_2
-#cmakedefine01  USE_JUGAAD_TOSTREAM_3
 
 
 /*

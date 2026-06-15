@@ -60,7 +60,6 @@ jobs:
           pattern: artifact-*
           path: build-debug/workAroundFlags/
           merge-multiple: true
-          #run-id: ${{ needs.linux-sub-workflow.outputs.run-id }}
         continue-on-error: true
 
       # Download artifacts from macOS sub-workflow run
@@ -70,17 +69,15 @@ jobs:
           pattern: artifact-*
           path: build-debug/workAroundFlags/
           merge-multiple: true
-          #run-id: ${{ needs.macos-sub-workflow.outputs.run-id }}
         continue-on-error: true
 
       # Download artifacts from Windows sub-workflow run
       - name: Download Windows Sub-Workflow Artifacts
         uses: actions/download-artifact@v8
         with:
-          #pattern: artifact-*
+          pattern: artifact-*
           path: build-debug/workAroundFlags/
           merge-multiple: true
-          #run-id: ${{ needs.windows-sub-workflow.outputs.run-id }}
         continue-on-error: true
 
       - name: List Downloaded Artifacts

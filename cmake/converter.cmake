@@ -196,11 +196,6 @@ function(check_chrono_stream_functionality)
     message(STATUS "previous-build check for USE_DATE_FROMSTREAM_2 : ${USE_DATE_FROMSTREAM_2}")
 
     get_macro_value( ${CMAKE_CURRENT_BINARY_DIR}/include/converter/_workaroundConfig.h
-                    "USE_JUGAAD_FROMSTREAM_3"
-                     USE_JUGAAD_FROMSTREAM_3)
-    message(STATUS "previous-build check for USE_JUGAAD_FROMSTREAM_3 : ${USE_JUGAAD_FROMSTREAM_3}")
-
-    get_macro_value( ${CMAKE_CURRENT_BINARY_DIR}/include/converter/_workaroundConfig.h
                     "USE_CHRONO_TOSTREAM_1"
                      USE_CHRONO_TOSTREAM_1)
     message(STATUS "previous-build check for USE_CHRONO_TOSTREAM_1 : ${USE_CHRONO_TOSTREAM_1}")
@@ -210,24 +205,15 @@ function(check_chrono_stream_functionality)
                      USE_DATE_TOSTREAM_2)
     message(STATUS "previous-build check for USE_DATE_TOSTREAM_2 : ${USE_DATE_TOSTREAM_2}")
 
-    get_macro_value( ${CMAKE_CURRENT_BINARY_DIR}/include/converter/_workaroundConfig.h
-                    "USE_JUGAAD_TOSTREAM_3"
-                     USE_JUGAAD_TOSTREAM_3)
-    message(STATUS "previous-build check for USE_JUGAAD_TOSTREAM_3 : ${USE_JUGAAD_TOSTREAM_3}")
-
     if(   (NOT USE_CHRONO_FROMSTREAM_1 STREQUAL "NOTFOUND") AND
           (NOT USE_DATE_FROMSTREAM_2   STREQUAL "NOTFOUND") AND
-          (NOT USE_JUGAAD_FROMSTREAM_3 STREQUAL "NOTFOUND") AND
           (NOT USE_CHRONO_TOSTREAM_1 STREQUAL "NOTFOUND") AND
-          (NOT USE_DATE_TOSTREAM_2   STREQUAL "NOTFOUND") AND
-          (NOT USE_JUGAAD_TOSTREAM_3 STREQUAL "NOTFOUND")   )
+          (NOT USE_DATE_TOSTREAM_2   STREQUAL "NOTFOUND") )
         set(USE_CHRONO_FROMSTREAM_1 ${USE_CHRONO_FROMSTREAM_1} PARENT_SCOPE)
         set(USE_DATE_FROMSTREAM_2   ${USE_DATE_FROMSTREAM_2}   PARENT_SCOPE)
-        set(USE_JUGAAD_FROMSTREAM_3 ${USE_JUGAAD_FROMSTREAM_3} PARENT_SCOPE)
 
         set(USE_CHRONO_TOSTREAM_1   ${USE_CHRONO_TOSTREAM_1} PARENT_SCOPE)
         set(USE_DATE_TOSTREAM_2     ${USE_DATE_TOSTREAM_2}   PARENT_SCOPE)
-        set(USE_JUGAAD_TOSTREAM_3   ${USE_JUGAAD_TOSTREAM_3} PARENT_SCOPE)
 
         if( USE_DATE_FROMSTREAM_2 OR USE_DATE_TOSTREAM_2 )
             set(DATELIB "date")  # local-variable
@@ -241,11 +227,9 @@ function(check_chrono_stream_functionality)
 
     set(USE_CHRONO_FROMSTREAM_1 ${e_ENABLE_FEATURE} PARENT_SCOPE)
     set(USE_DATE_FROMSTREAM_2   ${e_DISABLE_FEATURE} PARENT_SCOPE)
-    set(USE_JUGAAD_FROMSTREAM_3 ${e_DISABLE_FEATURE} PARENT_SCOPE)
 
     set(USE_CHRONO_TOSTREAM_1   ${e_ENABLE_FEATURE} PARENT_SCOPE)
     set(USE_DATE_TOSTREAM_2     ${e_DISABLE_FEATURE} PARENT_SCOPE)
-    set(USE_JUGAAD_TOSTREAM_3   ${e_DISABLE_FEATURE} PARENT_SCOPE)
 
 
     # Platform check variables
@@ -273,10 +257,8 @@ function(check_chrono_stream_functionality)
         # for future reference, when <chrono> supports full functionality
         message(STATUS "checkChrono_fromStream[std::chrono::from_stream()] ++SUCCESS++")
         message(STATUS "checkChrono_fromStream[date::from_stream()] __SKIPPED__")
-        message(STATUS "checkChrono_fromStream[jugaad::from_stream()] __SKIPPED__")
         set(USE_CHRONO_FROMSTREAM_1 ${e_ENABLE_FEATURE} PARENT_SCOPE)
         set(USE_DATE_FROMSTREAM_2   ${e_DISABLE_FEATURE} PARENT_SCOPE)
-        set(USE_JUGAAD_FROMSTREAM_3 ${e_DISABLE_FEATURE} PARENT_SCOPE)
     else()
         message(STATUS "checkChrono_fromStream[std::chrono::from_stream()] --FAILED--")
     endif()
@@ -298,10 +280,8 @@ function(check_chrono_stream_functionality)
         # for future reference, when <chrono> supports full functionality
         message(STATUS "checkChrono_toStream[oss<<std::vformat()] ++SUCCESS++")
         message(STATUS "checkChrono_toStream[date::to_stream()] __SKIPPED__")
-        message(STATUS "checkChrono_toStream[jugaad::to_stream()] __SKIPPED__")
         set(USE_CHRONO_TOSTREAM_1 ${e_ENABLE_FEATURE} PARENT_SCOPE)
         set(USE_DATE_TOSTREAM_2   ${e_DISABLE_FEATURE} PARENT_SCOPE)
-        set(USE_JUGAAD_TOSTREAM_3 ${e_DISABLE_FEATURE} PARENT_SCOPE)
     else()
         message(STATUS "checkChrono_toStream[oss<<std::vformat()] --FAILED--")
     endif()
@@ -338,17 +318,12 @@ function(check_chrono_stream_functionality)
             if(COMPILE_RESULT_DATE_FROMSTREAM)
                 # ubuntu, mac - clang
                 message(STATUS "checkChrono_fromStream[date::from_stream()] ++SUCCESS++")
-                message(STATUS "checkChrono_fromStream[jugaad::from_stream()] __SKIPPED__")
                 set(USE_CHRONO_FROMSTREAM_1 ${e_DISABLE_FEATURE} PARENT_SCOPE)
                 set(USE_DATE_FROMSTREAM_2   ${e_ENABLE_FEATURE} PARENT_SCOPE)
-                set(USE_JUGAAD_FROMSTREAM_3 ${e_DISABLE_FEATURE} PARENT_SCOPE)
             else()
                 message(STATUS "checkChrono_fromStream[date::from_stream()] --FAILED--")
-                message(STATUS "checkChrono_fromStream[jugaad::from_stream()] ##ENABLED##")
-                message(STATUS "WARNING: The jugaad-conversion enabled handles a limited sub-set of date-format specifiers.")
                 set(USE_CHRONO_FROMSTREAM_1 ${e_DISABLE_FEATURE} PARENT_SCOPE)
                 set(USE_DATE_FROMSTREAM_2   ${e_DISABLE_FEATURE} PARENT_SCOPE)
-                set(USE_JUGAAD_FROMSTREAM_3 ${e_ENABLE_FEATURE} PARENT_SCOPE)
             endif()
         endif()
 
@@ -370,18 +345,13 @@ function(check_chrono_stream_functionality)
             if(COMPILE_RESULT_DATE_TOSTREAM)
                 # ubuntu, mac - clang
                 message(STATUS "checkChrono_toStream[date::to_stream()] ++SUCCESS++")
-                message(STATUS "checkChrono_toStream[jugaad::to_stream()] __SKIPPED__")
                 set(USE_CHRONO_TOSTREAM_1 ${e_DISABLE_FEATURE} PARENT_SCOPE)
                 set(USE_DATE_TOSTREAM_2   ${e_ENABLE_FEATURE} PARENT_SCOPE)
-                set(USE_JUGAAD_TOSTREAM_3 ${e_DISABLE_FEATURE} PARENT_SCOPE)
             else()
                 # msvc
                 message(STATUS "checkChrono_toStream[date::to_stream()] --FAILED--")
-                message(STATUS "checkChrono_toStream[jugaad::to_stream()] ##ENABLED##")
-                message(STATUS "WARNING: The jugaad-conversion enabled handles a limited sub-set of date-format specifiers.")
                 set(USE_CHRONO_TOSTREAM_1 ${e_DISABLE_FEATURE} PARENT_SCOPE)
                 set(USE_DATE_TOSTREAM_2   ${e_DISABLE_FEATURE} PARENT_SCOPE)
-                set(USE_JUGAAD_TOSTREAM_3 ${e_ENABLE_FEATURE} PARENT_SCOPE)
             endif()
         endif()
 
@@ -392,18 +362,13 @@ function(check_chrono_stream_functionality)
             unset(DATELIB PARENT_SCOPE)  # propagate to parent scope
         endif()
 
-        if(USE_JUGAAD_FROMSTREAM_3   OR   USE_JUGAAD_TOSTREAM_3)
-            message(STATUS "Using jugaad : This is an adhoc implementation, handling few of the date-conversion formats.")
-        endif()
     endif()
 
     #[==[   uncomment for testing purpose :: enabled JUGAAD
                 set(USE_CHRONO_FROMSTREAM_1 ${e_DISABLE_FEATURE} PARENT_SCOPE)
                 set(USE_DATE_FROMSTREAM_2   ${e_DISABLE_FEATURE} PARENT_SCOPE)
-                set(USE_JUGAAD_FROMSTREAM_3 ${e_ENABLE_FEATURE} PARENT_SCOPE)
                 set(USE_CHRONO_TOSTREAM_1   ${e_DISABLE_FEATURE} PARENT_SCOPE)
                 set(USE_DATE_TOSTREAM_2     ${e_DISABLE_FEATURE} PARENT_SCOPE)
-                set(USE_JUGAAD_TOSTREAM_3   ${e_ENABLE_FEATURE} PARENT_SCOPE)
     #]==]
 
 endfunction()
