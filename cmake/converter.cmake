@@ -562,39 +562,6 @@ function(check_floatingPoint_elementaryStringConversions)
     #]===]
 endfunction()
 
-function(check_three_way_comparison)
-    get_macro_value( ${CMAKE_CURRENT_BINARY_DIR}/include/converter/_workaroundConfig.h
-                    "USE_THREE_WAY_COMPARISON"
-                     USE_THREE_WAY_COMPARISON)
-    message(STATUS "previous-build check for USE_THREE_WAY_COMPARISON : ${USE_THREE_WAY_COMPARISON}")
-
-    if(NOT USE_THREE_WAY_COMPARISON STREQUAL "NOTFOUND")
-        set(USE_THREE_WAY_COMPARISON ${USE_THREE_WAY_COMPARISON} PARENT_SCOPE)
-        return()
-    endif()
-
-    try_compile(COMPILE_RESULT_THREE_WAY_COMPARISON
-                SOURCE_FROM_FILE    check_three_way_comparison.cpp
-                                    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/check_three_way_comparison.cpp"
-                CMAKE_FLAGS "$<${linux_host_with_gcc_like_cxx}:--std=gnu++2a>"
-                CMAKE_FLAGS "$<${linux_host_with_gcc_cxx}:-fconcepts>"
-                #CMAKE_FLAGS  "--std=gnu++2a -fconcepts"
-                CXX_STANDARD "${CMAKE_CXX_STANDARD}"
-                CXX_STANDARD_REQUIRED True)
-
-    if(COMPILE_RESULT_THREE_WAY_COMPARISON)
-        message(STATUS "THREE-WAY COMPARISON SUPPORTED")
-        set(USE_THREE_WAY_COMPARISON ${e_ENABLE_FEATURE} PARENT_SCOPE)
-    else()
-        # AppleClang-14 doesnot support "<=>" operator
-        message(STATUS "WARNING :: THREE-WAY COMPARISON  NOT  supported !!!")
-        set(USE_THREE_WAY_COMPARISON ${e_DISABLE_FEATURE} PARENT_SCOPE)
-    endif()
-    #[===[  for testing purpose
-    set(USE_THREE_WAY_COMPARISON ${e_ENABLE_FEATURE})
-    #]===]
-endfunction()
-
 #[===========[
   Check if compiler supports '-fmacro-prefix-map=old=new'  option
   refer ::: https://fossies.org/linux/bareos/core/CMakeLists.txt

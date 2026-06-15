@@ -112,7 +112,6 @@ add_library( converter::converter ALIAS converter )
 check_chrono_stream_functionality()  # fetches date-lib if needed
 check_clang_string_workaround()
 check_floatingPoint_elementaryStringConversions()
-check_three_way_comparison()
 
 
 
