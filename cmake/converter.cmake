@@ -225,10 +225,11 @@ function(check_chrono_stream_functionality)
         return()
     endif()
 
-    set(USE_CHRONO_FROMSTREAM_1 ${e_ENABLE_FEATURE} PARENT_SCOPE)
+    set(USE_CHRONO_FROMSTREAM_2 ${e_DISABLE_FEATURE} PARENT_SCOPE)
+    set(USE_CHRONO_FROMSTREAM_1 ${e_DISABLE_FEATURE} PARENT_SCOPE)
     set(USE_DATE_FROMSTREAM_2   ${e_DISABLE_FEATURE} PARENT_SCOPE)
 
-    set(USE_CHRONO_TOSTREAM_1   ${e_ENABLE_FEATURE} PARENT_SCOPE)
+    set(USE_CHRONO_TOSTREAM_1   ${e_DISABLE_FEATURE} PARENT_SCOPE)
     set(USE_DATE_TOSTREAM_2     ${e_DISABLE_FEATURE} PARENT_SCOPE)
 
 
@@ -256,16 +257,17 @@ function(check_chrono_stream_functionality)
     if(COMPILE_RESULT_CHRONO_FROMSTREAM)
         # for future reference, when <chrono> supports full functionality
         message(STATUS "checkChrono_fromStream[iss >> std::chrono::parse(fmt, ymd)] ++SUCCESS++")
-        message(STATUS "checkChrono_fromStream[std::chrono::from_stream()] __SKIPPED__")
-        message(STATUS "checkChrono_fromStream[date::from_stream()] __SKIPPED__")
-        set(USE_CHRONO_FROMSTREAM_1 2 PARENT_SCOPE)
-        set(USE_DATE_FROMSTREAM_2   ${e_DISABLE_FEATURE} PARENT_SCOPE)
+        #message(STATUS "checkChrono_fromStream[std::chrono::from_stream()] __SKIPPED__")
+        #message(STATUS "checkChrono_fromStream[date::from_stream()] __SKIPPED__")
+        set(USE_CHRONO_FROMSTREAM_2 ${e_ENABLE_FEATURE} PARENT_SCOPE)
+        #set(USE_CHRONO_FROMSTREAM_1 ${e_DISABLE_FEATURE} PARENT_SCOPE)
+        #set(USE_DATE_FROMSTREAM_2   ${e_DISABLE_FEATURE} PARENT_SCOPE)
     else()
         message(STATUS "checkChrono_fromStream[iss >> std::chrono::parse(fmt, ymd)] --FAILED--")
     endif()
 
 
-    if(NOT COMPILE_RESULT_CHRONO_FROMSTREAM)
+    #if(NOT COMPILE_RESULT_CHRONO_FROMSTREAM)
         try_compile(COMPILE_RESULT_CHRONO_FROMSTREAM
                     SOURCE_FROM_FILE    checkChrono_fromStream.cpp
                                         "${CMAKE_CURRENT_SOURCE_DIR}/cmake/checkChrono_fromStream.cpp"
@@ -288,7 +290,7 @@ function(check_chrono_stream_functionality)
         else()
             message(STATUS "checkChrono_fromStream[std::chrono::from_stream()] --FAILED--")
         endif()
-    endif()
+    #endif()
 
 
     try_compile(COMPILE_RESULT_CHRONO_TOSTREAM
