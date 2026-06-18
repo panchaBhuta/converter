@@ -21,23 +21,14 @@ std::string FromYMD(const datelib::year_month_day& pYmd, std::string::value_type
 #if    USE_CHRONO_TOSTREAM_1 == 1
     //std::chrono::to_stream(oss, fmt, pYmd);
 
-    // PreCompiler Macros to identify PROCESSORS : https://sourceforge.net/p/predef/wiki/Architectures/
-    // available OS-images : https://github.com/actions/runner-images?tab=readme-ov-file#available-images
-
-    //  https://en.cppreference.com/w/cpp/chrono/year_month_day/operator_ltlt
-    //oss << std::format(oss.getloc(), STATICALLY_WIDEN(std::string::value_type,"{:%F}"), pYmd);
-    //oss << std::format(oss.getloc(), "{:%F}", pYmd);
     std::string fmtV("{:");
     fmtV += fmt;
     fmtV += "}";
     oss << std::vformat(oss.getloc(), fmtV, std::make_format_args(pYmd));
 #else // if  USE_DATELIB_TOSTREAM_2 == 1
-    using CS = std::chrono::seconds;
-    std::string* abbrev  = nullptr;
-    std::chrono::seconds* offset_sec = nullptr;
-    date::fields<CS> fds{pYmd};
-    date::to_stream(oss, fmt, fds, abbrev, offset_sec);
+    oss << date::format(fmt, pYmd);
 #endif
+
     return oss.str();
 }
 
