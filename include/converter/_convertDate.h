@@ -175,30 +175,34 @@ namespace converter
                  const std::string::value_type* fmt)
     {
       datelibFrom::year_month_day ymd;
-      std::istringstream iss(str);
-
-      // Ensure the stream is strictly configured NOT to throw(e.g std::ios_base::failure) under any flag changes
-      iss.exceptions(std::ios_base::goodbit);  // IMPORTANT flag
-
-#if    USE_CHRONO_FROMSTREAM_1 == 1
-      CONVERTER_DEBUG_LOG("ConvertFromStr< std::chrono::year_month_day, S2T_FORMAT_YMD>ToVal_args()->  calling std::chrono::parse()");
-      // Parse string into chrono::year_month_day object (C++20)
-      iss >> std::chrono::parse(fmt, ymd);
-#else
-      CONVERTER_DEBUG_LOG("ConvertFromStr< std::chrono::year_month_day, S2T_FORMAT_YMD>ToVal_args()->  calling date::from_stream()");
-      date::from_stream(iss, fmt, ymd);
-#endif
 
       bool is_failed = false;
       bool is_bad = false;
       bool is_eof = false;
 
+
       try {
+        std::istringstream iss(str);
+
+        // Ensure the stream is strictly configured NOT to throw(e.g std::ios_base::failure) under any flag changes
+        iss.exceptions(std::ios_base::goodbit);  // IMPORTANT flag
+
+#if    USE_CHRONO_FROMSTREAM_1 == 1
+        CONVERTER_DEBUG_LOG("ConvertFromStr< std::chrono::year_month_day, S2T_FORMAT_YMD>ToVal_args()->  calling std::chrono::parse()");
+        // Parse string into chrono::year_month_day object (C++20)
+        iss >> std::chrono::parse(fmt, ymd);
+#else
+        CONVERTER_DEBUG_LOG("ConvertFromStr< std::chrono::year_month_day, S2T_FORMAT_YMD>ToVal_args()->  calling date::from_stream()");
+        date::from_stream(iss, fmt, ymd);
+#endif
+
         // Attempt to read the flags; if it throws here, we catch it smoothly
         is_failed = iss.fail();
         is_bad = iss.bad();
         is_eof = iss.eof();
-      } catch (const std::ios_base::failure&) {
+      } catch (const std::ios_base::failure& err) {
+        CONVERTER_DEBUG_LOG("ios-Failure-type :: [std::ios_base::failure] :: error-msg :: " << err.what());
+
         // If the stream threw during the check, we know it failed
         is_failed = true;
       }
