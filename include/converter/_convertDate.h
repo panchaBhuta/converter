@@ -177,6 +177,9 @@ namespace converter
       datelibFrom::year_month_day ymd;
       std::istringstream iss(str);
 
+      // Ensure the stream is strictly configured NOT to throw(e.g std::ios_base::failure) under any flag changes
+      iss.exceptions(std::ios_base::goodbit);  // IMPORTANT flag
+
 #if    USE_CHRONO_FROMSTREAM_1 == 1
       CONVERTER_DEBUG_LOG("ConvertFromStr< std::chrono::year_month_day, S2T_FORMAT_YMD>ToVal_args()->  calling std::chrono::parse()");
       // Parse string into chrono::year_month_day object (C++20)
