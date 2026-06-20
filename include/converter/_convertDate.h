@@ -188,10 +188,25 @@ namespace converter
       CONVERTER_DEBUG_LOG("ConvertFromStr< std::chrono::year_month_day, S2T_FORMAT_YMD>ToVal_args()->  calling date::from_stream()");
       date::from_stream(iss, fmt, ymd);
 #endif
-      CONVERTER_DEBUG_LOG("after call. checking stream status...." << " iss.fail()=" << iss.fail() << " iss.bad()="  << iss.bad() << " iss.eof()="  << iss.eof());
+
+      bool is_failed = false;
+      bool is_bad = false;
+      bool is_eof = false;
+
+      try {
+        // Attempt to read the flags; if it throws here, we catch it smoothly
+        is_failed = iss.fail();
+        is_bad = iss.bad();
+        is_eof = iss.eof();
+      } catch (const std::ios_base::failure&) {
+        // If the stream threw during the check, we know it failed
+        is_failed = true;
+      }
+
+      CONVERTER_DEBUG_LOG("after call. checking stream status...." << " iss.fail()=" << is_failed << " iss.bad()="  << is_bad << " iss.eof()="  << is_eof);
 
       // Validate stringstream is parsed as expected
-      if (iss.fail() || iss.bad())
+      if (is_failed || is_bad)
       {
         std::ostringstream ess{};
         if(USE_CHRONO_FROMSTREAM_1 == e_ENABLE_FEATURE)
@@ -201,7 +216,7 @@ namespace converter
           ess << "(lib->)date";
         }
         ess << " ::: strYMD='" << str << "' , format='" << fmt << "' stream-parse failed.";
-        ess << " iss.fail()=" << iss.fail() << "  iss.bad()=" << iss.bad() << std::endl;
+        ess << " iss.fail()=" << is_failed << " iss.bad()="  << is_bad << std::endl;
 
         std::invalid_argument err{ess.str()};
 
