@@ -181,30 +181,8 @@ namespace converter
       // Parse string into chrono::year_month_day object (C++20)
       iss >> std::chrono::parse(fmt, ymd);
 #else
-      if(!date::from_stream(iss, fmt, ymd))
-      {
-        std::ostringstream ess{};
-        ess << ((USE_CHRONO_FROMSTREAM_1 == e_ENABLE_FEATURE) ? "std::chrono" : "(lib->)date" );
-        ess << " ::: strYMD='" << str << "' , format='" << fmt << "' date::from_stream() failed.";
-        ess << " iss.fail()=" << iss.fail() << "  iss.bad()=" << iss.bad() << std::endl;
-
-        std::invalid_argument err{ess.str()};
-
-        return S2T_FORMAT_YMD::handler(str, err);
-      }
+      date::from_stream(iss, fmt, ymd);
 #endif
-
-      // Validate structural boundaries for final object safety
-      if (!ymd.ok())
-      {
-        std::ostringstream ess{};
-        ess << ((USE_CHRONO_FROMSTREAM_1 == e_ENABLE_FEATURE) ? "std::chrono" : "(lib->)date" );
-        ess << " ::: strYMD='" << str << "' , format='" << fmt << "' invalid-date, conversion failed." << std::endl;
-
-        std::invalid_argument err{ess.str()};
-
-        return S2T_FORMAT_YMD::handler(str, err);
-      }
 
       // Validate stringstream is parsed as expected
       if (iss.fail() || iss.bad())
@@ -213,6 +191,18 @@ namespace converter
         ess << ((USE_CHRONO_FROMSTREAM_1 == e_ENABLE_FEATURE) ? "std::chrono" : "(lib->)date" );
         ess << " ::: strYMD='" << str << "' , format='" << fmt << "' stream-parse failed.";
         ess << " iss.fail()=" << iss.fail() << "  iss.bad()=" << iss.bad() << std::endl;
+
+        std::invalid_argument err{ess.str()};
+
+        return S2T_FORMAT_YMD::handler(str, err);
+      }
+
+      // Validate structural boundaries for final object safety
+      if (!ymd.ok())
+      {
+        std::ostringstream ess{};
+        ess << ((USE_CHRONO_FROMSTREAM_1 == e_ENABLE_FEATURE) ? "std::chrono" : "(lib->)date" );
+        ess << " ::: strYMD='" << str << "' , format='" << fmt << "' invalid-date, conversion failed." << std::endl;
 
         std::invalid_argument err{ess.str()};
 

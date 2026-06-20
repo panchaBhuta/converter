@@ -23,7 +23,7 @@ void conversionEqualCheck(const T& val, const std::string& vStr, bool isValidDat
     unittest::ExpectEqual(T,           converter::ConvertFromStr<T>::ToVal(vStr), val);
     unittest::ExpectEqual(bool, val.ok(), isValidDate);
   } else {
-    ExpectException(converter::ConvertFromStr<T>::ToVal(vStr), std::invalid_argument);
+    ExpectException(converter::ConvertFromStr<T>::ToVal(vStr), std::invalid_argument);  // ubuntu-24.04,g++-12 throws some exception with message "basic_ios::clear: iostream error"
   }
   unittest::ExpectEqual(std::string, converter::ConvertFromVal<T>::ToStr(val), vStr);
 }
@@ -94,7 +94,8 @@ int main()
                           "2023-01-32", false);
 
   } catch (const std::exception& ex) {
-    std::cout << "Unexpected exception in testDateConversion: " << ex.what() << std::endl;
+    std::cout << "Test-failure in testDateConversionWindowsHeader: execption-type {" << typeid(ex).name();
+    std::cout << "} thrown.\nTest-failure-error-msg: " << ex.what() << std::endl;
     rv = 1;
   }
 
