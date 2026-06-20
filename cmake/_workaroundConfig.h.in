@@ -29,7 +29,6 @@
  *  as last resort calls an internal implementation 
  *  (msvc -> to_stream), which has limited formating support.
  */
-#cmakedefine01  USE_CHRONO_FROMSTREAM_2
 #cmakedefine01  USE_CHRONO_FROMSTREAM_1
 #cmakedefine01  USE_CHRONO_TOSTREAM_1
 

@@ -4,7 +4,7 @@
 
 //  ./manualBuild.sh cmake checkChrono_fromStream -DUSE_CHRONO_FROMSTREAM_1=1
 
-#if    USE_CHRONO_FROMSTREAM_1 > 0  // both 1 and 2
+#if    USE_CHRONO_FROMSTREAM_1 == 1
   #include <chrono>
   namespace datelib = std::chrono;
 #else  // if  USE_DATE_FROMSTREAM_2 == 1
@@ -19,7 +19,7 @@ datelib::year_month_day
     std::istringstream iss(pStr);
 
 
-#if    USE_CHRONO_FROMSTREAM_1 == 2
+#if    USE_CHRONO_FROMSTREAM_1 == 1
     // Parse string into chrono::/date:: year_month_day object (C++20)
     iss >> std::chrono::parse(fmt, ymd);
 #else
