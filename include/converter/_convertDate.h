@@ -178,11 +178,14 @@ namespace converter
       std::istringstream iss(str);
 
 #if    USE_CHRONO_FROMSTREAM_1 == 1
+      CONVERTER_DEBUG_LOG("ConvertFromStr< std::chrono::year_month_day, S2T_FORMAT_YMD>ToVal_args()->  calling std::chrono::parse()");
       // Parse string into chrono::year_month_day object (C++20)
       iss >> std::chrono::parse(fmt, ymd);
 #else
+      CONVERTER_DEBUG_LOG("ConvertFromStr< std::chrono::year_month_day, S2T_FORMAT_YMD>ToVal_args()->  calling date::from_stream()");
       date::from_stream(iss, fmt, ymd);
 #endif
+      CONVERTER_DEBUG_LOG("after call. checking stream status....");
 
       // Validate stringstream is parsed as expected
       if (iss.fail() || iss.bad())
@@ -197,6 +200,8 @@ namespace converter
         return S2T_FORMAT_YMD::handler(str, err);
       }
 
+      CONVERTER_DEBUG_LOG("after stream status. checking ymd status....");
+
       // Validate structural boundaries for final object safety
       if (!ymd.ok())
       {
@@ -208,6 +213,8 @@ namespace converter
 
         return S2T_FORMAT_YMD::handler(str, err);
       }
+
+      CONVERTER_DEBUG_LOG("after ymd status. returning ymd....");
 
 
 #if    USE_CHRONO_FROMSTREAM_1 == 1
