@@ -212,7 +212,7 @@ namespace converter
       // Validate stringstream is parsed as expected
       if (is_failed || is_bad)
       {
-        std::ostringstream ess{};
+        std::ostringstream ess;
         if(USE_CHRONO_FROMSTREAM_1 == e_ENABLE_FEATURE)
         {
           ess << "std::chrono";
@@ -221,6 +221,8 @@ namespace converter
         }
         ess << " ::: strYMD='" << str << "' , format='" << fmt << "' stream-parse failed.";
         ess << " iss.fail()=" << is_failed << " iss.bad()="  << is_bad << std::endl;
+
+        CONVERTER_DEBUG_LOG("error-message;" << ess.str());
 
         std::invalid_argument err{ess.str()};
 
