@@ -26,7 +26,8 @@ std::string FromYMD(const datelib::year_month_day& pYmd, std::string::value_type
     fmtV += "}";
     oss << std::vformat(oss.getloc(), fmtV, std::make_format_args(pYmd));
 #else // if  USE_DATELIB_TOSTREAM_2 == 1
-    oss << date::format(fmt, pYmd);
+    //oss << date::format(fmt, pYmd);
+    date::to_stream(oss, fmt, pYmd);
 #endif
 
     return oss.str();

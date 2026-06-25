@@ -14,12 +14,18 @@ void conversionEqualCheck(const T& val, const std::string& vStr, bool isValidDat
   std::cout << "######  date-conversion testing for date=" << vStr << std::endl;
   if(isValidDate)
   {
+    std::cout << "S2T-Test-Start" << std::endl;
     unittest::ExpectEqual(T,           converter::ConvertFromStr<T>::ToVal(vStr), val);
     unittest::ExpectEqual(bool, val.ok(), isValidDate);
+    std::cout << "S2T-Test-end" << std::endl;
   } else {
+    std::cout << "S2T-Failure-Test-start" << std::endl;
     ExpectException(converter::ConvertFromStr<T>::ToVal(vStr), std::invalid_argument);  // ubuntu-24.04,g++-12 throws some exception with message "basic_ios::clear: iostream error"
+    std::cout << "S2T-Failure-Test-end" << std::endl;
   }
+  std::cout << "T2S-Test-Start" << std::endl;
   unittest::ExpectEqual(std::string, converter::ConvertFromVal<T>::ToStr(val), vStr);
+  std::cout << "T2S-Test-End" << std::endl;
 }
 
 int main()

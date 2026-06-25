@@ -176,71 +176,44 @@ namespace converter
     {
       datelibFrom::year_month_day ymd;
 
-      bool is_failed = false;
-      bool is_bad = false;
-      bool is_eof = false;
+      std::istringstream iss(str);
 
-
-      try {
-        std::istringstream iss(str);
-
-        // Ensure the stream is strictly configured NOT to throw(e.g std::ios_base::failure) under any flag changes
-        iss.exceptions(std::ios_base::goodbit);  // IMPORTANT flag
+      // Ensure the stream is strictly configured NOT to throw(e.g std::ios_base::failure) under any flag changes
+      iss.exceptions(std::ios_base::goodbit);  // IMPORTANT flag
 
 #if    USE_CHRONO_FROMSTREAM_1 == 1
-        CONVERTER_DEBUG_LOG("ConvertFromStr< std::chrono::year_month_day, S2T_FORMAT_YMD>ToVal_args()->  calling std::chrono::parse()");
-        // Parse string into chrono::year_month_day object (C++20)
-        iss >> std::chrono::parse(fmt, ymd);
+      CONVERTER_DEBUG_LOG("ConvertFromStr< std::chrono::year_month_day, S2T_FORMAT_YMD>ToVal_args()->  calling std::chrono::parse()");
+      // Parse string into chrono::year_month_day object (C++20)
+      iss >> std::chrono::parse(fmt, ymd);
 #else
-        CONVERTER_DEBUG_LOG("ConvertFromStr< std::chrono::year_month_day, S2T_FORMAT_YMD>ToVal_args()->  calling date::from_stream()");
-        date::from_stream(iss, fmt, ymd);
+      CONVERTER_DEBUG_LOG("ConvertFromStr< std::chrono::year_month_day, S2T_FORMAT_YMD>ToVal_args()->  calling date::from_stream()");
+      date::from_stream(iss, fmt, ymd);
 #endif
 
-        // Attempt to read the flags; if it throws here, we catch it smoothly
-        is_failed = iss.fail();
-        is_bad = iss.bad();
-        is_eof = iss.eof();
-      } catch (const std::ios_base::failure& err) {
-        CONVERTER_DEBUG_LOG("ios-Failure-type :: [std::ios_base::failure] :: error-msg :: " << err.what());
-
-        // If the stream threw during the check, we know it failed
-        is_failed = true;
-      }
-
-      CONVERTER_DEBUG_LOG("after call. checking stream status...." << " iss.fail()=" << is_failed << " iss.bad()="  << is_bad << " iss.eof()="  << is_eof);
+      const bool is_failed = iss.fail();
+      const bool is_bad = iss.bad();
+      //const bool is_eof = iss.eof();
 
       // Validate stringstream is parsed as expected
       if (is_failed || is_bad)
       {
         std::ostringstream ess;
-        if(USE_CHRONO_FROMSTREAM_1 == e_ENABLE_FEATURE)
-        {
-          ess << "std::chrono";
-        } else {
-          ess << "(lib->)date";
-        }
-        ess << " ::: strYMD='" << str << "' , format='" << fmt << "' stream-parse failed.";
-        ess << " iss.fail()=" << is_failed << " iss.bad()="  << is_bad << std::endl;
 
-        CONVERTER_DEBUG_LOG("error-message;" << ess.str());
+        ess << ((USE_CHRONO_FROMSTREAM_1 == e_ENABLE_FEATURE)? "std::chrono" : "(lib->)date" );
+        ess << " ::: strYMD='" << str << "' , format='" << fmt << "' stream-parse failed.";
+        ess << " iss.fail()=" << is_failed << " iss.bad()="  << is_bad;
 
         std::invalid_argument err{ess.str()};
 
         return S2T_FORMAT_YMD::handler(str, err);
       }
 
-      CONVERTER_DEBUG_LOG("after stream status. checking ymd status....");
-
       // Validate structural boundaries for final object safety
       if (!ymd.ok())
       {
         std::ostringstream ess{};
-        if(USE_CHRONO_FROMSTREAM_1 == e_ENABLE_FEATURE)
-        {
-          ess << "std::chrono";
-        } else {
-          ess << "(lib->)date";
-        }
+
+        ess << ((USE_CHRONO_FROMSTREAM_1 == e_ENABLE_FEATURE)? "std::chrono" : "(lib->)date" );
         ess << " ::: strYMD='" << str << "' , format='" << fmt << "' invalid-date, conversion failed." << std::endl;
 
         std::invalid_argument err{ess.str()};
@@ -248,10 +221,8 @@ namespace converter
         return S2T_FORMAT_YMD::handler(str, err);
       }
 
-      CONVERTER_DEBUG_LOG("after ymd status. returning ymd....");
 
-
-#if    USE_CHRONO_FROMSTREAM_1 == 1
+#if    USE_CHRONO_FROMSTREAM_1 == e_ENABLE_FEATURE
       return ymd;
 #else
       std::chrono::year_month_day chrono_ymd {
@@ -318,6 +289,93 @@ namespace converter
   template<c_formatYMDoss T2S_FORMAT_YMD>
   struct ConvertFromVal< std::chrono::year_month_day, T2S_FORMAT_YMD>
   {
+#if USE_DATE_TOSTREAM_2  ==  e_ENABLE_FEATURE
+  private:
+    // The conversion-function "_jugaad()" handles a limited sub-set of date-conversion specifiers
+    inline static void
+    _jugaad(  const std::chrono::year_month_day& val,
+              const std::string::value_type* fmt,
+              std::ostringstream& oss)
+    {
+      std::function<void(char)> write;
+      write = [&oss,&write,&val] (char convSpecifier) -> void
+      {
+        static const std::array<std::string, 13> monthShort = {
+          "%", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+        };
+
+        static const std::array<std::string, 13> monthLong = {
+          "%", "Janary", "February", "March", "April", "May", "June",
+               "July", "August", "September", "October", "November", "December"
+        };
+
+        switch(convSpecifier)
+        {
+          case 'Y' :
+            oss << std::setfill('0') << std::setw(4) << int(val.year()); break;
+          case 'm':
+            oss << std::setfill('0') << std::setw(2) << unsigned(val.month()); break;
+          case 'd':
+            oss << std::setfill('0') << std::setw(2) << unsigned(val.day()); break;
+          case 'F': //  "%Y-%m-%d"
+            write('Y'); oss << '-'; write('m'); oss << '-'; write('d'); break;
+          case 'D': //  "%m/%d/%y"
+            write('m'); oss << '/'; write('d'); oss << '/'; write('y'); break;
+          case 'y' :
+            oss << std::setfill('0') << std::setw(2) << (int(val.year()) % 100); break;
+          case 'b' :
+            try {
+              oss << monthShort.at(unsigned(val.month()));
+            } catch (const std::out_of_range&) {
+              oss << '%' << convSpecifier;
+            }
+            break;
+          case 'B' :
+            try {
+              oss << monthLong.at(unsigned(val.month()));
+            } catch (const std::out_of_range&) {
+              oss << '%' << convSpecifier;
+            }
+            break;
+          default:
+            oss << '%' << convSpecifier;
+        }
+      };
+
+      if (strlen(fmt)>1)
+      {
+        enum e_ParseState { READ, REPLACE };
+        e_ParseState state = e_ParseState::READ;
+        char present = fmt[0];
+        if( '%' == present )
+          state = e_ParseState::REPLACE;
+        for(size_t iii = 1; iii < strlen(fmt); ++iii)
+        {
+          present = fmt[iii];
+          if(e_ParseState::REPLACE == state)
+          {
+            write(present);
+            state = e_ParseState::READ;
+          } else {
+            if( '%' == present )
+            {
+              state = e_ParseState::REPLACE;
+            } else {
+              oss << present;
+              //state = e_ParseState::READ;
+            }
+          }
+        }
+      } else {
+        if (strlen(fmt)==1)
+          oss << fmt[1];
+      }
+    }
+
+
+  public:
+#endif
+
     /**
      * @brief   'type' definition being declared for.
      */
@@ -355,17 +413,46 @@ namespace converter
 #if    USE_CHRONO_TOSTREAM_1 == 1
       //std::chrono::to_stream(oss, fmt, pYmd);
 
+      CONVERTER_DEBUG_LOG("ConvertFromVal< std::chrono::year_month_day, T2S_FORMAT_YMD>ToStr_args()->  calling std::vformat()");
       std::string fmtV("{:");
       fmtV += fmt;
       fmtV += "}";
       oss << std::vformat(oss.getloc(), fmtV, std::make_format_args(val));
 #else // if  USE_DATELIB_TOSTREAM_2 == 1
+
       date::year_month_day date_val {
           date::year{static_cast<int>(val.year())},
           date::month{static_cast<unsigned>(val.month())},
           date::day{static_cast<unsigned>(val.day())}
       };
-      oss << date::format(fmt, date_val);
+      // don't use date::format(), as 'os.exceptions(std::ios::failbit | std::ios::badbit);' throws exception in ubuntu-24:g++-12
+      // there are few more compilers which throws exception in ubuntu-24
+      // date::format() uses date::to_stream()
+      //oss << date::format(fmt, date_val);
+      // oss.imbue(loc);  TODO
+      CONVERTER_DEBUG_LOG("ConvertFromVal< std::chrono::year_month_day, T2S_FORMAT_YMD>ToStr_args()->  calling date::to_stream()");
+      date::to_stream(oss, fmt, date_val);
+      if (oss.fail() || oss.bad()) // || oss.eof())
+      {
+        if(!val.ok())
+        {
+          // this happens in special case where ubuntu-24:g++-12
+          std::ostringstream oss2;
+          T2S_FORMAT_YMD::streamUpdate(oss2);
+
+          // The conversion-function "_jugaad()" handles a limited sub-set of date-conversion specifiers
+          _jugaad( val, fmt, oss2);
+          if (!(oss2.fail() || oss2.bad())) // || oss.eof())
+          {
+            CONVERTER_DEBUG_LOG("ConvertFromVal< std::chrono::year_month_day, T2S_FORMAT_YMD>::_jugaad() for date2string output : str=" << oss2.str());
+            return oss2.str();
+          } else {
+            throw std::invalid_argument("ConvertFromVal< std::chrono::year_month_day, T2S_FORMAT_YMD>::_jugaad() Failure in date2string");
+          }
+        } else {
+          throw std::invalid_argument("std::ostringstream Failure in date2string");
+        }
+      }
 #endif
 
       return oss.str();
