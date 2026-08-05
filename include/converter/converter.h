@@ -30,7 +30,7 @@
 #include <locale>
 #include <stdexcept>
 
-#define CONVERTER_VERSION_MAJOR 1
+#define CONVERTER_VERSION_MAJOR 2
 #define CONVERTER_VERSION_MINOR 4
 #define CONVERTER_VERSION_PATCH 33
 
@@ -78,13 +78,15 @@
 
 #include <converter/_workaroundConfig.h>
 #include <converter/_common.h>
-#include <converter/_convertS2T.h>
-#include <converter/_convertT2S.h>
-#include <converter/_convertDate.h>
-#include <converter/_convertTuple.h>
-#include <converter/_convertC2T.h>
-#include <converter/_convertT2C.h>
+//#include <converter/_convertS2T.h>
+//#include <converter/_convertT2S.h>
+//#include <converter/_convertTuple.h>
+//#include <converter/_convertC2T.h>
+//#include <converter/_convertT2C.h>
 
+#include <converter/_convertStr2T.h>
+#include <converter/_convertT2Str.h>
+#include <converter/_convertDate.h>
 
 namespace converter
 {

@@ -2,7 +2,7 @@
  * _common.h
  *
  * URL:      https://github.com/panchaBhuta/converter
- * Version:  v1.0
+ * Version:  v2.4
  *
  * Copyright (c) 2023-2026 Gautam Dhar
  * All rights reserved.
@@ -15,6 +15,8 @@
 
 #include <charconv>
 #include <type_traits>
+#include <concepts>
+#include <algorithm>
 
 
 /*
@@ -26,149 +28,32 @@
 namespace converter
 {
   template <typename T>
-  struct always_false : std::false_type {};
+  struct always_true : std::true_type {};
+
+  template <typename T>
+  struct always_false : std::false_type {};  // usually as default for type-traits or in static_assert()
 
   // [=============================================================[   common helpers
-  // [=========[  concept :  is std::from_chars supported
-  template<typename T>
-  concept c_isFromCharsEnable = requires(const char* first, const char* last, T& value) {
-      { std::from_chars(first, last, value) } -> std::same_as<std::from_chars_result>;
-      // https://en.cppreference.com/w/cpp/utility/from_chars.html
-  };
-
-
-  template <typename T, typename = void>
-  struct has_from_chars : std::false_type {};
-  template <typename T>
-  struct has_from_chars<T, std::void_t<
-    decltype(std::from_chars(
-        std::declval<const char*>(),
-        std::declval<const char*>(),
-        std::declval<T&>()
-    ))
-  >> : std::true_type {};
-  // ]=========]  concept :  is std::from_chars supported
-
-
-  // [=========[  concept :  char-types
+  // [=========[  concept :  types
   //  refer https://www.codeproject.com/Articles/5348002/A-History-of-C-and-Cplusplus-Character-Data-Types
   template <typename T>
-  concept c_canBsigned_char = ( std::is_same_v<T, char> ||
-                                std::is_same_v<T, wchar_t> );
-
-  template <typename T>
-  struct is_signed_char { static constexpr bool value = false; };
-  template <>
-  struct is_signed_char<signed char> { static constexpr bool value = true; };
-  template <c_canBsigned_char T>
-  struct is_signed_char<T> {
-    // plain chars can be either signed or unsigned as they are machine dependent, but printable characters are always positive
-    static constexpr bool
-    value = (static_cast<int>((std::numeric_limits<T>::min)()) < 0);
-    // warning C4003: not enough arguments for function-like macro invocation 'min'
-    // work-around is (std::numeric_limits<T>::min)()
-  };
-  template <typename T>
-  concept c_signed_char = is_signed_char<T>::value;
-
-  template <typename T, typename = void>
-  struct is_unsigned_char { static constexpr bool value = false; };
-  template <>
-  struct is_unsigned_char<unsigned char> { static constexpr bool value = true; };
-  // [==[ char8_t : corner case
-       /*
-        *  C++20 introduces a new character type specifically for UTF-8 encoded character data: char8_t.
-        *  It has the same size and sign as unsigned char but is distinct from it.
-        *
-        *  The upcoming C standard (probably C23) includes a proposal for char8_t, which is a typedef to unsigned char.
-        */
-  template <>
-  struct is_unsigned_char<  char8_t,
-                            std::enable_if_t<!std::is_same_v<unsigned char, char8_t>>
-                         >
-  { static constexpr bool value = true; };
-  // ]==] char8_t : corner case
-  template <>
-  struct is_unsigned_char<char16_t> { static constexpr bool value = true; };
-  template <>
-  struct is_unsigned_char<char32_t> { static constexpr bool value = true; };
-  template <c_canBsigned_char T>
-  struct is_unsigned_char<T> {
-    // plain chars can be either signed or unsigned as they are machine dependent, but printable characters are always positive
-    static constexpr bool
-    value = (static_cast<int>((std::numeric_limits<T>::min)()) == 0);
-  };
-  template <typename T>
-  concept c_unsigned_char = is_unsigned_char<T>::value;
-
-  template <typename T>
-  struct is_char {
-    static constexpr bool
-    value = is_signed_char<T>::value || is_unsigned_char<T>::value;
-  };
-  template <typename T>
-  concept c_char = is_char<T>::value;
-
-/*
-  ?? not used yet. but  as a place holder for future use if required. ??
-
-  // Plain char, signed char, and unsigned char are three distinct types.
-  // A char, a signed char, and an unsigned char occupy the same amount of storage and have the
-  // same alignment requirements (basic.types); that is, they have the same object representation.
-  template<c_char T>
-  struct is_basicChar { static constexpr bool value = false; };
-
-  template<>
-  struct is_basicChar<char> { static constexpr bool value = true; };
-
-  template<>
-  struct is_basicChar<signed char> { static constexpr bool value = true; };
-
-  template<>
-  struct is_basicChar<unsigned char> { static constexpr bool value = true; };
-
-  template <c_char T>
-  concept c_basicChar = is_basicChar<T>::value;
-
-  template <c_char T>
-  concept c_NOT_basicChar = (!is_basicChar<T>::value);
-*/
-  // ]=========]  concept :  char-types
+  concept c_char = std::is_same_v<T, char>          ||
+                   std::is_same_v<T, signed char>   ||
+                   std::is_same_v<T, unsigned char> ||
+                   std::is_same_v<T, wchar_t>       ||
+                   std::is_same_v<T, char8_t>       ||   // C++20
+                   std::is_same_v<T, char16_t>      ||   // C++11
+                   std::is_same_v<T, char32_t>;          // C++11
 
   template<typename T>
-  concept c_arithmetic = std::is_arithmetic_v<T>;
+  concept c_arithmetic = std::is_arithmetic_v<T>;  // std::is_integral<T>::value || std::is_floating_point<T>::value
 
-  template<typename T>
-  concept c_integral = std::is_integral_v<T>;
-
-
-  // [=========[  concept : integer-types
-  // std::integral is true for 'bool' and 'char'.
-  // Conversion for 'bool' and 'char' is different from other 'integral-s'.
-  // Hence need for a 'concept' to segregate from 'bool' and 'char'
-  template<typename T>
-  struct is_integer_type
-  {
-    static constexpr bool value = std::is_integral_v<T> &&
-                                  (!is_char<T>::value) &&
-                                  (!std::is_same_v<T, bool>);
-  };
   template <typename T>
-  concept c_integer_type = is_integer_type<T>::value;
-
-  //template <typename T>
-  //concept c_std_integral = is_integral_v<T>;
-  // ]=========]  concept : integer-types
-
-
-  // [=========[  concept : floating_point-types
-  // Going with the flow, and just wrapping up floating_point
-  template<typename T>
-  concept c_floating_point = std::is_floating_point_v<T>;
+  concept c_integral = std::is_integral<T>::value;  // includes bool and char's signed and unsigned
 
   template<typename T>
-  concept c_NOT_floating_point = !std::is_floating_point_v<T>;
-  // ]=========]  concept : floating_point-types
+  concept c_floating_point = std::is_floating_point<T>::value;
+  // ]=========]  concept : types
 
 
   /*
@@ -196,9 +81,6 @@ namespace converter
   template<typename T>
   concept c_quiet_NaN = std::numeric_limits<T>::has_quiet_NaN;
 
-  template<typename T>
-  concept c_number_type = std::is_arithmetic_v<T> && (!is_char<T>::value);
-
   // refer: https://stackoverflow.com/a/72451771/2299954
   namespace _prv_impl
   {
@@ -216,8 +98,16 @@ namespace converter
   template<typename T>
   concept c_basic_string = is_string<T>;
 
-  template<typename T>
-  concept c_NOT_basic_string = !is_string<T>;
+
+  template <typename ENUM, std::size_t N>
+  constexpr bool check_any_of(std::array<ENUM, N> arr, ENUM enumVal)
+  {
+    return std::any_of( arr.begin(), arr.end(),
+                        [enumVal](ENUM val) { return val == enumVal; }
+                      );
+    return false;
+  }
+
 
 
 
@@ -249,162 +139,204 @@ namespace converter
   };
   */
 
+
+
+
+
+  template< typename T >
+  struct Format_StringStream;
+
+  class Format_StringStream_Base
+  {
+  protected:
+    /*
+      * Default constructor. Constructs a copy of the global C++ locale,
+      * which is the locale most recently used as the argument to std::locale::global
+      * or a copy of std::locale::classic() if no call to std::locale::global has been made.
+    */
+    Format_StringStream_Base( const std::locale& loc ) // = std::locale{}
+                        //std::ios_base::fmtflags flags = std::ios_base::fmtflags(0)  -> use later if needed
+        : _loc(loc), _hasLocParam(true) //, _flags(flags)
+    {}
+
+    Format_StringStream_Base()
+        : _loc(std::locale{}), _hasLocParam(false) //, _flags(flags)
+    {}
+
+    Format_StringStream_Base(const Format_StringStream_Base&  other) = default;
+    Format_StringStream_Base(      Format_StringStream_Base&& other) = default;
+    Format_StringStream_Base& operator=(const Format_StringStream_Base& other) = delete;
+
+
+    Format_StringStream_Base( const std::locale& loc, const bool hasLocParam ) // = std::locale{}
+                        //std::ios_base::fmtflags flags = std::ios_base::fmtflags(0)  -> use later if needed
+        : _loc(loc), _hasLocParam(hasLocParam) //, _flags(flags)
+    {}
+
+
+
+    const std::locale _loc;
+    //const std::ios_base::fmtflags _flags;
+    const bool _hasLocParam;
+
+    template<typename OT>
+    friend struct Format_StringStream;
+
+  public:
+    bool hasLocParam() const { return _hasLocParam; }
+    const std::locale& getLoc() const { return _loc; }
+
+    template<
+              class CharT,
+              class Traits = std::char_traits<CharT>
+            >
+    void applyFormatArgs(std::basic_ios<CharT, Traits>& ios) const
+    {
+      if (!_hasLocParam) return;
+
+      ios.imbue(_loc);
+      // ios.setf(_flags); // set format flags if needed in future
+    }
+  };
+
+
+  template < c_integral T >
+  struct Format_StringStream<T> : public Format_StringStream_Base
+  {
+    using type = Format_StringStream<T>;
+
+    static type getDefaultFormatArgs()
+    {
+      return type();
+    }
+
+    // Safely inherit all constructors from the Base class
+    using Format_StringStream_Base::Format_StringStream_Base;
+
+    /// Rule of 3 / 5 Rule Compliance
+    Format_StringStream(const type&  other) = default;
+    Format_StringStream(      type&& other) = default;
+    Format_StringStream& operator=(const type& other) = delete;
+
+    template<c_integral OT>
+        requires ( !std::is_same_v<T, OT> )
+    Format_StringStream(const Format_StringStream<OT>& other)
+        : Format_StringStream_Base(other._loc, other._hasLocParam)
+    {}
+
+    template<
+              class CharT,
+              class Traits = std::char_traits<CharT>
+            >
+    void applyFormatArgs(std::basic_ios<CharT, Traits>& ios) const
+    {
+
+      Format_StringStream_Base::applyFormatArgs(ios);
+    }
+  };
+
+  template < c_floating_point T >
+  struct Format_StringStream<T> : public Format_StringStream_Base
+  {
+    using type = Format_StringStream<T>;
+
+    static type getDefaultFormatArgs()
+    {
+      return type();
+    }
+
+    Format_StringStream( const std::locale& loc, // = std::locale{},
+                         const int precision )    // = std::cout.precision() // default_precision
+                        //std::ios_base::fmtflags flags = std::ios_base::fmtflags(0)  -> use later if needed
+        : Format_StringStream_Base(loc), _precision(precision), _hasPrecisionParam(true) //, _flags(flags)
+    {}
+
+    Format_StringStream()
+        : Format_StringStream_Base(), _precision(std::numeric_limits<T>::max_digits10), _hasPrecisionParam(false) //, _flags(flags)
+    {}
+
+    Format_StringStream( const std::locale& loc )    // = std::numeric_limits<T>::max_digits10 // default_precision
+                        //std::ios_base::fmtflags flags = std::ios_base::fmtflags(0)  -> use later if needed
+        : Format_StringStream_Base(loc), _precision(std::numeric_limits<T>::max_digits10), _hasPrecisionParam(false) //, _flags(flags)
+    {}
+
+    Format_StringStream( const int precision )    // = std::numeric_limits<T>::max_digits10 // default_precision
+                        //std::ios_base::fmtflags flags = std::ios_base::fmtflags(0)  -> use later if needed
+        : Format_StringStream_Base(), _precision(precision), _hasPrecisionParam(true) //, _flags(flags)
+    {}
+
+    /// Rule of 3 / 5 Rule Compliance
+    Format_StringStream(const type&  other) = default;
+    Format_StringStream(      type&& other) = default;
+    Format_StringStream& operator=(const type& other) = delete;
+
+    template<c_floating_point OT>
+        requires ( !std::is_same_v<T, OT> )
+    Format_StringStream(const Format_StringStream<OT>& other)
+        : Format_StringStream_Base(static_cast< Format_StringStream_Base& >(other)),
+          _precision(std::numeric_limits<T>::max_digits10), _hasPrecisionParam(other._hasPrecisionParam)
+    {}
+
+    template<
+              class CharT,
+              class Traits = std::char_traits<CharT>
+            >
+    void applyFormatArgs(std::basic_ios<CharT, Traits>& ios) const
+    {
+
+      Format_StringStream_Base::applyFormatArgs(ios);
+
+      if (!_hasPrecisionParam) return;
+
+      /*
+       * refer document PROJECT_DIR/doc/T2text2T_conversion.odt
+       *
+       * using digits10 instead of max_digits10 to set precision for stringstream-based conversion,
+       * as the precision for stringstream-based conversion should be set to the maximum number of
+       * decimal digits that can be represented without losing precision, which is given by digits10.
+       * Setting it to max_digits10 would be unnecessarily high and could lead to performance issues
+       * without providing any additional benefit in terms of precision for typical use cases.
+      */
+      //if constexpr ( std::numeric_limits<T>::digits10 > 0 )  // Input safety (Text ➡️ Float)
+      // we donot use "digits10" as for any round-trip conersions
+      //   "Text ➡️ Float ➡️ Text"    OR   "Float ➡️ Text ➡️ Float"
+      // "max_digits10" has prominance even for : Input safety (Text ➡️ Float)
+      if constexpr ( c_floating_point<T> )  // Output safety (Float ➡️ Text)
+      {
+        if (_precision > 0)
+        {
+          // https://en.cppreference.com/w/cpp/io/manip/setprecision.html
+          ios.precision(_precision);
+        }
+      }
+      // ios.setf(_flags); // set format flags if needed in future
+    }
+
+  private:
+    const std::streamsize _precision;
+    //const std::ios_base::fmtflags _flags;
+    const bool _hasPrecisionParam;
+  };
+
+
+
+  template< typename T, auto... ARGS >
+  struct Format_SpecializedImplementation
+  {
+    using type = void*; // work around to fit into FormatInfo::getDefaultFormatArgs()
+
+    constexpr static type getDefaultFormatArgs()
+    {
+      return static_cast<void*>(nullptr);
+    }
+  };
+
+
+  template <typename T, auto CONV_PROCESS >
+  struct FormatInfo;
+
   // ]=============================================================]   common helpers
 
 
+} // namespace converter
 
-  // [=============================================================[ COMMON_FORMAT
-  template <typename IOSS>
-  struct is_iostream {
-    static constexpr bool
-    value = is_char<typename IOSS::char_type>::value &&
-                         (std::is_same_v<std::basic_istringstream<typename IOSS::char_type>,IOSS> ||
-                          std::is_same_v<std::basic_ostringstream<typename IOSS::char_type>,IOSS>);
-  };
-  template <typename IOSS>
-  concept c_iostream = is_iostream<IOSS>::value;
-
-
-  template<c_iostream IOSS>
-  struct Format_StreamAsIs
-  {
-    using stream_type = IOSS;
-
-    constexpr static inline void streamUpdate(IOSS&) {}
-  };
-
-  template<c_iostream IOSS>
-  struct Format_StreamUseClassicLocale
-  {
-    using stream_type = IOSS;
-    static inline void streamUpdate(IOSS& ss)
-    {
-      const std::locale& ulocale = std::locale::classic();
-      ss.imbue(ulocale);
-    }
-  };
-
-  template<c_iostream IOSS, const char* usrLoc>
-  struct Format_StreamUserLocale
-  {
-    using stream_type = IOSS;
-    static inline void streamUpdate(IOSS& ss)
-    {
-      const std::locale userlocale(usrLoc);
-      ss.imbue(userlocale);
-    }
-  };
-
-
-
-  /*
-      https://stackoverflow.com/questions/52299062/template-specialization-for-sfinae
-      That is simply how SFINAE works ;)
-
-      As you know, you have to "create a failure" within the template declaration and not inside the template definition. As this:
-
-      template < typename X, typename = ... here is the code which may generate an error     during instantiation >
-      void Bla() {}
-
-      The only chance to put some "code" in the declaration is to define something in the template parameter list or inside the template function declaration itself like:
-
-      template < typename X>
-      void Bla( ... something which may generates an error )   <<== also works on return type
-      {}
-  */
-  // also refer  ::  https://stackoverflow.com/questions/11055923/stdenable-if-parameter-vs-template-parameter/11056146#11056146
-  template <typename, typename = void>
-  struct has_streamUpdate : std::false_type {};
-
-  template <typename FMT>
-  struct has_streamUpdate<FMT, std::void_t< decltype(FMT::streamUpdate),  // check for the presence of static member function   FMT::streamUpdate
-                                            typename FMT::stream_type     // check for the presence of type-def FMT::stream_type
-                                          >
-                         >
-           : std::is_same<decltype(&FMT::streamUpdate), void(*)(typename FMT::stream_type&)>  // member is function
-  {};
-
-  template <typename, typename = void >
-  struct is_formatSS : std::false_type {};
-
-  template <typename FMT>
-  struct is_formatSS< FMT,
-                      typename std::enable_if_t<   has_streamUpdate<FMT>::value &&
-                                                   is_iostream<typename FMT::stream_type>::value
-                                               >
-                    >
-           : std::true_type
-  {};
-  template <typename FMT>
-  concept c_formatSS = is_formatSS<FMT>::value;
-
-  template <typename, typename = void>
-  struct is_formatYMDss : std::false_type {};
-
-  template <typename FMT>
-  struct is_formatYMDss< FMT,
-                         std::void_t<decltype(FMT::ymdFormat)>  // check for the presence of FMT::ymdFormat
-                       >
-           : is_formatSS<FMT>
-  {};
-  template <typename FMT>
-  concept c_formatYMDss = is_formatYMDss<FMT>::value;
-
-  template<c_iostream IOSS,
-           c_formatSS FORMAT_1,
-           c_formatSS FORMAT_2 >
-      requires std::is_same_v<IOSS,typename FORMAT_1::stream_type> &&
-               std::is_same_v<IOSS,typename FORMAT_2::stream_type>
-  struct Format_StreamCombineFormat
-  {
-    using stream_type = IOSS;
-
-    static inline void streamUpdate(IOSS& ss)
-    {
-      FORMAT_2::streamUpdate(ss);
-      FORMAT_1::streamUpdate(ss);
-    }
-  };
-
-  template<c_floating_point T>
-  constexpr int getDecimalPrecision()
-  {
-    /*
-       Q: why +3 in the return ?
-       A: There is loss of data-precision at several places, for e.g:
-          float pi_val = 3.1415926535f;  // (1)
-          std::ostringstream oss;
-          oss << pi_val; std::string pi_str = oss.str();  // (2)
-          std::istringstream iss(pi_str); float pi_read;
-          iss >> pi_read; // (3)
-
-          The data-precision loss is happening at steps (1), (2) and (3)
-          The precision-loss at (1), where in rvalue-raw is not captured exactly
-          in lvalue-variable. This is system dependent.
-          The value in lvalue-variable(pi_val) should be written to text at a
-          higher precision digits for float(hence +3). As we need to eliminate the
-          precision loss happening at steps (2) and (3).
-          The repeatability or read-write accuracy can only be achieved by using
-          higher precision of that specified by precision accuracy for float.
-
-          Refer test091, which fails when +3 is removed here.
-    */
-    //  https://www.learncpp.com/cpp-tutorial/floating-point-numbers/
-    //  https://en.cppreference.com/w/cpp/types/numeric_limits/digits10
-    return std::numeric_limits<T>::digits10 + 3;
-    /*
-    if constexpr (std::is_same_v<T, float>)
-      return FLT_DIG+3;  // (4 bytes) -> 6 significant digits, typically 7
-      //  (6 for IEEE float)
-    else
-    if constexpr (std::is_same_v<T, double>)
-      return DBL_DIG+3;  // (8 bytes) -> 15 significant digits, typically 16
-      //  (15 for IEEE double)
-    else
-    if constexpr (std::is_same_v<T, long double>)
-      return LDBL_DIG+3;  // (if 16 bytes) -> 33-36 significant digits
-      //  (18 for 80-bit Intel long double; 33 for IEEE quadruple)
-    */
-  }
-  // ]=============================================================] COMMON_FORMAT
-}

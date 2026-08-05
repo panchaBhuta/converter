@@ -216,5 +216,102 @@ namespace unittest
           decimalPrecision, decimalSeperator, currencySeperator, stringent_check);
   }
 
+
+  template <>
+  struct SScompatible<converter::Str2TnConversionProcess> {
+    inline static std::string getVal(const converter::Str2TnConversionProcess& val)
+    {
+      switch (val)
+      {
+        case converter::Str2TnConversionProcess::SPECIALIZED_IMPLEMENTATION  : return "SPECIALIZED_IMPLEMENTATION";
+        case converter::Str2TnConversionProcess::FROM_CHARS                  : return "FROM_CHARS";
+        case converter::Str2TnConversionProcess::S2N                         : return "S2N";
+        case converter::Str2TnConversionProcess::STRINGSTREAM                : return "STRINGSTREAM";
+        default                                                              : return "Str2TnConversionProcess::???";
+      }
+    }
+  };
+
+  template <std::size_t N>
+  struct SScompatible<std::array<converter::Str2TnConversionProcess, N>> {
+    inline static std::string getVal(const std::array<converter::Str2TnConversionProcess, N>& val)
+    {
+      std::ostringstream oss;
+      oss << "array-Str2TnConversionProcess{";
+      for (const converter::Str2TnConversionProcess& s2t : val)
+      {
+        oss << SScompatible<converter::Str2TnConversionProcess>::getVal(s2t) << ",";
+      }
+      oss << "}";
+      return oss.str();
+    }
+  };
+
+
+  template <>
+  struct SScompatible<converter::Str2TnErrorHandler> {
+    inline static std::string getVal(const converter::Str2TnErrorHandler& val)
+    {
+      switch (val)
+      {
+        case converter::Str2TnErrorHandler::QUIET_NAN     : return "QUIET_NAN";
+        case converter::Str2TnErrorHandler::SIGNAL_NAN    : return "SIGNAL_NAN";
+        case converter::Str2TnErrorHandler::INAPPLICABLE  : return "INAPPLICABLE";
+        case converter::Str2TnErrorHandler::THROW_ERROR   : return "THROW_ERROR";
+        case converter::Str2TnErrorHandler::VARIANT_VAL   : return "VARIANT_VAL";
+        default                                           : return "Str2TnErrorHandler::???";
+      }
+    }
+  };
+
+  template <std::size_t N>
+  struct SScompatible<std::array<converter::Str2TnErrorHandler, N>> {
+    inline static std::string getVal(const std::array<converter::Str2TnErrorHandler, N>& val)
+    {
+      std::ostringstream oss;
+      oss << "array-Str2TnErrorHandler{";
+      for (const converter::Str2TnErrorHandler& err : val)
+      {
+        oss << SScompatible<converter::Str2TnErrorHandler>::getVal(err) << ",";
+      }
+      oss << "}";
+      return oss.str();
+    }
+  };
+
+
+  template <>
+  struct SScompatible<converter::Tn2StrConversionProcess> {
+    inline static std::string getVal(const converter::Tn2StrConversionProcess& val)
+    {
+      switch (val)
+      {
+        case converter::Tn2StrConversionProcess::SPECIALIZED_IMPLEMENTATION  : return "SPECIALIZED_IMPLEMENTATION";
+        case converter::Tn2StrConversionProcess::TO_CHARS                    : return "TO_CHARS";
+        case converter::Tn2StrConversionProcess::TO_STRING                   : return "TO_STRING";
+        case converter::Tn2StrConversionProcess::STRINGSTREAM                : return "STRINGSTREAM";
+        default                                                              : return "Tn2StrConversionProcess::???";
+      }
+    }
+  };
+
+  template <std::size_t N>
+  struct SScompatible<std::array<converter::Tn2StrConversionProcess, N>> {
+    inline static std::string getVal(const std::array<converter::Tn2StrConversionProcess, N>& val)
+    {
+      std::ostringstream oss;
+      oss << "array-Tn2StrConversionProcess{";
+      for (const converter::Tn2StrConversionProcess& t2s : val)
+      {
+        oss << SScompatible<converter::Tn2StrConversionProcess>::getVal(t2s) << ",";
+      }
+      oss << "}";
+      return oss.str();
+    }
+  };
+
+
+
+
 }
 

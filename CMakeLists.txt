@@ -212,6 +212,6 @@ endif()
 # Build examples when requested by the user
 message(STATUS "Build examples: ${CONVERTER_BUILD_EXAMPLES}")
 if (CONVERTER_BUILD_EXAMPLES)
-    add_subdirectory(examples)
+    #add_subdirectory(examples)
 endif()
 

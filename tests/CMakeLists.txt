@@ -96,9 +96,12 @@ endmacro(add_perf_test)
 # Unit tests
 add_unit_test(testPlatform)
 
-add_unit_test(testDefaultTemplateInstantiation)
-add_unit_test(testAllTemplateInstantiation)
+add_unit_test(testSupportingTemplates)
 add_unit_test(testBasicConversions)
+
+add_unit_test(testAllConversionTemplateInstances)
+
+#[======================[
 add_unit_test(testFloatingPointNaN)
 add_unit_test(testIntegerNaN)
 
@@ -118,6 +121,7 @@ add_unit_test(testTupleConversions)
 
 add_unit_test(testCIstring)
 add_unit_test(testRegexString)
+#]======================]
 
 
 #[======================[

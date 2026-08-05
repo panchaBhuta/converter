@@ -461,6 +461,11 @@ function(check_floatingPoint_elementaryStringConversions)
                      USE_FLOATINGPOINT_TO_CHARS_1)
     message(STATUS "previous-build check for USE_FLOATINGPOINT_TO_CHARS_1 : ${USE_FLOATINGPOINT_TO_CHARS_1}")
 
+    get_macro_value( ${CMAKE_CURRENT_BINARY_DIR}/include/converter/_workaroundConfig.h
+                    "USE_FLOATINGPOINT_TO_STRING_1"
+                     USE_FLOATINGPOINT_TO_STRING_1)
+    message(STATUS "previous-build check for USE_FLOATINGPOINT_TO_STRING_1 : ${USE_FLOATINGPOINT_TO_STRING_1}")
+
     if(   (NOT USE_FLOATINGPOINT_FROM_CHARS_1  STREQUAL "NOTFOUND") AND
           (NOT USE_FLOATINGPOINT_TO_CHARS_1    STREQUAL "NOTFOUND")  )
         set(USE_FLOATINGPOINT_FROM_CHARS_1  ${USE_FLOATINGPOINT_FROM_CHARS_1}  PARENT_SCOPE)
@@ -510,20 +515,61 @@ function(check_floatingPoint_elementaryStringConversions)
         message(STATUS "check_floatingPoint_toChars ::  --FAILED--")
     endif()
 
-    if(COMPILE_FLOATINGPOINT_FROM_CHARS AND COMPILE_FLOATINGPOINT_TO_CHARS)
-        message(STATUS "floatingPoint_fromChars algo ::  default-ENABLED")
-        message(STATUS "floatingPoint_toChars algo ::  default-ENABLED")
+
+    if(  COMPILE_FLOATINGPOINT_FROM_CHARS  )
+        message(STATUS "floatingPoint_fromChars algo ::  ENABLED")
         set(USE_FLOATINGPOINT_FROM_CHARS_1   ${e_ENABLE_FEATURE} PARENT_SCOPE)
+    else()
+        message(STATUS "WARNING :: floatingPoint_fromChars algo ::  DISABLED")
+        set(USE_FLOATINGPOINT_FROM_CHARS_1   ${e_DISABLE_FEATURE} PARENT_SCOPE)
+    endif()
+
+    if(  COMPILE_FLOATINGPOINT_TO_CHARS  )
+        message(STATUS "floatingPoint_toChars algo ::  ENABLED")
         set(USE_FLOATINGPOINT_TO_CHARS_1     ${e_ENABLE_FEATURE} PARENT_SCOPE)
     else()
-        message(STATUS "WARNING :: floatingPoint_fromChars algo ::  workaround-enabled")
-        message(STATUS "WARNING :: floatingPoint_toChars algo ::  workaround-enabled")
-        set(USE_FLOATINGPOINT_FROM_CHARS_1   ${e_DISABLE_FEATURE} PARENT_SCOPE)
+        message(STATUS "WARNING :: floatingPoint_toChars algo ::  DISABLED")
         set(USE_FLOATINGPOINT_TO_CHARS_1     ${e_DISABLE_FEATURE} PARENT_SCOPE)
     endif()
+
+
+
+    try_run    (RUN_FLOATINGPOINT_TO_STRING  COMPILE_FLOATINGPOINT_TO_STRING
+                SOURCE_FROM_FILE    check_floatingPoint_toString.cpp
+                                    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/check_floatingPoint_toString.cpp"
+                CMAKE_FLAGS "$<${linux_host_with_gcc_like_cxx}:--std=gnu++2a>"
+                CMAKE_FLAGS "$<${linux_host_with_gcc_cxx}:-fconcepts>"
+                #CMAKE_FLAGS  "--std=gnu++2a -fconcepts"   not needed
+                #COMPILE_DEFINITIONS "-DUSE_FLOATINGPOINT_FROM_CHARS=${e_ENABLE_FEATURE}"  not needed
+                CXX_STANDARD "${CMAKE_CXX_STANDARD}"
+                CXX_STANDARD_REQUIRED True
+                LOG_DESCRIPTION "run-check: check_floatingPoint_toString.cpp"
+                COMPILE_OUTPUT_VARIABLE  TRY_COMPILE_OUTPUT
+                RUN_OUTPUT_VARIABLE      TRY_RUN_OUTPUT)     # return 0;
+                #RUN_OUTPUT_STDOUT_VARIABLE LOG_RUN_STDOUT
+                #RUN_OUTPUT_STDERR_VARIABLE LOG_RUN_STDERR)
+    message(STATUS "check_floatingPoint_toString compile output : ${COMPILE_FLOATINGPOINT_TO_STRING}")
+    message(STATUS "check_floatingPoint_toString run compile : ${RUN_FLOATINGPOINT_TO_STRING}")
+
+
+    if( COMPILE_FLOATINGPOINT_TO_STRING  AND
+        ( ( NOT RUN_FLOATINGPOINT_TO_STRING   STREQUAL  "FAILED_TO_RUN" ) AND
+          (     RUN_FLOATINGPOINT_TO_STRING   EQUAL 0 )
+        )
+      )
+        message(STATUS "check_floatingPoint_toString ::  ++SUCCESS++")
+        message(STATUS "floatingPoint_toString algo ::  ENABLED")
+        set(USE_FLOATINGPOINT_TO_STRING_1    ${e_ENABLE_FEATURE} PARENT_SCOPE)
+    else()
+        message(STATUS "check_floatingPoint_toString ::  --FAILED--")
+        message(STATUS "WARNING :: floatingPoint_toString algo ::  DISABLED")
+        set(USE_FLOATINGPOINT_TO_STRING_1    ${e_DISABLE_FEATURE} PARENT_SCOPE)
+    endif()
+
     #[===[  for testing purpose
         set(USE_FLOATINGPOINT_FROM_CHARS_1   ${e_DISABLE_FEATURE} PARENT_SCOPE)
         set(USE_FLOATINGPOINT_TO_CHARS_1     ${e_DISABLE_FEATURE} PARENT_SCOPE)
+        set(USE_FLOATINGPOINT_TO_STRING_1    ${e_DISABLE_FEATURE} PARENT_SCOPE)
     #]===]
 endfunction()
 

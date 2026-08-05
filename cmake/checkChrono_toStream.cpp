@@ -25,6 +25,10 @@ std::string FromYMD(const datelib::year_month_day& pYmd, std::string::value_type
     fmtV += fmt;
     fmtV += "}";
     oss << std::vformat(oss.getloc(), fmtV, std::make_format_args(pYmd));
+    // return std::format(fmtV, today); this only works when fmtV is string literal
+    // like "{:%d %B %Y}"  gets converted to "std::format_string<Args...> fmt"
+    // Compile-Time Validation: it is a template wrapper,
+    // the C++ compiler parses your format string ("{:%d %B %Y}") during compilation.
 #else // if  USE_DATELIB_TOSTREAM_2 == 1
     //oss << date::format(fmt, pYmd);
     date::to_stream(oss, fmt, pYmd);

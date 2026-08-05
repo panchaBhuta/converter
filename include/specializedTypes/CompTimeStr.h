@@ -68,9 +68,17 @@ namespace specializedTypes
   template<std::size_t N>
   struct CompTimeStr
   {
+    std::size_t size;
     char data[N] {};
 
-    consteval CompTimeStr(const char (&str)[N])
+    consteval CompTimeStr(const char (&str)[N])  // only Compile time
+        : size(N)
+    {
+      std::copy_n(str, N, data);
+    }
+
+    constexpr CompTimeStr(const char (&str)[N], bool)  // Compile time, can be run-time
+        : size(N)
     {
       std::copy_n(str, N, data);
     }
@@ -81,9 +89,16 @@ namespace specializedTypes
       return std::equal(data, data + N, other.data);
     }
 
-  };
-}
+    // Provide a helper to expose data safely as a string_view
+    constexpr std::string_view view() const {
+      return std::string_view(data, N - 1); // exclude null terminator
+    }
 
+  };
+
+  // Deduction guide to allow omitting <N> when initializing manually
+  template<std::size_t N>
+  CompTimeStr(const char (&str)[N]) -> CompTimeStr<N>;
 /*
   template<CompTimeStr S>
   struct MyTemplateClass {
@@ -96,3 +111,59 @@ namespace specializedTypes
   // Usage:
   // MyTemplateClass<"Hello World"> instance;
 */
+
+
+
+
+  // Source - https://stackoverflow.com/a/35943472
+  // Posted by Jamboree, modified by community. See post 'Timeline' for change history
+  // Retrieved 2026-07-13, License - CC BY-SA 3.0
+
+  struct string_view
+  {
+    char const* data;
+    std::streamsize size;
+  };
+
+  inline std::ostream& operator<<(std::ostream& o, string_view const& s)
+  {
+    return o.write(s.data, s.size);
+  }
+
+  template<class T>
+  //constexpr
+  string_view get_name()
+  {
+    //return {__PRETTY_FUNCTION__, sizeof(__PRETTY_FUNCTION__)};
+    // __PRETTY_FUNCTION__ = "constexpr specializedTypes::string_view specializedTypes::get_name() [with T = short int]"
+
+    char const* p = __PRETTY_FUNCTION__;
+    char const* const pEnd = p + sizeof(__PRETTY_FUNCTION__);
+
+    while (*p++ != '=' && p < pEnd);
+    for (; *p == ' ' && p < pEnd; ++p);
+    char const* p2 = p;
+    int count = 1;
+    for (; p2 < pEnd;++p2)
+    {
+      switch (*p2)
+      {
+      case '[':
+        ++count;
+        break;
+      case ']':
+        --count;
+        if (!count)
+          return {p, static_cast<std::streamsize>(p2 - p)};
+      default :
+        break;
+      }
+    }
+    return {};
+  }
+
+  template <typename T>
+  constexpr auto type_name_length = get_name<T>().size;
+
+}
+

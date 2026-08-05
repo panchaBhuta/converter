@@ -2,6 +2,7 @@
 #include <charconv>
 #include <array>
 #include <limits>
+#include <cassert>
 
 //  ./manualBuild.sh cmake check_floatingPoint_toChars
 
