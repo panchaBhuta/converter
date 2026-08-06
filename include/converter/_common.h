@@ -214,9 +214,8 @@ namespace converter
     using Format_StringStream_Base::Format_StringStream_Base;
 
     /// Rule of 3 / 5 Rule Compliance
-    Format_StringStream(const type&  other) = default;
-    Format_StringStream(      type&& other) = default;
-    Format_StringStream& operator=(const type& other) = delete;
+    Format_StringStream(const Format_StringStream&  other) = default;
+    Format_StringStream(      Format_StringStream&& other) = default;
 
     template<c_integral OT>
         requires ( !std::is_same_v<T, OT> )
@@ -266,9 +265,8 @@ namespace converter
     {}
 
     /// Rule of 3 / 5 Rule Compliance
-    Format_StringStream(const type&  other) = default;
-    Format_StringStream(      type&& other) = default;
-    Format_StringStream& operator=(const type& other) = delete;
+    Format_StringStream(const Format_StringStream&  other) = default;
+    Format_StringStream(      Format_StringStream&& other) = default;
 
     template<c_floating_point OT>
         requires ( !std::is_same_v<T, OT> )

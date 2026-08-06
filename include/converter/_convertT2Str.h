@@ -444,9 +444,8 @@ namespace converter
         isDefault(false)
     {}
 
-    Format_ToChars(const Format_ToChars<T>&  other) = default;
-    Format_ToChars(      Format_ToChars<T>&& other) = default;
-    Format_ToChars& operator=(const Format_ToChars<T>& other) = delete;
+    Format_ToChars(const Format_ToChars&  other) = default;
+    Format_ToChars(      Format_ToChars&& other) = default;
 
     template<c_floating_point OT>
         requires ( !std::is_same_v<T, OT> )
@@ -502,7 +501,7 @@ namespace converter
   template < typename T >
   class T2Strhelper
   {
-    constexpr static DefaultTn2Str<T>::t_arrConversionProcesses
+    constexpr static typename DefaultTn2Str<T>::t_arrConversionProcesses
       _ArrConversionProcesses = DefaultTn2Str<T>::validConversionProcesses();
 
   public:

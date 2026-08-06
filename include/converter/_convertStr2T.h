@@ -579,7 +579,7 @@ namespace converter
   template < typename T >
   class Str2Thelper
   {
-    constexpr static DefaultStr2Tn<T>::t_arrConversionProcesses
+    constexpr static typename DefaultStr2Tn<T>::t_arrConversionProcesses
       _ArrConversionProcesses = DefaultStr2Tn<T>::validConversionProcesses();
 
   public:

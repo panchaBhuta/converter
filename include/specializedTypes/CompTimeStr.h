@@ -131,8 +131,8 @@ namespace specializedTypes
   }
 
   template<class T>
-  //constexpr
-  string_view get_name()
+  constexpr
+  string_view get_name()  // use this instead of typeid(T).name(){as it results in cryptic name}
   {
     //return {__PRETTY_FUNCTION__, sizeof(__PRETTY_FUNCTION__)};
     // __PRETTY_FUNCTION__ = "constexpr specializedTypes::string_view specializedTypes::get_name() [with T = short int]"

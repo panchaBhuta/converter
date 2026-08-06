@@ -44,12 +44,12 @@
 using namespace converter;
 
 template <typename T>
-using t_arrConversionProcessesS2T = DefaultStr2Tn<T>::t_arrConversionProcesses;
+using t_arrConversionProcessesS2T = typename DefaultStr2Tn<T>::t_arrConversionProcesses;
 template <typename T>
-using t_arrErrorHandlers          = DefaultStr2Tn<T>::t_arrErrorHandlers;
+using t_arrErrorHandlers          = typename DefaultStr2Tn<T>::t_arrErrorHandlers;
 
 template <typename T>
-using t_arrConversionProcessesT2S = DefaultTn2Str<T>::t_arrConversionProcesses;
+using t_arrConversionProcessesT2S = typename DefaultTn2Str<T>::t_arrConversionProcesses;
 
 
 
@@ -59,7 +59,7 @@ void checkAvailableParameters(const t_arrConversionProcessesS2T<T>& valProcesses
                               const t_arrErrorHandlers<T>&          valHandlers,
                               const t_arrConversionProcessesT2S<T>& valProcessesT2S)
 {
-  std::cout << "Checking available parameters for type: " << typeid(T).name() << std::endl;
+  std::cout << "Checking available parameters for type: " << specializedTypes::get_name<T>() << std::endl;
   unittest::ExpectEqual(t_arrConversionProcessesS2T<T>, DefaultStr2Tn<T>::validConversionProcesses(), valProcessesS2T);
   unittest::ExpectEqual(t_arrErrorHandlers<T>,          DefaultStr2Tn<T>::validErrorHandlers(),       valHandlers);
   unittest::ExpectEqual(t_arrConversionProcessesT2S<T>, DefaultTn2Str<T>::validConversionProcesses(), valProcessesT2S);
