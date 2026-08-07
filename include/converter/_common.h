@@ -165,7 +165,6 @@ namespace converter
 
     Format_StringStream_Base(const Format_StringStream_Base&  other) = default;
     Format_StringStream_Base(      Format_StringStream_Base&& other) = default;
-    Format_StringStream_Base& operator=(const Format_StringStream_Base& other) = delete;
 
 
     Format_StringStream_Base( const std::locale& loc, const bool hasLocParam ) // = std::locale{}
@@ -318,19 +317,15 @@ namespace converter
 
 
 
-  template< typename T, auto... ARGS >
+  template< typename T, auto ... ARGS >
   struct Format_SpecializedImplementation
   {
-    using type = void*; // work around to fit into FormatInfo::getDefaultFormatArgs()
-
-    constexpr static type getDefaultFormatArgs()
-    {
-      return static_cast<void*>(nullptr);
-    }
+    static_assert(sizeof(T) == 0,
+              "No Format_SpecializedImplementation specialization found");
   };
 
 
-  template <typename T, auto CONV_PROCESS >
+  template <typename T, auto CONV_PROCESS, auto ... ARGS >
   struct FormatInfo;
 
   // ]=============================================================]   common helpers

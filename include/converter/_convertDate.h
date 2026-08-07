@@ -82,9 +82,8 @@ namespace converter
     {}
 
     // Rule of 3 / 5 Rule Compliance
-    Format_SpecializedImplementation(const type& other) = default;
-    Format_SpecializedImplementation(type&& other) = default;
-    Format_SpecializedImplementation& operator=(const type& other) = delete;
+    Format_SpecializedImplementation(const Format_SpecializedImplementation& other) = default;
+    Format_SpecializedImplementation(Format_SpecializedImplementation&& other) = default;
 
     // 2. Returns a default instance using the fallback literal string format
     static type getDefaultFormatArgs()
@@ -139,9 +138,8 @@ namespace converter
     using Format_StringStream_Base::Format_StringStream_Base;
 
     /// Rule of 3 / 5 Rule Compliance
-    Format_SpecializedImplementation(const type&  other) = default;
-    Format_SpecializedImplementation(      type&& other) = default;
-    Format_SpecializedImplementation& operator=(const type& other) = delete;
+    Format_SpecializedImplementation(const Format_SpecializedImplementation&  other) = default;
+    Format_SpecializedImplementation(      Format_SpecializedImplementation&& other) = default;
 
     template<
               class CharT,
@@ -169,9 +167,8 @@ namespace converter
     using Format_StringStream_Base::Format_StringStream_Base;
 
     /// Rule of 3 / 5 Rule Compliance
-    Format_StringStream(const type&  other) = default;
-    Format_StringStream(      type&& other) = default;
-    Format_StringStream& operator=(const type& other) = delete;
+    Format_StringStream(const Format_StringStream&  other) = default;
+    Format_StringStream(      Format_StringStream&& other) = default;
 
     template<
               class CharT,
@@ -182,27 +179,6 @@ namespace converter
       Format_StringStream_Base::applyFormatArgs(ios);
     }
   };
-
-
-  template <Tn2StrConversionProcess CONV_PROCESS >
-          requires ( isSupported_Tn2StrConversionProcess<std::chrono::year_month_day, CONV_PROCESS>::value )
-  struct FormatInfo< std::chrono::year_month_day, CONV_PROCESS >
-  {
-    // Bind default compile time fallback instance using structural conversion helpers
-    inline static constexpr specializedTypes::CompTimeStr defaultLiteral{"{:%d-%m-%Y}"};
-
-    constexpr static auto getDefaultFormatArgs()
-    {
-      if constexpr (CONV_PROCESS == Tn2StrConversionProcess::STRINGSTREAM) {
-        return Format_StringStream<std::chrono::year_month_day>::getDefaultFormatArgs();
-      } else if constexpr (CONV_PROCESS == Tn2StrConversionProcess::SPECIALIZED_IMPLEMENTATION) {
-        return Format_SpecializedImplementation<std::chrono::year_month_day, defaultLiteral>::getDefaultFormatArgs();
-      }
-    }
-
-    using type = decltype(getDefaultFormatArgs());
-  };
-
 
   // ]=============================================================] COMMON_FORMAT
 
@@ -221,6 +197,19 @@ namespace converter
                                                      ERR_HANDLER >
   {
   private:
+    inline static std::chrono::year_month_day _dateLib2chrono(const datelibFrom::year_month_day& val)
+    {
+#if    USE_CHRONO_FROMSTREAM_1 == 1
+      return val;
+#else // if  USE_DATELIB_FROMSTREAM_2 == 1
+      return std::chrono::year_month_day {
+          std::chrono::year{static_cast<int>(val.year())},
+          std::chrono::month{static_cast<unsigned>(val.month())},
+          std::chrono::day{static_cast<unsigned>(val.day())}
+      };
+#endif
+    }
+
     /**
      * @brief   Converts string holding 'year_month_day' value. The string has the format "%F" -> "%Y-%m-%d"
      * @param   str                 input string representing date.
@@ -275,17 +264,7 @@ namespace converter
       }
 
 
-#if    USE_CHRONO_FROMSTREAM_1 == e_ENABLE_FEATURE
-      return ymd;
-#else
-      std::chrono::year_month_day chrono_ymd {
-          std::chrono::year{static_cast<int>(ymd.year())},
-          std::chrono::month{static_cast<unsigned>(ymd.month())},
-          std::chrono::day{static_cast<unsigned>(ymd.day())}
-      };
-
-      return chrono_ymd;
-#endif
+      return _dateLib2chrono(ymd);
     }
 
   public:
@@ -502,4 +481,49 @@ int main() {
 
   // ]=============================================================] ConvertFromVal
 
+
+  // [=============================================================[ COMMON_FORMAT
+
+  template <>
+  struct FormatInfo< std::chrono::year_month_day, Str2TnConversionProcess::SPECIALIZED_IMPLEMENTATION >
+  {
+    static auto getDefaultFormatArgs()
+    {
+      return Format_SpecializedImplementation<std::chrono::year_month_day>::getDefaultFormatArgs();
+    }
+
+    using type = Format_StringStream<std::chrono::year_month_day>::type;
+  };
+
+
+  template <>
+  struct FormatInfo< std::chrono::year_month_day, Tn2StrConversionProcess::STRINGSTREAM >
+  {
+    static auto getDefaultFormatArgs()
+    {
+      return Format_StringStream<std::chrono::year_month_day>::getDefaultFormatArgs();
+    }
+
+    using type = Format_StringStream<std::chrono::year_month_day>::type;
+  };
+
+
+  template <specializedTypes::CompTimeStr FS>
+  struct FormatInfo < std::chrono::year_month_day,
+                      Tn2StrConversionProcess::SPECIALIZED_IMPLEMENTATION,
+                      FS  // = ConvertFromVal<std::chrono::year_month_day, Tn2StrConversionProcess::SPECIALIZED_IMPLEMENTATION>::defaultFmt
+                          // = "{:%F}" for USE_CHRONO_TOSTREAM_1 == 1, ELSE
+                          // =   "%F"  for USE_DATELIB_TOSTREAM_2 == 1
+                    >
+  {
+    static auto getDefaultFormatArgs()
+    {
+      return Format_SpecializedImplementation < std::chrono::year_month_day, FS >::getDefaultFormatArgs();
+    }
+
+    using type = Format_SpecializedImplementation < std::chrono::year_month_day, FS >::type;
+  };
+
+
+  // ]=============================================================] COMMON_FORMAT
 }

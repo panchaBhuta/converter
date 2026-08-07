@@ -33,7 +33,7 @@ jobs:
         # https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories  (os-labels : windows-2022)
         # https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#preinstalled-software-for-github-owned-images
         #   os: [windows-2025, windows-2022]  #  windows-latest  ==  windows-2022
-        os: [windows-2025-vs2026, windows-2025, windows-2022] #, windows-2019]  #  windows-latest  ==  windows-2025
+        os: [windows-2025-vs2026, windows-2022, windows-11-vs2026-arm] #, windows-2019]  #  windows-latest  ==  windows-2025
         # https://cmake.org/cmake/help/latest/manual/cmake.1.html#cmdoption-cmake-T
         # CMake compiler option doesn't work for Visual Studio project :: https://youtrack.jetbrains.com/issue/CPP-17314
         # https://github.com/actions/runner-images/blob/main/images/win/Windows2022-Readme.md#tools
@@ -44,9 +44,9 @@ jobs:
           # g++-13  == 'MSVC 19'
           # clang   == 'MSVC 19'
           # ClangCl == 'Clang 16'
-        toolset_compiler: [ { compiler: default, toolset: -1, cmdShell: bash,        rawCompiler: msbuild.exe,  compilerMacros: "echo msbuild_does_not_support" },    #  microsoft/setup-msbuild@v2
+        toolset_compiler: [ { compiler: default, toolset: -1, cmdShell: cmd,         rawCompiler: msbuild.exe,  compilerMacros: "echo msbuild_does_not_support" },    #  microsoft/setup-msbuild@v2
                             #    on more details on  msbuild not supporting "-dM' option, refer https://stackoverflow.com/questions/4239993/determining-endianness-at-compile-time
-                            { compiler: ClangCl, toolset:  1, cmdShell: bash,        rawCompiler: clang++,      compilerMacros: "clang++  -dM -E -x c++ NUL:"   },    #  microsoft/setup-msbuild@v2
+                            { compiler: ClangCl, toolset:  1, cmdShell: cmd,         rawCompiler: clang++,      compilerMacros: "clang++  -dM -E -x c++ NUL:"   },    #  microsoft/setup-msbuild@v2
                             # https://github.com/ArchieAtkinson/CppTemplate
                             # https://github.com/scikit-build/scikit-build-core/blob/main/.github/workflows/ci.yml
                             { compiler: g++,     toolset:  0, cmdShell: "msys2 {0}", rawCompiler: g++,          compilerMacros: "g++  -dM -E -x c++ /dev/null"  } ]   #  msys2/setup-msys2@v2
@@ -84,7 +84,7 @@ jobs:
         if: matrix.toolset_compiler.compiler == 'g++'
         run: echo "${{matrix.toolset_compiler.rawCompiler}} --version"; ${{matrix.toolset_compiler.rawCompiler}} --version
       - name: Checkout Repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Get Version (compiler==default[msbuild.exe])
         if: matrix.toolset_compiler.compiler == 'default'
         run: uname -a && echo "------------" && cmake --version && echo "------------"
@@ -110,14 +110,14 @@ jobs:
         # https://docs.github.com/en/actions/learn-github-actions/expressions
         # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idif
         if: matrix.toolset_compiler.compiler == 'default'
-        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug
+        run: cmake --log-level=TRACE -G "Visual Studio 17 2022" -A x64 -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug
       - name: Configure CMake (compiler=g++) [Debug]
         if: matrix.toolset_compiler.toolset == 0
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=${{matrix.toolset_compiler.compiler}}
       - name: Configure CMake (toolset_compiler=clangCl) [Debug]
         # https://cmake.org/cmake/help/latest/guide/user-interaction/index.html
         if: matrix.toolset_compiler.toolset == 1
-        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug  -T "${{matrix.toolset_compiler.compiler}}"
+        run: cmake --log-level=TRACE -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug  -T "${{matrix.toolset_compiler.compiler}}"
 
       - name: Check Work-Around-Flags
         run: |

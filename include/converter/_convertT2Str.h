@@ -490,6 +490,9 @@ namespace converter
         return Format_StringStream<T>::getDefaultFormatArgs();
       } else if constexpr (CONV_PROCESS == Tn2StrConversionProcess::SPECIALIZED_IMPLEMENTATION) {
         return Format_SpecializedImplementation<T>::getDefaultFormatArgs();
+      } else {
+        static_assert(sizeof(T) == 0,
+              "For [FormatInfo< T, Tn2StrConversionProcess CONV_PROCESS >] , no 'FormatInfo' for CONV_PROCESS");
       }
     }
 

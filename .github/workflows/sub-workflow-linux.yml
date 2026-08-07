@@ -47,32 +47,44 @@ jobs:
           #  Clang: 13.0.1, 14.0.0, 15.0.7
           #  default  ==  g++-11
           #  clang++  ==  clang++-14
-        compiler: [ default, g++-11, g++-12, g++-13, g++-14,  clang++-13, clang++-14, clang++-15, clang++-16, clang++-17, clang++-18 ]
+        compiler: [ default, g++-12, g++-13, g++-14,  clang++-13, clang++-14, clang++-15, clang++-16, clang++-17, clang++-18 ]
+          #  ChapGPT recommendation : drop g++-11 support ; why? read below ...
+          #  Your library is using advanced C++20 features
+
+          #  Your code makes heavy use of:
+
+          #    * class-type NTTPs (CompTimeStr)
+          #    * constrained templates (requires)
+          #    * concepts
+          #    * partial specializations involving NTTPs
+          #    * std::chrono
+          #    * std::format
+
+          # These are exactly the areas where GCC 11 had the roughest implementation.
+
         exclude: [
-          { os: ubuntu-24.04    , compiler: g++-11 },
-          { os: ubuntu-24.04    , compiler: g++-13 },     # default
+          { os: ubuntu-24.04    , compiler: g++-13 },      # default
           { os: ubuntu-24.04    , compiler: clang++-13 },
           { os: ubuntu-24.04    , compiler: clang++-14 },
           { os: ubuntu-24.04    , compiler: clang++-15 },
           #{ os: ubuntu-24.04    , compiler: clang++-18 }, # clang++
-          { os: ubuntu-24.04-arm, compiler: g++-11 },
-          { os: ubuntu-24.04-arm, compiler: g++-13 },     # default
+          { os: ubuntu-24.04-arm, compiler: g++-13 },      # default
           { os: ubuntu-24.04-arm, compiler: clang++-13 },
           { os: ubuntu-24.04-arm, compiler: clang++-14 },
           { os: ubuntu-24.04-arm, compiler: clang++-15 },
           #{ os: ubuntu-24.04-arm, compiler: clang++-18 }, # clang++
-          { os: ubuntu-22.04    , compiler: g++-11 },     # default
-          { os: ubuntu-22.04    , compiler: g++-13 },     # g++-13 got removed later from ubuntu-22 runner
+          { os: ubuntu-22.04    , compiler: default },     # g++-11
+          { os: ubuntu-22.04    , compiler: g++-13 },      # g++-13 got removed later from ubuntu-22 runner
           { os: ubuntu-22.04    , compiler: g++-14 },
           #{ os: ubuntu-22.04    , compiler: clang++-14 }, # clang++ 
           { os: ubuntu-22.04    , compiler: clang++-16 },
           { os: ubuntu-22.04    , compiler: clang++-17 },
           { os: ubuntu-22.04    , compiler: clang++-18 },
-          { os: ubuntu-22.04-arm, compiler: g++-11 },     # default
-          { os: ubuntu-22.04-arm, compiler: g++-13 },     # g++-13 got removed later from ubuntu-22 runner
+          { os: ubuntu-22.04-arm, compiler: default },      # g++-11
+          { os: ubuntu-22.04-arm, compiler: g++-13 },      # g++-13 got removed later from ubuntu-22 runner
           { os: ubuntu-22.04-arm, compiler: g++-14 },
-          { os: ubuntu-22.04-arm, compiler: clang++-13 }, #         fails on chrono include, refer : https://github.com/actions/runner-images/issues/8659
-          { os: ubuntu-22.04-arm, compiler: clang++-14 }, # clang++ fails on chrono include, refer : https://github.com/actions/runner-images/issues/8659
+          { os: ubuntu-22.04-arm, compiler: clang++-13 },  #         fails on chrono include, refer : https://github.com/actions/runner-images/issues/8659
+          { os: ubuntu-22.04-arm, compiler: clang++-14 },  # clang++ fails on chrono include, refer : https://github.com/actions/runner-images/issues/8659
           { os: ubuntu-22.04-arm, compiler: clang++-16 },
           { os: ubuntu-22.04-arm, compiler: clang++-17 },
           { os: ubuntu-22.04-arm, compiler: clang++-18 } ]
@@ -94,7 +106,7 @@ jobs:
           echo "default:: ${COMPILER} --version"; ${COMPILER} --version
 
       - name: Checkout Repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Get Version
         run: uname -a && echo "------------" && cmake --version && echo "------------" ; bash -c 'COMPILER="${{matrix.compiler}}"; if [ "${COMPILER}" == "default" ]; then COMPILER="g++"; fi; ${COMPILER}  -dM -E -x c++ /dev/null | egrep -i "(apple|mach|gnu|clang|llvm|linux|WIN|version|major|minor)"'
