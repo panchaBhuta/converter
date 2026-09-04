@@ -2,12 +2,19 @@
 #include <string>
 #include <cassert>
 
-//  ./manualBuild.sh cmake checkChrono_fromStream -DUSE_CHRONO_FROMSTREAM_1=1
+#define  e_DATE_NO_LIB  0     //  no date conversion support from any available lib's
+#define  e_DATE_CHRONO  1     //  std::chrono
+#define  e_DATE_HHDATE  2     //  https://github.com/HowardHinnant/date/
 
-#if    USE_CHRONO_FROMSTREAM_1 == 1
+//  ./manualBuild.sh cmake checkChrono_fromStream -DSUPPORTED_DATE_LIB_FOR_FROMSTREAM=e_DATE_CHRONO
+
+
+
+
+#if    SUPPORTED_DATE_LIB_FOR_FROMSTREAM == e_DATE_CHRONO
   #include <chrono>
   namespace datelib = std::chrono;
-#else  // if  USE_DATE_FROMSTREAM_2 == 1
+#elif    SUPPORTED_DATE_LIB_FOR_FROMSTREAM == e_DATE_HHDATE
   #include <date/date.h>
   namespace datelib = date;
 #endif
@@ -19,12 +26,7 @@ datelib::year_month_day
     std::istringstream iss(pStr);
 
 
-#if    USE_CHRONO_FROMSTREAM_1 == 1
-    // Parse string into chrono::/date:: year_month_day object (C++20)
-    iss >> std::chrono::parse(fmt, ymd);
-#else
     datelib::from_stream(iss, fmt, ymd);
-#endif
 
     assert(!iss.fail());
     assert(!iss.bad());

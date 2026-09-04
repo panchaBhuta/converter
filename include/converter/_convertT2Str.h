@@ -139,7 +139,7 @@ namespace converter
 
                 The return value may differ significantly from what std::cout prints by default, see the example.
 
-      That's why for c_floating_point<T> is enabled with macro USE_FLOATINGPOINT_TO_STRING_1
+      That's why for c_floating_point<T> is enabled with macro ENABLE_FLOATINGPOINT_TO_STRING_1
 
      std::cout: 23.43
      to_string: 23.430000
@@ -158,7 +158,7 @@ namespace converter
    */
   template<typename T>
   concept c_isNum2SSupported = ( ( c_integral<T> && !std::same_as<T, bool> && !c_char<T> ) ||
-                                 ( c_floating_point<T> && bool(USE_FLOATINGPOINT_TO_STRING_1) )
+                                 ( c_floating_point<T> && bool(ENABLE_FLOATINGPOINT_TO_STRING_1) )
                                )  &&
                                requires(T val) { { std::to_string(val) } -> std::same_as<std::string>; };
   // ]=========]  concept :  is std::to_string() supported
@@ -281,9 +281,9 @@ namespace converter
       } else if constexpr ( c_floating_point<T> &&
                             // if (   CONV_PROCESS != Tn2StrConversionProcess::TO_STRING ||
                             //      ( CONV_PROCESS == Tn2StrConversionProcess::TO_STRING &&  -> this is redundant check
-                            //        USE_FLOATINGPOINT_TO_STRING_1 == true )
+                            //        ENABLE_FLOATINGPOINT_TO_STRING_1 == true )
                             //    )
-                            ( CONV_PROCESS != Tn2StrConversionProcess::TO_STRING || bool(USE_FLOATINGPOINT_TO_STRING_1) )
+                            ( CONV_PROCESS != Tn2StrConversionProcess::TO_STRING || bool(ENABLE_FLOATINGPOINT_TO_STRING_1) )
                           ) {
         if constexpr ( isConversionNum2SCppSupported<float, CONV_PROCESS>::value &&
                        std::numeric_limits<T>::max() <= std::numeric_limits<float>::max() ) {

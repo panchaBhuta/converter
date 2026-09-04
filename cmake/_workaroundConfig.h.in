@@ -17,37 +17,34 @@
 #cmakedefine01 e_DISABLE_FEATURE
 
 
+
+
 /*
  *  Date conversion typically uses std::chrono::from_stream() and
  *  std::chrono::to_stream(), which as of writing this code
  *  is NOT fully supported across all OS's.
  * 
- *  Till then, USE_DATELIB_FROMSTREAM and USE_DATELIB_TOSTREAM
+ *  Till then, SUPPORTED_DATE_LIB_FOR_FROMSTREAM == e_DATE_HHDATE  and  SUPPORTED_DATE_LIB_FOR_TOSTREAM == e_DATE_HHDATE
  *  macro-variables are used to switch 
  *  "std::chrono" lib where possible(msvc -> from_stream),    OR 
  *  "date" lib (ubuntu, macOS -> from_stream+to_stream)       OR
  *  as last resort calls an internal implementation 
  *  (msvc -> to_stream), which has limited formating support.
  */
-#cmakedefine01  USE_CHRONO_FROMSTREAM_1
-#cmakedefine01  USE_CHRONO_TOSTREAM_1
+//  Define conversion library used for date
+#define  e_DATE_NO_LIB  0     //  no date conversion support from any available lib's
+#define  e_DATE_CHRONO  1     //  std::chrono
+#define  e_DATE_HHDATE  2     //  https://github.com/HowardHinnant/date/
 
-#cmakedefine01  USE_DATE_FROMSTREAM_2
-#cmakedefine01  USE_DATE_TOSTREAM_2
+#define  SUPPORTED_DATE_LIB_FOR_FROMSTREAM     @DATE_LIBRARY_DEPENDENCY_S2D@
+#define  SUPPORTED_DATE_LIB_FOR_TOSTREAM       @DATE_LIBRARY_DEPENDENCY_D2S@
 
 
-/*
- * Failure to compile std::u16string from libstdc++ 12.1 in c++20 mode #55560 
- * https://github.com/llvm/llvm-project/issues/55560
- */
-#cmakedefine01  USE_CLANG_STRING_WORKS_1
-#cmakedefine01  USE_CLANG_STRING_WORKAROUND_2
-#if USE_CLANG_STRING_WORKAROUND_2 == e_ENABLE_FEATURE
-  #include <string>
-  [[maybe_unused]]static std::u8string  clang_string_workaround(const  char8_t* a, const  char8_t* b) { return {a, b}; }
-  [[maybe_unused]]static std::u16string clang_string_workaround(const char16_t* a, const char16_t* b) { return {a, b}; }
-  [[maybe_unused]]static std::u32string clang_string_workaround(const char32_t* a, const char32_t* b) { return {a, b}; }
-#endif
+// #cmakedefine01  SUPPORTED_CHRONO_FROMSTREAM_1
+// #cmakedefine01  SUPPORTED_CHRONO_TOSTREAM_1
+
+// #cmakedefine01  SUPPORTED_DATE_FROMSTREAM_2
+// #cmakedefine01  SUPPORTED_DATE_TOSTREAM_2
 
 
 /*
@@ -55,8 +52,22 @@
  * refer "Elementary string conversions*" in the below link
  * https://en.cppreference.com/w/cpp/compiler_support/17#C.2B.2B17_library_features
  */
-#cmakedefine01  USE_FLOATINGPOINT_FROM_CHARS_1
-#cmakedefine01  USE_FLOATINGPOINT_TO_CHARS_1
+#cmakedefine01  HAS_FLOATINGPOINT_FROM_CHARS_1
+#cmakedefine01  HAS_FLOATINGPOINT_TO_CHARS_1
 
 
-#cmakedefine01  USE_FLOATINGPOINT_TO_STRING_1
+#cmakedefine01  ENABLE_FLOATINGPOINT_TO_STRING_1
+
+
+/*
+ * Failure to compile std::u16string from libstdc++ 12.1 in c++20 mode #55560 
+ * https://github.com/llvm/llvm-project/issues/55560
+ */
+#cmakedefine01  TEST_HAS_CLANG_STRING_1
+#cmakedefine01  TEST_WORKAROUND_CLANG_STRING_2
+#if TEST_WORKAROUND_CLANG_STRING_2 == e_ENABLE_FEATURE
+  #include <string>
+  [[maybe_unused]]static std::u8string  clang_string_workaround(const  char8_t* a, const  char8_t* b) { return {a, b}; }
+  [[maybe_unused]]static std::u16string clang_string_workaround(const char16_t* a, const char16_t* b) { return {a, b}; }
+  [[maybe_unused]]static std::u32string clang_string_workaround(const char32_t* a, const char32_t* b) { return {a, b}; }
+#endif
