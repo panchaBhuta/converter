@@ -54,6 +54,7 @@ jobs:
         #           { os: macos-15, compiler: g++-13 },
         #           { os: macos-15, compiler: g++-12 } ]
     runs-on: ${{matrix.os}}
+    timeout-minutes: 5
     outputs:
       run-id: ${{ github.run_id }}
 
@@ -84,8 +85,8 @@ jobs:
           FLAG_DIR="${{github.workspace}}/build-debug/workAroundFlags"
           mkdir -p   ${FLAG_DIR}
           FLAG_FILE="${FLAG_DIR}/flag-${{matrix.os}}-${{matrix.compiler}}.csv"
-          echo "_OS,compiler,"$(grep define  "${{github.workspace}}/build-debug/include/converter/_workaroundConfig.h" | grep -v -e "^//" -e " e_[^ ]*_FEATURE " | sed "s/#define  //g" | cut -d' ' -f1 | tr '\n' ',' | sed 's/,$/\n/g')  >  "${FLAG_FILE}"
-          echo "${{matrix.os}},${{matrix.compiler}},"$(grep define  "${{github.workspace}}/build-debug/include/converter/_workaroundConfig.h" | grep -v -e "^//" -e " e_[^ ]*_FEATURE " | sed "s/#define  //g" | cut -d' ' -f2 | tr '\n' ',' | sed 's/,$/\n/g')  >>  "${FLAG_FILE}"
+          echo "_OS,compiler,"$(grep "#define"  "${{github.workspace}}/build-debug/include/converter/_workaroundConfig.h" | sed "s/  */ /g" | cut -d' ' -f2,3 | grep -e "^SUPPORTED_" -e "^HAS_" -e "^ENABLE_" -e "^TEST_" | cut -d' ' -f1 | tr '\n' ',' | sed 's/,$/\n/g')  >  "${FLAG_FILE}"
+          echo "${{matrix.os}},${{matrix.compiler}},"$(grep "#define"  "${{github.workspace}}/build-debug/include/converter/_workaroundConfig.h" | sed "s/  */ /g" | cut -d' ' -f2,3 | grep -e "^SUPPORTED_" -e "^HAS_" -e "^ENABLE_" -e "^TEST_" | cut -d' ' -f2 | tr '\n' ',' | sed 's/,$/\n/g')  >>  "${FLAG_FILE}"
           cat "${FLAG_FILE}"
 
       - name: Upload Artifact from Sub-Workflow
