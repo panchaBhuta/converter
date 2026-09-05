@@ -325,7 +325,6 @@ namespace converter
               //const std::string& fmt,
               const std::chrono::year_month_day& val)
       {
-        [[maybe_unused]] std::format_string<std::chrono::year_month_day> fmt_str{FmtStr.data};
         return format(loc, FmtStr.data, val);
       }
 
@@ -352,7 +351,6 @@ namespace converter
       format( //const std::string& fmt,
               const std::chrono::year_month_day& val)
       {
-        [[maybe_unused]] std::format_string<std::chrono::year_month_day> fmt_str{FmtStr.data};
         return format(FmtStr.data, val);
       }
 
