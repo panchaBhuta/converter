@@ -146,6 +146,7 @@ namespace converter
   template< typename T >
   struct Format_StringStream;
 
+  // Optional-Locale
   class Format_StringStream_Base
   {
   protected:

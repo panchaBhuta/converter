@@ -18,38 +18,34 @@
 #include <cstring>
 #include <string>
 #include <array>
-#include <map>
 #include <locale>
 #include <algorithm>
 #include <cctype>
 
 #include <converter/_common.h>
-
-#include <converter/_workaroundConfig.h>
 #include <specializedTypes/CompTimeStr.h>
 
 
-#if    USE_CHRONO_TOSTREAM_1 == e_ENABLE_FEATURE
-  #include <format>
-#endif
+#include <converter/_convertDateWorkaround.h>
+#include <converter/specializedHelper/_dateFormat.h>
 
-#if  USE_DATE_FROMSTREAM_2 == e_ENABLE_FEATURE  ||  USE_DATE_TOSTREAM_2 == e_ENABLE_FEATURE
-  #include <date/date.h>
-#endif
 
-#if    USE_CHRONO_FROMSTREAM_1 == e_ENABLE_FEATURE
-  namespace datelibFrom = std::chrono;
-#elif  USE_DATE_FROMSTREAM_2 == e_ENABLE_FEATURE
-  namespace datelibFrom = date;
-#endif
+/*
+                         converter
+                            │
+              ┌─────────────┴─────────────┐
+              │                           │
+       Convert date/string          Stream date
+              │                           │
+       _convertDate.h               _dateFormat.h
+              │                           │
+              ↓                           ↓
+  _convertDateWorkaround.h       date_format<> + pword
+              │                           │
+       chrono / HH-date          converter::operator<<
+*/
 
-#if    USE_CHRONO_TOSTREAM_1 == e_ENABLE_FEATURE
-  namespace datelibTo = std::chrono;
-  namespace formatLibTo = std;
-#elif  USE_DATE_TOSTREAM_2 == e_ENABLE_FEATURE
-  namespace datelibTo = date;
-  namespace formatLibTo = date;
-#endif
+
 
 
 namespace converter
@@ -59,99 +55,11 @@ namespace converter
 
   // [=============================================================[ COMMON_FORMAT
 
-  template <>
-  struct Format_SpecializedImplementation<std::chrono::year_month_day>
-    : public Format_StringStream_Base
-  {
-    using type = Format_SpecializedImplementation<std::chrono::year_month_day>;
-
-    /*
-      * Default constructor. Constructs a copy of the global C++ locale,
-      * which is the locale most recently used as the argument to std::locale::global
-      * or a copy of std::locale::classic() if no call to std::locale::global has been made.
-    */
-    Format_SpecializedImplementation(
-                        const std::string& fmt, // "%Y-%m-%d"  without curly braces
-                        const std::locale& loc) // = std::locale{},
-                        //std::ios_base::fmtflags flags = std::ios_base::fmtflags(0)  -> use later if needed
-        : Format_StringStream_Base(loc), _dateFormat_runTime(fmt)
-    {}
-
-    Format_SpecializedImplementation(const std::string& fmt) // "%Y-%m-%d"  without curly braces
-        : Format_StringStream_Base(), _dateFormat_runTime(fmt)
-    {}
-
-    // Rule of 3 / 5 Rule Compliance
-    Format_SpecializedImplementation(const Format_SpecializedImplementation& other) = default;
-    Format_SpecializedImplementation(Format_SpecializedImplementation&& other) = default;
-
-    // 2. Returns a default instance using the fallback literal string format
-    static type getDefaultFormatArgs()
-    {
-      return type("%F"); // "%F" standard equivalent to "%Y-%m-%d"
-    }
-
-    template<
-              class CharT,
-              class Traits = std::char_traits<CharT>
-            >
-    void applyFormatArgs(std::basic_ios<CharT, Traits>& ios) const
-    {
-      Format_StringStream_Base::applyFormatArgs(ios);
-    }
-
-    const std::string&   getDateFormat() const
-    {
-      return _dateFormat_runTime;  //"%Y-%m-%d"
-    }
-
-  private:
-    const std::string _dateFormat_runTime;  // "%Y-%m-%d"
-  };
-
-
-  /*
-   * FmtStr must appear in the specialization argument list.In your current snippet,
-   * CompTimeStr<N> is provided as the second argument, but the template parameter FmtStr
-   * is completely unreferenced in the signature <std::chrono::year_month_day, CompTimeStr<N>>.
-   * Because FmtStr cannot be deduced by the compiler, compilation will fail.
-
-  template <std::size_t N, specializedTypes::CompTimeStr<N> FmtStr>
-  struct Format_SpecializedImplementation<std::chrono::year_month_day, specializedTypes::CompTimeStr<N> >
-  */
-  template <std::size_t N, specializedTypes::CompTimeStr<N> FmtStr>   // FmtStr = "{:%d-%m-%Y}" with curly braces
-  struct Format_SpecializedImplementation<std::chrono::year_month_day, FmtStr>
-    : public Format_StringStream_Base
-  {
-    // Evaluates to this specific instantiated class type
-    using type = Format_SpecializedImplementation<std::chrono::year_month_day, FmtStr>;
-
-    inline static constexpr specializedTypes::CompTimeStr<N> dateFormat_compileTime{FmtStr};
-
-    // Returns a default-constructed instance of this specialized formatter
-    static type getDefaultFormatArgs()
-    {
-      return type();
-    }
-
-    // Safely inherit all constructors from the Base class
-    using Format_StringStream_Base::Format_StringStream_Base;
-
-    /// Rule of 3 / 5 Rule Compliance
-    Format_SpecializedImplementation(const Format_SpecializedImplementation&  other) = default;
-    Format_SpecializedImplementation(      Format_SpecializedImplementation&& other) = default;
-
-    template<
-              class CharT,
-              class Traits = std::char_traits<CharT>
-            >
-    void applyFormatArgs(std::basic_ios<CharT, Traits>& ios) const
-    {
-      // Forward the locale configuration up to the stream base
-      Format_StringStream_Base::applyFormatArgs(ios);
-    }
-  };
-
+  // Optional-Locale and no Format
+  // if OS-compiler combination supports istringstream << std::chrono::year_month_day
+  // then   ConvertFromVal< T, Tn2StrConversionProcess::STRINGSTREAM >:: ToStr(const T& val,
+  //                                                                           const typename Format_StringStream<T>::type& format_ss)
+  // gets enabled where T = std::chrono::year_month_day, refer _convertT2Str.h
   template <>
   struct Format_StringStream<std::chrono::year_month_day>
     : public Format_StringStream_Base
@@ -180,7 +88,111 @@ namespace converter
     }
   };
 
+
+
+  // Optional-Locale and CompileTime-evaluation of std::format_string
+  /*
+   * FmtStr must appear in the specialization argument list.In your current snippet,
+   * CompTimeStr<N> is provided as the second argument, but the template parameter FmtStr
+   * is completely unreferenced in the signature <std::chrono::year_month_day, CompTimeStr<N>>.
+   * Because FmtStr cannot be deduced by the compiler, compilation will fail.
+
+      template <std::size_t N, specializedTypes::CompTimeStr<N> FmtStr>
+      struct Format_SpecializedImplementation<std::chrono::year_month_day, specializedTypes::CompTimeStr<N> >
+  */
+  //template <std::size_t N, specializedTypes::CompTimeStr<N> FmtStr>   // FmtStr = "{:%d-%m-%Y}" with curly braces
+  template < specializedTypes::CompTimeStr FmtStr>   // FmtStr = "{:%d-%m-%Y}" with curly braces
+  struct Format_SpecializedImplementation<std::chrono::year_month_day, FmtStr>
+    : public Format_StringStream_Base
+  {
+    // Evaluates to this specific instantiated class type
+    using type = Format_SpecializedImplementation<std::chrono::year_month_day, FmtStr>;
+
+    //inline static constexpr specializedTypes::CompTimeStr<N> dateFormat_compileTime{FmtStr};
+    inline static constexpr specializedTypes::CompTimeStr dateFormat_compileTime{FmtStr};
+
+    // Returns a default-constructed instance of this specialized formatter
+    static type getDefaultFormatArgs()
+    {
+      return type();
+    }
+
+    // Safely inherit all constructors from the Base class
+    using Format_StringStream_Base::Format_StringStream_Base;
+
+    /// Rule of 3 / 5 Rule Compliance
+    Format_SpecializedImplementation(const Format_SpecializedImplementation&  other) = default;
+    Format_SpecializedImplementation(      Format_SpecializedImplementation&& other) = default;
+
+    template<
+              class CharT,
+              class Traits = std::char_traits<CharT>
+            >
+    void applyFormatArgs(std::basic_ios<CharT, Traits>& ios) const
+    {
+      // Forward the locale configuration up to the stream base
+      Format_StringStream_Base::applyFormatArgs(ios);
+    }
+  };
+
+
+  // Optional-Locale and RunTime-Date-Format
+  /*
+   * use this
+  */
+  template <>
+  struct Format_SpecializedImplementation<std::chrono::year_month_day>
+    : public Format_StringStream_Base
+  {
+    using type = Format_SpecializedImplementation<std::chrono::year_month_day>;
+
+    /*
+      * Default constructor. Constructs a copy of the global C++ locale,
+      * which is the locale most recently used as the argument to std::locale::global
+      * or a copy of std::locale::classic() if no call to std::locale::global has been made.
+    */
+    Format_SpecializedImplementation(
+                        const std::string& fmt, // "{:%d-%m-%Y}"
+                        const std::locale& loc) // = std::locale{},
+                        //std::ios_base::fmtflags flags = std::ios_base::fmtflags(0)  -> use later if needed
+        : Format_StringStream_Base(loc), _dateFormat_runTime(fmt)
+    {}
+
+    Format_SpecializedImplementation(const std::string& fmt) // "{:%d-%m-%Y}"
+        : Format_StringStream_Base(), _dateFormat_runTime(fmt)
+    {}
+
+    // Rule of 3 / 5 Rule Compliance
+    Format_SpecializedImplementation(const Format_SpecializedImplementation& other) = default;
+    Format_SpecializedImplementation(Format_SpecializedImplementation&& other) = default;
+
+    // 2. Returns a default instance using the fallback literal string format
+    static type getDefaultFormatArgs()
+    {
+      return type("{:%F}"); // "{:%F}" standard equivalent to "{:%d-%m-%Y}"
+    }
+
+    template<
+              class CharT,
+              class Traits = std::char_traits<CharT>
+            >
+    void applyFormatArgs(std::basic_ios<CharT, Traits>& ios) const
+    {
+      Format_StringStream_Base::applyFormatArgs(ios);
+    }
+
+    const std::string&   getDateFormat() const
+    {
+      return _dateFormat_runTime;  //"{:%d-%m-%Y}"
+    }
+
+  private:
+    const std::string _dateFormat_runTime;  // "{:%d-%m-%Y}"
+  };
+
   // ]=============================================================] COMMON_FORMAT
+
+
 
 
   // [=============================================================[ ConvertFromStr
@@ -196,20 +208,6 @@ namespace converter
   struct ConvertFromStr<std::chrono::year_month_day, Str2TnConversionProcess::SPECIALIZED_IMPLEMENTATION,
                                                      ERR_HANDLER >
   {
-  private:
-    inline static std::chrono::year_month_day _dateLib2chrono(const datelibFrom::year_month_day& val)
-    {
-#if    USE_CHRONO_FROMSTREAM_1 == 1
-      return val;
-#else // if  USE_DATELIB_FROMSTREAM_2 == 1
-      return std::chrono::year_month_day {
-          std::chrono::year{static_cast<int>(val.year())},
-          std::chrono::month{static_cast<unsigned>(val.month())},
-          std::chrono::day{static_cast<unsigned>(val.day())}
-      };
-#endif
-    }
-
     /**
      * @brief   Converts string holding 'year_month_day' value. The string has the format "%F" -> "%Y-%m-%d"
      * @param   str                 input string representing date.
@@ -220,21 +218,16 @@ namespace converter
     typename ReturnType<std::chrono::year_month_day, ERR_HANDLER>::type
     _ToVal( const std::string& str,
             std::istringstream& iss,
-            const std::string::value_type* fmt )
+            const char* fmt )
     {
       datelibFrom::year_month_day ymd;
 
       // Ensure the stream is strictly configured NOT to throw(e.g std::ios_base::failure) under any flag changes
       iss.exceptions(std::ios_base::goodbit);  // IMPORTANT flag
 
-#if    USE_CHRONO_FROMSTREAM_1 == 1
-      CONVERTER_DEBUG_LOG("trace :: return_type ConvertFromStr< std::chrono::year_month_day, Str2TnConversionProcess::SPECIALIZED_IMPLEMENTATION, " << ERR_HANDLER << ">_ToVal()->  calling std::chrono::parse()");
-      // Parse string into chrono::year_month_day object (C++20)
-      iss >> std::chrono::parse(fmt, ymd);
-#else
-      CONVERTER_DEBUG_LOG("trace :: return_type ConvertFromStr< std::chrono::year_month_day, Str2TnConversionProcess::SPECIALIZED_IMPLEMENTATION, " << ERR_HANDLER << ">_ToVal()->  calling date::from_stream()");
-      date::from_stream(iss, fmt, ymd);
-#endif
+      CONVERTER_DEBUG_LOG("trace :: return_type ConvertFromStr< std::chrono::year_month_day, Str2TnConversionProcess::SPECIALIZED_IMPLEMENTATION, " << ERR_HANDLER << ">_ToVal()->  calling " << workaround::DateAdapterS2T<datelibFrom::year_month_day>::functionName);
+
+      workaround::DateAdapterS2T<datelibFrom::year_month_day>::fromStream(iss, fmt, ymd);    // "%F" -> "%Y-%m-%d"
 
       const bool is_failed = iss.fail();
       const bool is_bad = iss.bad();
@@ -245,8 +238,7 @@ namespace converter
       {
         std::ostringstream ess;
 
-        ess << ((USE_CHRONO_FROMSTREAM_1 == e_ENABLE_FEATURE)? "std::chrono" : "(lib->)date" );
-        ess << " ::: strYMD='" << str << "' , format='" << fmt << "' stream-parse failed.";
+        ess << workaround::DateAdapterS2T<datelibFrom::year_month_day>::dateLibName << " ::: strYMD='" << str << "' , format='" << fmt << "' stream-parse failed.";
         ess << " iss.fail()=" << is_failed << " iss.bad()="  << is_bad;
 
         return ErrorHandler<value_type, ERR_HANDLER>::template handle<std::invalid_argument>(str, ess.str());
@@ -257,14 +249,13 @@ namespace converter
       {
         std::ostringstream ess{};
 
-        ess << ((USE_CHRONO_FROMSTREAM_1 == e_ENABLE_FEATURE)? "std::chrono" : "(lib->)date" );
-        ess << " ::: strYMD='" << str << "' , format='" << fmt << "' invalid-date, conversion failed." << std::endl;
+        ess << workaround::DateAdapterS2T<datelibFrom::year_month_day>::dateLibName << " ::: strYMD='" << str << "' , format='" << fmt << "' invalid-date, conversion failed." << std::endl;
 
         return ErrorHandler<value_type, ERR_HANDLER>::template handle<std::invalid_argument>(str, ess.str());
       }
 
 
-      return _dateLib2chrono(ymd);
+      return workaround::DateAdapter::toChrono(ymd);
     }
 
   public:
@@ -283,7 +274,7 @@ namespace converter
      */
     inline static return_type
     ToVal(  const std::string& str,
-            const std::string::value_type* fmt = "%F" )
+            const char* fmt = "%F" )
     {
       std::istringstream iss(str);
       return _ToVal(str, iss, fmt);
@@ -327,13 +318,6 @@ namespace converter
     using return_type = std::string;
     constexpr static Tn2StrConversionProcess conversionProcess = Tn2StrConversionProcess::SPECIALIZED_IMPLEMENTATION;
 
-    // Create static compile-time fallback constant token
-#if    USE_CHRONO_TOSTREAM_1 == 1
-    inline static constexpr specializedTypes::CompTimeStr defaultFmt{"{:%F}"};   // "%F" -> "%Y-%m-%d"
-#else
-    inline static constexpr specializedTypes::CompTimeStr defaultFmt{"%F"};   // "%F" -> "%Y-%m-%d"
-#endif
-
      /**
       * @brief   Converts string holding a possibly-numerical value to floating-point datatype representation.
       * @param   str                 input string.
@@ -342,115 +326,35 @@ namespace converter
       */
     inline static return_type
     ToStr(const std::chrono::year_month_day& val,
-          const typename Format_SpecializedImplementation<std::chrono::year_month_day>::type& format_ss) // "%F" -> "%Y-%m-%d"
+          const typename Format_SpecializedImplementation<std::chrono::year_month_day>::type& format_ss) // "{:%F}" -> "{:%Y-%m-%d}"
           // = Format_SpecializedImplementation<std::chrono::year_month_day>::getDefaultFormatArgs() )
     {
-#if    USE_CHRONO_TOSTREAM_1 == 1
-      CONVERTER_DEBUG_LOG("trace :: return_type ConvertFromVal< std::chrono::year_month_day, Tn2StrConversionProcess::SPECIALIZED_IMPLEMENTATION >::ToStr(val='" << val << "', format_ss)");
-#else
-      CONVERTER_DEBUG_LOG("trace :: return_type ConvertFromVal< std::chrono::year_month_day, Tn2StrConversionProcess::SPECIALIZED_IMPLEMENTATION >::ToStr(dateStr, format_ss)");
-#endif
+      CONVERTER_DEBUG_LOG("trace :: return_type ConvertFromVal< std::chrono::year_month_day, Tn2StrConversionProcess::SPECIALIZED_IMPLEMENTATION >::ToStr(" << _chrono2string(val) << ", format_ss)");
 
       std::ostringstream oss;
       format_ss.applyFormatArgs(oss); // set locale for stringstream based conversion
 
-#if    USE_CHRONO_TOSTREAM_1 == 1
-      //std::chrono::to_stream(oss, fmt, val);
-
-      std::string fmtV("{:");
-      fmtV += format_ss.getDateFormat();  // format_ss.getDateFormat() = "%F" -> "%Y-%m-%d"
-      fmtV += "}";
-      oss << std::vformat(fmtV, std::make_format_args(val));
-#else // if  USE_DATELIB_TOSTREAM_2 == 1
-      //oss << date::format(fmt, val);
-      date::to_stream(oss, format_ss.getDateFormat().c_str(), _chrono2dateLib(val));
-#endif
-
+      workaround::DateAdapterT2S<datelibTo::year_month_day>::toStream(oss, format_ss.getDateFormat(), val);  // "{:%F}" -> "{:%Y-%m-%d}"
       return oss.str();
     }
 
-    template< specializedTypes::CompTimeStr FS = defaultFmt > // "%F" -> "%Y-%m-%d"
+    //template <std::size_t N, specializedTypes::CompTimeStr<N> FmtStr
+    template <specializedTypes::CompTimeStr FmtStr = "{:%F}" >
     inline static return_type
     ToStr(const std::chrono::year_month_day& val,
-          const typename Format_SpecializedImplementation<std::chrono::year_month_day, FS>::type& format_ss
-           = Format_SpecializedImplementation<std::chrono::year_month_day, FS>::getDefaultFormatArgs() )
+          const typename Format_SpecializedImplementation<std::chrono::year_month_day, FmtStr>::type& format_ss
+           = Format_SpecializedImplementation<std::chrono::year_month_day, FmtStr>::getDefaultFormatArgs() )
     {
-#if    USE_CHRONO_TOSTREAM_1 == 1
-      CONVERTER_DEBUG_LOG("trace :: return_type ConvertFromVal< std::chrono::year_month_day, Tn2StrConversionProcess::SPECIALIZED_IMPLEMENTATION >::ToStr<" << FS.data << ">(val='" << val << "', format_ss)");
-#else
-      CONVERTER_DEBUG_LOG("trace :: return_type ConvertFromVal< std::chrono::year_month_day, Tn2StrConversionProcess::SPECIALIZED_IMPLEMENTATION >::ToStr<" << FS.data << ">(dateStr, format_ss)");
-#endif
-
-      std::ostringstream oss;
-      format_ss.applyFormatArgs(oss); // set locale for stringstream based conversion
-
-      // Convert your compile-time data safely into a format string wrapper
-      // This eliminates the need for expensive 'std::ostringstream' heap overhead!
-#if    USE_CHRONO_TOSTREAM_1 == 1
-      constexpr std::format_string<std::chrono::year_month_day> fmtStr{ FS.data };
-#endif
-
+      CONVERTER_DEBUG_LOG("trace :: return_type ConvertFromVal< std::chrono::year_month_day, Tn2StrConversionProcess::SPECIALIZED_IMPLEMENTATION >::ToStr<" << FmtStr.data << ">(" << _chrono2string(val) << ", format_ss)");
 
       if (format_ss.hasLocParam())
       {
-        oss << formatLibTo::format( format_ss.getLoc(),
-#if    USE_CHRONO_TOSTREAM_1 == 1
-          fmtStr
-#else
-          FS.data
-#endif
-        , _chrono2dateLib(val) );
+        return workaround::DateAdapterT2S<datelibTo::year_month_day>::format<FmtStr.data>( format_ss.getLoc(), val );
       } else {
-        oss << formatLibTo::format(
-#if    USE_CHRONO_TOSTREAM_1 == 1
-          fmtStr
-#else
-          FS.data
-#endif
-        , _chrono2dateLib(val) );
+        return workaround::DateAdapterT2S<datelibTo::year_month_day>::format<FmtStr.data>( val );
       }
-
-      return oss.str();
     }
 
-    /**
-     * @brief   Converts 'year_month_day' using a user-provided string literal.
-     * @note    The template parameter ensures compile-time format validation.
-     * @param   val     Input 'year_month_day'.
-     * @param   fmt     String literal format wrapper (e.g., "%Y-%m-%d").
-     * @returns Formatted std::string.
-     */
-    template<std::size_t N>
-    inline static std::string
-    ToStr( const std::chrono::year_month_day& val,
-           const char (&fmt)[N])   // "%Y-%m-%d"
-    {
-#if    USE_CHRONO_TOSTREAM_1 == 1
-      CONVERTER_DEBUG_LOG("trace :: return_type ConvertFromVal< std::chrono::year_month_day, SPECIALIZED_IMPLEMENTATION >::ToStr<N>(val='" << val << "', '" << fmt << "')");
-#else
-      CONVERTER_DEBUG_LOG("trace :: return_type ConvertFromVal< std::chrono::year_month_day, SPECIALIZED_IMPLEMENTATION >::ToStr<N>(dateStr, '" << fmt << "')");
-#endif
-
-      return formatLibTo::format( fmt, _chrono2dateLib(val) ); // as std::format() accepts literal string as compile-time constant
-      //return formatLibTo::format("%Y-%m-%d", val);
-    }
-
-    template<std::size_t N>
-    inline static std::string
-    ToStr( const std::chrono::year_month_day& val,
-           const char (&fmt)[N],   // "%Y-%m-%d"
-           const std::locale& loc) // Passed as a traditional runtime reference
-    {
-#if    USE_CHRONO_TOSTREAM_1 == 1
-      CONVERTER_DEBUG_LOG("trace :: return_type ConvertFromVal< std::chrono::year_month_day, SPECIALIZED_IMPLEMENTATION >::ToStr<N>(val='" << val << "', '" << fmt << "', loc)");
-#else
-      CONVERTER_DEBUG_LOG("trace :: return_type ConvertFromVal< std::chrono::year_month_day, SPECIALIZED_IMPLEMENTATION >::ToStr<N>(dateStr, '" << fmt << "', loc)");
-#endif
-
-      // std::format accepts a std::locale as its first argument
-      return formatLibTo::format(loc, fmt, _chrono2dateLib(val) ); // as std::format() accepts literal string as compile-time constant
-      //return formatLibTo::format(loc, "%Y-%m-%d", val);
-    }
 /*
 int main() {
     using namespace std::chrono;
@@ -465,17 +369,14 @@ int main() {
 */
 
   private:
-    inline static datelibTo::year_month_day _chrono2dateLib(const std::chrono::year_month_day& val)
+    inline static std::string _chrono2string(const std::chrono::year_month_day& val)
     {
-#if    USE_CHRONO_TOSTREAM_1 == 1
-      return val;
-#else // if  USE_DATELIB_TOSTREAM_2 == 1
-      return date::year_month_day {
-          date::year{static_cast<int>(val.year())},
-          date::month{static_cast<unsigned>(val.month())},
-          date::day{static_cast<unsigned>(val.day())}
-      };
-#endif
+
+      std::ostringstream oss;
+      oss << "{ YYYY[" << static_cast<int>(val.year()) << "]/mm[" << static_cast<unsigned>(val.month())
+          << "]/dd[" << static_cast<unsigned>(val.day()) << "] }" << std::endl;
+
+      return oss.str();
     }
   };
 
@@ -492,7 +393,7 @@ int main() {
       return Format_SpecializedImplementation<std::chrono::year_month_day>::getDefaultFormatArgs();
     }
 
-    using type = Format_StringStream<std::chrono::year_month_day>::type;
+    using type = typename Format_StringStream<std::chrono::year_month_day>::type;
   };
 
 
@@ -504,7 +405,7 @@ int main() {
       return Format_StringStream<std::chrono::year_month_day>::getDefaultFormatArgs();
     }
 
-    using type = Format_StringStream<std::chrono::year_month_day>::type;
+    using type = typename Format_StringStream<std::chrono::year_month_day>::type;
   };
 
 
@@ -512,8 +413,7 @@ int main() {
   struct FormatInfo < std::chrono::year_month_day,
                       Tn2StrConversionProcess::SPECIALIZED_IMPLEMENTATION,
                       FS  // = ConvertFromVal<std::chrono::year_month_day, Tn2StrConversionProcess::SPECIALIZED_IMPLEMENTATION>::defaultFmt
-                          // = "{:%F}" for USE_CHRONO_TOSTREAM_1 == 1, ELSE
-                          // =   "%F"  for USE_DATELIB_TOSTREAM_2 == 1
+                          // = "{:%F}"
                     >
   {
     static auto getDefaultFormatArgs()
@@ -521,7 +421,7 @@ int main() {
       return Format_SpecializedImplementation < std::chrono::year_month_day, FS >::getDefaultFormatArgs();
     }
 
-    using type = Format_SpecializedImplementation < std::chrono::year_month_day, FS >::type;
+    using type = typename Format_SpecializedImplementation < std::chrono::year_month_day, FS >::type;
   };
 
 
