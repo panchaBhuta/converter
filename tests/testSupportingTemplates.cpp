@@ -21,16 +21,40 @@
   #define T2S_CHRONO_YMD_STRINGSTREAM
 #endif
 
-#if HAS_FLOATINGPOINT_FROM_CHARS_1 == 1
-  #define S2T_FLOATINGPOINT_FROM_CHARS  Str2TnConversionProcess::FROM_CHARS COMMA
+#if (HAS_FLOATINGPOINT_FROM_CHARS & 1) == 1
+  #define S2T_FLOATINGPOINT_FROM_CHARS_float  Str2TnConversionProcess::FROM_CHARS COMMA
 #else
-  #define S2T_FLOATINGPOINT_FROM_CHARS
+  #define S2T_FLOATINGPOINT_FROM_CHARS_float
 #endif
 
-#if HAS_FLOATINGPOINT_TO_CHARS_1 == 1
-  #define T2S_FLOATINGPOINT_TO_CHARS  Tn2StrConversionProcess::TO_CHARS COMMA
+#if (HAS_FLOATINGPOINT_FROM_CHARS & 2) == 2
+  #define S2T_FLOATINGPOINT_FROM_CHARS_double  Str2TnConversionProcess::FROM_CHARS COMMA
 #else
-  #define T2S_FLOATINGPOINT_TO_CHARS
+  #define S2T_FLOATINGPOINT_FROM_CHARS_double
+#endif
+
+#if (HAS_FLOATINGPOINT_FROM_CHARS & 4) == 4
+  #define S2T_FLOATINGPOINT_FROM_CHARS_long_double  Str2TnConversionProcess::FROM_CHARS COMMA
+#else
+  #define S2T_FLOATINGPOINT_FROM_CHARS_long_double
+#endif
+
+#if (HAS_FLOATINGPOINT_TO_CHARS & 1) == 1
+  #define T2S_FLOATINGPOINT_TO_CHARS_float  Tn2StrConversionProcess::TO_CHARS COMMA
+#else
+  #define T2S_FLOATINGPOINT_TO_CHARS_float
+#endif
+
+#if (HAS_FLOATINGPOINT_TO_CHARS & 2) == 2
+  #define T2S_FLOATINGPOINT_TO_CHARS_double  Tn2StrConversionProcess::TO_CHARS COMMA
+#else
+  #define T2S_FLOATINGPOINT_TO_CHARS_double
+#endif
+
+#if (HAS_FLOATINGPOINT_TO_CHARS & 4) == 4
+  #define T2S_FLOATINGPOINT_TO_CHARS_long_double  Tn2StrConversionProcess::TO_CHARS COMMA
+#else
+  #define T2S_FLOATINGPOINT_TO_CHARS_long_double
 #endif
 
 #if ENABLE_FLOATINGPOINT_TO_STRING_1 == 1
@@ -142,35 +166,35 @@ int main()
                                                     Tn2StrConversionProcess::STRINGSTREAM } );
 
 
-    std::cout << "floating-point's" << std::endl;
-    checkAvailableParameters<float> ( { S2T_FLOATINGPOINT_FROM_CHARS
+    std::cout << "floating-point's  HAS_FLOATINGPOINT_FROM_CHARS=" << HAS_FLOATINGPOINT_FROM_CHARS << " , HAS_FLOATINGPOINT_TO_CHARS=" << HAS_FLOATINGPOINT_TO_CHARS << std::endl;
+    checkAvailableParameters<float> ( { S2T_FLOATINGPOINT_FROM_CHARS_float
                                         Str2TnConversionProcess::S2N,
                                         Str2TnConversionProcess::STRINGSTREAM },
                                       { Str2TnErrorHandler::QUIET_NAN,
                                         Str2TnErrorHandler::SIGNAL_NAN,
                                         Str2TnErrorHandler::THROW_ERROR,
                                         Str2TnErrorHandler::VARIANT_VAL },
-                                      { T2S_FLOATINGPOINT_TO_CHARS
+                                      { T2S_FLOATINGPOINT_TO_CHARS_float
                                         T2S_FLOATINGPOINT_TO_STRING
                                         Tn2StrConversionProcess::STRINGSTREAM } );
-    checkAvailableParameters<double> ( { S2T_FLOATINGPOINT_FROM_CHARS
+    checkAvailableParameters<double> ( { S2T_FLOATINGPOINT_FROM_CHARS_double
                                          Str2TnConversionProcess::S2N,
                                          Str2TnConversionProcess::STRINGSTREAM },
                                        { Str2TnErrorHandler::QUIET_NAN,
                                          Str2TnErrorHandler::SIGNAL_NAN,
                                          Str2TnErrorHandler::THROW_ERROR,
                                          Str2TnErrorHandler::VARIANT_VAL },
-                                       { T2S_FLOATINGPOINT_TO_CHARS
+                                       { T2S_FLOATINGPOINT_TO_CHARS_double
                                          T2S_FLOATINGPOINT_TO_STRING
                                          Tn2StrConversionProcess::STRINGSTREAM } );
-    checkAvailableParameters<long double> ( { S2T_FLOATINGPOINT_FROM_CHARS
+    checkAvailableParameters<long double> ( { S2T_FLOATINGPOINT_FROM_CHARS_long_double
                                               Str2TnConversionProcess::S2N,
                                               Str2TnConversionProcess::STRINGSTREAM },
                                             { Str2TnErrorHandler::QUIET_NAN,
                                               Str2TnErrorHandler::SIGNAL_NAN,
                                               Str2TnErrorHandler::THROW_ERROR,
                                               Str2TnErrorHandler::VARIANT_VAL },
-                                            { T2S_FLOATINGPOINT_TO_CHARS
+                                            { T2S_FLOATINGPOINT_TO_CHARS_long_double
                                               T2S_FLOATINGPOINT_TO_STRING
                                               Tn2StrConversionProcess::STRINGSTREAM } );
 

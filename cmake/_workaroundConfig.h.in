@@ -13,6 +13,36 @@
 
 #pragma once
 
+
+
+/*
+ *        macro Prefixes and their meaning
+ *  -----------------------------------------------------------------------------------------------------
+ *  e_         — represents enum value(s) of any feature.
+ *               e.g: e_ENABLE_FEATURE, e_DATE_CHRONO
+ *
+ *  **     Below macro values are noted across OS's and compilers     **
+ *  **     and compiled into doc/consolidateWorkAroundFlags.csv       **
+ *  SUPPORTED_ — identifies whether a feature is supported by the standard library / third-party library.
+ *               These are used by the converter's preprocessor logic to determine which code gets compiled.
+ *               e.g: SUPPORTED_DATE_LIB_FOR_FROMSTREAM
+ *  HAS_       — identifies that functionality is available, but is not necessarily used by the converter;
+ *               intended these mainly for identifying any C++20 concepts/specialized templates/feature and
+ *               documented it's avaliability in doc/consolidateWorkAroundFlags.csv.
+ *               e.g: HAS_FLOATINGPOINT_FROM_CHARS
+ *  ENABLE_    — identifies whether a supported feature should actually be enabled/used;
+ *               this is configuration/toggling rather than capability detection.
+ *               e.g: ENABLE_FLOATINGPOINT_TO_STRING_1
+ *  TEST_      — in corner cases some of the test-cases has dependency on standard-libs, but particular
+ *               compiler might not support a feature yet. For e.g some functionality of string by clang
+ *               compiler. In such a scenario, that testing is skipped over. No work arounds are
+ *               provided as it's not part of the conerter library.
+ *               e.g: TEST_HAS_CLANG_STRING_1
+ */
+
+
+
+
 #cmakedefine01 e_ENABLE_FEATURE
 #cmakedefine01 e_DISABLE_FEATURE
 
@@ -31,7 +61,7 @@
  *  as last resort calls an internal implementation 
  *  (msvc -> to_stream), which has limited formating support.
  */
-//  Define conversion library used for date
+//  enums to Define conversion library used for date-conversion
 #define  e_DATE_NO_LIB  0     //  no date conversion support from any available lib's
 #define  e_DATE_CHRONO  1     //  std::chrono
 #define  e_DATE_HHDATE  2     //  https://github.com/HowardHinnant/date/
@@ -46,9 +76,29 @@
  * floating-point conversion by "Elementary string conversions*" is not supported by all OSes.
  * refer "Elementary string conversions*" in the below link
  * https://en.cppreference.com/w/cpp/compiler_support/17#C.2B.2B17_library_features
+      #
+      # HAS_FLOATINGPOINT_FROM_CHARS and HAS_FLOATINGPOINT_TO_CHARS macro values
+      # are bitmask for the 3 floating-point types:
+      #
+      #   bit 0 (1) -> float
+      #   bit 1 (2) -> double
+      #   bit 2 (4) -> long double
+      #
+      # Therefore:
+      #
+      #   0 = none supported
+      #   1 = float
+      #   2 = double
+      #   3 = float + double
+      #   4 = long double
+      #   5 = float + long double
+      #   6 = double + long double
+      #   7 = all three
+      #
+      # Normally, we expect value 7 for both HAS_FLOATINGPOINT_FROM_CHARS and HAS_FLOATINGPOINT_TO_CHARS.
  */
-#cmakedefine01  HAS_FLOATINGPOINT_FROM_CHARS_1
-#cmakedefine01  HAS_FLOATINGPOINT_TO_CHARS_1
+#define  HAS_FLOATINGPOINT_FROM_CHARS       @HAS_FLOATINGPOINT_FROM_CHARS@
+#define  HAS_FLOATINGPOINT_TO_CHARS         @HAS_FLOATINGPOINT_TO_CHARS@
 
 
 #cmakedefine01  ENABLE_FLOATINGPOINT_TO_STRING_1

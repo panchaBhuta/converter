@@ -220,14 +220,14 @@ namespace converter
             std::istringstream& iss,
             const char* fmt )
     {
-      datelibFrom::year_month_day ymd;
+      t_datelibFrom ymd;
 
       // Ensure the stream is strictly configured NOT to throw(e.g std::ios_base::failure) under any flag changes
       iss.exceptions(std::ios_base::goodbit);  // IMPORTANT flag
 
-      CONVERTER_DEBUG_LOG("trace :: return_type ConvertFromStr< std::chrono::year_month_day, Str2TnConversionProcess::SPECIALIZED_IMPLEMENTATION, " << ERR_HANDLER << ">_ToVal()->  calling " << workaround::DateAdapterS2T<datelibFrom::year_month_day>::functionName);
+      CONVERTER_DEBUG_LOG("trace :: return_type ConvertFromStr< std::chrono::year_month_day, Str2TnConversionProcess::SPECIALIZED_IMPLEMENTATION, " << ERR_HANDLER << ">_ToVal()->  calling " << workaround::DateAdapterS2T<t_datelibFrom>::functionName);
 
-      workaround::DateAdapterS2T<datelibFrom::year_month_day>::fromStream(iss, fmt, ymd);    // "%F" -> "%Y-%m-%d"
+      workaround::DateAdapterS2T<t_datelibFrom>::fromStream(iss, fmt, ymd);    // "%F" -> "%Y-%m-%d"
 
       const bool is_failed = iss.fail();
       const bool is_bad = iss.bad();
@@ -238,7 +238,7 @@ namespace converter
       {
         std::ostringstream ess;
 
-        ess << workaround::DateAdapterS2T<datelibFrom::year_month_day>::dateLibName << " ::: strYMD='" << str << "' , format='" << fmt << "' stream-parse failed.";
+        ess << workaround::DateAdapterS2T<t_datelibFrom>::dateLibName << " ::: strYMD='" << str << "' , format='" << fmt << "' stream-parse failed.";
         ess << " iss.fail()=" << is_failed << " iss.bad()="  << is_bad;
 
         return ErrorHandler<value_type, ERR_HANDLER>::template handle<std::invalid_argument>(str, ess.str());
@@ -249,7 +249,7 @@ namespace converter
       {
         std::ostringstream ess{};
 
-        ess << workaround::DateAdapterS2T<datelibFrom::year_month_day>::dateLibName << " ::: strYMD='" << str << "' , format='" << fmt << "' invalid-date, conversion failed." << std::endl;
+        ess << workaround::DateAdapterS2T<t_datelibFrom>::dateLibName << " ::: strYMD='" << str << "' , format='" << fmt << "' invalid-date, conversion failed." << std::endl;
 
         return ErrorHandler<value_type, ERR_HANDLER>::template handle<std::invalid_argument>(str, ess.str());
       }
@@ -334,7 +334,7 @@ namespace converter
       std::ostringstream oss;
       format_ss.applyFormatArgs(oss); // set locale for stringstream based conversion
 
-      workaround::DateAdapterT2S<datelibTo::year_month_day>::toStream(oss, format_ss.getDateFormat(), val);  // "{:%F}" -> "{:%Y-%m-%d}"
+      workaround::DateAdapterT2S<t_datelibTo>::toStream(oss, format_ss.getDateFormat(), val);  // "{:%F}" -> "{:%Y-%m-%d}"
       return oss.str();
     }
 
@@ -349,9 +349,9 @@ namespace converter
 
       if (format_ss.hasLocParam())
       {
-        return workaround::DateAdapterT2S<datelibTo::year_month_day>::format<FmtStr.data>( format_ss.getLoc(), val );
+        return workaround::DateAdapterT2S<t_datelibTo>::format<FmtStr.data>( format_ss.getLoc(), val );
       } else {
-        return workaround::DateAdapterT2S<datelibTo::year_month_day>::format<FmtStr.data>( val );
+        return workaround::DateAdapterT2S<t_datelibTo>::format<FmtStr.data>( val );
       }
     }
 

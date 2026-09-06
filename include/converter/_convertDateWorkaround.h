@@ -83,9 +83,9 @@
 #endif
 
 #if    SUPPORTED_DATE_LIB_FOR_FROMSTREAM == e_DATE_CHRONO
-  namespace datelibFrom = std::chrono;
+  using t_datelibFrom = std::chrono::year_month_day;
 #elif  SUPPORTED_DATE_LIB_FOR_FROMSTREAM == e_DATE_HHDATE
-  namespace datelibFrom = date;
+  using t_datelibFrom = date::year_month_day;
 #else
   static_assert(
     SUPPORTED_DATE_LIB_FOR_FROMSTREAM != e_DATE_NO_LIB,
@@ -94,9 +94,9 @@
 #endif
 
 #if    SUPPORTED_DATE_LIB_FOR_TOSTREAM == e_DATE_CHRONO
-  namespace datelibTo   = std::chrono;
+  using t_datelibTo   = std::chrono::year_month_day;
 #elif  SUPPORTED_DATE_LIB_FOR_TOSTREAM == e_DATE_HHDATE
-  namespace datelibTo   = date;
+  using t_datelibTo   = date::year_month_day;
 #else
   static_assert(
     SUPPORTED_DATE_LIB_FOR_TOSTREAM != e_DATE_NO_LIB,

@@ -193,7 +193,7 @@ namespace converter
      * CompTimeStr, but once installed in the ostream it is
      * stored as a runtime string.
      */
-    workaround::DateAdapterT2S<datelibTo::year_month_day>::toStream(os, format, ymd);  // "{:%F}" formats as "{:%Y-%m-%d}"
+    workaround::DateAdapterT2S<t_datelibTo>::toStream(os, format, ymd);  // "{:%F}" formats as "{:%Y-%m-%d}"
 
     return os;
   }

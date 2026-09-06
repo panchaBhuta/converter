@@ -6,7 +6,7 @@
 
 int main(int, char**)
 {
-  float result;
+  FLOAT_TYPE result;
   std::string str("1.2345");
   [[maybe_unused]] auto [ptr, ec] = std::from_chars(str.data(), str.data() + str.size(), result);
 
