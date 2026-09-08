@@ -4,7 +4,7 @@
  * URL:      https://github.com/panchaBhuta/converter
  * Version:  v1.4
  *
- * Copyright (c) 2023-2025 Gautam Dhar
+ * Copyright (c) 2023-2026 Gautam Dhar
  * All rights reserved.
  *
  * converter is distributed under the BSD 3-Clause license, see LICENSE for details.
@@ -25,19 +25,17 @@
  *  **     and compiled into doc/consolidateWorkAroundFlags.csv       **
  *  SUPPORTED_ — identifies whether a feature is supported by the standard library / third-party library.
  *               These are used by the converter's preprocessor logic to determine which code gets compiled.
+ *               This is used for toggling, when a particular feature is not supported by standard lib,
+ *               to enable fallback code(in place of call to the standard lib code).
  *               e.g: SUPPORTED_DATE_LIB_FOR_FROMSTREAM
- *  HAS_       — identifies that functionality is available, but is not necessarily used by the converter;
+ *  HAS_       — identifies that functionality is available, but is not used by the converter;
  *               intended these mainly for identifying any C++20 concepts/specialized templates/feature and
- *               documented it's avaliability in doc/consolidateWorkAroundFlags.csv.
+ *               document it's avaliability in doc/consolidateWorkAroundFlags.csv.
+ *               Can be useful for debugging in corner-case senario.
  *               e.g: HAS_FLOATINGPOINT_FROM_CHARS
  *  ENABLE_    — identifies whether a supported feature should actually be enabled/used;
  *               this is configuration/toggling rather than capability detection.
- *               e.g: ENABLE_FLOATINGPOINT_TO_STRING_1
- *  TEST_      — in corner cases some of the test-cases has dependency on standard-libs, but particular
- *               compiler might not support a feature yet. For e.g some functionality of string by clang
- *               compiler. In such a scenario, that testing is skipped over. No work arounds are
- *               provided as it's not part of the conerter library.
- *               e.g: TEST_HAS_CLANG_STRING_1
+ *               e.g: ENABLE_FLOATINGPOINT_TO_STRING
  */
 
 
@@ -101,18 +99,49 @@
 #define  HAS_FLOATINGPOINT_TO_CHARS         @HAS_FLOATINGPOINT_TO_CHARS@
 
 
-#cmakedefine01  ENABLE_FLOATINGPOINT_TO_STRING_1
+/*
+ * WARNING :: With floating point types std::to_string may yield unexpected results as the number
+ *            of significant digits in the returned string can be zero, for e.g: pVal = 1e-09
+ *
+ *            The return value may differ significantly from what std::cout prints by default, see the example.
+ *
+ * std::cout: 23.43
+ * to_string: 23.430000
+ *
+ * std::cout: 1e-09
+ * to_string: 0.000000
+ *
+ * std::cout: 1e+40
+ * to_string: 10000000000000000303786028427003666890752.000000
+ *
+ * std::cout: 1e-40
+ * to_string: 0.000000
+ *
+ * std::cout: 1.23457e+08
+ * to_string: 123456789.000000
+ */
+#cmakedefine01  ENABLE_FLOATINGPOINT_TO_STRING
 
 
 /*
  * Failure to compile std::u16string from libstdc++ 12.1 in c++20 mode #55560 
  * https://github.com/llvm/llvm-project/issues/55560
  */
-#cmakedefine01  TEST_HAS_CLANG_STRING_1
-#cmakedefine01  TEST_WORKAROUND_CLANG_STRING_2
-#if TEST_WORKAROUND_CLANG_STRING_2 == e_ENABLE_FEATURE
+#define   e_NOT_CLANG_COMPILER         0
+#define   e_CLANG_STRING_SUPPORTED     1
+#define   e_CLANG_STRING_WORKAROUND    2
+#define   e_CLANG_STRING_DISABLED      3
+
+
+#define   SUPPORTED_CLANG_STRING      @SUPPORTED_CLANG_STRING@
+
+#if SUPPORTED_CLANG_STRING == e_CLANG_STRING_WORKAROUND
   #include <string>
   [[maybe_unused]]static std::u8string  clang_string_workaround(const  char8_t* a, const  char8_t* b) { return {a, b}; }
   [[maybe_unused]]static std::u16string clang_string_workaround(const char16_t* a, const char16_t* b) { return {a, b}; }
   [[maybe_unused]]static std::u32string clang_string_workaround(const char32_t* a, const char32_t* b) { return {a, b}; }
+#elif SUPPORTED_CLANG_STRING  ==  e_CLANG_STRING_DISABLED
+  #warning Possibly wrong build initialization. Check for SUPPORTED_CLANG_STRING  ==  e_CLANG_STRING_DISABLED.
 #endif
+
+

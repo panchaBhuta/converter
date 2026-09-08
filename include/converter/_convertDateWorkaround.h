@@ -32,7 +32,8 @@
  * Howard Hinnant date is used only as a fallback.
  *
  * This file is expected to become redundant as support for the
- * required std::chrono functionality becomes universally available.
+ * required std::chrono functionality becomes universally available
+ * across widely used OSes and C++ compilers.
  *
  *    Today
  *    ─────
@@ -52,7 +53,19 @@
  *        │
  *        └── std::chrono
  *
- *    _delete _convertDateWorkaround.h_
+ *    *delete _convertDateWorkaround.h*
+ *
+ * The macros SUPPORTED_DATE_LIB_FOR_FROMSTREAM and SUPPORTED_DATE_LIB_FOR_TOSTREAM
+ * are declared in <converter/_workaroundConfig.h>, which is not
+ * part of converter repository, but an header artifact created
+ * during the cmake's config call. cmake run's a few probes to
+ * determine the availabilty of required std::chrono functionality
+ * and if it fails checks for the same in the fall-back Howard Hinnant date.
+ * Accordingly SUPPORTED_DATE_LIB_FOR_FROMSTREAM and SUPPORTED_DATE_LIB_FOR_TOSTREAM
+ * are configured with the probes results.
+ * The header artifact <converter/_workaroundConfig.h> lies in the
+ * build-folder that cmake creates and then cmake includes that
+ * build-folder-path as well at the time of compilation.
  */
 
 

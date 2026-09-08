@@ -189,67 +189,56 @@ endfunction()
 # https://github.com/llvm/llvm-project/issues/55560
 function(check_clang_string_workaround)
     get_macro_value( ${CMAKE_CURRENT_BINARY_DIR}/include/converter/_workaroundConfig.h
-                    "TEST_HAS_CLANG_STRING_1"
-                     TEST_HAS_CLANG_STRING_1)
-    message(STATUS "previous-build check for TEST_HAS_CLANG_STRING_1 : ${TEST_HAS_CLANG_STRING_1}")
+                    "SUPPORTED_CLANG_STRING"
+                     SUPPORTED_CLANG_STRING)
+    message(STATUS "previous-build check for SUPPORTED_CLANG_STRING : ${SUPPORTED_CLANG_STRING}")
 
-    get_macro_value( ${CMAKE_CURRENT_BINARY_DIR}/include/converter/_workaroundConfig.h
-                    "TEST_WORKAROUND_CLANG_STRING_2"
-                     TEST_WORKAROUND_CLANG_STRING_2)
-    message(STATUS "previous-build check for TEST_WORKAROUND_CLANG_STRING_2 : ${TEST_WORKAROUND_CLANG_STRING_2}")
-
-    if(   (NOT TEST_HAS_CLANG_STRING_1       STREQUAL "NOTFOUND") AND
-          (NOT TEST_WORKAROUND_CLANG_STRING_2  STREQUAL "NOTFOUND")  )
-        set(TEST_HAS_CLANG_STRING_1      ${TEST_HAS_CLANG_STRING_1}      PARENT_SCOPE)
-        set(TEST_WORKAROUND_CLANG_STRING_2 ${TEST_WORKAROUND_CLANG_STRING_2} PARENT_SCOPE)
+    if(   (NOT SUPPORTED_CLANG_STRING       STREQUAL "NOTFOUND")  )
+        set(SUPPORTED_CLANG_STRING      "${SUPPORTED_CLANG_STRING}"      PARENT_SCOPE)
         return()
     endif()
 
-    set(TEST_HAS_CLANG_STRING_1       ${e_ENABLE_FEATURE} PARENT_SCOPE)
-    set(TEST_WORKAROUND_CLANG_STRING_2  ${e_DISABLE_FEATURE} PARENT_SCOPE)
 
     if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
         try_compile(COMPILE_RESULT_CLANG_STRING_DEFAULT
                     SOURCE_FROM_FILE    check_clang_string.cpp
                                         "${CMAKE_CURRENT_SOURCE_DIR}/cmake/check_clang_string.cpp"
-                    COMPILE_DEFINITIONS "-DTEST_WORKAROUND_CLANG_STRING_2=${e_DISABLE_FEATURE}"
+                    COMPILE_DEFINITIONS "-DSUPPORTED_CLANG_STRING=e_CLANG_STRING_SUPPORTED"
                     CXX_STANDARD "${CMAKE_CXX_STANDARD}"
                     CXX_STANDARD_REQUIRED True
-                    LOG_DESCRIPTION "compiler-check: check_clang_string.cpp : -DTEST_WORKAROUND_CLANG_STRING_2=${e_DISABLE_FEATURE}"
+                    LOG_DESCRIPTION "compiler-check: check_clang_string.cpp : -DSUPPORTED_CLANG_STRING=e_CLANG_STRING_SUPPORTED"
                     OUTPUT_VARIABLE TRY_COMPILE_OUTPUT)
         message(STATUS ${TRY_COMPILE_OUTPUT})
 
         if(COMPILE_RESULT_CLANG_STRING_DEFAULT)
             message(STATUS "check_clang_string :: default mode ++SUCCESS++")
             message(STATUS "check_clang_string :: workaround   __SKIPPED__")
-            set(TEST_HAS_CLANG_STRING_1       ${e_ENABLE_FEATURE} PARENT_SCOPE)
-            set(TEST_WORKAROUND_CLANG_STRING_2  ${e_DISABLE_FEATURE} PARENT_SCOPE)
+            set(SUPPORTED_CLANG_STRING       "e_CLANG_STRING_SUPPORTED" PARENT_SCOPE)
         else()
             message(STATUS "check_clang_string :: default mode --FAILED--")
 
             try_compile(COMPILE_RESULT_CLANG_STRING_WORKAROUND
                         SOURCE_FROM_FILE    check_clang_string.cpp
                                             "${CMAKE_CURRENT_SOURCE_DIR}/cmake/check_clang_string.cpp"
-                        COMPILE_DEFINITIONS "-DTEST_WORKAROUND_CLANG_STRING_2=${e_ENABLE_FEATURE}"
+                        COMPILE_DEFINITIONS "-DSUPPORTED_CLANG_STRING=e_CLANG_STRING_WORKAROUND"
                         CXX_STANDARD "${CMAKE_CXX_STANDARD}"
                         CXX_STANDARD_REQUIRED True
-                        LOG_DESCRIPTION "compiler-check: check_clang_string.cpp : -DTEST_WORKAROUND_CLANG_STRING_2=${e_ENABLE_FEATURE}"
+                        LOG_DESCRIPTION "compiler-check: check_clang_string.cpp : -DSUPPORTED_CLANG_STRING=e_CLANG_STRING_WORKAROUND"
                         OUTPUT_VARIABLE TRY_COMPILE_OUTPUT)
             message(STATUS ${TRY_COMPILE_OUTPUT})
 
             if(COMPILE_RESULT_CLANG_STRING_WORKAROUND)
                 message(STATUS "check_clang_string :: workaround ++SUCCESS++")
-                set(TEST_HAS_CLANG_STRING_1       ${e_DISABLE_FEATURE} PARENT_SCOPE)
-                set(TEST_WORKAROUND_CLANG_STRING_2  ${e_ENABLE_FEATURE} PARENT_SCOPE)
+                set(SUPPORTED_CLANG_STRING       "e_CLANG_STRING_WORKAROUND" PARENT_SCOPE)
             else()
                 message(STATUS "check_clang_string :: workaround --FAILED--")
-                set(TEST_HAS_CLANG_STRING_1       ${e_DISABLE_FEATURE} PARENT_SCOPE)
-                set(TEST_WORKAROUND_CLANG_STRING_2  ${e_DISABLE_FEATURE} PARENT_SCOPE)
+                set(SUPPORTED_CLANG_STRING       "e_CLANG_STRING_DISABLED" PARENT_SCOPE)
             endif()
         endif()
 
     else()
-        message(STATUS "NON Clang compiler, default settings for TEST_HAS_CLANG_STRING_1")
+        message(STATUS "NON Clang compiler, default settings for SUPPORTED_CLANG_STRING")
+        set(SUPPORTED_CLANG_STRING       "e_NOT_CLANG_COMPILER" PARENT_SCOPE)
     endif()
 endfunction()
 
@@ -459,9 +448,9 @@ function(check_floatingPoint_elementaryStringConversions)
     message(STATUS "previous-build check for HAS_FLOATINGPOINT_TO_CHARS : ${HAS_FLOATINGPOINT_TO_CHARS}")
 
     get_macro_value( ${CMAKE_CURRENT_BINARY_DIR}/include/converter/_workaroundConfig.h
-                    "ENABLE_FLOATINGPOINT_TO_STRING_1"
-                     ENABLE_FLOATINGPOINT_TO_STRING_1)
-    message(STATUS "previous-build check for ENABLE_FLOATINGPOINT_TO_STRING_1 : ${ENABLE_FLOATINGPOINT_TO_STRING_1}")
+                    "ENABLE_FLOATINGPOINT_TO_STRING"
+                     ENABLE_FLOATINGPOINT_TO_STRING)
+    message(STATUS "previous-build check for ENABLE_FLOATINGPOINT_TO_STRING : ${ENABLE_FLOATINGPOINT_TO_STRING}")
 
     if(   (NOT HAS_FLOATINGPOINT_FROM_CHARS  STREQUAL "NOTFOUND") AND
           (NOT HAS_FLOATINGPOINT_TO_CHARS    STREQUAL "NOTFOUND")  )
@@ -518,17 +507,17 @@ function(check_floatingPoint_elementaryStringConversions)
       )
         message(STATUS "check_floatingPoint_toString ::  ++SUCCESS++")
         message(STATUS "floatingPoint_toString algo ::  ENABLED")
-        set(ENABLE_FLOATINGPOINT_TO_STRING_1    ${e_ENABLE_FEATURE} PARENT_SCOPE)
+        set(ENABLE_FLOATINGPOINT_TO_STRING    ${e_ENABLE_FEATURE} PARENT_SCOPE)
     else()
         message(STATUS "check_floatingPoint_toString ::  --FAILED--")
         message(STATUS "WARNING :: floatingPoint_toString algo ::  DISABLED")
-        set(ENABLE_FLOATINGPOINT_TO_STRING_1    ${e_DISABLE_FEATURE} PARENT_SCOPE)
+        set(ENABLE_FLOATINGPOINT_TO_STRING    ${e_DISABLE_FEATURE} PARENT_SCOPE)
     endif()
 
     #[===[  for testing purpose
         set(HAS_FLOATINGPOINT_FROM_CHARS   ${e_DISABLE_FEATURE} PARENT_SCOPE)
         set(HAS_FLOATINGPOINT_TO_CHARS     ${e_DISABLE_FEATURE} PARENT_SCOPE)
-        set(ENABLE_FLOATINGPOINT_TO_STRING_1    ${e_DISABLE_FEATURE} PARENT_SCOPE)
+        set(ENABLE_FLOATINGPOINT_TO_STRING    ${e_DISABLE_FEATURE} PARENT_SCOPE)
     #]===]
 endfunction()
 

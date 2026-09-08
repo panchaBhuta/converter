@@ -49,12 +49,10 @@ int main()
     conversionEqualCheck<signed char>('b', "b");
     conversionEqualCheck<unsigned char>('c', "c");
     conversionEqualCheck<wchar_t>('d',  "d"); /// MSVC Warning
-#if TEST_HAS_CLANG_STRING_1 == e_ENABLE_FEATURE || TEST_WORKAROUND_CLANG_STRING_2 == e_ENABLE_FEATURE
+#if SUPPORTED_CLANG_STRING  !=  e_CLANG_STRING_DISABLED
     conversionEqualCheck<char8_t>('e',  "e");
     conversionEqualCheck<char16_t>('f',  "f");
     conversionEqualCheck<char32_t>('g',  "g");
-#else
-    #warning Possibly wrong build initialization. Either TEST_HAS_CLANG_STRING_1  or TEST_WORKAROUND_CLANG_STRING_2 should be enabled.
 #endif
 
     conversionEqualCheck<std::string>("test std::string",  "test std::string");
