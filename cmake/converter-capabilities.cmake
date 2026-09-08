@@ -185,64 +185,6 @@ function(check_chrono_stream_functionality)
 endfunction()
 
 
-# Failure to compile std::u16string from libstdc++ 12.1 in c++20 mode #55560 
-# https://github.com/llvm/llvm-project/issues/55560
-function(check_clang_string_workaround)
-    get_macro_value( ${CMAKE_CURRENT_BINARY_DIR}/include/converter/_workaroundConfig.h
-                    "SUPPORTED_CLANG_STRING"
-                     SUPPORTED_CLANG_STRING)
-    message(STATUS "previous-build check for SUPPORTED_CLANG_STRING : ${SUPPORTED_CLANG_STRING}")
-
-    if(   (NOT SUPPORTED_CLANG_STRING       STREQUAL "NOTFOUND")  )
-        set(SUPPORTED_CLANG_STRING      "${SUPPORTED_CLANG_STRING}"      PARENT_SCOPE)
-        return()
-    endif()
-
-
-    if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-        try_compile(COMPILE_RESULT_CLANG_STRING_DEFAULT
-                    SOURCE_FROM_FILE    check_clang_string.cpp
-                                        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/check_clang_string.cpp"
-                    COMPILE_DEFINITIONS "-DSUPPORTED_CLANG_STRING=e_CLANG_STRING_SUPPORTED"
-                    CXX_STANDARD "${CMAKE_CXX_STANDARD}"
-                    CXX_STANDARD_REQUIRED True
-                    LOG_DESCRIPTION "compiler-check: check_clang_string.cpp : -DSUPPORTED_CLANG_STRING=e_CLANG_STRING_SUPPORTED"
-                    OUTPUT_VARIABLE TRY_COMPILE_OUTPUT)
-        message(STATUS ${TRY_COMPILE_OUTPUT})
-
-        if(COMPILE_RESULT_CLANG_STRING_DEFAULT)
-            message(STATUS "check_clang_string :: default mode ++SUCCESS++")
-            message(STATUS "check_clang_string :: workaround   __SKIPPED__")
-            set(SUPPORTED_CLANG_STRING       "e_CLANG_STRING_SUPPORTED" PARENT_SCOPE)
-        else()
-            message(STATUS "check_clang_string :: default mode --FAILED--")
-
-            try_compile(COMPILE_RESULT_CLANG_STRING_WORKAROUND
-                        SOURCE_FROM_FILE    check_clang_string.cpp
-                                            "${CMAKE_CURRENT_SOURCE_DIR}/cmake/check_clang_string.cpp"
-                        COMPILE_DEFINITIONS "-DSUPPORTED_CLANG_STRING=e_CLANG_STRING_WORKAROUND"
-                        CXX_STANDARD "${CMAKE_CXX_STANDARD}"
-                        CXX_STANDARD_REQUIRED True
-                        LOG_DESCRIPTION "compiler-check: check_clang_string.cpp : -DSUPPORTED_CLANG_STRING=e_CLANG_STRING_WORKAROUND"
-                        OUTPUT_VARIABLE TRY_COMPILE_OUTPUT)
-            message(STATUS ${TRY_COMPILE_OUTPUT})
-
-            if(COMPILE_RESULT_CLANG_STRING_WORKAROUND)
-                message(STATUS "check_clang_string :: workaround ++SUCCESS++")
-                set(SUPPORTED_CLANG_STRING       "e_CLANG_STRING_WORKAROUND" PARENT_SCOPE)
-            else()
-                message(STATUS "check_clang_string :: workaround --FAILED--")
-                set(SUPPORTED_CLANG_STRING       "e_CLANG_STRING_DISABLED" PARENT_SCOPE)
-            endif()
-        endif()
-
-    else()
-        message(STATUS "NON Clang compiler, default settings for SUPPORTED_CLANG_STRING")
-        set(SUPPORTED_CLANG_STRING       "e_NOT_CLANG_COMPILER" PARENT_SCOPE)
-    endif()
-endfunction()
-
-
 
 # ------------------------------------------------------------------------------
 # check_compile_file()

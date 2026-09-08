@@ -154,7 +154,6 @@ A :: No, there will be no build conflict. CMake handles this situation completel
 
 check_chrono_stream_functionality()  # fetches date-lib if needed
 check_floatingPoint_elementaryStringConversions()
-check_clang_string_workaround()
 
 
 

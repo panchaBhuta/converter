@@ -123,25 +123,3 @@
 #cmakedefine01  ENABLE_FLOATINGPOINT_TO_STRING
 
 
-/*
- * Failure to compile std::u16string from libstdc++ 12.1 in c++20 mode #55560 
- * https://github.com/llvm/llvm-project/issues/55560
- */
-#define   e_NOT_CLANG_COMPILER         0
-#define   e_CLANG_STRING_SUPPORTED     1
-#define   e_CLANG_STRING_WORKAROUND    2
-#define   e_CLANG_STRING_DISABLED      3
-
-
-#define   SUPPORTED_CLANG_STRING      @SUPPORTED_CLANG_STRING@
-
-#if SUPPORTED_CLANG_STRING == e_CLANG_STRING_WORKAROUND
-  #include <string>
-  [[maybe_unused]]static std::u8string  clang_string_workaround(const  char8_t* a, const  char8_t* b) { return {a, b}; }
-  [[maybe_unused]]static std::u16string clang_string_workaround(const char16_t* a, const char16_t* b) { return {a, b}; }
-  [[maybe_unused]]static std::u32string clang_string_workaround(const char32_t* a, const char32_t* b) { return {a, b}; }
-#elif SUPPORTED_CLANG_STRING  ==  e_CLANG_STRING_DISABLED
-  #warning Possibly wrong build initialization. Check for SUPPORTED_CLANG_STRING  ==  e_CLANG_STRING_DISABLED.
-#endif
-
-
