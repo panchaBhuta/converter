@@ -98,9 +98,9 @@ void checkAvailableParameters(const t_arrConversionProcessesS2T<T>& valProcesses
                    << ((HAS_FLOATINGPOINT_FROM_CHARS & bitMask) == bitMask)
               << std::endl;
 
-    static_assert( c_isFromCharsSupported<T> !=
+    static_assert( c_isFromCharsSupported<T> ==
                       ((HAS_FLOATINGPOINT_FROM_CHARS & bitMask) == bitMask),
-                   "failure in expression c_isFromCharsSupported<T> != ((HAS_FLOATINGPOINT_FROM_CHARS & bitMask) == bitMask)" );
+                   "failure in expression c_isFromCharsSupported<T> == ((HAS_FLOATINGPOINT_FROM_CHARS & bitMask) == bitMask)" );
 
     if constexpr (!c_isFromCharsSupported<T>)
     {
