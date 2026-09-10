@@ -84,6 +84,32 @@ void checkAvailableParameters(const t_arrConversionProcessesS2T<T>& valProcesses
                               const t_arrConversionProcessesT2S<T>& valProcessesT2S)
 {
   std::cout << "Checking available parameters for type: " << specializedTypes::get_name<T>() << std::endl;
+
+  if constexpr (std::is_floating_point_v<T>)
+  {
+    constexpr size_t bitMask =
+          std::is_same_v<T, float>       ? 1 :
+          std::is_same_v<T, double>      ? 2 :
+          std::is_same_v<T, long double> ? 4 :
+          0;
+
+    std::cout << "c_isFromCharsSupported<" << specializedTypes::get_name<T>() << "> = " << c_isFromCharsSupported<T>
+              << " :: ((HAS_FLOATINGPOINT_FROM_CHARS & " << bitMask << ") == " << bitMask << ") = "
+                   << ((HAS_FLOATINGPOINT_FROM_CHARS & bitMask) == bitMask)
+              << std::endl;
+
+    static_assert( c_isFromCharsSupported<T> !=
+                      ((HAS_FLOATINGPOINT_FROM_CHARS & bitMask) == bitMask),
+                   "failure in expression c_isFromCharsSupported<T> != ((HAS_FLOATINGPOINT_FROM_CHARS & bitMask) == bitMask)" );
+
+    if constexpr (!c_isFromCharsSupported<T>)
+    {
+      std::cout << "isBumpedTypeS2NConversionAvailable<" << specializedTypes::get_name<T>() << ", FROM_CHARS>::value = "
+                << isBumpedTypeS2NConversionAvailable<T, Str2TnConversionProcess::FROM_CHARS>::value
+                << std::endl;
+    }
+  }
+
   unittest::ExpectEqual(t_arrConversionProcessesS2T<T>, DefaultStr2Tn<T>::validConversionProcesses(), valProcessesS2T);
   unittest::ExpectEqual(t_arrErrorHandlers<T>,          DefaultStr2Tn<T>::validErrorHandlers(),       valHandlers);
   unittest::ExpectEqual(t_arrConversionProcessesT2S<T>, DefaultTn2Str<T>::validConversionProcesses(), valProcessesT2S);
