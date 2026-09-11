@@ -102,10 +102,34 @@ void checkAvailableParameters(const t_arrConversionProcessesS2T<T>& valProcesses
                       ((HAS_FLOATINGPOINT_FROM_CHARS & bitMask) == bitMask),
                    "failure in expression c_isFromCharsSupported<T> == ((HAS_FLOATINGPOINT_FROM_CHARS & bitMask) == bitMask)" );
 
+    std::cout << "c_isToCharsSupported<" << specializedTypes::get_name<T>() << "> = " << c_isToCharsSupported<T>
+              << " :: ((HAS_FLOATINGPOINT_TO_CHARS & " << bitMask << ") == " << bitMask << ") = "
+                   << ((HAS_FLOATINGPOINT_FROM_CHARS & bitMask) == bitMask)
+              << std::endl;
+
+    static_assert( c_isToCharsSupported<T> ==
+                      ((HAS_FLOATINGPOINT_TO_CHARS & bitMask) == bitMask),
+                   "failure in expression c_isToCharsSupported<T> == ((HAS_FLOATINGPOINT_TO_CHARS & bitMask) == bitMask)" );
+  }
+
+  if constexpr (c_numeric<T>)
+  {
     if constexpr (!c_isFromCharsSupported<T>)
     {
-      std::cout << "isBumpedTypeS2NConversionAvailable<" << specializedTypes::get_name<T>() << ", FROM_CHARS>::value = "
+      using t_bumpedFromType = typename isBumpedTypeS2NConversionAvailable<T, Str2TnConversionProcess::FROM_CHARS>::nearestSuperType;
+      std::cout << "c_isFromCharsSupported<" << specializedTypes::get_name<T>() << "> = false :: "
+                << "isBumpedTypeS2NConversionAvailable<" << specializedTypes::get_name<T>() << ", FROM_CHARS>::value = "
                 << isBumpedTypeS2NConversionAvailable<T, Str2TnConversionProcess::FROM_CHARS>::value
+                << "isBumpedTypeS2NConversionAvailable<" << specializedTypes::get_name<T>() << ", FROM_CHARS>::nearestSuperType = "
+                << specializedTypes::get_name<t_bumpedFromType>()
+                << std::endl;
+
+      using t_bumpedToType = typename isBumpedTypeN2SConversionAvailable<T, Tn2StrConversionProcess::TO_CHARS>::nearestSuperType;
+      std::cout << "c_isToCharsSupported<" << specializedTypes::get_name<T>() << "> = false :: "
+                << "isBumpedTypeN2SConversionAvailable<" << specializedTypes::get_name<T>() << ", TO_CHARS>::value = "
+                << isBumpedTypeN2SConversionAvailable<T, Tn2StrConversionProcess::TO_CHARS>::value
+                << "isBumpedTypeN2SConversionAvailable<" << specializedTypes::get_name<T>() << ", TO_CHARS>::nearestSuperType = "
+                << specializedTypes::get_name<t_bumpedToType>()
                 << std::endl;
     }
   }
@@ -224,6 +248,7 @@ int main()
                                               T2S_FLOATINGPOINT_TO_STRING
                                               Tn2StrConversionProcess::STRINGSTREAM } );
 
+
     std::cout << "bool" << std::endl;
     checkAvailableParameters<bool>( { Str2TnConversionProcess::FROM_CHARS, // isBumpedTypeS2NConversionAvailable
                                       Str2TnConversionProcess::S2N, // isBumpedTypeS2NConversionAvailable
@@ -233,6 +258,7 @@ int main()
                                     { Tn2StrConversionProcess::TO_CHARS, // isBumpedTypeN2SConversionAvailable
                                       Tn2StrConversionProcess::TO_STRING, // isBumpedTypeN2SConversionAvailable
                                       Tn2StrConversionProcess::STRINGSTREAM } );
+
 
     std::cout << "char's" << std::endl;
     checkAvailableParameters<char>( { Str2TnConversionProcess::STRINGSTREAM,

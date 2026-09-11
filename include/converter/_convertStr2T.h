@@ -278,27 +278,8 @@ namespace converter
     static constexpr bool value = false;
   };
 
-  template < c_char T >
-  struct isBumpedTypeS2NConversionAvailable<T, Str2TnConversionProcess::FROM_CHARS >
-  {
-    static constexpr bool value = false;
-  };
 
-  template < c_char T >
-  struct isBumpedTypeS2NConversionAvailable<T, Str2TnConversionProcess::S2N >
-  {
-    static constexpr bool value = false;
-  };
-
-  template < c_arithmetic T, Str2TnConversionProcess CONV_PROCESS >
-        requires ( isConversionS2NumCppSupported<T, CONV_PROCESS>::value )
-  struct isBumpedTypeS2NConversionAvailable < T, CONV_PROCESS >
-  {
-    static constexpr bool value = false;
-  };
-
-
-  template < c_arithmetic T, Str2TnConversionProcess CONV_PROCESS >
+  template < c_numeric T, Str2TnConversionProcess CONV_PROCESS >
         requires ( isConversionS2NumNotCppSupported<T, CONV_PROCESS>::value )
   struct isBumpedTypeS2NConversionAvailable < T, CONV_PROCESS >
   {
@@ -308,47 +289,57 @@ namespace converter
     {
       if constexpr ( c_integral<T> ) {
         if constexpr ( std::numeric_limits<T>::is_signed ) {
-          if constexpr ( isConversionS2NumCppSupported<short, CONV_PROCESS>::value &&
-                         std::numeric_limits<T>::max() < std::numeric_limits<short>::max() ) {
+          if constexpr ( (!std::is_same<T, short>::value) &&
+                         isConversionS2NumCppSupported<short, CONV_PROCESS>::value &&
+                         std::numeric_limits<T>::max() <= std::numeric_limits<short>::max() ) {
             return std::type_identity<short>{};
-          } else if constexpr ( isConversionS2NumCppSupported<int, CONV_PROCESS>::value &&
-                                std::numeric_limits<T>::max() < std::numeric_limits<int>::max() ) {
+          } else if constexpr ( (!std::is_same<T, int>::value) &&
+                                isConversionS2NumCppSupported<int, CONV_PROCESS>::value &&
+                                std::numeric_limits<T>::max() <= std::numeric_limits<int>::max() ) {
             return std::type_identity<int>{};
-          } else if constexpr ( isConversionS2NumCppSupported<long, CONV_PROCESS>::value &&
-                                std::numeric_limits<T>::max() < std::numeric_limits<long>::max() ) {
+          } else if constexpr ( (!std::is_same<T, long>::value) &&
+                                isConversionS2NumCppSupported<long, CONV_PROCESS>::value &&
+                                std::numeric_limits<T>::max() <= std::numeric_limits<long>::max() ) {
             return std::type_identity<long>{};
-          } else if constexpr ( isConversionS2NumCppSupported<long long, CONV_PROCESS>::value &&
-                                std::numeric_limits<T>::max() < std::numeric_limits<long long>::max() ) {
+          } else if constexpr ( (!std::is_same<T, long long>::value) &&
+                                std::numeric_limits<T>::max() <= std::numeric_limits<long long>::max() ) {
             return std::type_identity<long long>{};
           } else {
             return std::type_identity<void>{};
           }
         } else {
-          if constexpr ( isConversionS2NumCppSupported<unsigned short, CONV_PROCESS>::value &&
-                         std::numeric_limits<T>::max() < std::numeric_limits<unsigned short>::max() ) {
+          if constexpr ( (!std::is_same<T, unsigned short>::value) &&
+                         isConversionS2NumCppSupported<unsigned short, CONV_PROCESS>::value &&
+                         std::numeric_limits<T>::max() <= std::numeric_limits<unsigned short>::max() ) {
             return std::type_identity<unsigned short>{};
-          } else if constexpr ( isConversionS2NumCppSupported<unsigned int, CONV_PROCESS>::value &&
-                                std::numeric_limits<T>::max() < std::numeric_limits<unsigned int>::max() ) {
+          } else if constexpr ( (!std::is_same<T, unsigned int>::value) &&
+                                isConversionS2NumCppSupported<unsigned int, CONV_PROCESS>::value &&
+                                std::numeric_limits<T>::max() <= std::numeric_limits<unsigned int>::max() ) {
             return std::type_identity<unsigned int>{};
-          } else if constexpr ( isConversionS2NumCppSupported<unsigned long, CONV_PROCESS>::value &&
-                                std::numeric_limits<T>::max() < std::numeric_limits<unsigned long>::max() ) {
+          } else if constexpr ( (!std::is_same<T, unsigned long>::value) &&
+                                isConversionS2NumCppSupported<unsigned long, CONV_PROCESS>::value &&
+                                std::numeric_limits<T>::max() <= std::numeric_limits<unsigned long>::max() ) {
             return std::type_identity<unsigned long>{};
-          } else if constexpr ( isConversionS2NumCppSupported<unsigned long long, CONV_PROCESS>::value &&
-                                std::numeric_limits<T>::max() < std::numeric_limits<unsigned long long>::max() ) {
+          } else if constexpr ( (!std::is_same<T, unsigned long long>::value) &&
+                                isConversionS2NumCppSupported<unsigned long long, CONV_PROCESS>::value &&
+                                std::numeric_limits<T>::max() <= std::numeric_limits<unsigned long long>::max() ) {
             return std::type_identity<unsigned long long>{};
           } else {
             return std::type_identity<void>{};
           }
         }
       } else if constexpr ( c_floating_point<T> ) {
-        if constexpr ( isConversionS2NumCppSupported<float, CONV_PROCESS>::value &&
-                       std::numeric_limits<T>::max() < std::numeric_limits<float>::max() ) {
+        if constexpr ( (!std::is_same<T, float>::value) &&
+                       isConversionS2NumCppSupported<float, CONV_PROCESS>::value &&
+                       std::numeric_limits<T>::max() <= std::numeric_limits<float>::max() ) {
           return std::type_identity<float>{};
-        } else if constexpr ( isConversionS2NumCppSupported<double, CONV_PROCESS>::value &&
-                              std::numeric_limits<T>::max() < std::numeric_limits<double>::max() ) {
+        } else if constexpr ( (!std::is_same<T, double>::value) &&
+                              isConversionS2NumCppSupported<double, CONV_PROCESS>::value &&
+                              std::numeric_limits<T>::max() <= std::numeric_limits<double>::max() ) {
           return std::type_identity<double>{};
-        } else if constexpr ( isConversionS2NumCppSupported<long double, CONV_PROCESS>::value &&
-                              std::numeric_limits<T>::max() < std::numeric_limits<long double>::max() ) {
+        } else if constexpr ( (!std::is_same<T, long double>::value) &&
+                              isConversionS2NumCppSupported<long double, CONV_PROCESS>::value &&
+                              std::numeric_limits<T>::max() <= std::numeric_limits<long double>::max() ) {
           return std::type_identity<long double>{};
         } else {
           return std::type_identity<void>{};
@@ -358,22 +349,10 @@ namespace converter
       }
     }
 
-  template<bool isNearest>
-  constexpr static bool _isBumped()
-  {
-    if constexpr (isNearest)
-    {
-      return ( std::numeric_limits<T>::max() <= std::numeric_limits<nearestSuperType>::max() );
-    } else {
-      return false;
-    }
-  }
-
   public:
     using nearestSuperType = typename decltype(_getNearestSuperTypeIdentity())::type;
-    static constexpr bool hasNearest = !std::is_same_v< nearestSuperType, void >;
 
-    static constexpr bool value = _isBumped<hasNearest>();
+    static constexpr bool value = !std::is_same_v< nearestSuperType, void >;
   };
 
   template <typename T>

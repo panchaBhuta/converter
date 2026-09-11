@@ -53,6 +53,9 @@ namespace converter
 
   template<typename T>
   concept c_floating_point = std::is_floating_point<T>::value;
+
+  template<typename T>
+  concept c_numeric = c_arithmetic<T> && (!c_char<T>); // && (!std::is_same_v<T, bool>);
   // ]=========]  concept : types
 
 
