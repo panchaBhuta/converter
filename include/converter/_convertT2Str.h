@@ -209,10 +209,15 @@ namespace converter
                          > {};
 
 
-
+  // Primary template:
+  // Bumped conversion is not applicable.
   template < typename T, Tn2StrConversionProcess CONV_PROCESS >
   struct isBumpedTypeN2SConversionAvailable
   {
+    // void means this template is not applicable to a
+    // numeric bump conversion (primary template).
+    using nearestSuperType = void;
+
     static constexpr bool value = false;
   };
 
@@ -222,7 +227,7 @@ namespace converter
   struct isBumpedTypeN2SConversionAvailable < T, CONV_PROCESS >
   {
   private:
-    // Return a type-identity for the nearest supported super-type (or void if none found)
+    // Return a type-identity for the nearest supported super-type (or std::nullptr_t if none found)
     constexpr static auto _getNearestSuperTypeIdentity()
     {
       if constexpr ( c_integral<T> ) {
@@ -244,7 +249,7 @@ namespace converter
                                 std::numeric_limits<T>::max() <= std::numeric_limits<long long>::max() ) {
             return std::type_identity<long long>{};
           } else {
-            return std::type_identity<void>{};
+            return std::type_identity<std::nullptr_t>{};
           }
         } else {
           if constexpr ( (!std::is_same<T, unsigned short>::value) &&
@@ -264,7 +269,7 @@ namespace converter
                                 std::numeric_limits<T>::max() <= std::numeric_limits<unsigned long long>::max() ) {
             return std::type_identity<unsigned long long>{};
           } else {
-            return std::type_identity<void>{};
+            return std::type_identity<std::nullptr_t>{};
           }
         }
       } else if constexpr ( c_floating_point<T> &&
@@ -287,17 +292,19 @@ namespace converter
                               std::numeric_limits<T>::max() <= std::numeric_limits<long double>::max() ) {
           return std::type_identity<long double>{};
         } else {
-          return std::type_identity<void>{};
+          return std::type_identity<std::nullptr_t>{};
         }
       } else {
-        return std::type_identity<void>{};
+        return std::type_identity<std::nullptr_t>{};
       }
     }
 
   public:
+    // std::nullptr_t       -> bumping applicable, but no supported super-type.                      value = false
+    // numeric ST           -> bumping available for the type T. type T bumped to super-type ST.     value = true
     using nearestSuperType = typename decltype(_getNearestSuperTypeIdentity())::type;
 
-    static constexpr bool value = !std::is_same_v< nearestSuperType, void >;
+    static constexpr bool value = !std::is_same_v< nearestSuperType, std::nullptr_t >;
   };
 
   template <typename T>

@@ -120,11 +120,8 @@ void checkAvailableParameters(const t_arrConversionProcessesS2T<T>& valProcesses
       std::cout << "c_isFromCharsSupported<" << specializedTypes::get_name<T>() << "> = false :: "
                 << "isBumpedTypeS2NConversionAvailable<" << specializedTypes::get_name<T>() << ", FROM_CHARS>::value = "
                 << isBumpedTypeS2NConversionAvailable<T, Str2TnConversionProcess::FROM_CHARS>::value;
-      if constexpr (isBumpedTypeS2NConversionAvailable<T, Str2TnConversionProcess::FROM_CHARS>::value)
-      {
-        std::cout << " :: isBumpedTypeS2NConversionAvailable<" << specializedTypes::get_name<T>() << ", FROM_CHARS>::nearestSuperType = "
-                  << specializedTypes::get_name<t_bumpedFromType>();
-      }
+      std::cout << " :: isBumpedTypeS2NConversionAvailable<" << specializedTypes::get_name<T>() << ", FROM_CHARS>::nearestSuperType = "
+                << specializedTypes::get_name<t_bumpedFromType>();
       std::cout << std::endl;
     }
 
@@ -134,11 +131,8 @@ void checkAvailableParameters(const t_arrConversionProcessesS2T<T>& valProcesses
       std::cout << "c_isToCharsSupported<" << specializedTypes::get_name<T>() << "> = false :: "
                 << "isBumpedTypeN2SConversionAvailable<" << specializedTypes::get_name<T>() << ", TO_CHARS>::value = "
                 << isBumpedTypeN2SConversionAvailable<T, Tn2StrConversionProcess::TO_CHARS>::value;
-      if constexpr (isBumpedTypeN2SConversionAvailable<T, Tn2StrConversionProcess::TO_CHARS>::value)
-      {
-        std::cout << " :: isBumpedTypeN2SConversionAvailable<" << specializedTypes::get_name<T>() << ", TO_CHARS>::nearestSuperType = "
-                  << specializedTypes::get_name<t_bumpedToType>();
-      }
+      std::cout << " :: isBumpedTypeN2SConversionAvailable<" << specializedTypes::get_name<T>() << ", TO_CHARS>::nearestSuperType = "
+                << specializedTypes::get_name<t_bumpedToType>();
       std::cout << std::endl;
     }
   }
