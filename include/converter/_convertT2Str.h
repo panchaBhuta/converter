@@ -222,90 +222,40 @@ namespace converter
   };
 
 
-  template < c_numeric T, Tn2StrConversionProcess CONV_PROCESS >
-        requires ( isConversionNum2SNotCppSupported<T, CONV_PROCESS>::value )
-  struct isBumpedTypeN2SConversionAvailable < T, CONV_PROCESS >
+  template <c_numeric T, Tn2StrConversionProcess CONV_PROCESS>
+      requires (
+          isConversionNum2SNotCppSupported<T, CONV_PROCESS>::value
+      )
+  struct isBumpedTypeN2SConversionAvailable<T, CONV_PROCESS>
+      : isBumpedTypeConversionAvailable<
+            T,
+            CONV_PROCESS,
+            isConversionNum2SCppSupported>
   {
-  private:
-    // Return a type-identity for the nearest supported super-type (or std::nullptr_t if none found)
-    constexpr static auto _getNearestSuperTypeIdentity()
-    {
-      if constexpr ( c_integral<T> ) {
-        if constexpr ( std::numeric_limits<T>::is_signed ) {
-          if constexpr ( (!std::is_same<T, short>::value) &&
-                         isConversionNum2SCppSupported<short, CONV_PROCESS>::value &&
-                         std::numeric_limits<T>::max() <= std::numeric_limits<short>::max() ) {
-            return std::type_identity<short>{};
-          } else if constexpr ( (!std::is_same<T, int>::value) &&
-                                isConversionNum2SCppSupported<int, CONV_PROCESS>::value &&
-                                std::numeric_limits<T>::max() <= std::numeric_limits<int>::max() ) {
-            return std::type_identity<int>{};
-          } else if constexpr ( (!std::is_same<T, long>::value) &&
-                                isConversionNum2SCppSupported<long, CONV_PROCESS>::value &&
-                                std::numeric_limits<T>::max() <= std::numeric_limits<long>::max() ) {
-            return std::type_identity<long>{};
-          } else if constexpr ( (!std::is_same<T, long long>::value) &&
-                                isConversionNum2SCppSupported<long long, CONV_PROCESS>::value &&
-                                std::numeric_limits<T>::max() <= std::numeric_limits<long long>::max() ) {
-            return std::type_identity<long long>{};
-          } else {
-            return std::type_identity<std::nullptr_t>{};
-          }
-        } else {
-          if constexpr ( (!std::is_same<T, unsigned short>::value) &&
-                         isConversionNum2SCppSupported<unsigned short, CONV_PROCESS>::value &&
-                         std::numeric_limits<T>::max() <= std::numeric_limits<unsigned short>::max() ) {
-            return std::type_identity<unsigned short>{};
-          } else if constexpr ( (!std::is_same<T, unsigned int>::value) &&
-                                isConversionNum2SCppSupported<unsigned int, CONV_PROCESS>::value &&
-                                std::numeric_limits<T>::max() <= std::numeric_limits<unsigned int>::max() ) {
-            return std::type_identity<unsigned int>{};
-          } else if constexpr ( (!std::is_same<T, unsigned long>::value) &&
-                                isConversionNum2SCppSupported<unsigned long, CONV_PROCESS>::value &&
-                                std::numeric_limits<T>::max() <= std::numeric_limits<unsigned long>::max() ) {
-            return std::type_identity<unsigned long>{};
-          } else if constexpr ( (!std::is_same<T, unsigned long long>::value) &&
-                                isConversionNum2SCppSupported<unsigned long long, CONV_PROCESS>::value &&
-                                std::numeric_limits<T>::max() <= std::numeric_limits<unsigned long long>::max() ) {
-            return std::type_identity<unsigned long long>{};
-          } else {
-            return std::type_identity<std::nullptr_t>{};
-          }
-        }
-      } else if constexpr ( c_floating_point<T> &&
-                            // if (   CONV_PROCESS != Tn2StrConversionProcess::TO_STRING ||
-                            //      ( CONV_PROCESS == Tn2StrConversionProcess::TO_STRING &&  -> this is redundant check
-                            //        ENABLE_FLOATINGPOINT_TO_STRING == true )
-                            //    )
-                            ( CONV_PROCESS != Tn2StrConversionProcess::TO_STRING || bool(ENABLE_FLOATINGPOINT_TO_STRING) )
-                          ) {
-        if constexpr ( (!std::is_same<T, float>::value) &&
-                       isConversionNum2SCppSupported<float, CONV_PROCESS>::value &&
-                       std::numeric_limits<T>::max() <= std::numeric_limits<float>::max() ) {
-          return std::type_identity<float>{};
-        } else if constexpr ( (!std::is_same<T, double>::value) &&
-                              isConversionNum2SCppSupported<double, CONV_PROCESS>::value &&
-                              std::numeric_limits<T>::max() <= std::numeric_limits<double>::max() ) {
-          return std::type_identity<double>{};
-        } else if constexpr ( (!std::is_same<T, long double>::value) &&
-                              isConversionNum2SCppSupported<long double, CONV_PROCESS>::value &&
-                              std::numeric_limits<T>::max() <= std::numeric_limits<long double>::max() ) {
-          return std::type_identity<long double>{};
-        } else {
-          return std::type_identity<std::nullptr_t>{};
-        }
-      } else {
-        return std::type_identity<std::nullptr_t>{};
-      }
-    }
-
   public:
     // std::nullptr_t       -> bumping applicable, but no supported super-type.                      value = false
     // numeric ST           -> bumping available for the type T. type T bumped to super-type ST.     value = true
-    using nearestSuperType = typename decltype(_getNearestSuperTypeIdentity())::type;
 
-    static constexpr bool value = !std::is_same_v< nearestSuperType, std::nullptr_t >;
+    using nearestSuperType =
+        typename decltype(
+            isBumpedTypeConversionAvailable<
+                  T,
+                  CONV_PROCESS,
+                  isConversionNum2SCppSupported>::template
+            _getNearestSuperTypeIdentity<
+                CONV_PROCESS != Tn2StrConversionProcess::TO_STRING ||
+                bool(ENABLE_FLOATINGPOINT_TO_STRING)
+            >()
+        )::type;
+
+    static constexpr bool value =
+        !std::is_same_v<
+            nearestSuperType,
+            std::nullptr_t>;
   };
+
+
+
 
   template <typename T>
   struct DefaultTn2Str

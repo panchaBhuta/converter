@@ -332,6 +332,163 @@ namespace converter
   template <typename T, auto CONV_PROCESS, auto ... ARGS >
   struct FormatInfo;
 
+
+  // [=========[  type-bump for conversion
+
+  /*
+  Is native conversion available?
+        |
+        +-- yes --> use it
+        |
+        +-- no --> can we bump the type?
+                     |
+                     +-- yes --> use nearest supported super-type
+                     |
+                     +-- no --> conversion unavailable
+
+  isBumpedTypeConversionAvailable
+          |
+          |-- CapabilityTrait<CandidateType, CONV_PROCESS>
+          |
+          +-- common bumping algorithm
+                  |
+                  +-- _matchType()
+                  +-- _iterateForType()
+                  +-- _evaluateTypes()
+                  +-- _getNearestSuperTypeIdentity()
+
+  isBumpedTypeS2NConversionAvailable
+          |
+          +--> isBumpedTypeConversionAvailable<
+                   isConversionS2NumCppSupported >
+
+  isBumpedTypeN2SConversionAvailable
+          |
+          +--> isBumpedTypeConversionAvailable<
+                   isConversionN2SNumCppSupported >
+  */
+  template <
+      c_numeric T,
+      auto CONV_PROCESS,
+      template <typename, decltype(CONV_PROCESS)> class CapabilityTrait
+  >
+  struct isBumpedTypeConversionAvailable
+  {
+  protected:
+
+    template <size_t INDEX, typename... CandidateTypes>
+    constexpr static int _matchType()
+    {
+      using t_candidateTypes = std::tuple<CandidateTypes...>;
+
+      using CandidateType =
+          std::tuple_element_t<INDEX, t_candidateTypes>;
+
+      if constexpr (std::is_same_v<T, CandidateType>)
+        return INDEX;
+
+      if constexpr (
+          (INDEX + 1) < std::tuple_size_v<t_candidateTypes>)
+      {
+        return _matchType<
+            INDEX + 1,
+            CandidateTypes...>();
+      } else {
+        return -1;
+      }
+    }
+
+
+    template <
+        bool StartIdxTypeMatch,
+        size_t INDEX,
+        typename... CandidateTypes
+    >
+    constexpr static auto _iterateForType()
+    {
+      using t_candidateTypes = std::tuple<CandidateTypes...>;
+
+      using CandidateType =
+          std::tuple_element_t<INDEX, t_candidateTypes>;
+
+      constexpr bool candidateSupported =
+          CapabilityTrait<
+              CandidateType,
+              CONV_PROCESS
+          >::value;
+
+      constexpr bool candidateIsSuperType =
+          StartIdxTypeMatch
+              ? (std::numeric_limits<T>::max() <
+                 std::numeric_limits<CandidateType>::max())
+              : (std::numeric_limits<T>::max() <=
+                 std::numeric_limits<CandidateType>::max());
+
+      if constexpr (
+          candidateSupported &&
+          candidateIsSuperType)
+      {
+        return std::type_identity<CandidateType>{};
+      } else if constexpr (
+          (INDEX + 1) < std::tuple_size_v<t_candidateTypes>) {
+        return _iterateForType<
+            false,
+            INDEX + 1,
+            CandidateTypes...>();
+      } else {
+        return std::type_identity<std::nullptr_t>{};
+      }
+    }
+
+
+    template <typename... CandidateTypes>
+    constexpr static auto _evaluateTypes()
+    {
+      constexpr int matchedIndex =
+          _matchType<0, CandidateTypes...>();
+
+      return _iterateForType<
+          (matchedIndex != -1),
+          (matchedIndex != -1) ? matchedIndex : 0,
+          CandidateTypes...>();
+    }
+
+
+    // Return a type-identity for the nearest supported super-type
+    // or std::nullptr_t when type-bumping is not available/applicable.
+    template <bool AdditionalCheck_FloatingPoint>
+    constexpr static auto _getNearestSuperTypeIdentity()
+    {
+      if constexpr (c_integral<T>)
+      {
+        if constexpr (std::numeric_limits<T>::is_signed)
+        {
+          return _evaluateTypes<
+              short,
+              int,
+              long,
+              long long>();
+        } else {
+          return _evaluateTypes<
+              unsigned short,
+              unsigned int,
+              unsigned long,
+              unsigned long long>();
+        }
+      } else if constexpr (c_floating_point<T> && AdditionalCheck_FloatingPoint) {
+        return _evaluateTypes<
+            float,
+            double,
+            long double>();
+      } else {
+        return std::type_identity<std::nullptr_t>{};
+      }
+    }
+  };
+
+
+  // ]=========]  type-bump for conversion
+
   // ]=============================================================]   common helpers
 
 

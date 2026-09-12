@@ -104,7 +104,7 @@ void checkAvailableParameters(const t_arrConversionProcessesS2T<T>& valProcesses
 
     std::cout << "c_isToCharsSupported<" << specializedTypes::get_name<T>() << "> = " << c_isToCharsSupported<T>
               << " :: ((HAS_FLOATINGPOINT_TO_CHARS & " << bitMask << ") == " << bitMask << ") = "
-                   << ((HAS_FLOATINGPOINT_FROM_CHARS & bitMask) == bitMask)
+                   << ((HAS_FLOATINGPOINT_TO_CHARS & bitMask) == bitMask)
               << std::endl;
 
     static_assert( c_isToCharsSupported<T> ==
