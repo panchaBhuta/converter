@@ -152,6 +152,8 @@ A :: No, there will be no build conflict. CMake handles this situation completel
 #]======================================================================================]
 
 
+add_subdirectory(cmake/diagnostic_try_run)
+
 check_chrono_stream_functionality()  # fetches date-lib if needed
 check_floatingPoint_elementaryStringConversions()
 

@@ -45,9 +45,6 @@ jobs:
       - name: Compiler Macros Available
         run: ${{matrix.toolset_compiler.compilerMacros}}
 
-      - name: Diagnostic CMake try_run (trivial executable)
-        run: |
-          cmake --log-level=TRACE -G "${{matrix.generator}}" -A x64 -S "${{github.workspace}}/cmake/diagnostic_try_run" -B "${{github.workspace}}/build-diagnostic-try-run"
       - name: Configure CMake (compiler=default) [Debug]
         if: matrix.toolset_compiler.compiler == 'default'
         run: |
