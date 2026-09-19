@@ -3,6 +3,7 @@
 #include <array>
 #include <limits>
 #include <cassert>
+#include <iostream>
 
 #ifdef _MSC_VER
 #include <crtdbg.h>
@@ -21,6 +22,7 @@ int main(int, char**)
   std::array<char, std::numeric_limits<float>::digits +5 > str;  // +5 just to be on the safe side :)
   float value = 11.0f;
   std::string strVal = std::to_string(value); // std::to_string(11.0f) -> "11.0000000" is not what is expected "11"
+  std::cerr << "BEFORE_ASSERT_11\n";
   assert(strVal == "11");
 
   value = 1.2345f;
@@ -29,4 +31,3 @@ int main(int, char**)
 
   return 0;
 }
-
