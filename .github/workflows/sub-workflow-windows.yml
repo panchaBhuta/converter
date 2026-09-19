@@ -13,7 +13,7 @@ jobs:
         include:
           - os: windows-2025-vs2026
             generator: "Visual Studio 18 2026"
-            toolset_compiler: { compiler: default, toolset: -1, cmdShell: pwsh, rawCompiler: cl.exe, compilerMacros: "echo msbuild_does_not_support" }
+            toolset_compiler: { compiler: default, toolset: -1, cmdShell: cmd, rawCompiler: cl.exe, compilerMacros: "echo msbuild_does_not_support" }
     runs-on: ${{matrix.os}}
     timeout-minutes: 5
     outputs:
