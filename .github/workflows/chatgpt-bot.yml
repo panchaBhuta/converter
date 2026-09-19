@@ -1,0 +1,10 @@
+name: ChatGPT Bot - Windows VS2026
+
+on:
+  push:
+    branches: [chatgpt_bot]
+  workflow_dispatch:
+
+jobs:
+  windows-sub-workflow:
+    uses: ./.github/workflows/sub-workflow-windows.yml
