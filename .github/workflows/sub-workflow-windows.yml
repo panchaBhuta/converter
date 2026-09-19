@@ -15,7 +15,7 @@ jobs:
             generator: "Visual Studio 18 2026"
             toolset_compiler: { compiler: default, toolset: -1, cmdShell: cmd, rawCompiler: cl.exe, compilerMacros: "echo msbuild_does_not_support" }
     runs-on: ${{matrix.os}}
-    timeout-minutes: 5
+    timeout-minutes: 3
     outputs:
       run-id: ${{ github.run_id }}
 
