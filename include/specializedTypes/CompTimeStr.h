@@ -142,31 +142,110 @@ namespace specializedTypes
   constexpr
   string_view get_name()  // use this instead of typeid(T).name(){as it results in cryptic name}
   {
-    //return {MY_LOG_FUNCTION, sizeof(MY_LOG_FUNCTION)};
-    // MY_LOG_FUNCTION = "constexpr specializedTypes::string_view specializedTypes::get_name() [with T = short int]"
-
     char const* p = MY_LOG_FUNCTION;
     char const* const pEnd = p + sizeof(MY_LOG_FUNCTION);
 
-    while (*p++ != '=' && p < pEnd);
-    for (; *p == ' ' && p < pEnd; ++p);
+#if defined(__GNUC__) || defined(__clang__)
+
+    // GCC / Clang:
+    // "... get_name() [with T = short int]"
+    while (p < pEnd && *p != '=')
+      ++p;
+
+    if (p == pEnd)
+      return {};
+
+    ++p; // skip '='
+
+    while (p < pEnd && *p == ' ')
+      ++p;
+
     char const* p2 = p;
     int count = 1;
-    for (; p2 < pEnd;++p2)
+
+    for (; p2 < pEnd; ++p2)
     {
       switch (*p2)
       {
       case '[':
         ++count;
         break;
+
       case ']':
         --count;
         if (!count)
           return {p, static_cast<std::streamsize>(p2 - p)};
-      default :
+
+      default:
         break;
       }
     }
+
+#elif defined(_MSC_VER)
+
+    // MSVC:
+    // "... get_name<short int>(void)"
+    constexpr char const functionName[] = "get_name<";
+    constexpr std::size_t functionNameLength = sizeof(functionName) - 1;
+
+    if (pEnd - p < functionNameLength)
+      return {};
+
+    char const* const functionNameEnd = pEnd - functionNameLength;
+
+    while (p <= functionNameEnd)
+    {
+      bool match = true;
+
+      for (std::size_t i = 0; i < functionNameLength; ++i)
+      {
+        if (p[i] != functionName[i])
+        {
+          match = false;
+          break;
+        }
+      }
+
+      if (match)
+        break;
+
+      ++p;
+    }
+
+    if (p > functionNameEnd)
+      return {};
+
+    p += functionNameLength; // now points immediately after '<'
+
+    char const* p2 = p;
+    int count = 1;
+
+    for (; p2 < pEnd; ++p2)
+    {
+      switch (*p2)
+      {
+      case '<':
+        ++count;
+        break;
+
+      case '>':
+        --count;
+        if (!count)
+          return {p, static_cast<std::streamsize>(p2 - p)};
+
+      default:
+        break;
+      }
+    }
+
+#else
+
+    // __func__ contains only the function name and therefore
+    // does not contain the template argument.
+    return {};
+
+#endif
+
     return {};
   }
 
