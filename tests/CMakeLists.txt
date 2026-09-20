@@ -96,6 +96,10 @@ endmacro(add_perf_test)
 
 
 
+# Diagnostic tests
+add_unit_test(diagnostic_get_name)
+
+
 # Unit tests
 add_unit_test(testPlatform)
 
