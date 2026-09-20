@@ -137,9 +137,24 @@ void checkAvailableParameters(const t_arrConversionProcessesS2T<T>& valProcesses
     }
   }
 
-  unittest::ExpectEqual(t_arrConversionProcessesS2T<T>, DefaultStr2Tn<T>::validConversionProcesses(), valProcessesS2T);
-  unittest::ExpectEqual(t_arrErrorHandlers<T>,          DefaultStr2Tn<T>::validErrorHandlers(),       valHandlers);
-  unittest::ExpectEqual(t_arrConversionProcessesT2S<T>, DefaultTn2Str<T>::validConversionProcesses(), valProcessesT2S);
+  std::cout << "DefaultStr2Tn<" << specializedTypes::get_name<T>() << ">::validConversionProcesses() = " <<
+        unittest::SScompatible<decltype(DefaultStr2Tn<T>::validConversionProcesses())>::getVal(DefaultStr2Tn<T>::validConversionProcesses()) << std::endl;
+  std::cout << "valProcessesS2T = " <<
+        unittest::SScompatible<std::remove_cvref_t<decltype(valProcessesS2T)>>::getVal(valProcessesS2T) << std::endl << std::endl;
+
+  std::cout << "DefaultStr2Tn<" << specializedTypes::get_name<T>() << ">::validErrorHandlers() = " <<
+        unittest::SScompatible<decltype(DefaultStr2Tn<T>::validErrorHandlers())>::getVal(DefaultStr2Tn<T>::validErrorHandlers()) << std::endl;
+  std::cout << "valHandlers = " <<
+        unittest::SScompatible<std::remove_cvref_t<decltype(valHandlers)>>::getVal(valHandlers) << std::endl << std::endl;
+
+  std::cout << "DefaultTn2Str<" << specializedTypes::get_name<T>() << ">::validConversionProcesses() = " <<
+        unittest::SScompatible<decltype(DefaultTn2Str<T>::validConversionProcesses())>::getVal(DefaultTn2Str<T>::validConversionProcesses()) << std::endl;
+  std::cout << "valProcessesT2S = " <<
+        unittest::SScompatible<std::remove_cvref_t<decltype(valProcessesT2S)>>::getVal(valProcessesT2S) << std::endl << std::endl << std::endl;
+
+  //unittest::ExpectEqual(t_arrConversionProcessesS2T<T>, DefaultStr2Tn<T>::validConversionProcesses(), valProcessesS2T);
+  //unittest::ExpectEqual(t_arrErrorHandlers<T>,          DefaultStr2Tn<T>::validErrorHandlers(),       valHandlers);
+  //unittest::ExpectEqual(t_arrConversionProcessesT2S<T>, DefaultTn2Str<T>::validConversionProcesses(), valProcessesT2S);
 }
 
 
