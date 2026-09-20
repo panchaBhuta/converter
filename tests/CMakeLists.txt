@@ -37,13 +37,13 @@ macro(add_unit_test testname)
     #            gives error as COMPILE_LANG_AND_ID is empty
     #            $<$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang>:COMPILING_CXX_WITH_CLANG>
     #            $<$<COMPILE_LANG_AND_ID:CXX,Intel>:COMPILING_CXX_WITH_INTEL>)
-
+    #
     target_link_libraries(${testname} converter) # donot specify PUBLIC here,
     # executable ${testname} has to have transitive association to all its dependencies(aka library chain)
-    # refer   https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#target-usage-requirements
+    # refer   https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#cmake-buildsystem.7.html
     # refer   https://cmake.org/cmake/help/latest/command/target_link_libraries.html#libraries-for-a-test-target-and-or-its-dependents
-    # refer   https://cmake.org/cmake/help/latest/command/target_link_libraries.html#libraries-for-a-test-target-and-or-its-dependents
-
+    #
+    # if(CMAKE_BUILD_TYPE MATCHES "Coverage")
     if(CMAKE_BUILD_TYPE MATCHES "Coverage")
       #refer   https://github.com/bilke/cmake-modules/blob/master/CodeCoverage.cmake
       # compile with coverage options
@@ -53,7 +53,8 @@ macro(add_unit_test testname)
       # How to use gcovr for code coverage?
       # If you have multiple compilers installed or if you are using Clang,
       # you will likely need to tell gcovr which gcov executable to use.
-      # By default, gcovr just uses the program named gcov .  This is fine for the default GCC compiler, e.g. gcc or g++ .
+      # By default, gcovr just uses the program named gcov .
+      # This is fine for the default GCC compiler, e.g. gcc or g++ .
       # Otherwise, you must use the --gcov-executable to tell it what to use.
 
       #  doesn't  work as expected, instead directly calling gcovr in make.sh
@@ -109,7 +110,6 @@ add_unit_test(diagnostic_get_name)
 add_unit_test(testPlatform)
 
 add_unit_test(testSupportingTemplates)
-
 add_unit_test(testBasicConversions)
 
 add_unit_test(testAllConversionTemplateInstances)
