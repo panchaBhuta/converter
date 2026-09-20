@@ -66,8 +66,8 @@ jobs:
           path: "build-debug/workAroundFlags/flag-${{matrix.os}}-${{matrix.toolset_compiler.compiler}}.csv"
 
       - name: Build [Debug]
-        if: matrix.toolset_compiler.compiler != 'g++'
-        run: cmake --build "${{github.workspace}}/build-debug" --config Debug -j$(nproc) -- -m -nologo -verbosity:normal
+        if: matrix.toolset_compiler.cmdShell == 'cmd'
+        run: cmake --build "${{github.workspace}}/build-debug" --config Debug -j %NUMBER_OF_PROCESSORS% -- -m -nologo -verbosity:normal
 
       - name: Test [Debug]
         working-directory: ${{github.workspace}}/build-debug
