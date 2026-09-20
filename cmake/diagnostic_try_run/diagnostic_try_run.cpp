@@ -1,29 +1,29 @@
 #include <cassert>
-#include <iostream>
-#include <string>
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER)
 #include <crtdbg.h>
-#endif
+#include <iostream>
+#include <stdlib.h>
 
-int main()
-{
-#ifdef _MSC_VER
+void disable_msvc_popups() {
+    // Disable the "Assertion Failed" dialog boxes
     _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
     _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);
+
+    _CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_FILE);
+    _CrtSetReportFile(_CRT_ERROR, _CRTDBG_FILE_STDERR);
+
+    // Prevent the Windows Error Reporting (WER) dialog for crashes
+    _set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
+}
 #endif
 
-    float value = 11.0f;
-    std::string strVal = std::to_string(value);
-    std::cout << "value=11.0f result=[" << strVal << "]\n";
+int main() {
+#if defined(_MSC_VER)
+    disable_msvc_popups();
+#endif
 
-    assert(strVal == "11");
-
-    value = 1.2345f;
-    strVal = std::to_string(value);
-    std::cout << "value=1.2345f result=[" << strVal << "]\n";
-
-    assert(strVal == "1.2345");
+    assert(false);
 
     return 0;
 }
