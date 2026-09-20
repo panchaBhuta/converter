@@ -5,8 +5,22 @@
 #include <cassert>
 #include <iostream>
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER)
 #include <crtdbg.h>
+#include <iostream>
+#include <stdlib.h>
+
+void disable_msvc_popups() {
+    // Disable the "Assertion Failed" dialog boxes
+    _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
+    _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);
+    
+    _CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_FILE);
+    _CrtSetReportFile(_CRT_ERROR, _CRTDBG_FILE_STDERR);
+
+    // Prevent the Windows Error Reporting (WER) dialog for crashes
+    _set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
+}
 #endif
 
 //  ./manualBuild.sh cmake check_floatingPoint_toString
@@ -14,9 +28,8 @@
 
 int main(int, char**)
 {
-#ifdef _MSC_VER
-  _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
-  _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);
+#if defined(_MSC_VER)
+    disable_msvc_popups();
 #endif
 
   std::array<char, std::numeric_limits<float>::digits +5 > str;  // +5 just to be on the safe side :)
