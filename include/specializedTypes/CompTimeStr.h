@@ -130,15 +130,23 @@ namespace specializedTypes
     return o.write(s.data, s.size);
   }
 
+#if defined(__GNUC__) || defined(__clang__)
+    #define MY_LOG_FUNCTION __PRETTY_FUNCTION__
+#elif defined(_MSC_VER)
+    #define MY_LOG_FUNCTION __FUNCSIG__
+#else
+    #define MY_LOG_FUNCTION __func__ // Fallback to standard C++ __func__ (name only)
+#endif
+
   template<class T>
   constexpr
   string_view get_name()  // use this instead of typeid(T).name(){as it results in cryptic name}
   {
-    //return {__PRETTY_FUNCTION__, sizeof(__PRETTY_FUNCTION__)};
-    // __PRETTY_FUNCTION__ = "constexpr specializedTypes::string_view specializedTypes::get_name() [with T = short int]"
+    //return {MY_LOG_FUNCTION, sizeof(MY_LOG_FUNCTION)};
+    // MY_LOG_FUNCTION = "constexpr specializedTypes::string_view specializedTypes::get_name() [with T = short int]"
 
-    char const* p = __PRETTY_FUNCTION__;
-    char const* const pEnd = p + sizeof(__PRETTY_FUNCTION__);
+    char const* p = MY_LOG_FUNCTION;
+    char const* const pEnd = p + sizeof(MY_LOG_FUNCTION);
 
     while (*p++ != '=' && p < pEnd);
     for (; *p == ' ' && p < pEnd; ++p);
