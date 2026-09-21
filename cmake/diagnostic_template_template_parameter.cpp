@@ -98,9 +98,6 @@ struct SpecificUnconstrainedTrait
 using TestSpecificUnconstrainedTrait =
     SpecificUnconstrainedTrait<int, P::A, CapabilityAllTypes>;
 
-
-// This case is expected to compile: the outer template is constrained,
-// but CapabilityTrait itself is unconstrained.
 static_assert(TestSpecificUnconstrainedTrait::value);
 
 
@@ -115,12 +112,75 @@ struct SpecificConstrainedTrait
     static constexpr bool value = true;
 };
 
+
 // Expected to fail with MSVC 19.51 (C3201) because the
 // template-template parameter itself is constrained.
 // using TestSpecificConstrainedTrait =
 //     SpecificConstrainedTrait<int, P::A, CapabilityArithmTypes>;
 //
 // static_assert(TestSpecificConstrainedTrait::value);
+
+
+template <
+    typename,
+    auto CONV_PROCESS,
+    template <ct_arithmetic, decltype(CONV_PROCESS)> class CapabilityTrait
+>
+    requires (CONV_PROCESS == P::A)
+struct Specific
+{
+    static constexpr bool value = true;
+};
+
+
+using TestSpecificAllTypes = Specific<int, P::A, CapabilityAllTypes>;
+using TestSpecificAllTypesResEnm = Specific<int, P::A, CapabilityAllTypesResEnm>;
+using TestSpecificArithmTypes = Specific<int, P::A, CapabilityArithmTypes>;
+using TestSpecificArithmTypesResEnm = Specific<int, P::A, CapabilityArithmTypesResEnm>;
+
+
+static_assert(TestSpecificAllTypes::value);
+static_assert(TestSpecificAllTypesResEnm::value);
+static_assert(TestSpecificArithmTypes::value);
+static_assert(TestSpecificArithmTypesResEnm::value);
+
+
+
+// 5. Outer requires constraint, unconstrained CapabilityTrait
+template <
+    typename,
+    auto CONV_PROCESS,
+    template <typename, decltype(CONV_PROCESS)> class CapabilityTrait
+>
+    requires (CONV_PROCESS == P::A)
+struct SpecificUnconstrainedTrait
+{
+    static constexpr bool value = true;
+};
+
+using TestSpecificUnconstrainedTrait =
+    SpecificUnconstrainedTrait<int, P::A, CapabilityAllTypes>;
+
+static_assert(TestSpecificUnconstrainedTrait::value);
+
+
+// 6. Constrained template-template parameter, no outer requires
+template <
+    typename,
+    auto CONV_PROCESS,
+    template <ct_arithmetic, decltype(CONV_PROCESS)> class CapabilityTrait
+>
+struct SpecificConstrainedTrait
+{
+    static constexpr bool value = true;
+};
+
+
+using TestSpecificConstrainedTrait =
+    SpecificConstrainedTrait<int, P::A, CapabilityArithmTypes>;
+
+
+static_assert(TestSpecificConstrainedTrait::value);
 
 
 int main()
