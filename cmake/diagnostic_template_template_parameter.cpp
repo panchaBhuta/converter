@@ -96,6 +96,42 @@ static_assert(TestSpecificArithmTypes::value);
 static_assert(TestSpecificArithmTypesResEnm::value);
 
 
+
+// 5. Outer requires constraint, unconstrained CapabilityTrait
+template <
+    typename,
+    auto CONV_PROCESS,
+    template <typename, decltype(CONV_PROCESS)> class CapabilityTrait
+>
+    requires (CONV_PROCESS == P::A)
+struct SpecificUnconstrainedTrait
+{
+    static constexpr bool value = true;
+};
+
+using TestSpecificUnconstrainedTrait =
+    SpecificUnconstrainedTrait<int, P::A, CapabilityAllTypes>;
+
+static_assert(TestSpecificUnconstrainedTrait::value);
+
+
+// 6. Constrained template-template parameter, no outer requires
+template <
+    typename,
+    auto CONV_PROCESS,
+    template <ct_arithmetic, decltype(CONV_PROCESS)> class CapabilityTrait
+>
+struct SpecificConstrainedTrait
+{
+    static constexpr bool value = true;
+};
+
+using TestSpecificConstrainedTrait =
+    SpecificConstrainedTrait<int, P::A, CapabilityArithmTypes>;
+
+static_assert(TestSpecificConstrainedTrait::value);
+
+
 int main()
 {
     return 0;
