@@ -1,10 +1,13 @@
+#include <type_traits>
+
 enum class P
 {
     A,
     B
 };
 
-template <typename, auto>
+template <typename, auto CONV_PROCESS,
+                 template <typename, decltype(CONV_PROCESS)> class CapabilityTrait>
 struct Generic
 {
     static constexpr bool value = true;
@@ -12,14 +15,27 @@ struct Generic
 
 template <typename T, P V>
     requires (V == P::A)
-struct Capability
+struct CapabilityAllTypes
 {
     static constexpr bool value = true;
 };
 
-using Test = Generic<int, P::A, Capability>;
+using TestAllTypes = Generic<int, P::A, CapabilityAllTypes>;
 
-static_assert(Test::value);
+
+  template<typename T>
+  concept ct_arithmetic = std::is_arithmetic_v<T>;  // std::is_integral<T>::value || std::is_floating_point<T>::value
+
+template <ct_arithmetic T, P V>
+    requires (V == P::A)
+struct CapabilityArithmTypes
+{
+    static constexpr bool value = true;
+};
+
+using TestArithmTypes = Generic<int, P::A, CapabilityArithmTypes>;
+
+static_assert(TestArithmTypes::value);
 
 int main()
 {
