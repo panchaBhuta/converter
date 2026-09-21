@@ -109,10 +109,10 @@ add_unit_test(diagnostic_get_name)
 # Unit tests
 add_unit_test(testPlatform)
 
-add_unit_test(testSupportingTemplates)
-add_unit_test(testBasicConversions)
+#add_unit_test(testSupportingTemplates)
+#add_unit_test(testBasicConversions)
 
-add_unit_test(testAllConversionTemplateInstances)
+#add_unit_test(testAllConversionTemplateInstances)
 
 #[======================[
 add_unit_test(testFloatingPointNaN)

@@ -152,9 +152,9 @@ void checkAvailableParameters(const t_arrConversionProcessesS2T<T>& valProcesses
   std::cout << "valProcessesT2S = " <<
         unittest::SScompatible<std::remove_cvref_t<decltype(valProcessesT2S)>>::getVal(valProcessesT2S) << std::endl << std::endl << std::endl;
 
-  //unittest::ExpectEqual(t_arrConversionProcessesS2T<T>, DefaultStr2Tn<T>::validConversionProcesses(), valProcessesS2T);
-  //unittest::ExpectEqual(t_arrErrorHandlers<T>,          DefaultStr2Tn<T>::validErrorHandlers(),       valHandlers);
-  //unittest::ExpectEqual(t_arrConversionProcessesT2S<T>, DefaultTn2Str<T>::validConversionProcesses(), valProcessesT2S);
+  unittest::ExpectEqual(t_arrConversionProcessesS2T<T>, DefaultStr2Tn<T>::validConversionProcesses(), valProcessesS2T);
+  unittest::ExpectEqual(t_arrErrorHandlers<T>,          DefaultStr2Tn<T>::validErrorHandlers(),       valHandlers);
+  unittest::ExpectEqual(t_arrConversionProcessesT2S<T>, DefaultTn2Str<T>::validConversionProcesses(), valProcessesT2S);
 }
 
 
