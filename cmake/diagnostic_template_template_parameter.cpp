@@ -72,13 +72,12 @@ struct CapabilityArithmTypesResEnm
 //     Generic<int, P::A, CapabilityArithmTypesResEnm>;
 
 
-// Only the unconstrained case is expected to compile in this diagnostic.
-// static_assert(TestAllTypes::value);
-//
-// The following assertions were removed because their corresponding
+// The unconstrained case is expected to compile.
+// The remaining assertions are commented out because their corresponding
 // template arguments are rejected by MSVC 19.51 before the assertion
 // can be evaluated.
-//
+static_assert(TestAllTypes::value);
+
 // static_assert(TestAllTypesResEnm::value);
 // static_assert(TestArithmTypes::value);
 // static_assert(TestArithmTypesResEnm::value);
