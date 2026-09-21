@@ -72,6 +72,30 @@ static_assert(TestArithmTypes::value);
 static_assert(TestArithmTypesResEnm::value);
 
 
+template <
+    typename,
+    auto CONV_PROCESS,
+    template <ct_arithmetic, decltype(CONV_PROCESS)> class CapabilityTrait
+>
+    requires (CONV_PROCESS == P::A)
+struct Specific
+{
+    static constexpr bool value = true;
+};
+
+
+using TestSpecificAllTypes = Specific<int, P::A, CapabilityAllTypes>;
+using TestSpecificAllTypesResEnm = Specific<int, P::A, CapabilityAllTypesResEnm>;
+using TestSpecificArithmTypes = Specific<int, P::A, CapabilityArithmTypes>;
+using TestSpecificArithmTypesResEnm = Specific<int, P::A, CapabilityArithmTypesResEnm>;
+
+
+static_assert(TestSpecificAllTypes::value);
+static_assert(TestSpecificAllTypesResEnm::value);
+static_assert(TestSpecificArithmTypes::value);
+static_assert(TestSpecificArithmTypesResEnm::value);
+
+
 int main()
 {
     return 0;
