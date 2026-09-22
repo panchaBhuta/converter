@@ -355,7 +355,7 @@ int main()
 {
     std::cout
         << "___________,capability_AllTypesAllEnum,capability_AllTypesConstrEnum,"
-        << "capability_ArithmTypesAllEnum,capability_ArithmTypesConstrEnum"
+        << "capability_ArithmTypesAllEnum,capability_ArithmTypesConstrEnum,"
         << "capability_ArithmTypesAllEnum2,capability_ArithmTypesConstrEnum2"
         << std::endl;
 
