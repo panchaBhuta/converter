@@ -45,6 +45,14 @@ struct Capability_ArithmTypesConstrEnum
     static constexpr bool value = true;
 };
 
+// 5. Arithmetic T constraint + enum requires constraint
+template <typename T, P V>
+    requires (ct_arithmetic<T> && V == P::A)
+struct Capability_ArithmTypesConstrEnum2
+{
+    static constexpr bool value = true;
+};
+
 
 // Consumer 1: no constraints
 template <
