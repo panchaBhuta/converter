@@ -45,7 +45,15 @@ struct Capability_ArithmTypesConstrEnum
     static constexpr bool value = true;
 };
 
-// 5. Arithmetic T constraint + enum requires constraint
+// 5. Arithmetic T constraint; V unconstrained
+template <ct_arithmetic T, P V>
+    requires true
+struct Capability_ArithmTypesAllEnum2
+{
+    static constexpr bool value = true;
+};
+
+// 6. Arithmetic T constraint + enum requires constraint
 template <typename T, P V>
     requires (ct_arithmetic<T> && V == P::A)
 struct Capability_ArithmTypesConstrEnum2
@@ -53,14 +61,6 @@ struct Capability_ArithmTypesConstrEnum2
     static constexpr bool value = true;
 };
 
-
-// 6. Arithmetic T constraint; V unconstrained
-template <ct_arithmetic T, P V>
-    requires true
-struct Capability_ArithmTypesAllEnum2
-{
-    static constexpr bool value = true;
-};
 
 // Consumer 1: no constraints
 template <
@@ -95,6 +95,16 @@ struct Test_Consumer_AllTypesAllEnum
     static constexpr bool capability_ArithmTypesConstrEnum =
         requires{
             typename Consumer_AllTypesAllEnum<int, P::A, Capability_ArithmTypesConstrEnum>;
+        };
+
+    static constexpr bool capability_ArithmTypesAllEnum2 =
+        requires{
+            typename Consumer_AllTypesAllEnum<int, P::A, Capability_ArithmTypesAllEnum2>;
+        };
+
+    static constexpr bool capability_ArithmTypesConstrEnum2 =
+        requires{
+            typename Consumer_AllTypesAllEnum<int, P::A, Capability_ArithmTypesConstrEnum2>;
         };
 };
 
@@ -134,6 +144,16 @@ struct Test_Consumer_AllTypesConstrEnum
         requires{
             typename Consumer_AllTypesConstrEnum<int, P::A, Capability_ArithmTypesConstrEnum>;
         };
+
+    static constexpr bool capability_ArithmTypesAllEnum2 =
+        requires{
+            typename Consumer_AllTypesConstrEnum<int, P::A, Capability_ArithmTypesAllEnum2>;
+        };
+
+    static constexpr bool capability_ArithmTypesConstrEnum2 =
+        requires{
+            typename Consumer_AllTypesConstrEnum<int, P::A, Capability_ArithmTypesConstrEnum2>;
+        };
 };
 
 
@@ -170,6 +190,16 @@ struct Test_Consumer_ArithmTypesAllEnum
     static constexpr bool capability_ArithmTypesConstrEnum =
         requires{
             typename Consumer_ArithmTypesAllEnum<int, P::A, Capability_ArithmTypesConstrEnum>;
+        };
+
+    static constexpr bool capability_ArithmTypesAllEnum2 =
+        requires{
+            typename Consumer_ArithmTypesAllEnum<int, P::A, Capability_ArithmTypesAllEnum2>;
+        };
+
+    static constexpr bool capability_ArithmTypesConstrEnum2 =
+        requires{
+            typename Consumer_ArithmTypesAllEnum<int, P::A, Capability_ArithmTypesConstrEnum2>;
         };
 };
 
@@ -210,10 +240,68 @@ struct Test_Consumer_ArithmTypesConstrEnum
         requires{
             typename Consumer_ArithmTypesConstrEnum<int, P::A, Capability_ArithmTypesConstrEnum>;
         };
+
+    static constexpr bool capability_ArithmTypesAllEnum2 =
+        requires{
+            typename Consumer_ArithmTypesConstrEnum<int, P::A, Capability_ArithmTypesAllEnum2>;
+        };
+
+    static constexpr bool capability_ArithmTypesConstrEnum2 =
+        requires{
+            typename Consumer_ArithmTypesConstrEnum<int, P::A, Capability_ArithmTypesConstrEnum2>;
+        };
 };
 
 
 // Consumer 5: arithmetic T1 and constrained capability T2,
+// with no constraint on CONV_PROCESS
+template <
+    ct_arithmetic,
+    auto CONV_PROCESS,
+    template <ct_arithmetic, decltype(CONV_PROCESS)> class CapabilityTrait
+>
+    requires true
+struct Consumer_ArithmTypesAllEnum2
+{
+    static constexpr bool value = true;
+};
+
+
+template <typename, auto CONV_PROCESS>
+struct Test_Consumer_ArithmTypesAllEnum2
+{
+    static constexpr bool capability_AllTypesAllEnum =
+        requires{
+            typename Consumer_ArithmTypesAllEnum2<int, P::A, Capability_AllTypesAllEnum>;
+        };
+
+    static constexpr bool capability_AllTypesConstrEnum =
+        requires{
+            typename Consumer_ArithmTypesAllEnum2<int, P::A, Capability_AllTypesConstrEnum>;
+        };
+
+    static constexpr bool capability_ArithmTypesAllEnum =
+        requires{
+            typename Consumer_ArithmTypesAllEnum2<int, P::A, Capability_ArithmTypesAllEnum>;
+        };
+
+    static constexpr bool capability_ArithmTypesConstrEnum =
+        requires{
+            typename Consumer_ArithmTypesAllEnum2<int, P::A, Capability_ArithmTypesConstrEnum>;
+        };
+
+    static constexpr bool capability_ArithmTypesAllEnum2 =
+        requires{
+            typename Consumer_ArithmTypesAllEnum2<int, P::A, Capability_ArithmTypesAllEnum2>;
+        };
+
+    static constexpr bool capability_ArithmTypesConstrEnum2 =
+        requires{
+            typename Consumer_ArithmTypesAllEnum2<int, P::A, Capability_ArithmTypesConstrEnum2>;
+        };
+};
+
+// Consumer 6: arithmetic T1 and constrained capability T2,
 // with CONV_PROCESS constrained to P::A
 template <
     typename T1,
@@ -226,18 +314,42 @@ struct Consumer_ArithmTypesConstrEnum2
     static constexpr bool value = true;
 };
 
-// Consumer 6: arithmetic T1 and constrained capability T2,
-// with no constraint on CONV_PROCESS
-template <
-    ct_arithmetic,
-    auto CONV_PROCESS,
-    template <ct_arithmetic, decltype(CONV_PROCESS)> class CapabilityTrait
->
-    requires true
-struct Consumer_ArithmTypesAllEnum2
+
+template <typename, auto CONV_PROCESS>
+struct Test_Consumer_ArithmTypesConstrEnum2
 {
-    static constexpr bool value = true;
+    static constexpr bool capability_AllTypesAllEnum =
+        requires{
+            typename Consumer_ArithmTypesConstrEnum2<int, P::A, Capability_AllTypesAllEnum>;
+        };
+
+    static constexpr bool capability_AllTypesConstrEnum =
+        requires{
+            typename Consumer_ArithmTypesConstrEnum2<int, P::A, Capability_AllTypesConstrEnum>;
+        };
+
+    static constexpr bool capability_ArithmTypesAllEnum =
+        requires{
+            typename Consumer_ArithmTypesConstrEnum2<int, P::A, Capability_ArithmTypesAllEnum>;
+        };
+
+    static constexpr bool capability_ArithmTypesConstrEnum =
+        requires{
+            typename Consumer_ArithmTypesConstrEnum2<int, P::A, Capability_ArithmTypesConstrEnum>;
+        };
+
+    static constexpr bool capability_ArithmTypesAllEnum2 =
+        requires{
+            typename Consumer_ArithmTypesConstrEnum2<int, P::A, Capability_ArithmTypesAllEnum2>;
+        };
+
+    static constexpr bool capability_ArithmTypesConstrEnum2 =
+        requires{
+            typename Consumer_ArithmTypesConstrEnum2<int, P::A, Capability_ArithmTypesConstrEnum2>;
+        };
 };
+
+
 
 int main()
 {
@@ -251,7 +363,9 @@ int main()
         << Test_Consumer_AllTypesAllEnum<int, P::A>::capability_AllTypesAllEnum << ","
         << Test_Consumer_AllTypesAllEnum<int, P::A>::capability_AllTypesConstrEnum << ","
         << Test_Consumer_AllTypesAllEnum<int, P::A>::capability_ArithmTypesAllEnum << ","
-        << Test_Consumer_AllTypesAllEnum<int, P::A>::capability_ArithmTypesConstrEnum
+        << Test_Consumer_AllTypesAllEnum<int, P::A>::capability_ArithmTypesConstrEnum << ","
+        << Test_Consumer_AllTypesAllEnum<int, P::A>::capability_ArithmTypesAllEnum2 << ","
+        << Test_Consumer_AllTypesAllEnum<int, P::A>::capability_ArithmTypesConstrEnum2
         << std::endl;
 
     std::cout
@@ -259,7 +373,9 @@ int main()
         << Test_Consumer_AllTypesConstrEnum<int, P::A>::capability_AllTypesAllEnum << ","
         << Test_Consumer_AllTypesConstrEnum<int, P::A>::capability_AllTypesConstrEnum << ","
         << Test_Consumer_AllTypesConstrEnum<int, P::A>::capability_ArithmTypesAllEnum << ","
-        << Test_Consumer_AllTypesConstrEnum<int, P::A>::capability_ArithmTypesConstrEnum
+        << Test_Consumer_AllTypesConstrEnum<int, P::A>::capability_ArithmTypesConstrEnum << ","
+        << Test_Consumer_AllTypesConstrEnum<int, P::A>::capability_ArithmTypesAllEnum2 << ","
+        << Test_Consumer_AllTypesConstrEnum<int, P::A>::capability_ArithmTypesConstrEnum2
         << std::endl;
 
     std::cout
@@ -267,7 +383,9 @@ int main()
         << Test_Consumer_ArithmTypesAllEnum<int, P::A>::capability_AllTypesAllEnum << ","
         << Test_Consumer_ArithmTypesAllEnum<int, P::A>::capability_AllTypesConstrEnum << ","
         << Test_Consumer_ArithmTypesAllEnum<int, P::A>::capability_ArithmTypesAllEnum << ","
-        << Test_Consumer_ArithmTypesAllEnum<int, P::A>::capability_ArithmTypesConstrEnum
+        << Test_Consumer_ArithmTypesAllEnum<int, P::A>::capability_ArithmTypesConstrEnum << ","
+        << Test_Consumer_ArithmTypesAllEnum<int, P::A>::capability_ArithmTypesAllEnum2 << ","
+        << Test_Consumer_ArithmTypesAllEnum<int, P::A>::capability_ArithmTypesConstrEnum2
         << std::endl;
 
     std::cout
@@ -275,7 +393,29 @@ int main()
         << Test_Consumer_ArithmTypesConstrEnum<int, P::A>::capability_AllTypesAllEnum << ","
         << Test_Consumer_ArithmTypesConstrEnum<int, P::A>::capability_AllTypesConstrEnum << ","
         << Test_Consumer_ArithmTypesConstrEnum<int, P::A>::capability_ArithmTypesAllEnum << ","
-        << Test_Consumer_ArithmTypesConstrEnum<int, P::A>::capability_ArithmTypesConstrEnum
+        << Test_Consumer_ArithmTypesConstrEnum<int, P::A>::capability_ArithmTypesConstrEnum << ","
+        << Test_Consumer_ArithmTypesConstrEnum<int, P::A>::capability_ArithmTypesAllEnum2 << ","
+        << Test_Consumer_ArithmTypesConstrEnum<int, P::A>::capability_ArithmTypesConstrEnum2
+        << std::endl;
+
+    std::cout
+        << "Consumer_ArithmTypesAllEnum2,"
+        << Test_Consumer_ArithmTypesAllEnum2<int, P::A>::capability_AllTypesAllEnum << ","
+        << Test_Consumer_ArithmTypesAllEnum2<int, P::A>::capability_AllTypesConstrEnum << ","
+        << Test_Consumer_ArithmTypesAllEnum2<int, P::A>::capability_ArithmTypesAllEnum << ","
+        << Test_Consumer_ArithmTypesAllEnum2<int, P::A>::capability_ArithmTypesConstrEnum << ","
+        << Test_Consumer_ArithmTypesAllEnum2<int, P::A>::capability_ArithmTypesAllEnum2 << ","
+        << Test_Consumer_ArithmTypesAllEnum2<int, P::A>::capability_ArithmTypesConstrEnum2
+        << std::endl;
+
+    std::cout
+        << "Consumer_ArithmTypesConstrEnum2,"
+        << Test_Consumer_ArithmTypesConstrEnum2<int, P::A>::capability_AllTypesAllEnum << ","
+        << Test_Consumer_ArithmTypesConstrEnum2<int, P::A>::capability_AllTypesConstrEnum << ","
+        << Test_Consumer_ArithmTypesConstrEnum2<int, P::A>::capability_ArithmTypesAllEnum << ","
+        << Test_Consumer_ArithmTypesConstrEnum2<int, P::A>::capability_ArithmTypesConstrEnum << ","
+        << Test_Consumer_ArithmTypesConstrEnum2<int, P::A>::capability_ArithmTypesAllEnum2 << ","
+        << Test_Consumer_ArithmTypesConstrEnum2<int, P::A>::capability_ArithmTypesConstrEnum2
         << std::endl;
 
     return 0;
