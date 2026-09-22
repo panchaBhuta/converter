@@ -1,4 +1,5 @@
 #include <type_traits>
+#include <iostream>
 
 enum class P
 {
@@ -6,148 +7,234 @@ enum class P
     B
 };
 
-template <
-    typename,
-    auto CONV_PROCESS,
-    template <typename, decltype(CONV_PROCESS)> class CapabilityTrait
->
-struct Generic
-{
-    static constexpr bool value = true;
-};
-
 
 // 1. No constraints
 template <typename T, P V>
-struct CapabilityAllTypes
+struct Capability_AllTypesAllEnum
 {
     static constexpr bool value = true;
 };
-
-using TestAllTypes = Generic<int, P::A, CapabilityAllTypes>;
 
 
 // 2. requires constraint on enum parameter
 //
-// MSVC 19.51 rejects this constrained template as a template-template
-// argument for Generic::CapabilityTrait with C3201.
 template <typename T, P V>
     requires (V == P::A)
-struct CapabilityAllTypesResEnm
+struct Capability_AllTypesConstrEnum
 {
     static constexpr bool value = true;
 };
-
-// Expected to fail with MSVC 19.51 (C3201).
-// using TestAllTypesResEnm =
-//     Generic<int, P::A, CapabilityAllTypesResEnm>;
 
 
 // 3. Concept constraint on T
 template<typename T>
 concept ct_arithmetic = std::is_arithmetic_v<T>;
-// std::is_integral<T>::value || std::is_floating_point<T>::value
 
 template <ct_arithmetic T, P V>
-struct CapabilityArithmTypes
+struct Capability_ArithmTypesAllEnum
 {
     static constexpr bool value = true;
 };
-
-// Expected to fail with MSVC 19.51 (C3201).
-// using TestArithmTypes =
-//     Generic<int, P::A, CapabilityArithmTypes>;
 
 
 // 4. Concept constraint on T + requires constraint on enum parameter
 template <ct_arithmetic T, P V>
     requires (V == P::A)
-struct CapabilityArithmTypesResEnm
+struct Capability_ArithmTypesConstrEnum
 {
     static constexpr bool value = true;
 };
 
-// Expected to fail with MSVC 19.51 (C3201).
-// using TestArithmTypesResEnm =
-//     Generic<int, P::A, CapabilityArithmTypesResEnm>;
+
+// Consumer 1: no constraints
+template <
+    typename,
+    auto CONV_PROCESS,
+    template <typename, decltype(CONV_PROCESS)> class CapabilityTrait
+>
+struct Consumer_AllTypesAllEnum
+{
+    static constexpr bool value = true;
+};
 
 
-// The unconstrained case is expected to compile.
-// The remaining assertions are commented out because their corresponding
-// template arguments are rejected by MSVC 19.51 before the assertion
-// can be evaluated.
-static_assert(TestAllTypes::value);
+template <typename, auto CONV_PROCESS>
+struct Test_Consumer_AllTypesAllEnum
+{
+    static constexpr bool capability_AllTypesAllEnum =
+        requires{
+            typename Consumer_AllTypesAllEnum<int, P::A, Capability_AllTypesAllEnum>;
+        };
 
-// static_assert(TestAllTypesResEnm::value);
-// static_assert(TestArithmTypes::value);
-// static_assert(TestArithmTypesResEnm::value);
+    static constexpr bool capability_AllTypesConstrEnum =
+        requires{
+            typename Consumer_AllTypesAllEnum<int, P::A, Capability_AllTypesConstrEnum>;
+        };
+
+    static constexpr bool capability_ArithmTypesAllEnum =
+        requires{
+            typename Consumer_AllTypesAllEnum<int, P::A, Capability_ArithmTypesAllEnum>;
+        };
+
+    static constexpr bool capability_ArithmTypesConstrEnum =
+        requires{
+            typename Consumer_AllTypesAllEnum<int, P::A, Capability_ArithmTypesConstrEnum>;
+        };
+};
 
 
-// 5. Outer requires constraint, unconstrained CapabilityTrait
+// Consumer 2: requires constraint on CONV_PROCESS
 template <
     typename,
     auto CONV_PROCESS,
     template <typename, decltype(CONV_PROCESS)> class CapabilityTrait
 >
     requires (CONV_PROCESS == P::A)
-struct SpecificUnconstrainedTrait
+struct Consumer_AllTypesConstrEnum
 {
     static constexpr bool value = true;
 };
 
-using TestSpecificUnconstrainedTrait =
-    SpecificUnconstrainedTrait<int, P::A, CapabilityAllTypes>;
 
-static_assert(TestSpecificUnconstrainedTrait::value);
+template <typename, auto CONV_PROCESS>
+struct Test_Consumer_AllTypesConstrEnum
+{
+    static constexpr bool capability_AllTypesAllEnum =
+        requires{
+            typename Consumer_AllTypesConstrEnum<int, P::A, Capability_AllTypesAllEnum>;
+        };
+
+    static constexpr bool capability_AllTypesConstrEnum =
+        requires{
+            typename Consumer_AllTypesConstrEnum<int, P::A, Capability_AllTypesConstrEnum>;
+        };
+
+    static constexpr bool capability_ArithmTypesAllEnum =
+        requires{
+            typename Consumer_AllTypesConstrEnum<int, P::A, Capability_ArithmTypesAllEnum>;
+        };
+
+    static constexpr bool capability_ArithmTypesConstrEnum =
+        requires{
+            typename Consumer_AllTypesConstrEnum<int, P::A, Capability_ArithmTypesConstrEnum>;
+        };
+};
 
 
-// 6. Constrained template-template parameter, no outer requires
+// Consumer 3: constrained T and constrained CapabilityTrait T
 template <
-    typename,
+    ct_arithmetic,
     auto CONV_PROCESS,
     template <ct_arithmetic, decltype(CONV_PROCESS)> class CapabilityTrait
 >
-struct SpecificConstrainedTrait
+struct Consumer_ArithmTypesAllEnum
 {
     static constexpr bool value = true;
 };
 
 
-// Expected to fail with MSVC 19.51 (C3201) because the
-// template-template parameter itself is constrained.
-// using TestSpecificConstrainedTrait =
-//     SpecificConstrainedTrait<int, P::A, CapabilityArithmTypes>;
-//
-// static_assert(TestSpecificConstrainedTrait::value);
+template <typename, auto CONV_PROCESS>
+struct Test_Consumer_ArithmTypesAllEnum
+{
+    static constexpr bool capability_AllTypesAllEnum =
+        requires{
+            typename Consumer_ArithmTypesAllEnum<int, P::A, Capability_AllTypesAllEnum>;
+        };
+
+    static constexpr bool capability_AllTypesConstrEnum =
+        requires{
+            typename Consumer_ArithmTypesAllEnum<int, P::A, Capability_AllTypesConstrEnum>;
+        };
+
+    static constexpr bool capability_ArithmTypesAllEnum =
+        requires{
+            typename Consumer_ArithmTypesAllEnum<int, P::A, Capability_ArithmTypesAllEnum>;
+        };
+
+    static constexpr bool capability_ArithmTypesConstrEnum =
+        requires{
+            typename Consumer_ArithmTypesAllEnum<int, P::A, Capability_ArithmTypesConstrEnum>;
+        };
+};
 
 
+// Consumer 4: constrained T, constrained CapabilityTrait T,
+// and requires constraint on CONV_PROCESS
 template <
-    typename,
+    ct_arithmetic,
     auto CONV_PROCESS,
     template <ct_arithmetic, decltype(CONV_PROCESS)> class CapabilityTrait
 >
     requires (CONV_PROCESS == P::A)
-struct Specific
+struct Consumer_ArithmTypesConstrEnum
 {
     static constexpr bool value = true;
 };
 
 
-using TestSpecificAllTypes = Specific<int, P::A, CapabilityAllTypes>;
-using TestSpecificAllTypesResEnm = Specific<int, P::A, CapabilityAllTypesResEnm>;
-using TestSpecificArithmTypes = Specific<int, P::A, CapabilityArithmTypes>;
-// Expected to fail with MSVC 19.51 (C3201).
-// using TestSpecificArithmTypesResEnm =
-//     Specific<int, P::A, CapabilityArithmTypesResEnm>;
+template <typename, auto CONV_PROCESS>
+struct Test_Consumer_ArithmTypesConstrEnum
+{
+    static constexpr bool capability_AllTypesAllEnum =
+        requires{
+            typename Consumer_ArithmTypesConstrEnum<int, P::A, Capability_AllTypesAllEnum>;
+        };
 
+    static constexpr bool capability_AllTypesConstrEnum =
+        requires{
+            typename Consumer_ArithmTypesConstrEnum<int, P::A, Capability_AllTypesConstrEnum>;
+        };
 
-static_assert(TestSpecificAllTypes::value);
-static_assert(TestSpecificAllTypesResEnm::value);
-static_assert(TestSpecificArithmTypes::value);
-// static_assert(TestSpecificArithmTypesResEnm::value);
+    static constexpr bool capability_ArithmTypesAllEnum =
+        requires{
+            typename Consumer_ArithmTypesConstrEnum<int, P::A, Capability_ArithmTypesAllEnum>;
+        };
+
+    static constexpr bool capability_ArithmTypesConstrEnum =
+        requires{
+            typename Consumer_ArithmTypesConstrEnum<int, P::A, Capability_ArithmTypesConstrEnum>;
+        };
+};
 
 
 int main()
 {
+    std::cout
+        << "___________,capability_AllTypesAllEnum,capability_AllTypesConstrEnum,"
+        << "capability_ArithmTypesAllEnum,capability_ArithmTypesConstrEnum"
+        << std::endl;
+
+    std::cout
+        << "Consumer_AllTypesAllEnum,"
+        << Test_Consumer_AllTypesAllEnum<int, P::A>::capability_AllTypesAllEnum << ","
+        << Test_Consumer_AllTypesAllEnum<int, P::A>::capability_AllTypesConstrEnum << ","
+        << Test_Consumer_AllTypesAllEnum<int, P::A>::capability_ArithmTypesAllEnum << ","
+        << Test_Consumer_AllTypesAllEnum<int, P::A>::capability_ArithmTypesConstrEnum
+        << std::endl;
+
+    std::cout
+        << "Consumer_AllTypesConstrEnum,"
+        << Test_Consumer_AllTypesConstrEnum<int, P::A>::capability_AllTypesAllEnum << ","
+        << Test_Consumer_AllTypesConstrEnum<int, P::A>::capability_AllTypesConstrEnum << ","
+        << Test_Consumer_AllTypesConstrEnum<int, P::A>::capability_ArithmTypesAllEnum << ","
+        << Test_Consumer_AllTypesConstrEnum<int, P::A>::capability_ArithmTypesConstrEnum
+        << std::endl;
+
+    std::cout
+        << "Consumer_ArithmTypesAllEnum,"
+        << Test_Consumer_ArithmTypesAllEnum<int, P::A>::capability_AllTypesAllEnum << ","
+        << Test_Consumer_ArithmTypesAllEnum<int, P::A>::capability_AllTypesConstrEnum << ","
+        << Test_Consumer_ArithmTypesAllEnum<int, P::A>::capability_ArithmTypesAllEnum << ","
+        << Test_Consumer_ArithmTypesAllEnum<int, P::A>::capability_ArithmTypesConstrEnum
+        << std::endl;
+
+    std::cout
+        << "Consumer_ArithmTypesConstrEnum,"
+        << Test_Consumer_ArithmTypesConstrEnum<int, P::A>::capability_AllTypesAllEnum << ","
+        << Test_Consumer_ArithmTypesConstrEnum<int, P::A>::capability_AllTypesConstrEnum << ","
+        << Test_Consumer_ArithmTypesConstrEnum<int, P::A>::capability_ArithmTypesAllEnum << ","
+        << Test_Consumer_ArithmTypesConstrEnum<int, P::A>::capability_ArithmTypesConstrEnum
+        << std::endl;
+
     return 0;
 }
