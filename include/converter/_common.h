@@ -370,7 +370,7 @@ namespace converter
   template <
       c_numeric T,
       auto CONV_PROCESS,
-      template <typename, decltype(CONV_PROCESS)> class CapabilityTrait
+      template <c_numeric, decltype(CONV_PROCESS)> class CapabilityTrait
   >
   struct isBumpedTypeConversionAvailable
   {
