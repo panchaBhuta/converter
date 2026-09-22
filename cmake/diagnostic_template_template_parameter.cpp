@@ -226,6 +226,19 @@ struct Consumer_ArithmTypesConstrEnum2
     static constexpr bool value = true;
 };
 
+// Consumer 6: arithmetic T1 and constrained capability T2,
+// with no constraint on CONV_PROCESS
+template <
+    ct_arithmetic,
+    auto CONV_PROCESS,
+    template <ct_arithmetic, decltype(CONV_PROCESS)> class CapabilityTrait
+>
+    requires true
+struct Consumer_ArithmTypesAllEnum2
+{
+    static constexpr bool value = true;
+};
+
 int main()
 {
     std::cout
