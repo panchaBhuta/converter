@@ -213,6 +213,19 @@ struct Test_Consumer_ArithmTypesConstrEnum
 };
 
 
+// Consumer 5: arithmetic T1 and constrained capability T2,
+// with CONV_PROCESS constrained to P::A
+template <
+    typename T1,
+    auto CONV_PROCESS,
+    template <ct_arithmetic T2, decltype(CONV_PROCESS)> class CapabilityTrait
+>
+    requires (ct_arithmetic<T1> && CONV_PROCESS == P::A)
+struct Consumer_ArithmTypesConstrEnum2
+{
+    static constexpr bool value = true;
+};
+
 int main()
 {
     std::cout
