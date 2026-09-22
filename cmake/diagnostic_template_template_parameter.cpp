@@ -54,6 +54,14 @@ struct Capability_ArithmTypesConstrEnum2
 };
 
 
+// 6. Arithmetic T constraint; V unconstrained
+template <ct_arithmetic T, P V>
+    requires true
+struct Capability_ArithmTypesAllEnum2
+{
+    static constexpr bool value = true;
+};
+
 // Consumer 1: no constraints
 template <
     typename,
