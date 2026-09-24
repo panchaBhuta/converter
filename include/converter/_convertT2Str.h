@@ -241,8 +241,8 @@ namespace converter
             isBumpedTypeConversionAvailable<
                   T,
                   CONV_PROCESS,
-                  isConversionNum2SCppSupported>::template
-            _getNearestSuperTypeIdentity<
+                  isConversionNum2SCppSupported>::
+            template _getNearestSuperTypeIdentity<
                 CONV_PROCESS != Tn2StrConversionProcess::TO_STRING ||
                 bool(ENABLE_FLOATINGPOINT_TO_STRING)
             >()

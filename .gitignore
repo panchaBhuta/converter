@@ -2,6 +2,8 @@
 .vscode/
 
 build*/
+deleted_files/
+ignore_work_in_progress_files/
 
 ### Linux ###
 *~
