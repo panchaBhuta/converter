@@ -187,9 +187,6 @@ namespace converter
 
 
   template < c_arithmetic T, Tn2StrConversionProcess CONV_PROCESS>
-      requires ( CONV_PROCESS == Tn2StrConversionProcess::TO_STRING           ||
-                 CONV_PROCESS == Tn2StrConversionProcess::TO_CHARS            ||
-                 CONV_PROCESS == Tn2StrConversionProcess::STRINGSTREAM   )
   struct isConversionNum2SCppSupported
     : std::bool_constant <
                            ( CONV_PROCESS == Tn2StrConversionProcess::TO_STRING           && c_isNum2SSupported<T>     ) ||
@@ -198,9 +195,6 @@ namespace converter
                          > {};
 
   template < c_arithmetic T, Tn2StrConversionProcess CONV_PROCESS>
-      requires ( CONV_PROCESS == Tn2StrConversionProcess::TO_STRING           ||
-                 CONV_PROCESS == Tn2StrConversionProcess::TO_CHARS            ||
-                 CONV_PROCESS == Tn2StrConversionProcess::STRINGSTREAM   )
   struct isConversionNum2SNotCppSupported
     : std::bool_constant <
                            ( CONV_PROCESS == Tn2StrConversionProcess::TO_STRING           && !c_isNum2SSupported<T>   ) ||

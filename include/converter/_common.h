@@ -370,7 +370,7 @@ namespace converter
   template <
       c_numeric T,
       auto CONV_PROCESS,
-      template <typename, decltype(CONV_PROCESS)> class CapabilityTrait
+      template <c_numeric, decltype(CONV_PROCESS)> class CapabilityTrait
   >
   struct isBumpedTypeConversionAvailable
   {
@@ -410,11 +410,17 @@ namespace converter
       using CandidateType =
           std::tuple_element_t<INDEX, t_candidateTypes>;
 
-      if constexpr (
+      constexpr bool candidateSupported =
         (!std::is_same_v<T, CandidateType>) &&                   // skip when function _matchType<0,CandidateTypes...>();  finds a match
-        CapabilityTrait<CandidateType, CONV_PROCESS>::value &&   // is conversion for CandidateType supported
-        (std::numeric_limits<T>::max() <=                        // T::max is not more than CandidateType::max
-         std::numeric_limits<CandidateType>::max()))
+        CapabilityTrait<CandidateType, CONV_PROCESS>::value;     // is conversion for CandidateType supported
+
+      constexpr bool candidateIsSuperType =
+          (std::numeric_limits<T>::max() <=                        // T::max is not more than CandidateType::max
+           std::numeric_limits<CandidateType>::max());
+
+      if constexpr (
+          candidateSupported &&
+          candidateIsSuperType)
       {
         return std::type_identity<CandidateType>{};
       } else if constexpr (
