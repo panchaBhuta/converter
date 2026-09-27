@@ -37,7 +37,7 @@ macro(add_unit_test testname)
     #            gives error as COMPILE_LANG_AND_ID is empty
     #            $<$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang>:COMPILING_CXX_WITH_CLANG>
     #            $<$<COMPILE_LANG_AND_ID:CXX,Intel>:COMPILING_CXX_WITH_INTEL>)
-
+    #
     target_link_libraries(${testname} converter) # donot specify PUBLIC here,
     # executable ${testname} has to have transitive association to all its dependencies(aka library chain)
     # refer   https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#target-usage-requirements
@@ -92,12 +92,27 @@ endmacro(add_perf_test)
 
 
 
+# Diagnostic tests
+#[==================[
+# use it manually, as it need not compile across all platforms.
+# project CMakeLists.txt  calls interactivelly thru cmake function check_template_template_parameter()
+# to determine the diagonistic, and publish its findings in
+# file ${CMAKE_CURRENT_BINARY_DIR}/check_template_template_parameter_output.txt
+if(CMAKE_BUILD_TYPE MATCHES "Debug")
+  add_executable(diagnostic_template_template_parameter
+                 "${CMAKE_CURRENT_SOURCE_DIR}/../cmake/diagnostic_template_template_parameter.cpp")
+  target_compile_definitions(diagnostic_template_template_parameter PRIVATE TEMPLATE_CONSTRAINT=CONSTRAINED_DIRECT_TEMPLATE_TEMPLATE_MATCHING_LIMITED)
+  add_test(NAME diagnostic_template_template_parameter
+           COMMAND "${PROJECT_BINARY_DIR}/tests/diagnostic_template_template_parameter" "${CMAKE_SYSTEM}" "${CMAKE_CXX_COMPILER_ID}-${CMAKE_CXX_COMPILER_VERSION}")
+endif()
+add_unit_test(diagnostic_template_template_parameter)
+#]==================]
 
-
+add_unit_test(diagnostic_get_name)
+add_unit_test(testPlatform)
 
 
 # Unit tests
-add_unit_test(testPlatform)
 
 add_unit_test(testSupportingTemplates)
 add_unit_test(testBasicConversions)
@@ -125,6 +140,7 @@ add_unit_test(testTupleConversions)
 add_unit_test(testCIstring)
 add_unit_test(testRegexString)
 #]======================]
+
 
 
 #[======================[
