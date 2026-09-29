@@ -20,11 +20,12 @@
 #include <converter/specializedHelper/_case_insensitive_string.h>
 
 namespace specializedTypes {
+
+
   using ci_string  =  std::basic_string<char, converter::ci_char_traits, std::string::allocator_type>;
 
   template<typename Traits>
   concept c_NOT_ci_char_traits = !std::is_same_v<converter::ci_char_traits, Traits>;
-}
 
   /*
     *  https://stackoverflow.com/questions/5195512/namespaces-and-operator-resolution
@@ -130,14 +131,12 @@ namespace specializedTypes {
   using ::operator==;
   using ::operator<=>;
 */
-//}
-
-
-namespace specializedTypes {
-  using ::operator<<;
-  using ::operator>>;
-  using ::operator+;
-  using ::operator+=;
-  using ::operator==;
-  using ::operator<=>;
 }
+
+
+using specializedTypes::operator<<;
+using specializedTypes::operator>>;
+using specializedTypes::operator+;
+using specializedTypes::operator+=;
+using specializedTypes::operator==;
+using specializedTypes::operator<=>;

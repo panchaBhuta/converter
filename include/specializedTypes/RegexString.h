@@ -87,7 +87,7 @@ namespace specializedTypes
         oss << "Assignment failed: other can't be empty, for regex pattern RegexString<" << CTS.data << ">";
         throw std::runtime_error(oss.str());
       }
-      _value = other._value;
+      (*this) = other._value;
       return *this;
     }
 
@@ -98,7 +98,6 @@ namespace specializedTypes
     std::string _value;
     const static std::regex _regex_pattern;
   };
-}
 
   /*
     *  https://stackoverflow.com/questions/5195512/namespaces-and-operator-resolution
@@ -112,8 +111,6 @@ namespace specializedTypes
   {
     return (os << obj.get());
   }
-
-namespace specializedTypes
-{
-  using ::operator<<;
 }
+
+using specializedTypes::operator<<;
