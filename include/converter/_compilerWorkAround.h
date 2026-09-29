@@ -32,9 +32,7 @@
  * It does not require the c_numeric concept to be declared at this point;
  * the C++ parser sees either 'typename' or 'c_numeric' after preprocessing.
  */
-#if defined(__GNUC__) && !defined(__clang__) \\
-    && ((__GNUC__ < 12) || \\
-        (__GNUC__ == 12 && __GNUC_MINOR__ < 4))
+#if defined(__GNUC__) && !defined(__clang__)     && ((__GNUC__ < 12) ||         (__GNUC__ == 12 && __GNUC_MINOR__ < 4))
 
 #define CONVERTER_TEMPLATE_TYPE_CONSTRAINT typename
 
