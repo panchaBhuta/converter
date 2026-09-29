@@ -18,6 +18,8 @@
 #include <concepts>
 #include <algorithm>
 
+#include <converter/_compilerWorkAround.h>
+
 
 /*
  *  NUMERIC_LOCALE : Number locales are specific settings for the 1000 separators and decimals.
@@ -370,7 +372,10 @@ namespace converter
   template <
       c_numeric T,
       auto CONV_PROCESS,
-      template <c_numeric, decltype(CONV_PROCESS)> class CapabilityTrait
+      template <
+          CONVERTER_TEMPLATE_TYPE_CONSTRAINT,
+          decltype(CONV_PROCESS)
+      > class CapabilityTrait
   >
   struct isBumpedTypeConversionAvailable
   {
