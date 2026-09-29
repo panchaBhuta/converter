@@ -11,7 +11,7 @@
 # https://cmake.org/cmake/help/v3.27/manual/cmake-packages.7.html#creating-packages
 
 # Project
-cmake_minimum_required(VERSION 3.23)
+cmake_minimum_required(VERSION 3.25)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 include(package-build-infrstructure)  # cmake/package-build-infrstructure.cmake

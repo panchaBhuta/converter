@@ -4,11 +4,20 @@
 #include <limits>
 #include <cassert>
 
+
+
+#include <commonUtils/disable_msvc_popups.h>
+
+
 //  ./manualBuild.sh cmake check_floatingPoint_toString
 
 
 int main(int, char**)
 {
+#if defined(_MSC_VER)
+    commonUtils::disable_msvc_popups();
+#endif
+
   std::array<char, std::numeric_limits<float>::digits +5 > str;  // +5 just to be on the safe side :)
   float value = 11.0f;
   std::string strVal = std::to_string(value); // std::to_string(11.0f) -> "11.0000000" is not what is expected "11"
