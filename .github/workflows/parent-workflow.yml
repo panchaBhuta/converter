@@ -2,13 +2,13 @@ name: Parent Workflow
 
 on:
   push:
-    branches: [ master, main, test-gcc12-regression ]
+    branches: [ test-gcc12-regression ]
     paths-ignore:
       - 'docs/**'
     tags-ignore:
       - v*
   pull_request:
-    branches: [ master, main, test-gcc12-regression ]
+    branches: [ test-gcc12-regression ]
     paths-ignore:
       - 'docs/**'
     tags-ignore:
