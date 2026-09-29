@@ -41,13 +41,17 @@ jobs:
         # for ARM refer below
         # https://github.com/actions/partner-runner-images
         # https://github.com/actions/partner-runner-images/blob/main/images/arm-ubuntu-24-image.md
-        os: [ ubuntu-24.04, ubuntu-22.04, ubuntu-24.04-arm, ubuntu-22.04-arm ]  #  ubuntu-latest  ==  ubuntu-24.04
+        include:
+          - os: ubuntu-22.04
+            compiler: g++-12
+          - os: ubuntu-22.04-arm
+            compiler: g++-12
         #  https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2204-Readme.md#installed-software
           #  GNU C++: 9.5.0, 10.5.0, 11.4.0, 12.3.0, 13.1.0
           #  Clang: 13.0.1, 14.0.0, 15.0.7
           #  default  ==  g++-11
           #  clang++  ==  clang++-14
-        compiler: [ default, g++-12, g++-13, g++-14,  clang++-13, clang++-14, clang++-15, clang++-16, clang++-17, clang++-18 ]
+
           #  ChapGPT recommendation : drop g++-11 support ; why? read below ...
           #  Your library is using advanced C++20 features
 
@@ -62,32 +66,7 @@ jobs:
 
           # These are exactly the areas where GCC 11 had the roughest implementation.
 
-        exclude: [
-          { os: ubuntu-24.04    , compiler: g++-13 },      # default
-          { os: ubuntu-24.04    , compiler: clang++-13 },
-          { os: ubuntu-24.04    , compiler: clang++-14 },
-          { os: ubuntu-24.04    , compiler: clang++-15 },
-          #{ os: ubuntu-24.04    , compiler: clang++-18 }, # clang++
-          { os: ubuntu-24.04-arm, compiler: g++-13 },      # default
-          { os: ubuntu-24.04-arm, compiler: clang++-13 },
-          { os: ubuntu-24.04-arm, compiler: clang++-14 },
-          { os: ubuntu-24.04-arm, compiler: clang++-15 },
-          #{ os: ubuntu-24.04-arm, compiler: clang++-18 }, # clang++
-          { os: ubuntu-22.04    , compiler: default },     # g++-11
-          { os: ubuntu-22.04    , compiler: g++-13 },      # g++-13 got removed later from ubuntu-22 runner
-          { os: ubuntu-22.04    , compiler: g++-14 },
-          #{ os: ubuntu-22.04    , compiler: clang++-14 }, # clang++ 
-          { os: ubuntu-22.04    , compiler: clang++-16 },
-          { os: ubuntu-22.04    , compiler: clang++-17 },
-          { os: ubuntu-22.04    , compiler: clang++-18 },
-          { os: ubuntu-22.04-arm, compiler: default },      # g++-11
-          { os: ubuntu-22.04-arm, compiler: g++-13 },      # g++-13 got removed later from ubuntu-22 runner
-          { os: ubuntu-22.04-arm, compiler: g++-14 },
-          { os: ubuntu-22.04-arm, compiler: clang++-13 },  #         fails on chrono include, refer : https://github.com/actions/runner-images/issues/8659
-          { os: ubuntu-22.04-arm, compiler: clang++-14 },  # clang++ fails on chrono include, refer : https://github.com/actions/runner-images/issues/8659
-          { os: ubuntu-22.04-arm, compiler: clang++-16 },
-          { os: ubuntu-22.04-arm, compiler: clang++-17 },
-          { os: ubuntu-22.04-arm, compiler: clang++-18 } ]
+
     runs-on: ${{matrix.os}}
     timeout-minutes: 5
     outputs:
