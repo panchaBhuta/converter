@@ -23,9 +23,3 @@ permissions:
 jobs:
   linux-sub-workflow:
     uses: ./.github/workflows/sub-workflow-linux.yml
-
-  # Consolidate job - downloads artifacts from each sub-workflow's run
-  consolidate:
-    needs: [linux-sub-workflow]
-    if: always() # Forces execution regardless of sub-workflow success/failure statuses
-    uses: ./.github/workflows/sub-workflow-consolidate.yml
