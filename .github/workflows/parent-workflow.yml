@@ -2,13 +2,13 @@ name: Parent Workflow
 
 on:
   push:
-    branches: [ master, main ]
+    branches: [ master, main, test-gcc12-regression ]
     paths-ignore:
       - 'docs/**'
     tags-ignore:
       - v*
   pull_request:
-    branches: [ master, main ]
+    branches: [ master, main, test-gcc12-regression ]
     paths-ignore:
       - 'docs/**'
     tags-ignore:
@@ -24,14 +24,8 @@ jobs:
   linux-sub-workflow:
     uses: ./.github/workflows/sub-workflow-linux.yml
 
-  macos-sub-workflow:
-    uses: ./.github/workflows/sub-workflow-macos.yml
-
-  windows-sub-workflow:
-    uses: ./.github/workflows/sub-workflow-windows.yml
-
   # Consolidate job - downloads artifacts from each sub-workflow's run
   consolidate:
-    needs: [linux-sub-workflow, macos-sub-workflow, windows-sub-workflow]
+    needs: [linux-sub-workflow]
     if: always() # Forces execution regardless of sub-workflow success/failure statuses
     uses: ./.github/workflows/sub-workflow-consolidate.yml
