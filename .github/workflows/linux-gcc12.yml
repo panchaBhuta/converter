@@ -1,0 +1,102 @@
+name: Linux GCC 12
+
+on:
+  push:
+    branches: [ chatgpt_bot ]
+    paths-ignore:
+      - 'docs/**'
+    tags-ignore:
+      - v*
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build-ubuntu-gcc12:
+    name: Build
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            compiler: g++-12
+          - os: ubuntu-22.04-arm
+            compiler: g++-12
+          - os: ubuntu-24.04
+            compiler: g++-12
+          - os: ubuntu-24.04-arm
+            compiler: g++-12
+
+    runs-on: ${{matrix.os}}
+    timeout-minutes: 5
+    outputs:
+      run-id: ${{ github.run_id }}
+
+    steps:
+      - name: Compiler Version
+        run: |
+          echo "g++ --version"; g++ --version; echo ""
+          echo "${{matrix.compiler}} --version"; ${{matrix.compiler}} --version
+
+      - name: Checkout Repo
+        uses: actions/checkout@v7
+
+      - name: Get Version
+        run: |
+          uname -a
+          echo "------------"
+          cmake --version
+          echo "------------"
+          ${{matrix.compiler}} -dM -E -x c++ /dev/null | egrep -i "(gnu|llvm|linux|version|major|minor)"
+
+      - name: Check Generators
+        run: cmake --help
+
+      - name: Compiler Macros Available
+        run: ${{matrix.compiler}} -dM -E -x c++ /dev/null
+
+      - name: Deploy Test-Dependencies
+        run: ./make.sh deps
+
+      - name: Configure CMake [Debug]
+        run: |
+          cmake -S "${{github.workspace}}"                 -B "${{github.workspace}}/build-debug"                 -DCONVERTER_BUILD_TESTS=ON                 -DCMAKE_BUILD_TYPE=Debug                 -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
+
+      - name: Check Work-Around-Flags
+        run: |
+          grep define "${{github.workspace}}/build-debug/include/converter/_workaroundConfig.h" | grep -v -e "^//" -e " e_[^ ]*_FEATURE "
+          FLAG_DIR="${{github.workspace}}/build-debug/workAroundFlags"
+          mkdir -p "${FLAG_DIR}"
+          FLAG_FILE="${FLAG_DIR}/flag-${{matrix.os}}-${{matrix.compiler}}.csv"
+          echo "_OS,compiler,"$(grep "#define" "${{github.workspace}}/build-debug/include/converter/_workaroundConfig.h" | sed "s/  */ /g" | cut -d' ' -f2,3 | grep -e "^SUPPORTED_" -e "^HAS_" -e "^ENABLE_" | cut -d' ' -f1 | tr '\n' ',' | sed 's/,$/\n/g') > "${FLAG_FILE}"
+          echo "${{matrix.os}},${{matrix.compiler}},"$(grep "#define" "${{github.workspace}}/build-debug/include/converter/_workaroundConfig.h" | sed "s/  */ /g" | cut -d' ' -f2,3 | grep -e "^SUPPORTED_" -e "^HAS_" -e "^ENABLE_" | cut -d' ' -f2 | tr '\n' ',' | sed 's/,$/\n/g') >> "${FLAG_FILE}"
+          cat "${FLAG_FILE}"
+
+      - name: Upload Artifact from Sub-Workflow
+        uses: actions/upload-artifact@v4
+        with:
+          name: "artifact-${{matrix.os}}-${{matrix.compiler}}"
+          path: "build-debug/workAroundFlags/flag-${{matrix.os}}-${{matrix.compiler}}.csv"
+
+      - name: Build [Debug]
+        run: cmake --build "${{github.workspace}}/build-debug" --config Debug -j$(nproc)
+
+      - name: Test [Debug]
+        working-directory: ${{github.workspace}}/build-debug
+        run: ctest -C Debug --verbose
+
+      - name: Configure CMake [Release]
+        run: |
+          cmake -S "${{github.workspace}}"                 -B "${{github.workspace}}/build-release"                 -DCONVERTER_BUILD_TESTS=ON                 -DCMAKE_BUILD_TYPE=Release                 -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
+
+      - name: Build [Release]
+        run: cmake --build "${{github.workspace}}/build-release" --config Release -j$(nproc)
+
+      - name: Test [Release]
+        working-directory: ${{github.workspace}}/build-release
+        run: ctest -C Release --verbose
+
+      - name: Install [Release]
+        run: sudo cmake --install "${{github.workspace}}/build-release" --config Release
