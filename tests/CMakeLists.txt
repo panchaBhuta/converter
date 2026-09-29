@@ -40,10 +40,9 @@ macro(add_unit_test testname)
     #
     target_link_libraries(${testname} converter) # donot specify PUBLIC here,
     # executable ${testname} has to have transitive association to all its dependencies(aka library chain)
-    # refer   https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#cmake-buildsystem.7.html
-    # refer   https://cmake.org/cmake/help/latest/command/target_link_libraries.html#libraries-for-a-test-target-and-or-its-dependents
-    #
-    # if(CMAKE_BUILD_TYPE MATCHES "Coverage")
+    # refer   https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#target-usage-requirements
+    # refer   https://cmake.org/cmake/help/latest/command/target_link_libraries.html#libraries-for-a-target-and-or-its-dependents
+
     if(CMAKE_BUILD_TYPE MATCHES "Coverage")
       #refer   https://github.com/bilke/cmake-modules/blob/master/CodeCoverage.cmake
       # compile with coverage options
@@ -55,7 +54,7 @@ macro(add_unit_test testname)
       # you will likely need to tell gcovr which gcov executable to use.
       # By default, gcovr just uses the program named gcov .
       # This is fine for the default GCC compiler, e.g. gcc or g++ .
-      # Otherwise, you must use the --gcov-executable to tell it what to use.
+      # Otherwise, you must use the --gcov-executable to tell gcovr what to use.
 
       #  doesn't  work as expected, instead directly calling gcovr in make.sh
       # add coverage target
@@ -86,8 +85,8 @@ macro(add_perf_test testname)
 
     target_link_libraries(${testname} converter)   # donot specify PUBLIC here,
     # executable ${testname} has to have transitive association to all its dependencies(aka library chain)
-    # refer   https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#cmake-buildsystem.7.html
-    # refer   https://cmake.org/cmake/help/latest/command/target_link_libraries.html#libraries-for-a-test-target-and-or-its-dependents
+    # refer   https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#target-usage-requirements
+    # refer   https://cmake.org/cmake/help/latest/command/target_link_libraries.html#libraries-for-a-target-and-or-its-dependents
   endif()
 endmacro(add_perf_test)
 
@@ -96,18 +95,26 @@ endmacro(add_perf_test)
 
 
 # Diagnostic tests
+#[==================[
+# use it manually, as it need not compile across all platforms.
+# project CMakeLists.txt  calls interactivelly thru cmake function check_template_template_parameter()
+# to determine the diagonistic, and publish its findings in
+# file ${CMAKE_CURRENT_BINARY_DIR}/check_template_template_parameter_output.txt
 if(CMAKE_BUILD_TYPE MATCHES "Debug")
   add_executable(diagnostic_template_template_parameter
                  "${CMAKE_CURRENT_SOURCE_DIR}/../cmake/diagnostic_template_template_parameter.cpp")
+  target_compile_definitions(diagnostic_template_template_parameter PRIVATE TEMPLATE_CONSTRAINT=CONSTRAINED_DIRECT_TEMPLATE_TEMPLATE_MATCHING_LIMITED)
   add_test(NAME diagnostic_template_template_parameter
-           COMMAND "${PROJECT_BINARY_DIR}/tests/diagnostic_template_template_parameter")
+           COMMAND "${PROJECT_BINARY_DIR}/tests/diagnostic_template_template_parameter" "${CMAKE_SYSTEM}" "${CMAKE_CXX_COMPILER_ID}-${CMAKE_CXX_COMPILER_VERSION}")
 endif()
+add_unit_test(diagnostic_template_template_parameter)
+#]==================]
 
 add_unit_test(diagnostic_get_name)
+add_unit_test(testPlatform)
 
 
 # Unit tests
-add_unit_test(testPlatform)
 
 add_unit_test(testSupportingTemplates)
 #add_unit_test(testBasicConversions)

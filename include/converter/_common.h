@@ -400,7 +400,6 @@ namespace converter
 
 
     template <
-        bool StartIdxTypeMatch,
         size_t INDEX,
         typename... CandidateTypes
     >
@@ -412,17 +411,12 @@ namespace converter
           std::tuple_element_t<INDEX, t_candidateTypes>;
 
       constexpr bool candidateSupported =
-          CapabilityTrait<
-              CandidateType,
-              CONV_PROCESS
-          >::value;
+        (!std::is_same_v<T, CandidateType>) &&                   // skip when function _matchType<0,CandidateTypes...>();  finds a match
+        CapabilityTrait<CandidateType, CONV_PROCESS>::value;     // is conversion for CandidateType supported
 
       constexpr bool candidateIsSuperType =
-          StartIdxTypeMatch
-              ? (std::numeric_limits<T>::max() <
-                 std::numeric_limits<CandidateType>::max())
-              : (std::numeric_limits<T>::max() <=
-                 std::numeric_limits<CandidateType>::max());
+          (std::numeric_limits<T>::max() <=                        // T::max is not more than CandidateType::max
+           std::numeric_limits<CandidateType>::max());
 
       if constexpr (
           candidateSupported &&
@@ -432,7 +426,6 @@ namespace converter
       } else if constexpr (
           (INDEX + 1) < std::tuple_size_v<t_candidateTypes>) {
         return _iterateForType<
-            false,
             INDEX + 1,
             CandidateTypes...>();
       } else {
@@ -441,6 +434,24 @@ namespace converter
     }
 
 
+    // Finds the nearest supported candidate type for T.
+    //
+    // If T itself is present in CandidateTypes..., iteration starts at the
+    // following candidate, because T cannot be used to "bump" itself.
+    // If T is not present, iteration starts at the first candidate.
+    //
+    // This is important on platforms where support for a type is inconsistent.
+    // For example, on macOS-26:AppleClang:
+    //
+    //     HAS_FLOATINGPOINT_FROM_CHARS = 3
+    //
+    // means std::from_chars() supports 'float' and 'double', while 'long double'
+    // is not. However, 'double' and 'long double' have equivalent numeric ranges,
+    // on macOS-26:AppleClang.
+    // Therefore, 'long double' must NOT be considered bumpable to 'double'.
+    // Starting after the matching 'long double' candidate ensures that 'double'
+    // is never considered as its supertype. matchedIndex if matched, returns the
+    // index of 'long double' in the list-of-types.
     template <typename... CandidateTypes>
     constexpr static auto _evaluateTypes()
     {
@@ -448,7 +459,6 @@ namespace converter
           _matchType<0, CandidateTypes...>();
 
       return _iterateForType<
-          (matchedIndex != -1),
           (matchedIndex != -1) ? matchedIndex : 0,
           CandidateTypes...>();
     }

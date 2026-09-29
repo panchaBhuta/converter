@@ -297,8 +297,8 @@ namespace converter
             isBumpedTypeConversionAvailable<
                   T,
                   CONV_PROCESS,
-                  isConversionS2NumCppSupported>::template
-            _getNearestSuperTypeIdentity<true>()
+                  isConversionS2NumCppSupported>::
+            template _getNearestSuperTypeIdentity<true>()
         )::type;
 
     static constexpr bool value =

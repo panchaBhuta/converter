@@ -378,6 +378,11 @@ endfunction()
 
 # check if compiler supports "elementary string conversions" for floating-point types
 # https://en.cppreference.com/w/cpp/compiler_support/17#C.2B.2B17_library_features
+# macros :
+#      HAS_FLOATINGPOINT_FROM_CHARS
+#      HAS_FLOATINGPOINT_TO_CHARS
+#      ENABLE_FLOATINGPOINT_TO_STRING
+# are consumed by cmake/_workaroundConfig.h.in  to create ${CMAKE_CURRENT_BINARY_DIR}/include/converter/_workaroundConfig.h
 function(check_floatingPoint_elementaryStringConversions)
     get_macro_value( ${CMAKE_CURRENT_BINARY_DIR}/include/converter/_workaroundConfig.h
                     "HAS_FLOATINGPOINT_FROM_CHARS"
@@ -394,15 +399,20 @@ function(check_floatingPoint_elementaryStringConversions)
                      ENABLE_FLOATINGPOINT_TO_STRING)
     message(STATUS "previous-build check for ENABLE_FLOATINGPOINT_TO_STRING : ${ENABLE_FLOATINGPOINT_TO_STRING}")
 
-    if(   (NOT HAS_FLOATINGPOINT_FROM_CHARS  STREQUAL "NOTFOUND") AND
-          (NOT HAS_FLOATINGPOINT_TO_CHARS    STREQUAL "NOTFOUND")  )
-        set(HAS_FLOATINGPOINT_FROM_CHARS  ${HAS_FLOATINGPOINT_FROM_CHARS}  PARENT_SCOPE)
-        set(HAS_FLOATINGPOINT_TO_CHARS    ${HAS_FLOATINGPOINT_TO_CHARS}    PARENT_SCOPE)
+    if(   (NOT HAS_FLOATINGPOINT_FROM_CHARS    STREQUAL "NOTFOUND") AND
+          (NOT HAS_FLOATINGPOINT_TO_CHARS      STREQUAL "NOTFOUND") AND
+          (NOT ENABLE_FLOATINGPOINT_TO_STRING  STREQUAL "NOTFOUND") )
+        set(HAS_FLOATINGPOINT_FROM_CHARS      ${HAS_FLOATINGPOINT_FROM_CHARS}  PARENT_SCOPE)
+        set(HAS_FLOATINGPOINT_TO_CHARS        ${HAS_FLOATINGPOINT_TO_CHARS}    PARENT_SCOPE)
+        set(ENABLE_FLOATINGPOINT_TO_STRING    ${ENABLE_FLOATINGPOINT_TO_STRING}    PARENT_SCOPE)
         return()
     endif()
 
     set(HAS_FLOATINGPOINT_FROM_CHARS  ${e_ENABLE_FEATURE} PARENT_SCOPE)
     set(HAS_FLOATINGPOINT_TO_CHARS    ${e_ENABLE_FEATURE} PARENT_SCOPE)
+    set(ENABLE_FLOATINGPOINT_TO_STRING    ${e_DISABLE_FEATURE} PARENT_SCOPE)
+
+
 
     check_floatingPoint_types( check_floatingPoint_fromChars.cpp AGGREGATE_RESULT_FLOATINGPOINT_FROM_CHARS )
 
@@ -426,25 +436,27 @@ function(check_floatingPoint_elementaryStringConversions)
     endif()
 
 
+
     #  std::string strVal = std::to_string(value); // std::to_string(11.0f) -> "11.0000000" is not what is expected "11"
-    try_run    (RUN_FLOATINGPOINT_TO_STRING  COMPILE_FLOATINGPOINT_TO_STRING
+    try_run    (RUN_RESULT_FLOATINGPOINT_TO_STRING
+                COMPILE_RESULT_FLOATINGPOINT_TO_STRING
                 SOURCE_FROM_FILE    check_floatingPoint_toString.cpp
                                     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/check_floatingPoint_toString.cpp"
                 #COMPILE_DEFINITIONS "-DHAS_FLOATINGPOINT_FROM_CHARS=${e_ENABLE_FEATURE}"  not needed
                 CXX_STANDARD "${CMAKE_CXX_STANDARD}"
                 CXX_STANDARD_REQUIRED True
                 LOG_DESCRIPTION "run-check: check_floatingPoint_toString.cpp"
-                COMPILE_OUTPUT_VARIABLE  TRY_COMPILE_OUTPUT
-                RUN_OUTPUT_VARIABLE      TRY_RUN_OUTPUT)     # return 0;
-                #RUN_OUTPUT_STDOUT_VARIABLE LOG_RUN_STDOUT
-                #RUN_OUTPUT_STDERR_VARIABLE LOG_RUN_STDERR)
-    message(STATUS "check_floatingPoint_toString compile output : ${COMPILE_FLOATINGPOINT_TO_STRING}")
-    message(STATUS "check_floatingPoint_toString run compile : ${RUN_FLOATINGPOINT_TO_STRING}")
+                COMPILE_OUTPUT_VARIABLE  TRY_COMPILE_OUTPUT_F2S
+                RUN_OUTPUT_VARIABLE      TRY_RUN_OUTPUT_F2S)     # return 0;
+                #RUN_OUTPUT_STDOUT_VARIABLE LOG_RUN_STDOUT_F2S
+                #RUN_OUTPUT_STDERR_VARIABLE LOG_RUN_STDERR_F2S)
+    message(STATUS "check_floatingPoint_toString compile output : ${COMPILE_RESULT_FLOATINGPOINT_TO_STRING}")
+    message(STATUS "check_floatingPoint_toString run compile : ${RUN_RESULT_FLOATINGPOINT_TO_STRING}")
 
 
-    if( COMPILE_FLOATINGPOINT_TO_STRING  AND
-        ( ( NOT RUN_FLOATINGPOINT_TO_STRING   STREQUAL  "FAILED_TO_RUN" ) AND
-          (     RUN_FLOATINGPOINT_TO_STRING   EQUAL 0 )
+    if( COMPILE_RESULT_FLOATINGPOINT_TO_STRING  AND
+        ( ( NOT RUN_RESULT_FLOATINGPOINT_TO_STRING   STREQUAL  "FAILED_TO_RUN" ) AND
+          (     RUN_RESULT_FLOATINGPOINT_TO_STRING   EQUAL 0 )
         )
       )
         message(STATUS "check_floatingPoint_toString ::  ++SUCCESS++")
@@ -463,3 +475,51 @@ function(check_floatingPoint_elementaryStringConversions)
     #]===]
 endfunction()
 
+
+function(diagnostic_template_template_parameter  TEMPLATE_TEMPLATE_PARAMETER   FUNCTION_RETURN)
+    try_run    (RUN_RESULT_TEMPLATE_TEMPLATE_PARAMETER
+                COMPILE_RESULT_TEMPLATE_TEMPLATE_PARAMETER
+                SOURCE_FROM_FILE    diagnostic_template_template_parameter.cpp
+                                    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/diagnostic_template_template_parameter.cpp"
+                COMPILE_DEFINITIONS "-DTEMPLATE_CONSTRAINT=${TEMPLATE_TEMPLATE_PARAMETER}"
+                ARGS "${CMAKE_SYSTEM}" "${CMAKE_CXX_COMPILER_ID}-${CMAKE_CXX_COMPILER_VERSION}"    # OS COMPILER argument
+                CXX_STANDARD "${CMAKE_CXX_STANDARD}"
+                CXX_STANDARD_REQUIRED True
+                LOG_DESCRIPTION "run-check: diagnostic_template_template_parameter.cpp"
+                COMPILE_OUTPUT_VARIABLE  TRY_COMPILE_OUTPUT_TTP
+                #RUN_OUTPUT_VARIABLE      TRY_RUN_OUTPUT_TTP)     # return 0;
+                RUN_OUTPUT_STDOUT_VARIABLE LOG_RUN_STDOUT_TTP
+                RUN_OUTPUT_STDERR_VARIABLE LOG_RUN_STDERR_TTP)
+    message(STATUS "diagnostic_template_template_parameter compile output : ${COMPILE_RESULT_TEMPLATE_TEMPLATE_PARAMETER}")
+    message(STATUS "diagnostic_template_template_parameter run compile : ${RUN_RESULT_TEMPLATE_TEMPLATE_PARAMETER}")
+
+
+    if( COMPILE_RESULT_TEMPLATE_TEMPLATE_PARAMETER  AND
+        ( ( NOT RUN_RESULT_TEMPLATE_TEMPLATE_PARAMETER   STREQUAL  "FAILED_TO_RUN" ) AND
+          (     RUN_RESULT_TEMPLATE_TEMPLATE_PARAMETER   EQUAL 0 )
+        )
+      )
+        message(STATUS "diagnostic_template_template_parameter ::  ++SUCCESS++\n${LOG_RUN_STDOUT_TTP}\n${LOG_RUN_STDERR_TTP}")
+        file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/check_template_template_parameter_output.txt" "${LOG_RUN_STDERR_TTP}")
+        set(FUNCTION_RETURN    ${e_ENABLE_FEATURE} PARENT_SCOPE)
+    else()
+        message(STATUS "diagnostic_template_template_parameter ::  --FAILED--")
+        message(STATUS "diagnostic_template_template_parameter ::  ---------std::cout--------")
+        message(STATUS "diagnostic_template_template_parameter ::  ${LOG_RUN_STDOUT_TTP}\n${LOG_RUN_STDERR_TTP}")
+        message(STATUS "diagnostic_template_template_parameter ::  ---------std::cerr--------")
+        message(STATUS "diagnostic_template_template_parameter ::  ${LOG_RUN_STDERR_TTP}")
+        set(FUNCTION_RETURN    ${e_DISABLE_FEATURE} PARENT_SCOPE)
+    endif()
+
+endfunction()
+
+# check extent of compiler support "template_template_parameter"
+function(check_template_template_parameter)
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/check_template_template_parameter_output.txt"
+               "_OS,compiler,TEMPLATE_CONSTRAINT,Consumer_AllTypesAllEnum,Consumer_AllTypesConstrEnum,Consumer_ArithmTypesAllEnum,Consumer_ArithmTypesConstrEnum,Consumer_ArithmTypesAllEnum2,Consumer_ArithmTypesConstrEnum2\n")
+    diagnostic_template_template_parameter(CONSTRAINED_DIRECT_TEMPLATE_TEMPLATE_MATCHING FUNCTION_RETURN)
+    if(FUNCTION_RETURN EQUAL 0)
+        diagnostic_template_template_parameter(CONSTRAINED_DIRECT_TEMPLATE_TEMPLATE_MATCHING_LIMITED FUNCTION_RETURN)
+        diagnostic_template_template_parameter(CONSTRAINED_PARTIAL_SPECIALIZATION FUNCTION_RETURN)
+    endif()
+endfunction()
