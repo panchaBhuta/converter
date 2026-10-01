@@ -53,25 +53,27 @@ jobs:
           # g++-13  == 'MSVC 19'
           # clang   == 'MSVC 19'
           # ClangCl == 'Clang 16'
-        toolset_compiler: [ { compiler: default, cmdShell: cmd,         rawCompiler: cl.exe,  compilerMacros: "echo msbuild_does_not_support" },    #  microsoft/setup-msbuild@v2
+        toolset_compiler: [ { compiler: default, cmdShell: cmd,         utilitiesShell: bash,        rawCompiler: cl.exe,  compilerMacros: "echo msbuild_does_not_support" },    #  microsoft/setup-msbuild@v2
                                 #    on more details on  msbuild not supporting "-dM' option, refer https://stackoverflow.com/questions/4239993/determining-endianness-at-compile-time
 
-                            { compiler: ClangCl, cmdShell: cmd,         rawCompiler: clang++, compilerMacros: "clang++  -dM -E -x c++ NUL:"   },    #  microsoft/setup-msbuild@v2
+                            { compiler: ClangCl, cmdShell: cmd,         utilitiesShell: bash,        rawCompiler: clang++, compilerMacros: "clang++  -dM -E -x c++ NUL:"   },    #  microsoft/setup-msbuild@v2
                                 # https://github.com/ArchieAtkinson/CppTemplate
                                 # https://github.com/scikit-build/scikit-build-core/blob/main/.github/workflows/ci.yml
 
-                            { compiler: g++,     cmdShell: "msys2 {0}", rawCompiler: g++,     compilerMacros: "g++  -dM -E -x c++ /dev/null"  } ]   #  msys2/setup-msys2@v2
+                            { compiler: g++,     cmdShell: "msys2 {0}", utilitiesShell: "msys2 {0}", rawCompiler: g++,     compilerMacros: "g++  -dM -E -x c++ /dev/null"  } ]   #  msys2/setup-msys2@v2
         exclude:
           # MSYS2/UCRT64 is an x64 toolchain; it doesn't target the ARM64 runner.
           # (Use CLANGARM64 instead if you want an ARM64 g++/clang build.)
+          # NOTE: this must match the toolset_compiler g++ entry above FIELD-FOR-FIELD
+          #       (including utilitiesShell) or the exclusion silently stops matching.
           - os-generator: { os: windows-11-vs2026-arm, generator: "Visual Studio 18 2026", generatorGCC: Ninja, arch: ARM64 }
-            toolset_compiler: { compiler: g++, cmdShell: "msys2 {0}", rawCompiler: g++, compilerMacros: "g++  -dM -E -x c++ /dev/null" }
+            toolset_compiler: { compiler: g++, cmdShell: "msys2 {0}", utilitiesShell: "msys2 {0}", rawCompiler: g++, compilerMacros: "g++  -dM -E -x c++ /dev/null" }
         #include:
         #  - os: windows-2019
         #      # ClangCl == 'Clang 12'
         #    toolset_compiler : { compiler: ClangCl, toolset: 1 }
-    runs-on: ${{matrix.os-generator.os}}
-    timeout-minutes: 15
+    runs-on: ${{ matrix.os-generator.os }}
+    timeout-minutes: 45
     outputs:
       run-id: ${{ github.run_id }}
 
@@ -120,10 +122,14 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v7
 
-      - name: Get Version
-        # bash (Git Bash) for cl.exe/ClangCl jobs, msys2 shell for the g++ job -
-        # both understand uname/egrep/pipes, unlike the default cmd shell.
-        shell: ${{ matrix.toolset_compiler.compiler == 'g++' && 'msys2 {0}' || 'bash' }}
+      # NOTE: a step's own `shell:` key cannot reference the `matrix` context
+      #       (GitHub Actions limitation - see actions/runner#444). That rules out
+      #       `shell: ${{ matrix.toolset_compiler.utilitiesShell }}` on a single step.
+      #       Split into two steps instead, selected via `if:`, which IS allowed
+      #       to use `matrix`.
+      - name: Get Version (compiler=default OR ClangCl)    -   cmdShell( bash )
+        if: matrix.toolset_compiler.compiler != 'g++'
+        shell: bash
         run: |
           uname -a
           echo "------------"
@@ -132,6 +138,15 @@ jobs:
           if [ "${{ matrix.toolset_compiler.compiler }}" != "default" ]; then
             ${{ matrix.toolset_compiler.compilerMacros }} | egrep -i "(apple|mach|gnu|clang|llvm|linux|WIN|version|major|minor)"
           fi
+
+      - name: Get Version (compiler=g++)     -   cmdShell( "msys2 {0}" )
+        if: matrix.toolset_compiler.compiler == 'g++'
+        run: |
+          uname -a
+          echo "------------"
+          cmake --version
+          echo "------------"
+          ${{ matrix.toolset_compiler.compilerMacros }} | egrep -i "(apple|mach|gnu|clang|llvm|linux|WIN|version|major|minor)"
 
       - name: Check Generators
         # https://stackoverflow.com/questions/25941536/what-is-a-cmake-generator
@@ -160,7 +175,7 @@ jobs:
       - name: Configure CMake (compiler=g++) [Debug]
         if: matrix.toolset_compiler.compiler == 'g++'
         run: |
-          cmake -G "${{ matrix.os-generator.generatorCC }}" -S "${{ github.workspace }}" -B "${{ github.workspace }}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=${{ matrix.toolset_compiler.compiler }}
+          cmake -G "${{ matrix.os-generator.generatorGCC }}" -S "${{ github.workspace }}" -B "${{ github.workspace }}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=${{ matrix.toolset_compiler.compiler }}
 
       - name: Configure CMake (compiler=ClangCl) [Debug]
         # https://cmake.org/cmake/help/latest/guide/user-interaction/index.html
@@ -168,8 +183,20 @@ jobs:
         run: |
           cmake --log-level=TRACE -G "${{ matrix.os-generator.generator }}" -A ${{ matrix.os-generator.arch }} -S "${{ github.workspace }}" -B "${{ github.workspace }}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -T "${{ matrix.toolset_compiler.compiler }}"
 
-      - name: Check Work-Around-Flags
-        shell: ${{ matrix.toolset_compiler.compiler == 'g++' && 'msys2 {0}' || 'bash' }}
+      - name: Check Work-Around-Flags (compiler=default OR ClangCl)    -   cmdShell( bash )
+        if: matrix.toolset_compiler.compiler != 'g++'
+        shell: bash
+        run: |
+          grep define "${{ github.workspace }}/build-debug/include/converter/_workaroundConfig.h" | grep -v -e "^//" -e " e_[^ ]*_FEATURE "
+          FLAG_DIR="${{ github.workspace }}/build-debug/workAroundFlags"
+          mkdir -p ${FLAG_DIR}
+          FLAG_FILE="${FLAG_DIR}/flag-${{ matrix.os-generator.os }}-${{ matrix.toolset_compiler.compiler }}.csv"
+          echo "_OS,compiler,"$(grep "#define"  "${{ github.workspace }}/build-debug/include/converter/_workaroundConfig.h" | sed "s/  */ /g" | cut -d' ' -f2,3 | grep -e "^SUPPORTED_" -e "^HAS_" -e "^ENABLE_" | cut -d' ' -f1 | tr '\n' ',' | sed 's/,$/\n/g')  >  "${FLAG_FILE}"
+          echo "${{ matrix.os-generator.os }},${{ matrix.toolset_compiler.compiler }},"$(grep "#define"  "${{ github.workspace }}/build-debug/include/converter/_workaroundConfig.h" | sed "s/  */ /g" | cut -d' ' -f2,3 | grep -e "^SUPPORTED_" -e "^HAS_" -e "^ENABLE_" | cut -d' ' -f2 | tr '\n' ',' | sed 's/,$/\n/g')  >>  "${FLAG_FILE}"
+          cat "${FLAG_FILE}"
+
+      - name: Check Work-Around-Flags (compiler=g++)     -   cmdShell( "msys2 {0}" )
+        if: matrix.toolset_compiler.compiler == 'g++'
         run: |
           grep define "${{ github.workspace }}/build-debug/include/converter/_workaroundConfig.h" | grep -v -e "^//" -e " e_[^ ]*_FEATURE "
           FLAG_DIR="${{ github.workspace }}/build-debug/workAroundFlags"
