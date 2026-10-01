@@ -418,6 +418,7 @@ function(check_floatingPoint_elementaryStringConversions)
 
     check_floatingPoint_types( check_floatingPoint_toChars.cpp   AGGREGATE_RESULT_FLOATINGPOINT_TO_CHARS )
 
+
     if(  AGGREGATE_RESULT_FLOATINGPOINT_FROM_CHARS  )
         message(STATUS "floatingPoint_fromChars algo ::  ENABLED")
         set(HAS_FLOATINGPOINT_FROM_CHARS   ${AGGREGATE_RESULT_FLOATINGPOINT_FROM_CHARS} PARENT_SCOPE)
@@ -503,6 +504,10 @@ function(diagnostic_template_template_parameter  TEMPLATE_TEMPLATE_PARAMETER   F
         set(FUNCTION_RETURN    ${e_ENABLE_FEATURE} PARENT_SCOPE)
     else()
         message(STATUS "diagnostic_template_template_parameter ::  --FAILED--")
+        message(STATUS "diagnostic_template_template_parameter ::  ---------std::cout--------")
+        message(STATUS "diagnostic_template_template_parameter ::  ${LOG_RUN_STDOUT_TTP}\n${LOG_RUN_STDERR_TTP}")
+        message(STATUS "diagnostic_template_template_parameter ::  ---------std::cerr--------")
+        message(STATUS "diagnostic_template_template_parameter ::  ${LOG_RUN_STDERR_TTP}")
         set(FUNCTION_RETURN    ${e_DISABLE_FEATURE} PARENT_SCOPE)
     endif()
 

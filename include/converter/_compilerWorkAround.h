@@ -16,6 +16,10 @@
 
 /*
  * Compiler-specific workarounds
+ * 
+ * Observed on Github runners :
+ *    Failed : GCC12.3   (ubuntu-22.04, g++-12) and (ubuntu-22.04-arm, g++-12)
+ *    Passed : GCC12.4   (ubuntu-24.04, g++-12) and (ubuntu-24.04-arm, g++-12)
  *
  * GCC 12.3 has an internal compiler error (Segmentation fault) when
  * matching the constrained template-template parameter used by

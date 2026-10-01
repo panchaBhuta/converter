@@ -92,6 +92,8 @@ endmacro(add_perf_test)
 
 
 
+
+
 # Diagnostic tests
 #[==================[
 # use it manually, as it need not compile across all platforms.
