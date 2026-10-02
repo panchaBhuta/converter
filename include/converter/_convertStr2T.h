@@ -336,6 +336,9 @@ namespace converter
 
   public:
 
+    using e_ConversionProcess = Str2TnConversionProcess;
+    using e_ErrorHandler      = Str2TnErrorHandler;
+
     using t_arrConversionProcesses = std::array < Str2TnConversionProcess, _arrSizeConversionProcesses >;
     using t_arrErrorHandlers       = std::array < Str2TnErrorHandler,      _arrSizeErrorHandlers >;
 
@@ -413,15 +416,19 @@ namespace converter
 
 
 
-  template < typename T, Str2TnConversionProcess CONV_PROCESS>
+  template < typename T, DefaultStr2Tn<T>::e_ConversionProcess CONV_PROCESS>
   struct isSupported_Str2TnConversionProcess
       // NOTE: validConversionProcesses() is inclusive of isBumpedTypeS2NConversionAvailable<>::true_type
-    : std::bool_constant < check_any_of( DefaultStr2Tn<T>::validConversionProcesses(), CONV_PROCESS ) > {};
+    : std::bool_constant < check_any_of( DefaultStr2Tn<T>::validConversionProcesses(),
+                                         static_cast<DefaultStr2Tn<T>::e_ConversionProcess>(CONV_PROCESS)   //  static_cast needed for windows-*:msvc  combination
+                                       ) > {};
 
 
-  template < typename T, Str2TnErrorHandler ERR_HANDLER>
+  template < typename T, DefaultStr2Tn<T>::e_ErrorHandler ERR_HANDLER>
   struct isSupported_Str2TnErrorHandler
-    : std::bool_constant < check_any_of( DefaultStr2Tn<T>::validErrorHandlers(), ERR_HANDLER ) > {};
+    : std::bool_constant < check_any_of( DefaultStr2Tn<T>::validErrorHandlers(),
+                                         static_cast<DefaultStr2Tn<T>::e_ErrorHandler>(ERR_HANDLER)   //  static_cast needed for windows-*:msvc  combination
+                                       ) > {};
 
 
 
@@ -540,7 +547,7 @@ namespace converter
   };
 
 
-  template < typename T, Str2TnErrorHandler ERR_HANDLER >
+  template < typename T, DefaultStr2Tn<T>::e_ErrorHandler ERR_HANDLER >
           requires ( ERR_HANDLER != Str2TnErrorHandler::INAPPLICABLE &&
                      isSupported_Str2TnErrorHandler<T, ERR_HANDLER>::value )
   struct ErrorHandler

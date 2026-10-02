@@ -270,6 +270,8 @@ namespace converter
 
   public:
 
+    using e_ConversionProcess = Tn2StrConversionProcess;
+
     using t_arrConversionProcesses = std::array < Tn2StrConversionProcess, _arrSizeConversionProcesses >;
 
     // first element (index=0) of array is the default Conversion-Process for that type T
@@ -330,10 +332,12 @@ namespace converter
 
 
 
-  template < typename T, Tn2StrConversionProcess CONV_PROCESS>
+  template < typename T, DefaultTn2Str<T>::e_ConversionProcess CONV_PROCESS>
   struct isSupported_Tn2StrConversionProcess
       // NOTE: validConversionProcesses() is inclusive of isBumpedTypeN2SConversionAvailable<>::true_type
-    : std::bool_constant < check_any_of( DefaultTn2Str<T>::validConversionProcesses(), CONV_PROCESS ) > {};
+    : std::bool_constant < check_any_of( DefaultTn2Str<T>::validConversionProcesses(),
+                                         static_cast<DefaultTn2Str<T>::e_ConversionProcess>(CONV_PROCESS)   //  static_cast needed for windows-*:msvc  combination
+                                       ) > {};
 
 
 
