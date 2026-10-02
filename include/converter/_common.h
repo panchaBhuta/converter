@@ -105,12 +105,11 @@ namespace converter
 
 
   template <typename ENUM, std::size_t N>
-  constexpr bool check_any_of(std::array<ENUM, N> arr, ENUM enumVal)
+  constexpr bool check_any_of(std::array<ENUM, N> arr, std::type_identity_t<ENUM> enumVal)
   {
     return std::any_of( arr.begin(), arr.end(),
                         [enumVal](ENUM val) { return val == enumVal; }
                       );
-    return false;
   }
 
 
