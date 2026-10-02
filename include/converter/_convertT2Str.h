@@ -332,11 +332,11 @@ namespace converter
 
 
 
-  template < typename T, DefaultTn2Str<T>::e_ConversionProcess CONV_PROCESS>
+  template < typename T, typename DefaultTn2Str<T>::e_ConversionProcess CONV_PROCESS>
   struct isSupported_Tn2StrConversionProcess
       // NOTE: validConversionProcesses() is inclusive of isBumpedTypeN2SConversionAvailable<>::true_type
     : std::bool_constant < check_any_of( DefaultTn2Str<T>::validConversionProcesses(),
-                                         static_cast<DefaultTn2Str<T>::e_ConversionProcess>(CONV_PROCESS)   //  static_cast needed for windows-*:msvc  combination
+                                         static_cast<typename DefaultTn2Str<T>::e_ConversionProcess>(CONV_PROCESS)   //  static_cast needed for windows-*:msvc  combination
                                        ) > {};
 
 
