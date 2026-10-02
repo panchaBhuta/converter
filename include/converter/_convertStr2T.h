@@ -547,7 +547,7 @@ namespace converter
   };
 
 
-  template < typename T, DefaultStr2Tn<T>::e_ErrorHandler ERR_HANDLER >
+  template < typename T, typename DefaultStr2Tn<T>::e_ErrorHandler ERR_HANDLER >
           requires ( ERR_HANDLER != Str2TnErrorHandler::INAPPLICABLE &&
                      isSupported_Str2TnErrorHandler<T, ERR_HANDLER>::value )
   struct ErrorHandler
