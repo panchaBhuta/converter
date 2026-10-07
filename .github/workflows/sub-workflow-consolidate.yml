@@ -38,6 +38,23 @@ jobs:
           fetch-depth: 0 # Fetches full history so git can switch and track branches safely
 
 
+      - name: Checkout automation branch
+        run: |
+          PR_BRANCH="automation/build-flags"
+
+          git fetch origin
+
+          if git show-ref --verify --quiet "refs/remotes/origin/${PR_BRANCH}"; then
+            echo "Branch exists on remote. Checking it out..."
+            git checkout -b "${PR_BRANCH}" "origin/${PR_BRANCH}"
+
+            echo "Syncing PR branch with latest changes from main..."
+            git merge origin/main --no-edit
+          else
+            echo "Branch does not exist. Creating a new one from main..."
+            git checkout -b "${PR_BRANCH}"
+          fi
+
       - name: Create Work-Around-Flags Directory
         run: |
           FLAG_DIR="${{github.workspace}}/build-debug/workAroundFlags"
@@ -113,20 +130,6 @@ jobs:
           # 1. Configure Git using the standard GitHub Actions bot identity
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          # 2. Safely switch to the PR branch (create it locally if it only exists remotely, or create from scratch)
-          git fetch origin
-          if git show-ref --verify --quiet "refs/remotes/origin/${PR_BRANCH}"; then
-            echo "Branch exists on remote. Checking it out..."
-            git checkout -b "${PR_BRANCH}" "origin/${PR_BRANCH}"
-
-            # Pull the absolute latest updates from main into this branch to stay current
-            echo "Syncing PR branch with latest changes from main..."
-            git merge origin/main --no-edit
-          else
-            echo "Branch does not exist. Creating a new one from main..."
-            git checkout -b "${PR_BRANCH}"
-          fi
 
           git add ${TARGET_FLAGS_FILE} ${TARGET_TTP_FILE}
 
