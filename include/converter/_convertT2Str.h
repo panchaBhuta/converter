@@ -296,7 +296,7 @@ namespace converter
 
 
   template <  typename T,
-              typename DefaultTn2Str<T>::e_ConversionProcess CONV_PROCESS = DefaultTn2Str<T>::validConversionProcesses()[0]  >
+              Tn2StrConversionProcess CONV_PROCESS = DefaultTn2Str<T>::validConversionProcesses()[0]  >
   struct ConvertFromVal
   {
     constexpr static size_t templateId = 0;
@@ -332,11 +332,11 @@ namespace converter
 
 
 
-  template < typename T, typename DefaultTn2Str<T>::e_ConversionProcess CONV_PROCESS>
+  template < typename T, Tn2StrConversionProcess CONV_PROCESS>
   struct isSupported_Tn2StrConversionProcess
       // NOTE: validConversionProcesses() is inclusive of isBumpedTypeN2SConversionAvailable<>::true_type
     : std::bool_constant < check_any_of( DefaultTn2Str<T>::validConversionProcesses(),
-                                         static_cast<typename DefaultTn2Str<T>::e_ConversionProcess>(CONV_PROCESS)   //  static_cast needed for windows-*:msvc  combination
+                                         static_cast<Tn2StrConversionProcess>(CONV_PROCESS)   //  static_cast needed for windows-*:msvc  combination
                                        ) > {};
 
 
@@ -411,7 +411,7 @@ namespace converter
 
 
 
-  template <typename T, typename DefaultTn2Str<T>::e_ConversionProcess CONV_PROCESS >
+  template <typename T, Tn2StrConversionProcess CONV_PROCESS >
           requires ( isSupported_Tn2StrConversionProcess<T, CONV_PROCESS>::value )
   struct FormatInfo< T, CONV_PROCESS >
   {
@@ -676,7 +676,7 @@ namespace converter
    *          then delegate the call to T's super-type.
    */
   template< c_arithmetic T,
-            typename DefaultTn2Str<T>::e_ConversionProcess CONV_PROCESS >
+            Tn2StrConversionProcess CONV_PROCESS >
           requires ( isBumpedTypeN2SConversionAvailable<T, CONV_PROCESS>::value )
   struct ConvertFromVal<T, CONV_PROCESS>
   {
