@@ -476,13 +476,20 @@ function(check_floatingPoint_elementaryStringConversions)
 endfunction()
 
 
-function(diagnostic_template_template_parameter  TEMPLATE_TEMPLATE_PARAMETER   FUNCTION_RETURN)
+set(DIAGNOSTIC_RESULT_FOLDER "${CMAKE_CURRENT_BINARY_DIR}/workAroundFlags") # also used in github yaml file(S)
+set(DIAGNOSTIC_TEMPLATE_TEMPLATE_PARAMETER_FILE "${DIAGNOSTIC_RESULT_FOLDER}/check_template_template_parameter_output.txt")
+
+function(diagnostic_template_template_parameter
+             TEMPLATE_TEMPLATE_PARAMETER
+             OS_DESCRIPTION
+             FUNCTION_RETURN)
+    message(STATUS "::OS_DESCRIPTION=${OS_DESCRIPTION}")
     try_run    (RUN_RESULT_TEMPLATE_TEMPLATE_PARAMETER
                 COMPILE_RESULT_TEMPLATE_TEMPLATE_PARAMETER
                 SOURCE_FROM_FILE    diagnostic_template_template_parameter.cpp
                                     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/diagnostic_template_template_parameter.cpp"
                 COMPILE_DEFINITIONS "-DTEMPLATE_CONSTRAINT=${TEMPLATE_TEMPLATE_PARAMETER}"
-                ARGS "${CMAKE_SYSTEM}" "${CMAKE_CXX_COMPILER_ID}-${CMAKE_CXX_COMPILER_VERSION}"    # OS COMPILER argument
+                ARGS "'${OS_DESCRIPTION}'" "${CMAKE_CXX_COMPILER_ID}-${CMAKE_CXX_COMPILER_VERSION}"    # OS COMPILER argument
                 CXX_STANDARD "${CMAKE_CXX_STANDARD}"
                 CXX_STANDARD_REQUIRED True
                 LOG_DESCRIPTION "run-check: diagnostic_template_template_parameter.cpp"
@@ -500,7 +507,7 @@ function(diagnostic_template_template_parameter  TEMPLATE_TEMPLATE_PARAMETER   F
         )
       )
         message(STATUS "diagnostic_template_template_parameter ::  ++SUCCESS++\n${LOG_RUN_STDOUT_TTP}\n${LOG_RUN_STDERR_TTP}")
-        file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/check_template_template_parameter_output.txt" "${LOG_RUN_STDERR_TTP}")
+        file(APPEND "${DIAGNOSTIC_TEMPLATE_TEMPLATE_PARAMETER_FILE}" "${LOG_RUN_STDERR_TTP}")
         set(FUNCTION_RETURN    ${e_ENABLE_FEATURE} PARENT_SCOPE)
     else()
         message(STATUS "diagnostic_template_template_parameter ::  --FAILED--")
@@ -513,13 +520,73 @@ function(diagnostic_template_template_parameter  TEMPLATE_TEMPLATE_PARAMETER   F
 
 endfunction()
 
+
+function(get_os_description OUTPUT_VARIABLE)
+    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        if(EXISTS "/etc/os-release")
+            file(STRINGS "/etc/os-release" OS_RELEASE_LINES)
+
+            foreach(line IN LISTS OS_RELEASE_LINES)
+                if(line MATCHES "^PRETTY_NAME=(.*)$")
+                    set(OS_DESCRIPTION "${CMAKE_MATCH_1}")
+                    string(REPLACE "\"" "" OS_DESCRIPTION "${OS_DESCRIPTION}")
+                    break()
+                endif()
+            endforeach()
+        else()
+            set(OS_DESCRIPTION "${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_VERSION}")
+        endif()
+
+    elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+
+        execute_process(
+            COMMAND sw_vers -productName
+            COMMAND tr -d "\n"
+            OUTPUT_VARIABLE OS_NAME
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+
+        execute_process(
+            COMMAND sw_vers -productVersion
+            OUTPUT_VARIABLE OS_VERSION
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+
+        set(OS_DESCRIPTION "${OS_NAME}-${OS_VERSION}")
+
+    elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+
+        set(OS_DESCRIPTION "${CMAKE_SYSTEM}")
+
+    else()
+
+        set(OS_DESCRIPTION "${CMAKE_SYSTEM}")
+
+    endif()
+
+    set(${OUTPUT_VARIABLE} "${OS_DESCRIPTION}" PARENT_SCOPE)
+
+endfunction()
+
+
 # check extent of compiler support "template_template_parameter"
 function(check_template_template_parameter)
-    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/check_template_template_parameter_output.txt"
+    get_os_description(OS_DESCRIPTION)
+    message(STATUS "OS_DESCRIPTION=${OS_DESCRIPTION}")
+    file(WRITE "${DIAGNOSTIC_TEMPLATE_TEMPLATE_PARAMETER_FILE}"
                "_OS,compiler,TEMPLATE_CONSTRAINT,Consumer_AllTypesAllEnum,Consumer_AllTypesConstrEnum,Consumer_ArithmTypesAllEnum,Consumer_ArithmTypesConstrEnum,Consumer_ArithmTypesAllEnum2,Consumer_ArithmTypesConstrEnum2\n")
-    diagnostic_template_template_parameter(CONSTRAINED_DIRECT_TEMPLATE_TEMPLATE_MATCHING FUNCTION_RETURN)
+    diagnostic_template_template_parameter(
+        CONSTRAINED_DIRECT_TEMPLATE_TEMPLATE_MATCHING
+        "${OS_DESCRIPTION}"
+        FUNCTION_RETURN)
     if(FUNCTION_RETURN EQUAL 0)
-        diagnostic_template_template_parameter(CONSTRAINED_DIRECT_TEMPLATE_TEMPLATE_MATCHING_LIMITED FUNCTION_RETURN)
-        diagnostic_template_template_parameter(CONSTRAINED_PARTIAL_SPECIALIZATION FUNCTION_RETURN)
+        diagnostic_template_template_parameter(
+            CONSTRAINED_DIRECT_TEMPLATE_TEMPLATE_MATCHING_LIMITED
+            "${OS_DESCRIPTION}"
+            FUNCTION_RETURN)
+        diagnostic_template_template_parameter(
+            CONSTRAINED_PARTIAL_SPECIALIZATION
+            "${OS_DESCRIPTION}"
+            FUNCTION_RETURN)
     endif()
 endfunction()

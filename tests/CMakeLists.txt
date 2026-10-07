@@ -107,7 +107,7 @@ if(CMAKE_BUILD_TYPE MATCHES "Debug")
   add_test(NAME diagnostic_template_template_parameter
            COMMAND "${PROJECT_BINARY_DIR}/tests/diagnostic_template_template_parameter" "${CMAKE_SYSTEM}" "${CMAKE_CXX_COMPILER_ID}-${CMAKE_CXX_COMPILER_VERSION}")
 endif()
-add_unit_test(diagnostic_template_template_parameter)
+##add_unit_test(diagnostic_template_template_parameter)
 #]==================]
 
 add_unit_test(diagnostic_get_name)

@@ -379,8 +379,8 @@ namespace converter
 
 
   template <  typename T,
-              Str2TnConversionProcess CONV_PROCESS = DefaultStr2Tn<T>::validConversionProcesses()[0],
-              Str2TnErrorHandler ERR_HANDLER = DefaultStr2Tn<T>::validErrorHandlers()[0]  >
+              typename DefaultStr2Tn<T>::e_ConversionProcess CONV_PROCESS = DefaultStr2Tn<T>::validConversionProcesses()[0],
+              typename DefaultStr2Tn<T>::e_ErrorHandler ERR_HANDLER = DefaultStr2Tn<T>::validErrorHandlers()[0]  >
   struct ConvertFromStr
   {
     constexpr static size_t templateId = 0;
@@ -495,7 +495,7 @@ namespace converter
 
 
 
-  template <typename T, Str2TnConversionProcess CONV_PROCESS >
+  template <typename T, typename DefaultStr2Tn<T>::e_ConversionProcess CONV_PROCESS >
           requires ( isSupported_Str2TnConversionProcess<T, CONV_PROCESS>::value )
   struct FormatInfo< T, CONV_PROCESS >
   {
@@ -604,7 +604,7 @@ namespace converter
 
 
 
-  template < c_isFromCharsSupported T, Str2TnErrorHandler ERR_HANDLER >
+  template < c_isFromCharsSupported T, typename DefaultStr2Tn<T>::e_ErrorHandler ERR_HANDLER >
           requires ( isSupported_Str2TnErrorHandler<T, ERR_HANDLER>::value &&
                      isSupported_Str2TnConversionProcess<T, Str2TnConversionProcess::FROM_CHARS>::value )
   struct ConvertFromStr< T, Str2TnConversionProcess::FROM_CHARS, ERR_HANDLER >
@@ -666,7 +666,7 @@ namespace converter
     }
   };
 
-  template < c_isExtractableFromStream T, Str2TnErrorHandler ERR_HANDLER >
+  template < c_isExtractableFromStream T, typename DefaultStr2Tn<T>::e_ErrorHandler ERR_HANDLER >
           requires ( isSupported_Str2TnErrorHandler<T, ERR_HANDLER>::value &&
                      isSupported_Str2TnConversionProcess<T, Str2TnConversionProcess::STRINGSTREAM>::value )
   struct ConvertFromStr< T, Str2TnConversionProcess::STRINGSTREAM, ERR_HANDLER >
@@ -758,7 +758,7 @@ namespace converter
 
 
 
-  template< c_isS2NumSupported T, Str2TnErrorHandler ERR_HANDLER>
+  template< c_isS2NumSupported T, typename DefaultStr2Tn<T>::e_ErrorHandler ERR_HANDLER >
           requires ( c_integral<T> &&
                      isSupported_Str2TnErrorHandler<T, ERR_HANDLER>::value &&
                      isSupported_Str2TnConversionProcess<T, Str2TnConversionProcess::S2N>::value )
@@ -829,7 +829,7 @@ namespace converter
     }
   };
 
-  template < c_isS2NumSupported T, Str2TnErrorHandler ERR_HANDLER >
+  template < c_isS2NumSupported T, typename DefaultStr2Tn<T>::e_ErrorHandler ERR_HANDLER >
           requires ( c_floating_point<T> &&
                      isSupported_Str2TnErrorHandler<T, ERR_HANDLER>::value &&
                      isSupported_Str2TnConversionProcess<T, Str2TnConversionProcess::S2N>::value )
@@ -931,7 +931,9 @@ namespace converter
    *          then delegate the call to T's super-type.
    * @tparam  ERR_HANDLER             enum variable of type Str2TnErrorHandler.
    */
-  template< c_arithmetic T, Str2TnConversionProcess CONV_PROCESS, Str2TnErrorHandler ERR_HANDLER>
+  template< c_arithmetic T,
+            typename DefaultStr2Tn<T>::e_ConversionProcess CONV_PROCESS,
+            typename DefaultStr2Tn<T>::e_ErrorHandler ERR_HANDLER >
           requires ( isSupported_Str2TnErrorHandler<T, ERR_HANDLER>::value    &&
                      isBumpedTypeS2NConversionAvailable<T, CONV_PROCESS>::value )
   struct ConvertFromStr<T, CONV_PROCESS, ERR_HANDLER >
@@ -1065,7 +1067,7 @@ namespace converter
    * @brief     Specialized implementation handling string to char conversion.
    * @tparam  CH                     'char-type' converted to, from string data.
    */
-  template<c_char CH, Str2TnErrorHandler ERR_HANDLER>
+  template<c_char CH, typename DefaultStr2Tn<CH>::e_ErrorHandler ERR_HANDLER >
           requires ( isSupported_Str2TnErrorHandler<CH, ERR_HANDLER>::value &&
                      isSupported_Str2TnConversionProcess<CH, Str2TnConversionProcess::SPECIALIZED_IMPLEMENTATION>::value )
   struct ConvertFromStr< CH, Str2TnConversionProcess::SPECIALIZED_IMPLEMENTATION, ERR_HANDLER >

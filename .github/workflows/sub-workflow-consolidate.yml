@@ -41,6 +41,7 @@ jobs:
       - name: Create Work-Around-Flags Directory
         run: |
           FLAG_DIR="${{github.workspace}}/build-debug/workAroundFlags"
+          # FLAG_DIR also used for check_template_template_parameter_output.txt; refer converter-capabilities.cmake
           mkdir -p ${FLAG_DIR}
 
 
@@ -73,23 +74,41 @@ jobs:
         #continue-on-error: true
 
 
-      - name: List Downloaded Artifacts
+      - name: List Downloaded Flag Artifacts
         run: |
-          echo "Artifacts downloaded: "$(ls -l "${{github.workspace}}/build-debug/workAroundFlags/" | grep -v "^total " | wc -l)
-          ls -R "${{github.workspace}}/build-debug/workAroundFlags/" || echo "No artifacts found"
+          echo "Artifacts Flag downloaded: "$(ls -l "${{github.workspace}}/build-debug/workAroundFlags/flag-*" | grep -v "^total " | wc -l)
+          ls -R "${{github.workspace}}/build-debug/workAroundFlags/flag-*" || echo "No artifacts found"
 
-      - name: Consolidate Artifacts and Merge
+      - name: Consolidate Flag Artifacts and Merge
         run: |
           # Enable nullglob so an unmatched glob expands to nothing instead of the literal pattern
           shopt -s nullglob
           files=("${{github.workspace}}/build-debug/workAroundFlags/flag-"*.csv)
-          sort -u "${files[@]}" > "${{github.workspace}}/doc/consolidateWorkAroundFlags.csv"
-          cat "${{github.workspace}}/doc/consolidateWorkAroundFlags.csv"
+          sort -u "${files[@]}" > "${{github.workspace}}/doc/github/runnerResults/consolidateWorkAroundFlags.csv"
+          cat "${{github.workspace}}/doc/github/runnerResults/consolidateWorkAroundFlags.csv"
+
+
+      - name: List Downloaded TTP Artifacts
+        run: |
+          echo "Artifacts TTP downloaded: "$(ls -l "${{github.workspace}}/build-debug/workAroundFlags/diagnostic-TTP-*" | grep -v "^total " | wc -l)
+          ls -R "${{github.workspace}}/build-debug/workAroundFlags/diagnostic-TTP-*" || echo "No artifacts found"
+
+      - name: Consolidate TTP Artifacts and Merge
+        run: |
+          # Enable nullglob so an unmatched glob expands to nothing instead of the literal pattern
+          shopt -s nullglob
+          files=("${{github.workspace}}/build-debug/workAroundFlags/diagnostic-TTP-"*.csv)
+          sort -u "${files[@]}" > "${{github.workspace}}/doc/github/runnerResults/consolidateDiagnosticTTP.csv"
+          cat "${{github.workspace}}/doc/github/runnerResults/consolidateDiagnosticTTP.csv"
+
+
+
 
       - name: GIT Commit and Push Changes
         run: |
           PR_BRANCH="automation/build-flags"
-          TARGET_FILE="${{github.workspace}}/doc/consolidateWorkAroundFlags.csv"
+          TARGET_FLAGS_FILE="${{github.workspace}}/doc/github/runnerResults/consolidateWorkAroundFlags.csv"
+          TARGET_TTP_FILE="${{github.workspace}}/doc/github/runnerResults/consolidateDiagnosticTTP.csv"
 
           # 1. Configure Git using the standard GitHub Actions bot identity
           git config --global user.name "github-actions[bot]"
@@ -109,11 +128,11 @@ jobs:
             git checkout -b "${PR_BRANCH}"
           fi
 
-          git add ${TARGET_FILE}
+          git add ${TARGET_FLAGS_FILE} ${TARGET_TTP_FILE}
 
           # Only commit and push if there are actual changes to prevent workflow errors
           if ! git diff --cached --quiet; then
-            git commit -m "chore: automatically update consolidateWorkAroundFlags.csv [skip ci]"
+            git commit -m "chore: automatically update consolidateWorkAroundFlags.csv and consolidateDiagnosticTTP.csv [skip ci]"
             git push origin "${PR_BRANCH}"
           else
             echo "No changes detected. Skipping commit."

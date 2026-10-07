@@ -349,9 +349,9 @@ namespace converter
 
       if (format_ss.hasLocParam())
       {
-        return workaround::DateAdapterT2S<t_datelibTo>::format<FmtStr.data>( format_ss.getLoc(), val );
+        return workaround::DateAdapterT2S<t_datelibTo>::format<FmtStr>( format_ss.getLoc(), val );
       } else {
-        return workaround::DateAdapterT2S<t_datelibTo>::format<FmtStr.data>( val );
+        return workaround::DateAdapterT2S<t_datelibTo>::format<FmtStr>( val );
       }
     }
 

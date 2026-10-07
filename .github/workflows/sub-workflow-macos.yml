@@ -88,13 +88,22 @@ jobs:
           echo "_OS,compiler,"$(grep "#define"  "${{github.workspace}}/build-debug/include/converter/_workaroundConfig.h" | sed "s/  */ /g" | cut -d' ' -f2,3 | grep -e "^SUPPORTED_" -e "^HAS_" -e "^ENABLE_" | cut -d' ' -f1 | tr '\n' ',' | sed 's/,$/\n/g')  >  "${FLAG_FILE}"
           echo "${{matrix.os}},${{matrix.compiler}},"$(grep "#define"  "${{github.workspace}}/build-debug/include/converter/_workaroundConfig.h" | sed "s/  */ /g" | cut -d' ' -f2,3 | grep -e "^SUPPORTED_" -e "^HAS_" -e "^ENABLE_" | cut -d' ' -f2 | tr '\n' ',' | sed 's/,$/\n/g')  >>  "${FLAG_FILE}"
           cat "${FLAG_FILE}"
+          DIAGNOSTIC_TTP_FILE="${FLAG_DIR}/diagnostic-TTP-${{matrix.os}}-${{matrix.compiler}}.csv"
+          mv "${FLAG_DIR}/check_template_template_parameter_output.txt" "${DIAGNOSTIC_TTP_FILE}"
 
-      - name: Upload Artifact from Sub-Workflow
+      - name: Upload Consolidate-WorkAround-Flags Artifact from Sub-Workflow
         uses: actions/upload-artifact@v4
         with:
-          name: "artifact-${{matrix.os}}-${{matrix.compiler}}"
+          name: "artifact-flag-${{matrix.os}}-${{matrix.compiler}}"
           path: "build-debug/workAroundFlags/flag-${{matrix.os}}-${{matrix.compiler}}.csv"
+          if-no-files-found: error
 
+      - name: Upload Consolidate-Diagnostic-TTP Artifact from Sub-Workflow
+        uses: actions/upload-artifact@v4
+        with:
+          name: "artifact-ttp-${{matrix.os}}-${{matrix.compiler}}"
+          path: "build-debug/workAroundFlags/diagnostic-TTP-${{matrix.os}}-${{matrix.compiler}}.csv"
+          if-no-files-found: error
 
       - name: Show compile commands [Debug]
         run: cat build-debug/compile_commands.json
