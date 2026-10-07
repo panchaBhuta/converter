@@ -42,6 +42,11 @@ jobs:
         run: |
           PR_BRANCH="automation/build-flags"
 
+          # 1. Configure Git using the standard GitHub Actions bot identity
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # 2. Safely switch to the PR branch (create it locally if it only exists remotely, or create from scratch)
           git fetch origin
 
           if git show-ref --verify --quiet "refs/remotes/origin/${PR_BRANCH}"; then
@@ -126,10 +131,6 @@ jobs:
           PR_BRANCH="automation/build-flags"
           TARGET_FLAGS_FILE="${{github.workspace}}/doc/github/runnerResults/consolidateWorkAroundFlags.csv"
           TARGET_TTP_FILE="${{github.workspace}}/doc/github/runnerResults/consolidateDiagnosticTTP.csv"
-
-          # 1. Configure Git using the standard GitHub Actions bot identity
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git add ${TARGET_FLAGS_FILE} ${TARGET_TTP_FILE}
 
