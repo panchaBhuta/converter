@@ -574,7 +574,7 @@ function(check_template_template_parameter)
     get_os_description(OS_DESCRIPTION)
     message(STATUS "OS_DESCRIPTION=${OS_DESCRIPTION}")
     file(WRITE "${DIAGNOSTIC_TEMPLATE_TEMPLATE_PARAMETER_FILE}"
-               "_OS,compiler,TEMPLATE_CONSTRAINT,Consumer_AllTypesAllEnum,Consumer_AllTypesConstrEnum,Consumer_ArithmTypesAllEnum,Consumer_ArithmTypesConstrEnum,Consumer_ArithmTypesAllEnum2,Consumer_ArithmTypesConstrEnum2\n")
+               "#OS,compiler,TEMPLATE_CONSTRAINT,Consumer_AllTypesAllEnum,Consumer_AllTypesConstrEnum,Consumer_ArithmTypesAllEnum,Consumer_ArithmTypesConstrEnum,Consumer_ArithmTypesAllEnum2,Consumer_ArithmTypesConstrEnum2\n")
     diagnostic_template_template_parameter(
         CONSTRAINED_DIRECT_TEMPLATE_TEMPLATE_MATCHING
         "${OS_DESCRIPTION}"

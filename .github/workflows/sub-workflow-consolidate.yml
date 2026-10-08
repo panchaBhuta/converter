@@ -106,7 +106,11 @@ jobs:
           # Enable nullglob so an unmatched glob expands to nothing instead of the literal pattern
           shopt -s nullglob
           files=("${{github.workspace}}/build-debug/workAroundFlags/flag-"*.csv)
-          sort -u "${files[@]}" > "${{github.workspace}}/doc/github/runnerResults/consolidateWorkAroundFlags.csv"
+
+          # Normalize Windows CRLF line endings before sorting
+          sed -i 's/\r$//' "${files[@]}"
+
+          LC_ALL=C sort -u "${files[@]}" > "${{github.workspace}}/doc/github/runnerResults/consolidateWorkAroundFlags.csv"
           cat "${{github.workspace}}/doc/github/runnerResults/consolidateWorkAroundFlags.csv"
 
 
@@ -120,7 +124,11 @@ jobs:
           # Enable nullglob so an unmatched glob expands to nothing instead of the literal pattern
           shopt -s nullglob
           files=("${{github.workspace}}/build-debug/workAroundFlags/diagnostic-TTP-"*.csv)
-          sort -u "${files[@]}" > "${{github.workspace}}/doc/github/runnerResults/consolidateDiagnosticTTP.csv"
+
+          # Normalize Windows CRLF line endings before sorting
+          sed -i 's/\r$//' "${files[@]}"
+
+          LC_ALL=C sort -u "${files[@]}" > "${{github.workspace}}/doc/github/runnerResults/consolidateDiagnosticTTP.csv"
           cat "${{github.workspace}}/doc/github/runnerResults/consolidateDiagnosticTTP.csv"
 
 

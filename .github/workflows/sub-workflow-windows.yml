@@ -191,7 +191,7 @@ jobs:
           FLAG_DIR="${{ github.workspace }}/build-debug/workAroundFlags"
           mkdir -p ${FLAG_DIR}
           FLAG_FILE="${FLAG_DIR}/flag-${{ matrix.os-generator.os }}-${{ matrix.toolset_compiler.compiler }}.csv"
-          echo "_OS,compiler,"$(grep "#define"  "${{ github.workspace }}/build-debug/include/converter/_workaroundConfig.h" | sed "s/  */ /g" | cut -d' ' -f2,3 | grep -e "^SUPPORTED_" -e "^HAS_" -e "^ENABLE_" | cut -d' ' -f1 | tr '\n' ',' | sed 's/,$/\n/g')  >  "${FLAG_FILE}"
+          echo "#OS,compiler,"$(grep "#define"  "${{ github.workspace }}/build-debug/include/converter/_workaroundConfig.h" | sed "s/  */ /g" | cut -d' ' -f2,3 | grep -e "^SUPPORTED_" -e "^HAS_" -e "^ENABLE_" | cut -d' ' -f1 | tr '\n' ',' | sed 's/,$/\n/g')  >  "${FLAG_FILE}"
           echo "${{ matrix.os-generator.os }},${{ matrix.toolset_compiler.compiler }},"$(grep "#define"  "${{ github.workspace }}/build-debug/include/converter/_workaroundConfig.h" | sed "s/  */ /g" | cut -d' ' -f2,3 | grep -e "^SUPPORTED_" -e "^HAS_" -e "^ENABLE_" | cut -d' ' -f2 | tr '\n' ',' | sed 's/,$/\n/g')  >>  "${FLAG_FILE}"
           cat "${FLAG_FILE}"
           DIAGNOSTIC_TTP_FILE="${FLAG_DIR}/diagnostic-TTP-${{ matrix.os-generator.os }}-${{ matrix.toolset_compiler.compiler }}.csv"
@@ -204,7 +204,7 @@ jobs:
           FLAG_DIR="${{ github.workspace }}/build-debug/workAroundFlags"
           mkdir -p ${FLAG_DIR}
           FLAG_FILE="${FLAG_DIR}/flag-${{ matrix.os-generator.os }}-${{ matrix.toolset_compiler.compiler }}.csv"
-          echo "_OS,compiler,"$(grep "#define"  "${{ github.workspace }}/build-debug/include/converter/_workaroundConfig.h" | sed "s/  */ /g" | cut -d' ' -f2,3 | grep -e "^SUPPORTED_" -e "^HAS_" -e "^ENABLE_" | cut -d' ' -f1 | tr '\n' ',' | sed 's/,$/\n/g')  >  "${FLAG_FILE}"
+          echo "#OS,compiler,"$(grep "#define"  "${{ github.workspace }}/build-debug/include/converter/_workaroundConfig.h" | sed "s/  */ /g" | cut -d' ' -f2,3 | grep -e "^SUPPORTED_" -e "^HAS_" -e "^ENABLE_" | cut -d' ' -f1 | tr '\n' ',' | sed 's/,$/\n/g')  >  "${FLAG_FILE}"
           echo "${{ matrix.os-generator.os }},${{ matrix.toolset_compiler.compiler }},"$(grep "#define"  "${{ github.workspace }}/build-debug/include/converter/_workaroundConfig.h" | sed "s/  */ /g" | cut -d' ' -f2,3 | grep -e "^SUPPORTED_" -e "^HAS_" -e "^ENABLE_" | cut -d' ' -f2 | tr '\n' ',' | sed 's/,$/\n/g')  >>  "${FLAG_FILE}"
           cat "${FLAG_FILE}"
           DIAGNOSTIC_TTP_FILE="${FLAG_DIR}/diagnostic-TTP-${{ matrix.os-generator.os }}-${{ matrix.toolset_compiler.compiler }}.csv"
