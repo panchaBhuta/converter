@@ -122,12 +122,12 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v7
 
-      # NOTE: a step's own `shell:` key cannot reference the `matrix` context
-      #       (GitHub Actions limitation - see actions/runner#444). That rules out
-      #       `shell: ${{ matrix.toolset_compiler.utilitiesShell }}` on a single step.
-      #       Split into two steps instead, selected via `if:`, which IS allowed
-      #       to use `matrix`.
-      - name: Get Version (compiler=default OR ClangCl)    -   cmdShell( bash )
+      - name: Get CMAKE Version (compiler=default OR ClangCl)    -   cmdShell( bash )
+        # NOTE: a step's own `shell:` key cannot reference the `matrix` context
+        #       (GitHub Actions limitation - see actions/runner#444). That rules out
+        #       `shell: ${{ matrix.toolset_compiler.utilitiesShell }}` on a single step.
+        #       Split into two steps instead, selected via `if:`, which IS allowed
+        #       to use `matrix`.
         if: matrix.toolset_compiler.compiler != 'g++'
         shell: bash
         run: |
@@ -139,7 +139,7 @@ jobs:
             ${{ matrix.toolset_compiler.compilerMacros }} | egrep -i "(apple|mach|gnu|clang|llvm|linux|WIN|version|major|minor)"
           fi
 
-      - name: Get Version (compiler=g++)     -   cmdShell( "msys2 {0}" )
+      - name: Get CMAKE Version (compiler=g++)     -   cmdShell( "msys2 {0}" )
         if: matrix.toolset_compiler.compiler == 'g++'
         run: |
           uname -a
@@ -153,7 +153,9 @@ jobs:
         run: cmake --help
 
       - name: Compiler Macros Available
-        run: ${{ matrix.toolset_compiler.compilerMacros }}
+        run: |
+          ${{ matrix.toolset_compiler.compilerMacros }}
+
       #- name: Check mingw64-binaries
         #run: ls -l /mnt/c/msys64/mingw64/bin && echo "##### 'whereis g++'" && whereis g++ && "##### 'g++ --version'" && g++ --version
         #run: echo "##### 'where g++'" && where g++
@@ -170,18 +172,18 @@ jobs:
         # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idif
         if: matrix.toolset_compiler.compiler == 'default'
         run: |
-          cmake --log-level=TRACE -G "${{ matrix.os-generator.generator }}" -A ${{ matrix.os-generator.arch }} -S "${{ github.workspace }}" -B "${{ github.workspace }}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug
+          cmake --log-level=TRACE -G "${{ matrix.os-generator.generator }}" -A ${{ matrix.os-generator.arch }} -S "${{ github.workspace }}" -B "${{ github.workspace }}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DGITHUB_OS_ID=${{ matrix.os-generator.os }} -DGITHUB_COMPILER_ID=${{ matrix.toolset_compiler.compiler }}
 
       - name: Configure CMake (compiler=g++) [Debug]
         if: matrix.toolset_compiler.compiler == 'g++'
         run: |
-          cmake -G "${{ matrix.os-generator.generatorGCC }}" -S "${{ github.workspace }}" -B "${{ github.workspace }}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=${{ matrix.toolset_compiler.compiler }}
+          cmake -G "${{ matrix.os-generator.generatorGCC }}" -S "${{ github.workspace }}" -B "${{ github.workspace }}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DGITHUB_OS_ID=${{ matrix.os-generator.os }} -DGITHUB_COMPILER_ID=${{ matrix.toolset_compiler.compiler }} -DCMAKE_CXX_COMPILER=${{ matrix.toolset_compiler.compiler }}
 
       - name: Configure CMake (compiler=ClangCl) [Debug]
         # https://cmake.org/cmake/help/latest/guide/user-interaction/index.html
         if: matrix.toolset_compiler.compiler == 'ClangCl'
         run: |
-          cmake --log-level=TRACE -G "${{ matrix.os-generator.generator }}" -A ${{ matrix.os-generator.arch }} -S "${{ github.workspace }}" -B "${{ github.workspace }}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -T "${{ matrix.toolset_compiler.compiler }}"
+          cmake --log-level=TRACE -G "${{ matrix.os-generator.generator }}" -A ${{ matrix.os-generator.arch }} -S "${{ github.workspace }}" -B "${{ github.workspace }}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DGITHUB_OS_ID=${{ matrix.os-generator.os }} -DGITHUB_COMPILER_ID=${{ matrix.toolset_compiler.compiler }} -T "${{ matrix.toolset_compiler.compiler }}"
 
       - name: Check Work-Around-Flags (compiler=default OR ClangCl)    -   cmdShell( bash )
         if: matrix.toolset_compiler.compiler != 'g++'
@@ -202,7 +204,7 @@ jobs:
         run: |
           grep define "${{ github.workspace }}/build-debug/include/converter/_workaroundConfig.h" | grep -v -e "^//" -e " e_[^ ]*_FEATURE "
           FLAG_DIR="${{ github.workspace }}/build-debug/workAroundFlags"
-          mkdir -p ${FLAG_DIR}
+          mkdir -p   ${FLAG_DIR}
           FLAG_FILE="${FLAG_DIR}/flag-${{ matrix.os-generator.os }}-${{ matrix.toolset_compiler.compiler }}.csv"
           echo "#OS,compiler,"$(grep "#define"  "${{ github.workspace }}/build-debug/include/converter/_workaroundConfig.h" | sed "s/  */ /g" | cut -d' ' -f2,3 | grep -e "^SUPPORTED_" -e "^HAS_" -e "^ENABLE_" | cut -d' ' -f1 | tr '\n' ',' | sed 's/,$/\n/g')  >  "${FLAG_FILE}"
           echo "${{ matrix.os-generator.os }},${{ matrix.toolset_compiler.compiler }},"$(grep "#define"  "${{ github.workspace }}/build-debug/include/converter/_workaroundConfig.h" | sed "s/  */ /g" | cut -d' ' -f2,3 | grep -e "^SUPPORTED_" -e "^HAS_" -e "^ENABLE_" | cut -d' ' -f2 | tr '\n' ',' | sed 's/,$/\n/g')  >>  "${FLAG_FILE}"
@@ -230,11 +232,13 @@ jobs:
       - name: Build compiler == cl.exe OR ClangCl [Debug]
         if: matrix.toolset_compiler.cmdShell == 'cmd'
         #  https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild-command-line-reference?view=vs-2022
-        run: cmake --build "${{ github.workspace }}/build-debug" --config Debug -j %NUMBER_OF_PROCESSORS%   -- -m -nologo -verbosity:normal
+        run: |
+          cmake --build "${{ github.workspace }}/build-debug" --config Debug -j %NUMBER_OF_PROCESSORS%   -- -m -nologo -verbosity:normal
 
       - name: Build compiler == g++ [Debug]
         if: matrix.toolset_compiler.compiler == 'g++'
-        run: cmake --build "${{ github.workspace }}/build-debug" --config Debug -j$(nproc)
+        run: |
+          cmake --build "${{ github.workspace }}/build-debug" --config Debug -j$(nproc)
 
       - name: Test [Debug]
         working-directory: ${{ github.workspace }}/build-debug
@@ -242,7 +246,8 @@ jobs:
         run: ctest -C Debug --verbose
 
       - name: Install [Debug]
-        run: cmake --install "${{ github.workspace }}/build-debug" --config Debug
+        run: |
+          cmake --install "${{ github.workspace }}/build-debug" --config Debug
 
       - name: Configure CMake (compiler=default) [Release]
         if: matrix.toolset_compiler.compiler == 'default'
@@ -261,16 +266,20 @@ jobs:
 
       - name: Build compiler == cl.exe OR ClangCl [Release]
         if: matrix.toolset_compiler.cmdShell == 'cmd'
-        run: cmake --build "${{ github.workspace }}/build-release" --config Release -j %NUMBER_OF_PROCESSORS%   -- -m -nologo -verbosity:normal
+        run: |
+          cmake --build "${{ github.workspace }}/build-release" --config Release -j %NUMBER_OF_PROCESSORS%   -- -m -nologo -verbosity:normal
 
       - name: Build compiler == g++ [Release]
         if: matrix.toolset_compiler.compiler == 'g++'
-        run: cmake --build "${{ github.workspace }}/build-release" --config Release -j$(nproc)
+        run: |
+          cmake --build "${{ github.workspace }}/build-release" --config Release -j$(nproc)
 
       - name: Test [Release]
         working-directory: ${{ github.workspace }}/build-release
-        run: ctest -C Release --verbose
+        run: |
+          ctest -C Release --verbose
 
       - name: Install [Release]
-        run: cmake --install "${{ github.workspace }}/build-release" --config Release
+        run: |
+          cmake --install "${{ github.workspace }}/build-release" --config Release
 

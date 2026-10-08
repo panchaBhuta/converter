@@ -57,7 +57,7 @@ jobs:
             git merge origin/main --no-edit
           else
             echo "Branch does not exist. Creating a new one from main..."
-            git checkout -b "${PR_BRANCH}"
+            git checkout -b "${PR_BRANCH}" origin/main
           fi
 
       - name: Create Work-Around-Flags Directory
@@ -68,38 +68,21 @@ jobs:
 
 
 
-      # Download artifacts from Linux sub-workflow run
-      - name: Download Linux Sub-Workflow Artifacts
+      # Download artifacts from all sub-workflow runs
+      - name: Download Sub-Workflow Artifacts
         uses: actions/download-artifact@v5
         with:
           pattern: artifact-*
           path: build-debug/workAroundFlags/
           merge-multiple: true
-        continue-on-error: true
-
-      # Download artifacts from macOS sub-workflow run
-      - name: Download macOS Sub-Workflow Artifacts
-        uses: actions/download-artifact@v5
-        with:
-          pattern: artifact-*
-          path: build-debug/workAroundFlags/
-          merge-multiple: true
-        continue-on-error: true
-
-      # Download artifacts from Windows sub-workflow run
-      - name: Download Windows Sub-Workflow Artifacts
-        uses: actions/download-artifact@v5
-        with:
-          pattern: artifact-*
-          path: build-debug/workAroundFlags/
-          merge-multiple: true
-        #continue-on-error: true
 
 
       - name: List Downloaded Flag Artifacts
         run: |
-          echo "Artifacts Flag downloaded: "$(ls -l "${{github.workspace}}/build-debug/workAroundFlags/flag-*" | grep -v "^total " | wc -l)
-          ls -R "${{github.workspace}}/build-debug/workAroundFlags/flag-*" || echo "No artifacts found"
+          shopt -s nullglob
+          files=("${{github.workspace}}/build-debug/workAroundFlags/flag-"*.csv)
+          echo "Artifacts Flag downloaded: ${#files[@]}"
+          printf '%s\\n' "${files[@]}"
 
       - name: Consolidate Flag Artifacts and Merge
         run: |
@@ -116,8 +99,10 @@ jobs:
 
       - name: List Downloaded TTP Artifacts
         run: |
-          echo "Artifacts TTP downloaded: "$(ls -l "${{github.workspace}}/build-debug/workAroundFlags/diagnostic-TTP-*" | grep -v "^total " | wc -l)
-          ls -R "${{github.workspace}}/build-debug/workAroundFlags/diagnostic-TTP-*" || echo "No artifacts found"
+          shopt -s nullglob
+          files=("${{github.workspace}}/build-debug/workAroundFlags/diagnostic-TTP-"*.csv)
+          echo "Artifacts TTP downloaded: ${#files[@]}"
+          printf '%s\\n' "${files[@]}"
 
       - name: Consolidate TTP Artifacts and Merge
         run: |

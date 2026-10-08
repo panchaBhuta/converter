@@ -371,7 +371,7 @@ function(check_floatingPoint_types FILE_NAME AGGREGATE_RESULT)
         "${Aggregate_result}"
         PARENT_SCOPE)
 
-    message(STATUS "${FILE_NAME} Aggregate_result = ${AGGREGATE_RESULT}")
+    message(STATUS "${FILE_NAME} Aggregate_result = ${Aggregate_result}")
 
 endfunction()
 
@@ -419,7 +419,7 @@ function(check_floatingPoint_elementaryStringConversions)
     check_floatingPoint_types( check_floatingPoint_toChars.cpp   AGGREGATE_RESULT_FLOATINGPOINT_TO_CHARS )
 
 
-    if(  AGGREGATE_RESULT_FLOATINGPOINT_FROM_CHARS  )
+    if( NOT  AGGREGATE_RESULT_FLOATINGPOINT_FROM_CHARS  EQUAL 0 )
         message(STATUS "floatingPoint_fromChars algo ::  ENABLED")
         set(HAS_FLOATINGPOINT_FROM_CHARS   ${AGGREGATE_RESULT_FLOATINGPOINT_FROM_CHARS} PARENT_SCOPE)
     else()
@@ -482,6 +482,7 @@ set(DIAGNOSTIC_TEMPLATE_TEMPLATE_PARAMETER_FILE "${DIAGNOSTIC_RESULT_FOLDER}/che
 function(diagnostic_template_template_parameter
              TEMPLATE_TEMPLATE_PARAMETER
              OS_DESCRIPTION
+             COMPILER_DESCRIPTION
              FUNCTION_RETURN)
     message(STATUS "::OS_DESCRIPTION=${OS_DESCRIPTION}")
     try_run    (RUN_RESULT_TEMPLATE_TEMPLATE_PARAMETER
@@ -489,7 +490,7 @@ function(diagnostic_template_template_parameter
                 SOURCE_FROM_FILE    diagnostic_template_template_parameter.cpp
                                     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/diagnostic_template_template_parameter.cpp"
                 COMPILE_DEFINITIONS "-DTEMPLATE_CONSTRAINT=${TEMPLATE_TEMPLATE_PARAMETER}"
-                ARGS "'${OS_DESCRIPTION}'" "${CMAKE_CXX_COMPILER_ID}-${CMAKE_CXX_COMPILER_VERSION}"    # OS COMPILER argument
+                ARGS "'${OS_DESCRIPTION}'" "${COMPILER_DESCRIPTION}"    # OS COMPILER argument to compiled binary
                 CXX_STANDARD "${CMAKE_CXX_STANDARD}"
                 CXX_STANDARD_REQUIRED True
                 LOG_DESCRIPTION "run-check: diagnostic_template_template_parameter.cpp"
@@ -533,7 +534,9 @@ function(get_os_description OUTPUT_VARIABLE)
                     break()
                 endif()
             endforeach()
-        else()
+        endif()
+
+        if(NOT DEFINED OS_DESCRIPTION)
             set(OS_DESCRIPTION "${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_VERSION}")
         endif()
 
@@ -564,29 +567,45 @@ function(get_os_description OUTPUT_VARIABLE)
 
     endif()
 
-    set(${OUTPUT_VARIABLE} "${OS_DESCRIPTION}" PARENT_SCOPE)
+    if(DEFINED CACHE{GITHUB_OS_ID})
+        set(${OUTPUT_VARIABLE} "${GITHUB_OS_ID}:${OS_DESCRIPTION}" PARENT_SCOPE)
+    else()
+        set(${OUTPUT_VARIABLE} "${OS_DESCRIPTION}" PARENT_SCOPE)
+    endif()
 
+endfunction()
+
+function(get_compiler_description OUTPUT_VARIABLE)
+    if(DEFINED CACHE{GITHUB_COMPILER_ID})
+        set(${OUTPUT_VARIABLE} "${GITHUB_COMPILER_ID}:${CMAKE_CXX_COMPILER_ID}-${CMAKE_CXX_COMPILER_VERSION}"  PARENT_SCOPE)
+    else()
+        set(${OUTPUT_VARIABLE} "${CMAKE_CXX_COMPILER_ID}-${CMAKE_CXX_COMPILER_VERSION}"  PARENT_SCOPE)
+    endif()
 endfunction()
 
 
 # check extent of compiler support "template_template_parameter"
 function(check_template_template_parameter)
     get_os_description(OS_DESCRIPTION)
+    get_compiler_description(COMPILER_DESCRIPTION)
     message(STATUS "OS_DESCRIPTION=${OS_DESCRIPTION}")
     file(WRITE "${DIAGNOSTIC_TEMPLATE_TEMPLATE_PARAMETER_FILE}"
                "#OS,compiler,TEMPLATE_CONSTRAINT,Consumer_AllTypesAllEnum,Consumer_AllTypesConstrEnum,Consumer_ArithmTypesAllEnum,Consumer_ArithmTypesConstrEnum,Consumer_ArithmTypesAllEnum2,Consumer_ArithmTypesConstrEnum2\n")
     diagnostic_template_template_parameter(
         CONSTRAINED_DIRECT_TEMPLATE_TEMPLATE_MATCHING
         "${OS_DESCRIPTION}"
+        "${COMPILER_DESCRIPTION}"
         FUNCTION_RETURN)
     if(FUNCTION_RETURN EQUAL 0)
         diagnostic_template_template_parameter(
             CONSTRAINED_DIRECT_TEMPLATE_TEMPLATE_MATCHING_LIMITED
             "${OS_DESCRIPTION}"
+            "${COMPILER_DESCRIPTION}"
             FUNCTION_RETURN)
         diagnostic_template_template_parameter(
             CONSTRAINED_PARTIAL_SPECIALIZATION
             "${OS_DESCRIPTION}"
+            "${COMPILER_DESCRIPTION}"
             FUNCTION_RETURN)
     endif()
 endfunction()

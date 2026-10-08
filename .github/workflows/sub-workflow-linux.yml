@@ -12,6 +12,12 @@ on:
     # https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#workflow_dispatch
     # To enable a workflow to be triggered manually, you need to configure the workflow_dispatch event
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 #env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
@@ -25,12 +31,6 @@ defaults:
 jobs:
   build-ubuntu:
     name: Build
-    #env:
-    #  osComplier:
-    #    "ubuntu-24.04"     : [         g++-12, g++-13, g++-14,                                     clang++-16, clang++-17, clang++-18 ]
-    #    "ubuntu-24.04-arm" : [         g++-12, g++-13, g++-14,                                     clang++-16, clang++-17, clang++-18 ]
-    #    "ubuntu-22.04"     : [ g++-11, g++-12,                  clang++-13, clang++-14, clang++-15 ]  #        g++-10
-    #    "ubuntu-22.04-arm" : [ g++-11, g++-12, g++-13,          clang++-13, clang++-14, clang++-15 ]  # g++-9, g++-10
     strategy:
       fail-fast: false
       matrix:
@@ -89,9 +89,9 @@ jobs:
           { os: ubuntu-22.04-arm, compiler: clang++-17 },
           { os: ubuntu-22.04-arm, compiler: clang++-18 } ]
     runs-on: ${{matrix.os}}
-    timeout-minutes: 5
-    outputs:
-      run-id: ${{ github.run_id }}
+    timeout-minutes: 15
+    #outputs:
+    #  run-id: ${{ github.run_id }}
 
 
     steps:
@@ -99,75 +99,115 @@ jobs:
         run: |
           echo "g++ --version"; g++ --version; echo ""
           echo "clang++ --version"; clang++ --version; echo ""
-          COMPILER="${{matrix.compiler}}"
+          COMPILER="${{ matrix.compiler }}"
           if [ "${COMPILER}" == "default" ]; then
             COMPILER="g++"
           fi
           echo ""
-          echo "default:: ${COMPILER} --version"; ${COMPILER} --version
+          echo "${COMPILER} --version"; ${COMPILER} --version
 
       - name: Checkout Repo
         uses: actions/checkout@v7
 
-      - name: Get Version
-        run: uname -a && echo "------------" && cmake --version && echo "------------" ; bash -c 'COMPILER="${{matrix.compiler}}"; if [ "${COMPILER}" == "default" ]; then COMPILER="g++"; fi; ${COMPILER}  -dM -E -x c++ /dev/null | egrep -i "(apple|mach|gnu|clang|llvm|linux|WIN|version|major|minor)"'
+      - name: Get CMAKE Version
+        run: |
+          uname -a
+          echo "------------"
+          cmake --version
+          echo "------------"
+          COMPILER="${{ matrix.compiler }}"
+          if [ "${COMPILER}" == "default" ]; then
+            COMPILER="g++"
+          fi
+          ${COMPILER}  -std=c++20 -dM -E -x c++ /dev/null | egrep -i "(apple|mach|gnu|clang|llvm|linux|WIN|version|major|minor)"
+
       - name: Check Generators
         # https://stackoverflow.com/questions/25941536/what-is-a-cmake-generator
         run: cmake --help
+
       - name: Compiler Macros Available
-        run: bash -c 'COMPILER="${{matrix.compiler}}"; if [ "${COMPILER}" == "default" ]; then COMPILER="g++"; fi; ${COMPILER}  -dM -E -x c++ /dev/null'
+        run: |
+          COMPILER="${{matrix.compiler}}"
+          if [ "${COMPILER}" == "default" ]; then
+            COMPILER="g++"
+          fi
+          ${COMPILER}  -dM -E -x c++ /dev/null
+
       - name: Deploy Test-Dependencies
         run: ./make.sh deps
+
       - name: Configure CMake (compiler=default) [Debug]
         if: matrix.compiler == 'default'
-        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug
+        run: |
+          cmake -S "${{ github.workspace }}" -B "${{ github.workspace }}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DGITHUB_OS_ID=${{ matrix.os }} -DGITHUB_COMPILER_ID=${{ matrix.compiler }}
+
       - name: Configure CMake (compiler=NOT-default) [Debug]
         if: matrix.compiler != 'default'
-        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
+        run: |
+          cmake -S "${{ github.workspace }}" -B "${{ github.workspace }}/build-debug" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DGITHUB_OS_ID=${{ matrix.os }} -DGITHUB_COMPILER_ID=${{ matrix.compiler }} -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}
 
       - name: Check Work-Around-Flags
         run: |
           grep define "${{github.workspace}}/build-debug/include/converter/_workaroundConfig.h" | grep -v -e "^//" -e " e_[^ ]*_FEATURE "
-          FLAG_DIR="${{github.workspace}}/build-debug/workAroundFlags"
+          FLAG_DIR="${{ github.workspace }}/build-debug/workAroundFlags"
           mkdir -p   ${FLAG_DIR}
-          FLAG_FILE="${FLAG_DIR}/flag-${{matrix.os}}-${{matrix.compiler}}.csv"
-          echo "#OS,compiler,"$(grep "#define"  "${{github.workspace}}/build-debug/include/converter/_workaroundConfig.h" | sed "s/  */ /g" | cut -d' ' -f2,3 | grep -e "^SUPPORTED_" -e "^HAS_" -e "^ENABLE_" | cut -d' ' -f1 | tr '\n' ',' | sed 's/,$/\n/g')  >  "${FLAG_FILE}"
-          echo "${{matrix.os}},${{matrix.compiler}},"$(grep "#define"  "${{github.workspace}}/build-debug/include/converter/_workaroundConfig.h" | sed "s/  */ /g" | cut -d' ' -f2,3 | grep -e "^SUPPORTED_" -e "^HAS_" -e "^ENABLE_" | cut -d' ' -f2 | tr '\n' ',' | sed 's/,$/\n/g')  >>  "${FLAG_FILE}"
+          FLAG_FILE="${FLAG_DIR}/flag-${{ matrix.os }}-${{ matrix.compiler }}.csv"
+          echo "#OS,compiler,"$(grep "#define"  "${{ github.workspace }}/build-debug/include/converter/_workaroundConfig.h" | sed "s/  */ /g" | cut -d' ' -f2,3 | grep -e "^SUPPORTED_" -e "^HAS_" -e "^ENABLE_" | cut -d' ' -f1 | tr '\n' ',' | sed 's/,$/\n/g')  >  "${FLAG_FILE}"
+          echo "${{ matrix.os }},${{ matrix.compiler }},"$(grep "#define"  "${{ github.workspace }}/build-debug/include/converter/_workaroundConfig.h" | sed "s/  */ /g" | cut -d' ' -f2,3 | grep -e "^SUPPORTED_" -e "^HAS_" -e "^ENABLE_" | cut -d' ' -f2 | tr '\n' ',' | sed 's/,$/\n/g')  >>  "${FLAG_FILE}"
           cat "${FLAG_FILE}"
-          DIAGNOSTIC_TTP_FILE="${FLAG_DIR}/diagnostic-TTP-${{matrix.os}}-${{matrix.compiler}}.csv"
+          DIAGNOSTIC_TTP_FILE="${FLAG_DIR}/diagnostic-TTP-${{ matrix.os }}-${{ matrix.compiler }}.csv"
           mv "${FLAG_DIR}/check_template_template_parameter_output.txt" "${DIAGNOSTIC_TTP_FILE}"
+
 
       - name: Upload Consolidate-WorkAround-Flags Artifact from Sub-Workflow
         uses: actions/upload-artifact@v4
         with:
           name: "artifact-flag-${{matrix.os}}-${{matrix.compiler}}"
-          path: "build-debug/workAroundFlags/flag-${{matrix.os}}-${{matrix.compiler}}.csv"
+          path: "build-debug/workAroundFlags/flag-${{ matrix.os }}-${{ matrix.compiler }}.csv"
           if-no-files-found: error
 
       - name: Upload Consolidate-Diagnostic-TTP Artifact from Sub-Workflow
         uses: actions/upload-artifact@v4
         with:
-          name: "artifact-ttp-${{matrix.os}}-${{matrix.compiler}}"
-          path: "build-debug/workAroundFlags/diagnostic-TTP-${{matrix.os}}-${{matrix.compiler}}.csv"
+          name: "artifact-ttp-${{ matrix.os }}-${{ matrix.compiler }}"
+          path: "build-debug/workAroundFlags/diagnostic-TTP-${{ matrix.os }}-${{ matrix.compiler }}.csv"
           if-no-files-found: error
 
 
+
       - name: Build [Debug]
-        run: cmake --build "${{github.workspace}}/build-debug" --config Debug -j$(nproc)
+        run: |
+          cmake --build "${{ github.workspace }}/build-debug" --config Debug -j$(nproc)
+
       - name: Test [Debug]
-        working-directory: ${{github.workspace}}/build-debug
+        working-directory: ${{ github.workspace }}/build-debug
         #run: ctest -C Debug --output-on-failure -j
         run: ctest -C Debug --verbose
+
+      - name: Install [Debug]
+        run: |
+          sudo cmake --install "${{ github.workspace }}/build-debug" --config Debug
+
       - name: Configure CMake (compiler=default) [Release]
         if: matrix.compiler == 'default'
-        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release
+        run: |
+          cmake -S "${{ github.workspace }}" -B "${{ github.workspace }}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release
+
       - name: Configure CMake (compiler=NOT-default) [Release]
         if: matrix.compiler != 'default'
-        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
+        run: |
+          cmake -S "${{ github.workspace }}" -B "${{ github.workspace }}/build-release" -DCONVERTER_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}
+
       - name: Build [Release]
-        run: cmake --build "${{github.workspace}}/build-release" --config Release -j$(nproc)
+        run: |
+          cmake --build "${{ github.workspace }}/build-release" --config Release -j$(nproc)
+
       - name: Test [Release]
-        working-directory: ${{github.workspace}}/build-release
-        run: ctest -C Release --verbose
+        working-directory: ${{ github.workspace }}/build-release
+        run: |
+          ctest -C Release --verbose
+
       - name: Install [Release]
-        run: sudo cmake --install "${{github.workspace}}/build-release" --config Release
+        run: |
+          sudo cmake --install "${{ github.workspace }}/build-release" --config Release
+
