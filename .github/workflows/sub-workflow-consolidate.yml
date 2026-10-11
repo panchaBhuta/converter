@@ -67,6 +67,11 @@ jobs:
           mkdir -p ${FLAG_DIR}
 
 
+      - name: Install dos2unix
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y dos2unix
+
 
       # Download artifacts from all sub-workflow runs
       - name: Download Sub-Workflow Artifacts
@@ -91,7 +96,7 @@ jobs:
           files=("${{github.workspace}}/build-debug/workAroundFlags/flag-"*.csv)
 
           # Normalize Windows CRLF line endings before sorting
-          sed -i 's/\r$//' "${files[@]}"
+          dos2unix "${files[@]}"
 
           LC_ALL=C sort -u "${files[@]}" > "${{github.workspace}}/doc/github/runnerResults/consolidateWorkAroundFlags.csv"
           cat "${{github.workspace}}/doc/github/runnerResults/consolidateWorkAroundFlags.csv"
@@ -111,7 +116,7 @@ jobs:
           files=("${{github.workspace}}/build-debug/workAroundFlags/diagnostic-TTP-"*.csv)
 
           # Normalize Windows CRLF line endings before sorting
-          sed -i 's/\r$//' "${files[@]}"
+          dos2unix "${files[@]}"
 
           LC_ALL=C sort -u "${files[@]}" > "${{github.workspace}}/doc/github/runnerResults/consolidateDiagnosticTTP.csv"
           cat "${{github.workspace}}/doc/github/runnerResults/consolidateDiagnosticTTP.csv"
