@@ -217,6 +217,8 @@ namespace unittest
   }
 
 
+
+
   template <>
   struct SScompatible<converter::Str2TnConversionProcess> {
     inline static std::string getVal(const converter::Str2TnConversionProcess& val)

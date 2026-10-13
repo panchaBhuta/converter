@@ -117,7 +117,7 @@ add_unit_test(testPlatform)
 # Unit tests
 
 add_unit_test(testSupportingTemplates)
-add_unit_test(testBasicConversions)
+add_unit_test(testDefaultConversions)
 
 add_unit_test(testAllConversionTemplateInstances)
 
