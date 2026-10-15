@@ -26,6 +26,9 @@
 #include <concepts>
 #include <cstddef>
 
+#include <system_error>
+#include <stdexcept>
+
 #include <converter/_common.h>
 #include <specializedTypes/CompTimeStr.h>
 
@@ -54,7 +57,7 @@ namespace converter
                  * The payload of a quiet NaN may be used to carry diagnostic information about
                  * the origin of the NaN value.
                 */
-                QUIET_NAN     = 0,    // for Floating-point
+                QUIET_NAN     = 0,    // for Floating-point only
                 /*
                  * https://en.wikipedia.org/wiki/NaN
                  * Signaling NaNs, or sNaNs, are special forms of a NaN that,
@@ -63,10 +66,10 @@ namespace converter
                  * sNaNs do not propagate. They are intended to be used for debugging purposes,
                  * to help identify uninitialized variables or other unexpected occurrences.
                 */
-                SIGNAL_NAN    = 1,    // for Floating-point
-                INAPPLICABLE  = 2,    // for std::string
-                THROW_ERROR   = 3,
-                VARIANT_VAL   = 4 };  // for numeric's and std::chrono
+                SIGNAL_NAN    = 1,    // for Floating-point only
+                INAPPLICABLE  = 2,    // for std::string only
+                THROW_ERROR   = 3,    // if Floating-Point then treat NAN's as exception
+                VARIANT_VAL   = 4 };  // for numeric's and std::chrono; when conversion error : store the string value in variant
 
   std::ostream& operator<<(std::ostream& os, Str2TnConversionProcess s2t)
   {
@@ -547,6 +550,23 @@ namespace converter
   };
 
 
+  /*
+   * -----------------------------------------------------------------------------
+   * Specially for floating-point:
+   * The error-handler policy determines what happens when a conversion produces
+   * NaN, not merely when parsing fails.
+   *
+   * The error handlers have two related uses:
+   *
+   * Error handler | Input converts to NaN             | Conversion fails
+   * --------------|-----------------------------------|------------------------------
+   * QUIET_NAN     | Return a quiet NaN                | Return a quiet NaN
+   * SIGNAL_NAN    | Return a signaling NaN            | Return a signaling NaN
+   * THROW_ERROR   | Throw an exception                | Throw an exception
+   * VARIANT_VAL   | Return the original string in the | Return the original string in
+   *               | variant                           | the variant
+   * -----------------------------------------------------------------------------
+   */
   template < typename T, Str2TnErrorHandler ERR_HANDLER >
           requires ( ERR_HANDLER != Str2TnErrorHandler::INAPPLICABLE &&
                      isSupported_Str2TnErrorHandler<T, ERR_HANDLER>::value )
@@ -556,23 +576,23 @@ namespace converter
     using value_type  = T;
 
     template < typename E = std::invalid_argument >
-    static return_type handle(const std::string& str, const std::string& errMsg)
+    static return_type handle(const std::string& strVal, const std::string& errMsg)
     {
       if constexpr ( ERR_HANDLER == Str2TnErrorHandler::THROW_ERROR )
       {
         throw E(errMsg);
       } else if constexpr ( ERR_HANDLER == Str2TnErrorHandler::VARIANT_VAL ) {
-        return return_type{str};
+        return return_type{strVal};
       } else if constexpr ( ERR_HANDLER == Str2TnErrorHandler::QUIET_NAN ) {
         if constexpr ( std::numeric_limits<T>::has_quiet_NaN )
         {
           try {
             if constexpr (std::is_same_v<T, float>) {
-              return std::nanf(str.c_str());
+              return std::nanf(strVal.c_str());
             } else if constexpr (std::is_same_v<T, double>) {
-              return std::nan(str.c_str());
+              return std::nan(strVal.c_str());
             } else if constexpr (std::is_same_v<T, long double>) {
-              return std::nanl(str.c_str());
+              return std::nanl(strVal.c_str());
             } else {
               static_assert(always_false<T>::value, "Unsupported type for FP-conversion");
             }
@@ -581,20 +601,104 @@ namespace converter
             CONVERTER_DEBUG_LOG( "nan() with string argument not supported by this implementation. Returning default quiet NaN value." );
             return std::numeric_limits<T>::quiet_NaN();
           }
+        } else {
+          static_assert(always_false<T>::value, "Config-conflict for Str2TnErrorHandler::QUIET_NAN as std::numeric_limits<T>::has_quiet_NaN is false :: for FP-conversion");
         }
       } else if constexpr ( ERR_HANDLER == Str2TnErrorHandler::SIGNAL_NAN ) {
         if constexpr ( std::numeric_limits<T>::has_signaling_NaN )
         {
           return std::numeric_limits<T>::signaling_NaN();
+        } else {
+          static_assert(always_false<T>::value, "Config-conflict for Str2TnErrorHandler::SIGNAL_NAN as std::numeric_limits<T>::has_signaling_NaN is false :: for FP-conversion");
         }
       } else {
         static_assert(always_false<T>::value, "Unsupported enum Str2TnErrorHandler for FP-conversion");
       }
     }
+
+    template < typename E = std::invalid_argument >
+        requires std::is_base_of_v<std::exception, E>
+    static return_type handle(const std::string& strVal, const E& err)
+    {
+      if constexpr ( ERR_HANDLER == Str2TnErrorHandler::THROW_ERROR )
+      {
+        throw err;
+      } else {
+        return handle(strVal, err.what());
+      }
+    }
+
+    static return_type handle(const std::string& strVal, const std::errc errCode)
+    {
+      std::error_code objErrCode = std::make_error_code(errCode);
+      return handle(strVal, errCode, objErrCode.message());
+    }
+
+    static return_type handle(const std::string& strVal, const std::errc errCode, const std::string& message)
+    {
+      if constexpr ( ERR_HANDLER == Str2TnErrorHandler::THROW_ERROR )
+      {
+        throw_appropriate_exception(errCode, message);
+      } else {
+        return handle(strVal, message);
+      }
+    }
+
+    [[noreturn]] static void throw_appropriate_exception(std::errc errCode, const std::string& message)
+    {
+      switch (errCode)
+      {
+        // Logic / Argument Errors
+        case std::errc::invalid_argument:
+          throw std::invalid_argument(message);
+        case std::errc::result_out_of_range:
+        case std::errc::value_too_large:
+          throw std::out_of_range(message);
+            
+        // Memory / Resource Errors
+        case std::errc::not_enough_memory:
+          throw std::bad_alloc(); // Note: bad_alloc doesn't take a message string
+            
+        // Runtime / Domain Errors
+        case std::errc::argument_out_of_domain:
+          throw std::domain_error(message);
+        case std::errc::operation_not_permitted:
+        case std::errc::permission_denied:
+          throw std::runtime_error(message + ": Permission denied");
+            
+        // Fallback for everything else (I/O, networking, hardware faults)
+        default:
+          throw std::system_error(std::make_error_code(errCode), message);
+      }
+    }
+
   };
 
 
+  template < typename T, Str2TnErrorHandler ERR_HANDLER >
+  struct CheckNAN
+  {
+    using return_type = typename ErrorHandler<T, ERR_HANDLER>::return_type;
+    using value_type  = T;
 
+    static return_type handle(const std::string& strVal, const T val)
+    {
+      if constexpr (c_floating_point<T>)
+      {
+        if (std::isnan(val))
+        {
+          const std::string errMsg =
+              "Conversion resulted in nan value: " + std::to_string(val) + " :: strVal = '" + strVal + "'";
+
+          CONVERTER_DEBUG_LOG(errMsg);
+
+          return ErrorHandler<T, ERR_HANDLER>::handle(strVal, errMsg);
+        }
+      }
+
+      return val;
+    }
+  };
 
 
 
@@ -633,8 +737,21 @@ namespace converter
 
       auto [ptr, ec] = std::from_chars(str.data(), str.data() + str.size(), result, format_args); // throws nothing
 
-      if (ec == std::errc()) {
-        return result;
+      if (ec == std::errc())
+      {
+        const char* const end = str.data() + str.size();
+
+        if (ptr != end)
+        {
+          const std::string errMsg =
+              "Unconsumed characters in input: '" + str + "'";
+
+          CONVERTER_DEBUG_LOG(errMsg);
+
+          return ErrorHandler<T, ERR_HANDLER>::handle(str, errMsg);
+        }
+
+        return CheckNAN<T, ERR_HANDLER>::handle( str, result);
       } else {
         std::stringstream errMsg;
         errMsg << std::make_error_code(ec).message() << " : 'return_type ConvertFromStr< T = [" << specializedTypes::get_name<T>()
@@ -642,26 +759,7 @@ namespace converter
 
         CONVERTER_DEBUG_LOG( errMsg.str() << "  str = '" << str << "' ; result = " << result );
 
-        if constexpr ( ERR_HANDLER == Str2TnErrorHandler::THROW_ERROR )
-        {
-          switch(ec)
-          {
-          case std::errc::invalid_argument:
-            throw std::invalid_argument(errMsg.str());
-          case std::errc::result_out_of_range:
-            throw std::out_of_range(errMsg.str());
-          default:
-            throw std::logic_error(errMsg.str());
-          }
-        } else if constexpr ( ERR_HANDLER == Str2TnErrorHandler::VARIANT_VAL ) {
-          return return_type{str};
-        } else if constexpr ( ERR_HANDLER == Str2TnErrorHandler::SIGNAL_NAN ) {
-          return std::numeric_limits<T>::signaling_NaN();
-        } else if constexpr ( ERR_HANDLER == Str2TnErrorHandler::QUIET_NAN ) {
-          return std::numeric_limits<T>::quiet_NaN();
-        } else {
-          static_assert(always_false<T>::value, "Unsupported Str2TnErrorHandler for FP-conversion");
-        }
+        return ErrorHandler<T, ERR_HANDLER>::handle(str, ec, errMsg.str());
       }
     }
   };
@@ -750,7 +848,7 @@ namespace converter
                                     << iss.bad() << "  iss.eof()=" << iss.eof());
         return ErrorHandler<T, ERR_HANDLER>::handle(str, errMsg);
       } else {
-        return result;
+        return CheckNAN<T, ERR_HANDLER>::handle( str, result);
       }
     }
   };
@@ -856,53 +954,18 @@ namespace converter
 
       try
       {
-        T val = _ToVal(str, format_args);
+        T result = _ToVal(str, format_args);
 
-        if (std::isnan(val))
-        {
-          const std::string errMsg = "Conversion resulted in nan value: " + std::to_string(val) + " :: str = '" + str + "'";
-          CONVERTER_DEBUG_LOG( errMsg );
-          if constexpr ( ERR_HANDLER == Str2TnErrorHandler::THROW_ERROR ) {
-            throw errMsg;
-          } else if constexpr ( ERR_HANDLER == Str2TnErrorHandler::VARIANT_VAL ) {
-            return return_type{str};
-          } else if constexpr ( ERR_HANDLER == Str2TnErrorHandler::QUIET_NAN ) {
-            return val;
-          } else if constexpr ( ERR_HANDLER == Str2TnErrorHandler::SIGNAL_NAN ) {
-            //return std::numeric_limits<T>::signaling_NaN();
-            return val;
-          } else {
-            static_assert(always_false<T>::value, "Unsupported Str2TnErrorHandler for FP-conversion");
-          }
-        }
-        return val;
+        return CheckNAN<T, ERR_HANDLER>::handle( str, result);
 
-      } catch (const std::invalid_argument& e) {
-        const std::string errMsg = "Invalid argument: " + std::string(e.what()) + " :: str = '" + str + "'";
+      } catch (const std::invalid_argument& err) {
+        const std::string errMsg = "Invalid argument: " + std::string(err.what()) + " :: str = '" + str + "'";
         CONVERTER_DEBUG_LOG( errMsg );
-        if constexpr ( ERR_HANDLER == Str2TnErrorHandler::THROW_ERROR )
-        {
-          throw e;
-        }
-      } catch (const std::out_of_range& e) {
-        const std::string errMsg = "Out of range: " + std::string(e.what()) + " :: str = '" + str + "'";
+        return ErrorHandler<T, ERR_HANDLER>::handle(str, err);
+      } catch (const std::out_of_range& err) {
+        const std::string errMsg = "Out of range: " + std::string(err.what()) + " :: str = '" + str + "'";
         CONVERTER_DEBUG_LOG( errMsg );
-        if constexpr ( ERR_HANDLER == Str2TnErrorHandler::THROW_ERROR )
-        {
-          throw e;
-        }
-      } catch (const std::string& errMsg) {
-        CONVERTER_DEBUG_LOG( errMsg );
-        if constexpr ( ERR_HANDLER == Str2TnErrorHandler::THROW_ERROR )
-        {
-          throw std::invalid_argument(errMsg);
-        }
-      }
-
-      if constexpr ( ERR_HANDLER != Str2TnErrorHandler::THROW_ERROR ) //
-      { // errMsg is already logged in catch block above for THROW_ERROR conditions,
-        // so passing empty string here as THROW_ERROR case is already handled in catch block above.
-        return ErrorHandler<T, ERR_HANDLER>::handle(str, "");
+        return ErrorHandler<T, ERR_HANDLER>::handle(str, err);
       }
     }
 
@@ -911,15 +974,28 @@ namespace converter
         // throws  std::invalid_argument, std::out_of_range
     {
       T val;
+      std::size_t  posSub = 0;
+      std::size_t* posSubPtr = &posSub;
+      if (pos != nullptr)
+      {
+        posSubPtr = pos;
+      }
       if constexpr (std::is_same_v<T, float>) {
-        val = std::stof(str, pos);  // throws  std::invalid_argument, std::out_of_range
+        val = std::stof(str, posSubPtr);  // throws  std::invalid_argument, std::out_of_range
       } else if constexpr (std::is_same_v<T, double>) {
-        val = std::stod(str, pos);
+        val = std::stod(str, posSubPtr);
       } else if constexpr (std::is_same_v<T, long double>) {
-        val = std::stold(str, pos);
+        val = std::stold(str, posSubPtr);
       } else {
         static_assert(always_false<T>::value, "Unsupported type for conversion");
       }
+
+      if ( (*posSubPtr) != str.size() )
+      {
+          throw std::invalid_argument(
+              "Unconsumed characters in input: '" + str + "'");
+      }
+
       return val;
     }
   };

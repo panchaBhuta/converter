@@ -463,7 +463,7 @@ namespace converter
           _matchType<0, CandidateTypes...>();
 
       return _iterateForType<
-          (matchedIndex != -1) ? matchedIndex : 0,
+          (matchedIndex != -1) ? size_t(matchedIndex) : size_t(0),
           CandidateTypes...>();
     }
 
