@@ -26,6 +26,11 @@
 #include <concepts>
 #include <cstddef>
 
+#include <string>
+#include <variant>
+#include <sstream>
+#include <ostream>
+
 #include <system_error>
 #include <stdexcept>
 
@@ -46,6 +51,7 @@ namespace converter
                 SPECIALIZED_IMPLEMENTATION = 4 };
 
   // Enum : Error Handling
+  // for more details refer comments of template class ErrorHandler
   enum struct Str2TnErrorHandler : int
               {
                 /*
@@ -69,7 +75,7 @@ namespace converter
                 SIGNAL_NAN    = 1,    // for Floating-point only
                 INAPPLICABLE  = 2,    // for std::string only
                 THROW_ERROR   = 3,    // if Floating-Point then treat NAN's as exception
-                VARIANT_VAL   = 4 };  // for numeric's and std::chrono; when conversion error : store the string value in variant
+                VARIANT_VAL   = 4 };  // Preserve the input in a typed variant alternative for NaN or conversion failure.
 
   std::ostream& operator<<(std::ostream& os, Str2TnConversionProcess s2t)
   {
@@ -100,9 +106,10 @@ namespace converter
     * @brief    This is a helper class to determine the return type of the conversion function
     *           based on the error handling process specified by 'ERR_HANDLER'.
     *           For e.g -> if 'ERR_HANDLER' is 'VARIANT_VAL', then the return type of the
-    *           conversion function will be 'std::variant<T, std::string>',
-    *           where 'T' is the numeric type being converted to   OR
-    *           'std::string' is the error message in case of conversion failure.
+    *           conversion function will be 'variantReturnType<T>',
+    *           where 'T' is the target type, Str2TNaNInput preserves the input
+    *           when conversion produces NaN, and Str2TConversionFailure preserves
+    *           the input when conversion fails.
     */
   template <typename T, Str2TnErrorHandler ERR_HANDLER >
   class ReturnType
@@ -111,7 +118,7 @@ namespace converter
                                       T,                              //  SIGNAL_NAN
                                       T,                              //  INAPPLICABLE
                                       T,                              //  THROW_ERROR
-                                      std::variant<T, std::string>    //  VARIANT_VAL
+                                      variantReturnType<T>            //  VARIANT_VAL
                                     >;
   public:
     using type = typename std::tuple_element< static_cast<size_t>(ERR_HANDLER), _return_types>::type;
@@ -552,19 +559,63 @@ namespace converter
 
   /*
    * -----------------------------------------------------------------------------
-   * Specially for floating-point:
-   * The error-handler policy determines what happens when a conversion produces
-   * NaN, not merely when parsing fails.
+   * String-to-number error-handling policy
    *
-   * The error handlers have two related uses:
+   * The selected handler determines the result when conversion fails or, for a
+   * floating-point target, when conversion produces NaN.
    *
-   * Error handler | Input converts to NaN             | Conversion fails
-   * --------------|-----------------------------------|------------------------------
-   * QUIET_NAN     | Return a quiet NaN                | Return a quiet NaN
-   * SIGNAL_NAN    | Return a signaling NaN            | Return a signaling NaN
-   * THROW_ERROR   | Throw an exception                | Throw an exception
-   * VARIANT_VAL   | Return the original string in the | Return the original string in
-   *               | variant                           | the variant
+   * Error handler | Result type                      | Behavior
+   * --------------|----------------------------------|------------------------------
+   * QUIET_NAN     | T                                | Return a quiet NaN. It can
+   *               |                                  | propagate through floating-
+   *               |                                  | point calculations without
+   *               |                                  | normally raising an invalid-
+   *               |                                  | operation exception.
+   * SIGNAL_NAN    | T                                | Return a signaling NaN. Its
+   *               |                                  | intended purpose is to help
+   *               |                                  | detect unexpected values.
+   *               |                                  | Using it in an operation may
+   *               |                                  | signal an invalid operation,
+   *               |                                  | depending on the platform and
+   *               |                                  | floating-point environment.
+   * THROW_ERROR   | T                                | Throw an exception to report
+   *               |                                  | the conversion problem.
+   * VARIANT_VAL   | variantReturnType<T>             | Preserve the original input
+   *               |                                  | string when conversion
+   *               |                                  | fails or produces NaN.
+   *
+   * For VARIANT_VAL, the alternatives have these meanings:
+   *
+   *   index 0: T                      -- successful conversion to a non-NaN value
+   *   index 1: Str2TNaNInput          -- conversion produced NaN; input is preserved
+   *   index 2: Str2TConversionFailure -- conversion failed; input is preserved
+   *
+   * Example outcomes for floating-point conversion:
+   *
+   *   Input       Alternative / result
+   *   ----------  -----------------------------------------------------------
+   *   "12.5"      index 0: the converted numeric value
+   *   "nan"       index 1: Str2TNaNInput{"nan"}, when the mechanism parses NaN
+   *   "garbage"   index 2: Str2TConversionFailure{"garbage"}
+   *   "inf"       index 0: infinity, if the selected mechanism accepts it
+   *
+   * The application should inspect the active alternative, not infer the
+   * outcome from the stored text. In particular, a string preserved in
+   * Str2TNaNInput has already been classified by the converter as producing
+   * NaN; a string in Str2TConversionFailure represents a failed conversion.
+   * An application may then choose its own policy for either outcome.
+   *
+   * QUIET_NAN and SIGNAL_NAN require the target type to support the corresponding
+   * NaN representation. A signaling NaN does not guarantee that a hardware
+   * floating-point exception will be raised merely by creating or returning it;
+   * behavior depends on the implementation and floating-point environment.
+   * INAPPLICABLE is used for conversions such as string-to-string conversion,
+   * where a numeric error-handling policy does not apply.
+   *
+   * This design lets the converter distinguish NaN outcomes from conversion
+   * failures without imposing application-specific interpretation rules. The
+   * wrapper types are non-template types because they store only the original
+   * input string; only variantReturnType<T> depends on the target type.
    * -----------------------------------------------------------------------------
    */
   template < typename T, Str2TnErrorHandler ERR_HANDLER >
@@ -576,44 +627,18 @@ namespace converter
     using value_type  = T;
 
     template < typename E = std::invalid_argument >
-    static return_type handle(const std::string& strVal, const std::string& errMsg)
+    static return_type handle(const std::string& strVal,
+                              const std::string& errMsg)
     {
-      if constexpr ( ERR_HANDLER == Str2TnErrorHandler::THROW_ERROR )
-      {
-        throw E(errMsg);
-      } else if constexpr ( ERR_HANDLER == Str2TnErrorHandler::VARIANT_VAL ) {
-        return return_type{strVal};
-      } else if constexpr ( ERR_HANDLER == Str2TnErrorHandler::QUIET_NAN ) {
-        if constexpr ( std::numeric_limits<T>::has_quiet_NaN )
-        {
-          try {
-            if constexpr (std::is_same_v<T, float>) {
-              return std::nanf(strVal.c_str());
-            } else if constexpr (std::is_same_v<T, double>) {
-              return std::nan(strVal.c_str());
-            } else if constexpr (std::is_same_v<T, long double>) {
-              return std::nanl(strVal.c_str());
-            } else {
-              static_assert(always_false<T>::value, "Unsupported type for FP-conversion");
-            }
-          } catch (...) {
-            // In case if the implementation doesn't support string argument for nan functions, we can return a default quiet NaN value.
-            CONVERTER_DEBUG_LOG( "nan() with string argument not supported by this implementation. Returning default quiet NaN value." );
-            return std::numeric_limits<T>::quiet_NaN();
-          }
-        } else {
-          static_assert(always_false<T>::value, "Config-conflict for Str2TnErrorHandler::QUIET_NAN as std::numeric_limits<T>::has_quiet_NaN is false :: for FP-conversion");
-        }
-      } else if constexpr ( ERR_HANDLER == Str2TnErrorHandler::SIGNAL_NAN ) {
-        if constexpr ( std::numeric_limits<T>::has_signaling_NaN )
-        {
-          return std::numeric_limits<T>::signaling_NaN();
-        } else {
-          static_assert(always_false<T>::value, "Config-conflict for Str2TnErrorHandler::SIGNAL_NAN as std::numeric_limits<T>::has_signaling_NaN is false :: for FP-conversion");
-        }
-      } else {
-        static_assert(always_false<T>::value, "Unsupported enum Str2TnErrorHandler for FP-conversion");
-      }
+      return _handle<E>( strVal, errMsg, 2);
+    }
+
+    template < typename E = std::invalid_argument >
+    static return_type handleVariant(const std::string& strVal,
+                                     const std::string& errMsg)
+    {
+      // CheckNAN calls this when the parsed numeric value is NaN: alternative 1.
+      return _handle<E>(strVal, errMsg, 1);
     }
 
     template < typename E = std::invalid_argument >
@@ -624,7 +649,7 @@ namespace converter
       {
         throw err;
       } else {
-        return handle(strVal, err.what());
+        return handle<E>(strVal, err.what());
       }
     }
 
@@ -672,6 +697,58 @@ namespace converter
       }
     }
 
+  private:
+    template < typename E >
+    static return_type _handle(const std::string& strVal,
+                               const std::string& errMsg,
+                               const size_t variantIndex) // 1 -> Str2TNaNInput; 2 -> Str2TConversionFailure
+    {
+      if constexpr ( ERR_HANDLER == Str2TnErrorHandler::THROW_ERROR )
+      {
+        throw E(errMsg);
+      } else if constexpr ( ERR_HANDLER == Str2TnErrorHandler::VARIANT_VAL ) {
+        if(variantIndex == 1)
+          return return_type{
+                std::in_place_index<1>,
+                Str2TNaNInput{strVal}
+            };
+        else
+          return return_type{
+                std::in_place_index<2>,
+                Str2TConversionFailure{strVal}
+            };
+      } else if constexpr ( ERR_HANDLER == Str2TnErrorHandler::QUIET_NAN ) {
+        if constexpr ( std::numeric_limits<T>::has_quiet_NaN )
+        {
+          try {
+            if constexpr (std::is_same_v<T, float>) {
+              return std::nanf(strVal.c_str());
+            } else if constexpr (std::is_same_v<T, double>) {
+              return std::nan(strVal.c_str());
+            } else if constexpr (std::is_same_v<T, long double>) {
+              return std::nanl(strVal.c_str());
+            } else {
+              static_assert(always_false<T>::value, "Unsupported type for FP-conversion");
+            }
+          } catch (...) {
+            // In case if the implementation doesn't support string argument for nan functions, we can return a default quiet NaN value.
+            CONVERTER_DEBUG_LOG( "nan() with string argument not supported by this implementation. Returning default quiet NaN value." );
+            return std::numeric_limits<T>::quiet_NaN();
+          }
+        } else {
+          static_assert(always_false<T>::value, "Config-conflict for Str2TnErrorHandler::QUIET_NAN as std::numeric_limits<T>::has_quiet_NaN is false :: for FP-conversion");
+        }
+      } else if constexpr ( ERR_HANDLER == Str2TnErrorHandler::SIGNAL_NAN ) {
+        if constexpr ( std::numeric_limits<T>::has_signaling_NaN )
+        {
+          return std::numeric_limits<T>::signaling_NaN();
+        } else {
+          static_assert(always_false<T>::value, "Config-conflict for Str2TnErrorHandler::SIGNAL_NAN as std::numeric_limits<T>::has_signaling_NaN is false :: for FP-conversion");
+        }
+      } else {
+        static_assert(always_false<T>::value, "Unsupported enum Str2TnErrorHandler for FP-conversion");
+      }
+    }
   };
 
 
@@ -692,7 +769,7 @@ namespace converter
 
           CONVERTER_DEBUG_LOG(errMsg);
 
-          return ErrorHandler<T, ERR_HANDLER>::handle(strVal, errMsg);
+          return ErrorHandler<T, ERR_HANDLER>::handleVariant(strVal, errMsg);
         }
       }
 
@@ -902,7 +979,14 @@ namespace converter
 
       if constexpr ( ERR_HANDLER == Str2TnErrorHandler::VARIANT_VAL )
       {
-        return return_type{str};
+        return return_type{
+              std::in_place_index<2>,
+              Str2TConversionFailure{str}
+          };
+      } else if constexpr ( ERR_HANDLER == Str2TnErrorHandler::THROW_ERROR ) {
+        // scenario handled before, no need to do anything here
+      } else {
+        static_assert(always_false<T>::value, "for c_integral<T> : Unsupported enum Str2TnErrorHandler for FP-conversion");
       }
     }
 
@@ -1043,12 +1127,20 @@ namespace converter
 
       if constexpr ( ERR_HANDLER == Str2TnErrorHandler::VARIANT_VAL )
       {
-        if ( val.index() != 0 ) // i.e is error, has string value
+        if ( val.index() == 0 )
         {
-          return_type errVal{std::get<std::string>(val)}; // throws std::bad_variant_access; but we donot expect this to be thrown here
-          return errVal; // return string
+          act_val = std::get<delegated_type>(val); // throws std::bad_variant_access; but we donot expect this to be thrown here
+        } else if(val.index() == 1) {
+          return return_type{
+                std::in_place_index<1>,
+                std::get<Str2TNaNInput>(val)
+            };
+        } else {
+          return return_type{
+                std::in_place_index<2>,
+                std::get<Str2TConversionFailure>(val)
+            };
         }
-        act_val = std::get<delegated_type>(val); // throws std::bad_variant_access; but we donot expect this to be thrown here
       } else {
         act_val = val;
       }
@@ -1064,9 +1156,11 @@ namespace converter
           return ErrorHandler<T, ERR_HANDLER>::template handle<std::out_of_range>(str, errMsg);
         }
       } else if constexpr ( std::numeric_limits<T>::max() == std::numeric_limits<delegated_type>::max() ) {
-        // on extremly rare occasion, if for e.g. int and int32 byte-size is, but are two different types, instead of alias,
+        // on extremly rare occasion, if for e.g. int and int32 byte-size is equal,
+        // but are two different types, instead of alias,
         // and int is supported for conversion, but int32 is not.
-        // by skipping the run-time min() max() check, Squeeze out performance if it's there.
+        // by skipping the run-time min() max() check,
+        // Squeeze out performance if it's there.
       } else {
         static_assert(always_false<T>::value, "abort!  ABORT!! How did this happen?");
       }
@@ -1164,9 +1258,11 @@ namespace converter
     ToVal(const std::string& str)
     {
       CONVERTER_DEBUG_LOG("trace :: return_type ConvertFromStr< T = [" << specializedTypes::get_name<CH>() << "] , Str2TnConversionProcess::SPECIALIZED_IMPLEMENTATION, " << ERR_HANDLER << " >::ToVal('" << str << "')");
-      if(str.length()>1)
+      if(str.length() != 1)
       {
-        std::string errMsg = "String has more than one character. 'CH ConvertFromStr<c_char CH, Str2TnConversionProcess::SPECIALIZED_IMPLEMENTATION, ERR_HANDLER >::ToVal(const std::string& str)' string2charT-conversion-failure for value '" + str + "'";
+        std::string errMsg =
+            "String must contain exactly one character. "
+            "Character conversion failed for input '" + str + "'";
         CONVERTER_DEBUG_LOG( errMsg );
         return ErrorHandler<CH, ERR_HANDLER>::handle(str, errMsg);
       }
@@ -1236,7 +1332,7 @@ namespace converter
    * @brief   convert a function with signature 'auto (*CONV_S2T)(const std::string&)'
    *          to a converter type that satisfies concept 'c_S2Tconverter'.
    * @tparam  CONV_S2T                   a function with signature 'T_V (*CONV_S2T)(const std::string&)'.
-   *                                     T_V represents either numeric type 'T' or 'variant std::variant<T, std::string>'
+   *                                     T_V represents either T or variantReturnType<T> (with distinct NaN/failure alternatives).
    */
   template< auto (*CONV_S2T)(const std::string&) >
   struct f_S2Tconv

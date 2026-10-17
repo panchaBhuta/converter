@@ -18,6 +18,16 @@
 #include <concepts>
 #include <algorithm>
 
+#include <array>         /* std::array */
+#include <limits>        /* std::numeric_limits */
+#include <string>        /* std::string */
+#include <variant>       /* std::variant, std::monostate */
+#include <locale>        /* std::locale */
+#include <sstream>       /* std::stringstream, std::istringstream, std::ostringstream */
+#include <istream>       /* std::istream */
+#include <ostream>       /* std::ostream */
+#include <tuple>         /* std::tuple — only if the commented-out specialization is restored */
+
 #include <converter/_compilerWorkAround.h>
 
 
@@ -115,14 +125,28 @@ namespace converter
 
 
 
+  /*
+   * VARIANT_VAL result alternatives:
+   *   index 0: T                      -- conversion succeeded with a non-NaN value
+   *   index 1: Str2TNaNInput          -- conversion produced NaN; preserve the input
+   *   index 2: Str2TConversionFailure -- conversion failed; preserve the input
+   *
+   * These wrapper types are intentionally non-template types: each stores only
+   * the original input string, independently of the conversion target type.
+   */
+  struct Str2TNaNInput
+  {
+      std::string value; // Original input that converted to NaN.
+  };
 
-  template<typename T> struct is_variant : std::false_type {};
-  template<typename ...Args>
-  struct is_variant<std::variant<Args...>> : std::true_type {};
-  template<typename ...Args>
-  concept c_variant = is_variant<Args...>::value;
-  template<typename ...Args>
-  concept c_NOT_variant = !is_variant<Args...>::value;
+  struct Str2TConversionFailure
+  {
+      std::string value; // Original input for which conversion failed.
+  };
+
+  template <typename T >
+  using variantReturnType =
+      std::variant<T, Str2TNaNInput, Str2TConversionFailure>;
 
   template <typename T>
   struct InferValueType {
@@ -130,7 +154,7 @@ namespace converter
   };
 
   template <typename T>
-  struct InferValueType<std::variant<T, std::string>> {
+  struct InferValueType<variantReturnType<T>> {
     using value_type = T;
   };
 
