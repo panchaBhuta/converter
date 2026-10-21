@@ -523,6 +523,7 @@ namespace converter
         std::stringstream errMsg;
         errMsg << std::make_error_code(result.ec).message() << " : 'std::string ConvertFromVal< T = [" << specializedTypes::get_name<T>()
                << "], Tn2StrConversionProcess::TO_CHARS >::ToStr(const T& val, auto... format_args)'";
+
         CONVERTER_DEBUG_LOG( errMsg.str() << "  val = '" << val << "'");
 
         switch(result.ec)
@@ -709,7 +710,6 @@ namespace converter
 
 
 
-
   /**
    * @brief     Specialized implementation handling string to string conversion.
    */
@@ -785,6 +785,57 @@ namespace converter
     }
   };
 
+
+  template< typename T,
+            Tn2StrConversionProcess CONV_PROCESS >
+          requires ( isSupported_Tn2StrConversionProcess<T, CONV_PROCESS>::value )
+  struct ConvertFromVal< variantReturnType<T>, CONV_PROCESS >
+  {
+    constexpr static size_t templateId = 9;
+    constexpr static bool isConversionImplemented = true;
+    using value_type  = variantReturnType<T>;
+    using return_type = std::string;
+    constexpr static Tn2StrConversionProcess conversionProcess = CONV_PROCESS;
+
+    inline static return_type
+    ToStr(const variantReturnType<T>& val)
+    {
+      CONVERTER_DEBUG_LOG("trace :: return_type ConvertFromVal< variantReturnType<T> = [ T = " << specializedTypes::get_name<T>() << "] , " << CONV_PROCESS << " >::ToStr(...)");
+
+      if ( val.index() == 0 )
+      {
+        const T& value = std::get<T>(val);
+        return ConvertFromVal<T, CONV_PROCESS >::ToStr(value);
+      } else if(val.index() == 1) {
+        return std::get<Str2TNaNInput>(val).value;
+      } else {
+        return std::get<Str2TConversionFailure>(val).value;
+      }
+    }
+
+    inline static return_type
+    ToStr(const variantReturnType<T>& val,
+          const typename FormatInfo<T, CONV_PROCESS>::type& format_args )
+        requires requires(
+            const T& value,
+            const typename FormatInfo<T, CONV_PROCESS>::type& args)
+        {
+            ConvertFromVal<T, CONV_PROCESS>::ToStr(value, args);
+        }
+    {
+      CONVERTER_DEBUG_LOG("trace :: return_type ConvertFromVal< variantReturnType<T> = [ T = " << specializedTypes::get_name<T>() << "] , " << CONV_PROCESS << " >::ToStr(..., format_args)");
+
+      if ( val.index() == 0 )
+      {
+        const T& value = std::get<T>(val);
+        return ConvertFromVal<T, CONV_PROCESS >::ToStr(value, format_args);
+      } else if(val.index() == 1) {
+        return std::get<Str2TNaNInput>(val).value;
+      } else {
+        return std::get<Str2TConversionFailure>(val).value;
+      }
+    }
+  };
   // ]=============================================================] ConvertFromVal
 
 
