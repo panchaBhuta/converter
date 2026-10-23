@@ -476,8 +476,9 @@ function(check_floatingPoint_elementaryStringConversions)
 endfunction()
 
 
-set(DIAGNOSTIC_RESULT_FOLDER "${CMAKE_CURRENT_BINARY_DIR}/workAroundFlags") # also used in github yaml file(S)
-set(DIAGNOSTIC_TEMPLATE_TEMPLATE_PARAMETER_FILE "${DIAGNOSTIC_RESULT_FOLDER}/check_template_template_parameter_output.txt")
+set(DIAGNOSTIC_RESULT_FOLDER                     "${CMAKE_CURRENT_BINARY_DIR}/workAroundFlags") # also used in github yaml file(S)
+set(DIAGNOSTIC_TEMPLATE_TEMPLATE_PARAMETER_FILE  "${DIAGNOSTIC_RESULT_FOLDER}/check_template_template_parameter_output.txt")
+set(DIAGNOSTIC_NAN_INFINITY_VALUES_FILE          "${DIAGNOSTIC_RESULT_FOLDER}/check_nan_infinity_values_output.txt")
 
 function(diagnostic_template_template_parameter
              TEMPLATE_TEMPLATE_PARAMETER
@@ -499,7 +500,7 @@ function(diagnostic_template_template_parameter
                 RUN_OUTPUT_STDOUT_VARIABLE LOG_RUN_STDOUT_TTP
                 RUN_OUTPUT_STDERR_VARIABLE LOG_RUN_STDERR_TTP)
     message(STATUS "diagnostic_template_template_parameter compile output : ${COMPILE_RESULT_TEMPLATE_TEMPLATE_PARAMETER}")
-    message(STATUS "diagnostic_template_template_parameter run compile : ${RUN_RESULT_TEMPLATE_TEMPLATE_PARAMETER}")
+    message(STATUS "diagnostic_template_template_parameter run     output : ${RUN_RESULT_TEMPLATE_TEMPLATE_PARAMETER}")
 
 
     if( COMPILE_RESULT_TEMPLATE_TEMPLATE_PARAMETER  AND
@@ -584,11 +585,14 @@ function(get_compiler_description OUTPUT_VARIABLE)
 endfunction()
 
 
+
 # check extent of compiler support "template_template_parameter"
 function(check_template_template_parameter)
     get_os_description(OS_DESCRIPTION)
     get_compiler_description(COMPILER_DESCRIPTION)
     message(STATUS "OS_DESCRIPTION=${OS_DESCRIPTION}")
+    message(STATUS "COMPILER_DESCRIPTION=${COMPILER_DESCRIPTION}")
+
     file(WRITE "${DIAGNOSTIC_TEMPLATE_TEMPLATE_PARAMETER_FILE}"
                "#OS,compiler,TEMPLATE_CONSTRAINT,Consumer_AllTypesAllEnum,Consumer_AllTypesConstrEnum,Consumer_ArithmTypesAllEnum,Consumer_ArithmTypesConstrEnum,Consumer_ArithmTypesAllEnum2,Consumer_ArithmTypesConstrEnum2\n")
     diagnostic_template_template_parameter(
@@ -607,5 +611,44 @@ function(check_template_template_parameter)
             "${OS_DESCRIPTION}"
             "${COMPILER_DESCRIPTION}"
             FUNCTION_RETURN)
+    endif()
+endfunction()
+
+function(check_nan_infinity_values)
+    get_os_description(OS_DESCRIPTION)
+    get_compiler_description(COMPILER_DESCRIPTION)
+
+    try_run    (RUN_RESULT_NAN_INFINITY_VALUES
+                COMPILE_RESULT_NAN_INFINITY_VALUES
+                SOURCE_FROM_FILE    diagnostic_nan_infinity_values.cpp
+                                    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/diagnostic_nan_infinity_values.cpp"
+                COMPILE_DEFINITIONS "-DTEMPLATE_CONSTRAINT=${NAN_INFINITY_VALUES}"
+                ARGS "'${OS_DESCRIPTION}'" "${COMPILER_DESCRIPTION}"    # OS COMPILER argument to compiled binary
+                CXX_STANDARD "${CMAKE_CXX_STANDARD}"
+                CXX_STANDARD_REQUIRED True
+                LOG_DESCRIPTION "run-check: diagnostic_nan_infinity_values.cpp"
+                COMPILE_OUTPUT_VARIABLE  TRY_COMPILE_OUTPUT_TTP
+                #RUN_OUTPUT_VARIABLE      TRY_RUN_OUTPUT_TTP)     # return 0;
+                RUN_OUTPUT_STDOUT_VARIABLE LOG_RUN_STDOUT_TTP
+                RUN_OUTPUT_STDERR_VARIABLE LOG_RUN_STDERR_TTP)
+    message(STATUS "diagnostic_nan_infinity_values compile output : ${COMPILE_RESULT_NAN_INFINITY_VALUES}")
+    message(STATUS "diagnostic_nan_infinity_values run     output : ${RUN_RESULT_NAN_INFINITY_VALUES}")
+
+
+    if( COMPILE_RESULT_NAN_INFINITY_VALUES  AND
+        ( ( NOT RUN_RESULT_NAN_INFINITY_VALUES   STREQUAL  "FAILED_TO_RUN" ) AND
+          (     RUN_RESULT_NAN_INFINITY_VALUES   EQUAL 0 )
+        )
+      )
+        message(STATUS "diagnostic_nan_infinity_values ::  ++SUCCESS++\n${LOG_RUN_STDOUT_TTP}\n${LOG_RUN_STDERR_TTP}")
+        file(WRITE "${DIAGNOSTIC_NAN_INFINITY_VALUES_FILE}" "${LOG_RUN_STDOUT_TTP}")
+        set(FUNCTION_RETURN    ${e_ENABLE_FEATURE} PARENT_SCOPE)
+    else()
+        message(STATUS "diagnostic_nan_infinity_values ::  --FAILED--")
+        message(STATUS "diagnostic_nan_infinity_values ::  ---------std::cout--------")
+        message(STATUS "diagnostic_nan_infinity_values ::  ${LOG_RUN_STDOUT_TTP}\n${LOG_RUN_STDERR_TTP}")
+        message(STATUS "diagnostic_nan_infinity_values ::  ---------std::cerr--------")
+        message(STATUS "diagnostic_nan_infinity_values ::  ${LOG_RUN_STDERR_TTP}")
+        set(FUNCTION_RETURN    ${e_DISABLE_FEATURE} PARENT_SCOPE)
     endif()
 endfunction()

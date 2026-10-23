@@ -122,6 +122,27 @@ jobs:
           cat "${{github.workspace}}/doc/github/runnerResults/consolidateDiagnosticTTP.csv"
 
 
+      - name: List Downloaded NaN-Infinity Artifacts
+        run: |
+          shopt -s nullglob
+          files=("${{github.workspace}}/build-debug/workAroundFlags/diagnostic-NAN-INF-"*.csv)
+          echo "Artifacts NAN-INF downloaded: ${#files[@]}"
+          printf '%s\\n' "${files[@]}"
+
+      - name: Consolidate NAN-INF Artifacts and Merge
+        run: |
+          # Enable nullglob so an unmatched glob expands to nothing instead of the literal pattern
+          shopt -s nullglob
+          files=("${{github.workspace}}/build-debug/workAroundFlags/diagnostic-NAN-INF-"*.csv)
+
+          # Normalize Windows CRLF line endings before sorting
+          dos2unix "${files[@]}"
+
+          LC_ALL=C sort -u "${files[@]}" > "${{github.workspace}}/doc/github/runnerResults/consolidateDiagnosticNAN-INF.csv"
+          cat "${{github.workspace}}/doc/github/runnerResults/consolidateDiagnosticNAN-INF.csv"
+
+ 
+
 
 
       - name: GIT Commit and Push Changes
@@ -129,8 +150,9 @@ jobs:
           PR_BRANCH="automation/build-flags"
           TARGET_FLAGS_FILE="${{github.workspace}}/doc/github/runnerResults/consolidateWorkAroundFlags.csv"
           TARGET_TTP_FILE="${{github.workspace}}/doc/github/runnerResults/consolidateDiagnosticTTP.csv"
+          TARGET_NAN_INF_FILE="${{github.workspace}}/doc/github/runnerResults/consolidateDiagnosticNAN-INF.csv"
 
-          git add ${TARGET_FLAGS_FILE} ${TARGET_TTP_FILE}
+          git add ${TARGET_FLAGS_FILE} ${TARGET_TTP_FILE} ${TARGET_NAN_INF_FILE}
 
           # Only commit and push if there are actual changes to prevent workflow errors
           if ! git diff --cached --quiet; then

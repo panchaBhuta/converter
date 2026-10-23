@@ -15,7 +15,7 @@
 int main(int, char**)
 {
 #if defined(_MSC_VER)
-    commonUtils::disable_msvc_popups();
+    commonUtils::disable_msvc_popups();  // assert() generates popus in msvc
 #endif
 
   std::array<char, std::numeric_limits<float>::digits +5 > str;  // +5 just to be on the safe side :)

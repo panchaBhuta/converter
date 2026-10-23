@@ -156,6 +156,7 @@ A :: No, there will be no build conflict. CMake handles this situation completel
 check_chrono_stream_functionality()  # fetches date-lib if needed
 check_floatingPoint_elementaryStringConversions()
 check_template_template_parameter()
+check_nan_infinity_values()
 
 
 project_check_cxx_compiler_flag_file_prefix_map(converter INTERFACE CONVERTER)
