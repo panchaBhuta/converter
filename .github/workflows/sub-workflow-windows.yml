@@ -197,7 +197,7 @@ jobs:
           DIAGNOSTIC_TTP_FILE="${FLAG_DIR}/diagnostic-TTP-${{ matrix.os-generator.os }}-${{ matrix.toolset_compiler.compiler }}.csv"
           mv "${FLAG_DIR}/check_template_template_parameter_output.txt"  "${DIAGNOSTIC_TTP_FILE}"
 
-          DIAGNOSTIC_NAN_INF_FILE="${FLAG_DIR}/diagnostic-NAN-INF-${{ matrix.os }}-${{ matrix.compiler }}.csv"
+          DIAGNOSTIC_NAN_INF_FILE="${FLAG_DIR}/diagnostic-NAN-INF-${{ matrix.os-generator.os }}-${{ matrix.toolset_compiler.compiler }}.csv"
           mv "${FLAG_DIR}/check_nan_infinity_values_output.txt" "${DIAGNOSTIC_NAN_INF_FILE}"
 
       - name: Check Work-Around-Flags (compiler=g++)     -   cmdShell( "msys2 {0}" )
@@ -231,8 +231,8 @@ jobs:
       - name: Upload Consolidate-Diagnostic-NAN-INF Artifact from Sub-Workflow
         uses: actions/upload-artifact@v4
         with:
-          name: "artifact-nan-inf-${{ matrix.os }}-${{ matrix.compiler }}"
-          path: "build-debug/workAroundFlags/diagnostic-NAN-INF-${{ matrix.os }}-${{ matrix.compiler }}.csv"
+          name: "artifact-nan-inf-${{ matrix.os-generator.os }}-${{ matrix.toolset_compiler.compiler }}"
+          path: "build-debug/workAroundFlags/diagnostic-NAN-INF-${{ matrix.os-generator.os }}-${{ matrix.toolset_compiler.compiler }}.csv"
           if-no-files-found: error
 
 
