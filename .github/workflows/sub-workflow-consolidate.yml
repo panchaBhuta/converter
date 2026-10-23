@@ -156,14 +156,23 @@ jobs:
             exit 1
           fi
 
-          # Normalize Windows CRLF line endings before sorting
-          dos2unix "${files[@]}" || {
-            echo "ERROR: Failed to normalize NAN-INF diagnostic files."
-            exit 1
-          }
+          OUTPUT_FILE="${{github.workspace}}/doc/github/runnerResults/consolidateDiagnosticNAN-INF.csv"
 
-          LC_ALL=C sort -u "${files[@]}" > "${{github.workspace}}/doc/github/runnerResults/consolidateDiagnosticNAN-INF.csv"
-          cat "${{github.workspace}}/doc/github/runnerResults/consolidateDiagnosticNAN-INF.csv"
+          # Remove trailing CR characters, then sort and deduplicate.
+          if ! cat "${files[@]}" |
+              sed 's/\r$//' |
+              LC_ALL=C sort -u > "${OUTPUT_FILE}"; then
+              echo "ERROR: Failed to consolidate NAN-INF diagnostic files."
+              exit 1
+          fi
+
+          # Verify that no CR characters remain.
+          if LC_ALL=C grep -n $'\r' "${OUTPUT_FILE}"; then
+              echo "ERROR: CR characters remain in consolidated NAN-INF CSV."
+              exit 1
+          fi
+
+          cat "${OUTPUT_FILE}"
 
  
 
