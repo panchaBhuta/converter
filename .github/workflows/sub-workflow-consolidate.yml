@@ -95,8 +95,16 @@ jobs:
           shopt -s nullglob
           files=("${{github.workspace}}/build-debug/workAroundFlags/flag-"*.csv)
 
+          if ((${#files[@]} == 0)); then
+            echo "ERROR: No workAroundFlags CSV files found."
+            exit 1
+          fi
+
           # Normalize Windows CRLF line endings before sorting
-          dos2unix "${files[@]}"
+          dos2unix "${files[@]}" || {
+            echo "ERROR: Failed to normalize workAroundFlags files."
+            exit 1
+          }
 
           LC_ALL=C sort -u "${files[@]}" > "${{github.workspace}}/doc/github/runnerResults/consolidateWorkAroundFlags.csv"
           cat "${{github.workspace}}/doc/github/runnerResults/consolidateWorkAroundFlags.csv"
@@ -115,8 +123,16 @@ jobs:
           shopt -s nullglob
           files=("${{github.workspace}}/build-debug/workAroundFlags/diagnostic-TTP-"*.csv)
 
+          if ((${#files[@]} == 0)); then
+            echo "ERROR: No Template-Template-Parameter diagnostic CSV files found."
+            exit 1
+          fi
+
           # Normalize Windows CRLF line endings before sorting
-          dos2unix "${files[@]}"
+          dos2unix "${files[@]}" || {
+            echo "ERROR: Failed to normalize NAN-INF diagnostic files."
+            exit 1
+          }
 
           LC_ALL=C sort -u "${files[@]}" > "${{github.workspace}}/doc/github/runnerResults/consolidateDiagnosticTTP.csv"
           cat "${{github.workspace}}/doc/github/runnerResults/consolidateDiagnosticTTP.csv"
@@ -135,8 +151,16 @@ jobs:
           shopt -s nullglob
           files=("${{github.workspace}}/build-debug/workAroundFlags/diagnostic-NAN-INF-"*.csv)
 
+          if ((${#files[@]} == 0)); then
+            echo "ERROR: No NAN-INF diagnostic CSV files found."
+            exit 1
+          fi
+
           # Normalize Windows CRLF line endings before sorting
-          dos2unix "${files[@]}"
+          dos2unix "${files[@]}" || {
+            echo "ERROR: Failed to normalize NAN-INF diagnostic files."
+            exit 1
+          }
 
           LC_ALL=C sort -u "${files[@]}" > "${{github.workspace}}/doc/github/runnerResults/consolidateDiagnosticNAN-INF.csv"
           cat "${{github.workspace}}/doc/github/runnerResults/consolidateDiagnosticNAN-INF.csv"
