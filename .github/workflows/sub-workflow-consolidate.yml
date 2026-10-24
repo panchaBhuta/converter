@@ -105,7 +105,7 @@ jobs:
             echo "ERROR: Failed to normalize workAroundFlags files."
             exit 1
           }
-	  sed -i 's/\r//' "${files[@]}"
+          sed -i 's/\r//' "${files[@]}"
 
           OUTPUT_FILE="${{github.workspace}}/doc/github/runnerResults/consolidateWorkAroundFlags.csv"
 
@@ -144,7 +144,7 @@ jobs:
             echo "ERROR: Failed to normalize TTP diagnostic files."
             exit 1
           }
-	  sed -i 's/\r//' "${files[@]}"
+          sed -i 's/\r//' "${files[@]}"
 
           OUTPUT_FILE="${{github.workspace}}/doc/github/runnerResults/consolidateDiagnosticTTP.csv"
 
@@ -183,7 +183,7 @@ jobs:
             echo "ERROR: Failed to normalize NAN-INF diagnostic files."
             exit 1
           }
-	  sed -i 's/\r//' "${files[@]}"
+          sed -i 's/\r//' "${files[@]}"
 
           OUTPUT_FILE="${{github.workspace}}/doc/github/runnerResults/consolidateDiagnosticNAN-INF.csv"
 
