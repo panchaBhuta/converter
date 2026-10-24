@@ -496,7 +496,7 @@ int main(int argc, char* argv[])
         << TEMPLATE_CONSTRAINT_STRING << ",capability_AllTypesAllEnum,capability_AllTypesConstrEnum,"
         << "capability_ArithmTypesAllEnum,capability_ArithmTypesConstrEnum,"
         << "capability_ArithmTypesAllEnum2,capability_ArithmTypesConstrEnum2"
-        << std::endl;
+        << "\n";
 
     std::cout
         << "Consumer_AllTypesAllEnum,"
@@ -506,7 +506,7 @@ int main(int argc, char* argv[])
         << Test_Consumer_AllTypesAllEnum<int, P::A>::capability_ArithmTypesConstrEnum << ","
         << Test_Consumer_AllTypesAllEnum<int, P::A>::capability_ArithmTypesAllEnum2 << ","
         << Test_Consumer_AllTypesAllEnum<int, P::A>::capability_ArithmTypesConstrEnum2
-        << std::endl;
+        << "\n";
 
     std::cout
         << "Consumer_AllTypesConstrEnum,"
@@ -516,7 +516,7 @@ int main(int argc, char* argv[])
         << Test_Consumer_AllTypesConstrEnum<int, P::A>::capability_ArithmTypesConstrEnum << ","
         << Test_Consumer_AllTypesConstrEnum<int, P::A>::capability_ArithmTypesAllEnum2 << ","
         << Test_Consumer_AllTypesConstrEnum<int, P::A>::capability_ArithmTypesConstrEnum2
-        << std::endl;
+        << "\n";
 
     std::cout
         << "Consumer_ArithmTypesAllEnum,"
@@ -526,7 +526,7 @@ int main(int argc, char* argv[])
         << Test_Consumer_ArithmTypesAllEnum<int, P::A>::capability_ArithmTypesConstrEnum << ","
         << Test_Consumer_ArithmTypesAllEnum<int, P::A>::capability_ArithmTypesAllEnum2 << ","
         << Test_Consumer_ArithmTypesAllEnum<int, P::A>::capability_ArithmTypesConstrEnum2
-        << std::endl;
+        << "\n";
 
     std::cout
         << "Consumer_ArithmTypesConstrEnum,"
@@ -536,7 +536,7 @@ int main(int argc, char* argv[])
         << Test_Consumer_ArithmTypesConstrEnum<int, P::A>::capability_ArithmTypesConstrEnum << ","
         << Test_Consumer_ArithmTypesConstrEnum<int, P::A>::capability_ArithmTypesAllEnum2 << ","
         << Test_Consumer_ArithmTypesConstrEnum<int, P::A>::capability_ArithmTypesConstrEnum2
-        << std::endl;
+        << "\n";
 
     std::cout
         << "Consumer_ArithmTypesAllEnum2,"
@@ -546,7 +546,7 @@ int main(int argc, char* argv[])
         << Test_Consumer_ArithmTypesAllEnum2<int, P::A>::capability_ArithmTypesConstrEnum << ","
         << Test_Consumer_ArithmTypesAllEnum2<int, P::A>::capability_ArithmTypesAllEnum2 << ","
         << Test_Consumer_ArithmTypesAllEnum2<int, P::A>::capability_ArithmTypesConstrEnum2
-        << std::endl;
+        << "\n";
 
     std::cout
         << "Consumer_ArithmTypesConstrEnum2,"
@@ -556,7 +556,7 @@ int main(int argc, char* argv[])
         << Test_Consumer_ArithmTypesConstrEnum2<int, P::A>::capability_ArithmTypesConstrEnum << ","
         << Test_Consumer_ArithmTypesConstrEnum2<int, P::A>::capability_ArithmTypesAllEnum2 << ","
         << Test_Consumer_ArithmTypesConstrEnum2<int, P::A>::capability_ArithmTypesConstrEnum2
-        << std::endl;
+        << "\n";
 
     const char* os = argv[1];
     const char* compiler = argv[2];
@@ -570,7 +570,7 @@ int main(int argc, char* argv[])
         << "Consumer_ArithmTypesConstrEnum,"
         << "Consumer_ArithmTypesAllEnum2,"
         << "Consumer_ArithmTypesConstrEnum2"
-        << std::endl;
+        << "\n";
     */
 
     std::cerr
@@ -583,7 +583,7 @@ int main(int argc, char* argv[])
         << Test_Consumer_ArithmTypesConstrEnum<int, P::A>::capability_bitMaskResult << ","
         << Test_Consumer_ArithmTypesAllEnum2<int, P::A>::capability_bitMaskResult << ","
         << Test_Consumer_ArithmTypesConstrEnum2<int, P::A>::capability_bitMaskResult
-        << std::endl;
+        << "\n";
 
     return 0;
 }

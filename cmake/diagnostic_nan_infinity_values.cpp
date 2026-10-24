@@ -28,7 +28,7 @@ void getLimits(const char* typeName, int order)
     else
         std::cout << ",";
 
-    std::cout << std::endl;
+    std::cout << "\n";
 }
 
 #define GETLIMITS(X, Y) getLimits<X>( #X , Y )
@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
         << "has_quiet_nan,quiet_NaN(),"
         << "has_signal_nan,signaling_NaN(),"
         << "has_infinity,infinity(),-infinity()"
-        << std::endl;
+        << "\n";
 
     GETLIMITS(float , 1);
     GETLIMITS(double , 2);

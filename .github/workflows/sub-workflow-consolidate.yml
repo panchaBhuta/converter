@@ -105,9 +105,20 @@ jobs:
             echo "ERROR: Failed to normalize workAroundFlags files."
             exit 1
           }
+	  sed -i 's/\r//' "${files[@]}"
 
-          LC_ALL=C sort -u "${files[@]}" > "${{github.workspace}}/doc/github/runnerResults/consolidateWorkAroundFlags.csv"
-          cat "${{github.workspace}}/doc/github/runnerResults/consolidateWorkAroundFlags.csv"
+          OUTPUT_FILE="${{github.workspace}}/doc/github/runnerResults/consolidateWorkAroundFlags.csv"
+
+          # sort and deduplicate.
+          LC_ALL=C sort -u "${files[@]}" > "${OUTPUT_FILE}"
+
+          # Verify that no CR characters remain.
+          if LC_ALL=C grep -n $'\r' "${OUTPUT_FILE}"; then
+              echo "ERROR: CR characters remain in consolidated WorkAroundFlags CSV."
+              exit 1
+          fi
+
+          cat "${OUTPUT_FILE}"
 
 
       - name: List Downloaded TTP Artifacts
@@ -130,12 +141,23 @@ jobs:
 
           # Normalize Windows CRLF line endings before sorting
           dos2unix "${files[@]}" || {
-            echo "ERROR: Failed to normalize NAN-INF diagnostic files."
+            echo "ERROR: Failed to normalize TTP diagnostic files."
             exit 1
           }
+	  sed -i 's/\r//' "${files[@]}"
 
-          LC_ALL=C sort -u "${files[@]}" > "${{github.workspace}}/doc/github/runnerResults/consolidateDiagnosticTTP.csv"
-          cat "${{github.workspace}}/doc/github/runnerResults/consolidateDiagnosticTTP.csv"
+          OUTPUT_FILE="${{github.workspace}}/doc/github/runnerResults/consolidateDiagnosticTTP.csv"
+
+          # sort and deduplicate.
+          LC_ALL=C sort -u "${files[@]}" > "${OUTPUT_FILE}"
+
+          # Verify that no CR characters remain.
+          if LC_ALL=C grep -n $'\r' "${OUTPUT_FILE}"; then
+              echo "ERROR: CR characters remain in consolidated TTP CSV."
+              exit 1
+          fi
+
+          cat "${OUTPUT_FILE}"
 
 
       - name: List Downloaded NaN-Infinity Artifacts
@@ -156,15 +178,17 @@ jobs:
             exit 1
           fi
 
+          # Normalize Windows CRLF line endings before sorting
+          dos2unix "${files[@]}" || {
+            echo "ERROR: Failed to normalize NAN-INF diagnostic files."
+            exit 1
+          }
+	  sed -i 's/\r//' "${files[@]}"
+
           OUTPUT_FILE="${{github.workspace}}/doc/github/runnerResults/consolidateDiagnosticNAN-INF.csv"
 
-          # Remove trailing CR characters, then sort and deduplicate.
-          if ! cat "${files[@]}" |
-              sed 's/\r$//' |
-              LC_ALL=C sort -u > "${OUTPUT_FILE}"; then
-              echo "ERROR: Failed to consolidate NAN-INF diagnostic files."
-              exit 1
-          fi
+          # sort and deduplicate.
+          LC_ALL=C sort -u "${files[@]}" > "${OUTPUT_FILE}"
 
           # Verify that no CR characters remain.
           if LC_ALL=C grep -n $'\r' "${OUTPUT_FILE}"; then
