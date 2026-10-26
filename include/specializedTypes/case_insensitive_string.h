@@ -93,7 +93,9 @@ namespace specializedTypes {
   operator==( const std::basic_string<CharT, Traits,                    Allocator>& str,
               const std::basic_string<CharT, converter::ci_char_traits, Allocator>& cistr)
   {
-    std::basic_string<CharT, converter::ci_char_traits, Allocator> chk = str;
+    std::basic_string<CharT, converter::ci_char_traits, Allocator>
+        chk(str.begin(), str.end());
+
     return chk == cistr;
   }
   template<typename CharT, specializedTypes::c_NOT_ci_char_traits Traits, typename Allocator>
@@ -101,7 +103,9 @@ namespace specializedTypes {
   operator==( const std::basic_string<CharT, converter::ci_char_traits, Allocator>& cistr,
               const std::basic_string<CharT, Traits,                    Allocator>& str)
   {
-    std::basic_string<CharT, converter::ci_char_traits, Allocator> chk = str;
+    std::basic_string<CharT, converter::ci_char_traits, Allocator>
+        chk(str.begin(), str.end());
+
     return cistr == chk;
   }
 
@@ -119,7 +123,9 @@ namespace specializedTypes {
   operator<=>( const std::basic_string<CharT, converter::ci_char_traits, Allocator>& cistr,
                 const std::basic_string<CharT, Traits,                   Allocator>& str)
   {
-    std::basic_string<CharT, converter::ci_char_traits, Allocator> chk = str;
+    std::basic_string<CharT, converter::ci_char_traits, Allocator>
+        chk(str.begin(), str.end());
+
     return cistr <=> chk;
   }
 

@@ -77,7 +77,9 @@ inline void conversionFP_S2T_C_E(const std::string& vStr)
   {
     conversionFP_S2T_C_NAN<T, CONV_PROCESS, ERR_HANDLER>(vStr);
   } else if constexpr (ERR_HANDLER == Str2TnErrorHandler::VARIANT_VAL) {
-    if ( vStr.compare("nan") == 0 ) {
+    specializedTypes::ci_string    ciNaN{"nan"};
+    if ( ciNaN == vStr )
+    {
       conversionFP_S2T_C_VARIANT<T, CONV_PROCESS, 1>(vStr);
     } else {
       conversionFP_S2T_C_VARIANT<T, CONV_PROCESS, 2>(vStr);
@@ -117,32 +119,8 @@ void conversionFP_S2T_iC(const std::string& vStr)
 }
 
 
-
-
-
-
-
-
-/*
-template <c_floating_point T, size_t IDX_CONV_PROCESS>
-void conversionFP_T2S_iC(const T& val, const std::string& vStr)
-{
-  if constexpr ( IDX_CONV_PROCESS < DefaultTn2Str<T>::validConversionProcesses().size() )
-  {
-    constexpr Tn2StrConversionProcess CONV_PROCESS =
-	        DefaultTn2Str<T>::validConversionProcesses()[IDX_CONV_PROCESS];
-    std::string sVal = ConvertFromVal<T , CONV_PROCESS>::ToStr(val);
-    unittest::ExpectEqual(std::string, sVal, vStr);
-
-    conversionFP_T2S_iC  <T, (IDX_CONV_PROCESS+1) >(val, vStr);
-  }
-}
-variantReturnType<T>
-*/
-
 template <c_floating_point T>
-//void conversionFP_FailureCheck_all(const T& val, const std::string& vStr)
-void conversionFP_FailureCheck_all(const std::string& vStr)
+void conversionFP_FailureCheck_S2T(const std::string& vStr)
 {
   std::cout << std::endl;
   std::cout << "S2T : CONV_PROCESS for type [" << specializedTypes::get_name<T>() << "] : ";
@@ -152,15 +130,41 @@ void conversionFP_FailureCheck_all(const std::string& vStr)
   for(size_t i = 0; i < DefaultStr2Tn<T>::validErrorHandlers().size() ; ++i) std::cout << DefaultStr2Tn<T>::validErrorHandlers()[i] << ", ";
   std::cout << std::endl;
   conversionFP_S2T_iC<T, 0 >(vStr);
-
-  std::cout << "T2S : CONV_PROCESS for type [" << specializedTypes::get_name<T>() << "] : ";
-  for(size_t i = 0; i < DefaultTn2Str<T>::validConversionProcesses().size() ; ++i) std::cout << DefaultTn2Str<T>::validConversionProcesses()[i] << ", ";
-  std::cout << std::endl;
-  //conversionFP_T2S_iC<T, 0 >(val, vStr);
 }
 
 
 
+
+
+
+
+template <c_floating_point T, size_t IDX_CONV_PROCESS>
+void conversionFP_T2S_iC(const T& val)
+{
+  if constexpr ( IDX_CONV_PROCESS < DefaultTn2Str<T>::validConversionProcesses().size() )
+  {
+    std::string vStr{"nan"};
+    constexpr Tn2StrConversionProcess CONV_PROCESS =
+	        DefaultTn2Str<T>::validConversionProcesses()[IDX_CONV_PROCESS];
+    std::string sVal = ConvertFromVal<T , CONV_PROCESS>::ToStr(val);
+    unittest::ExpectEqual(std::string, sVal, vStr);
+
+    conversionFP_T2S_iC  <T, (IDX_CONV_PROCESS+1) >(val);
+  }
+}
+/*
+variantReturnType<T>
+*/
+
+
+template <c_floating_point T>
+void conversionFP_FailureCheck_T2S(const T& val)
+{
+  std::cout << "T2S : CONV_PROCESS for type [" << specializedTypes::get_name<T>() << "] : ";
+  for(size_t i = 0; i < DefaultTn2Str<T>::validConversionProcesses().size() ; ++i) std::cout << DefaultTn2Str<T>::validConversionProcesses()[i] << ", ";
+  std::cout << std::endl;
+  conversionFP_T2S_iC<T, 0 >(val);
+}
 
 
 
@@ -172,7 +176,60 @@ int main()
 
   int rv = 0;
   try {
-    conversionFP_FailureCheck_all<float>("nan");
+    conversionFP_FailureCheck_S2T<float>      ("nan");
+    conversionFP_FailureCheck_S2T<double>     ("nan");
+    conversionFP_FailureCheck_S2T<long double>("nan");
+
+    conversionFP_FailureCheck_S2T<float>      ("Nan");
+    conversionFP_FailureCheck_S2T<double>     ("Nan");
+    conversionFP_FailureCheck_S2T<long double>("Nan");
+
+    conversionFP_FailureCheck_S2T<float>      ("nAn");
+    conversionFP_FailureCheck_S2T<double>     ("nAn");
+    conversionFP_FailureCheck_S2T<long double>("nAn");
+
+    conversionFP_FailureCheck_S2T<float>      ("naN");
+    conversionFP_FailureCheck_S2T<double>     ("naN");
+    conversionFP_FailureCheck_S2T<long double>("naN");
+
+    conversionFP_FailureCheck_S2T<float>      ("NAn");
+    conversionFP_FailureCheck_S2T<double>     ("NAn");
+    conversionFP_FailureCheck_S2T<long double>("NAn");
+
+    conversionFP_FailureCheck_S2T<float>      ("nAN");
+    conversionFP_FailureCheck_S2T<double>     ("nAN");
+    conversionFP_FailureCheck_S2T<long double>("nAN");
+
+    conversionFP_FailureCheck_S2T<float>      ("NaN");
+    conversionFP_FailureCheck_S2T<double>     ("NaN");
+    conversionFP_FailureCheck_S2T<long double>("NaN");
+
+    conversionFP_FailureCheck_S2T<float>      ("NAN");
+    conversionFP_FailureCheck_S2T<double>     ("NAN");
+    conversionFP_FailureCheck_S2T<long double>("NAN");
+
+    std::cout << "testFloatingPointNaN : T2S : has_quiet_NaN" << std::endl;
+    if constexpr (std::numeric_limits<float>::has_quiet_NaN)
+      conversionFP_FailureCheck_T2S<float>      (std::numeric_limits<float>::quiet_NaN());
+
+    if constexpr (std::numeric_limits<double>::has_quiet_NaN)
+      conversionFP_FailureCheck_T2S<double>     (std::numeric_limits<double>::quiet_NaN());
+
+    if constexpr (std::numeric_limits<long double>::has_quiet_NaN)
+      conversionFP_FailureCheck_T2S<long double>(std::numeric_limits<long double>::quiet_NaN());
+
+    std::cout << "testFloatingPointNaN : T2S : has_signaling_NaN" << std::endl;
+    if constexpr (std::numeric_limits<float>::has_signaling_NaN)
+      conversionFP_FailureCheck_T2S<float>      (std::numeric_limits<float>::signaling_NaN());
+
+    if constexpr (std::numeric_limits<double>::has_signaling_NaN)
+      conversionFP_FailureCheck_T2S<double>     (std::numeric_limits<double>::signaling_NaN());
+
+    if constexpr (std::numeric_limits<long double>::has_signaling_NaN)
+      conversionFP_FailureCheck_T2S<long double>(std::numeric_limits<long double>::signaling_NaN());
+
+    // TODO   T2S variantReturnType<T>
+
   } catch (const std::exception& ex) {
     std::cout << "Test Failed : err-msg : " << ex.what() << std::endl;
     rv = 1;

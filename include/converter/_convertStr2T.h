@@ -36,6 +36,7 @@
 
 #include <converter/_common.h>
 #include <specializedTypes/CompTimeStr.h>
+#include <specializedTypes/case_insensitive_string.h>
 
 namespace converter
 {
@@ -925,7 +926,8 @@ namespace converter
         if constexpr (c_floating_point<T> &&
                       std::numeric_limits<T>::has_quiet_NaN)
         {
-          if(str.compare("nan") == 0)
+          specializedTypes::ci_string    ciNaN{"nan"};
+          if ( ciNaN == str )
           {
             // workaround for stream as it does not convert string "nan"
             // to floating-type NaN in other conversion mechanisms
