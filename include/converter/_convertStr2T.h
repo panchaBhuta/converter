@@ -921,14 +921,7 @@ namespace converter
       // if the input cannot be parsed as a valid value of the type or if it contains more than one character.
       if (_checkStreamFailure(iss))
       {
-#if defined(_MSC_VER) && !defined(__clang__)
-
-    /* Microsoft Visual C++ (MSVC) */
-
-#elif defined(__GNUC__) && !defined(__clang__)
-
-    /* GCC (g++) */
-
+        // The branching below is applicable across all compilers tested on github
         if constexpr (c_floating_point<T> &&
                       std::numeric_limits<T>::has_quiet_NaN)
         {
@@ -937,17 +930,11 @@ namespace converter
             // workaround for stream as it does not convert string "nan"
             // to floating-type NaN in other conversion mechanisms
             T pseudoResult = (std::isnan(result)) ?
-                              result              :
-                              std::numeric_limits<T>::quiet_NaN() ;  // for Ubuntu:g++ this is the branch path
+                              result              :                  // compilers mostly don't hit this branch path
+                              std::numeric_limits<T>::quiet_NaN() ;  // this is the branch path taken by most compilers
             return CheckNAN<T, ERR_HANDLER>::handle( str, pseudoResult);
           }
         }
-
-#elif defined(__clang__)
-
-    /* Clang, including clang-cl */
-
-#endif
         std::string errMsg = "Stream read failure. " + funcName + " :: input-string-stream-failure for str='" + str + "'";
         CONVERTER_DEBUG_LOG( errMsg << std::boolalpha << " iss.fail()=" << iss.fail() << "  iss.bad()="   \
                                     << iss.bad() << "  iss.eof()=" << iss.eof());
