@@ -5,166 +5,174 @@
 #include <iostream>
 #include <cmath>
 #include <typeinfo>
+#include <type_traits>
+#include <limits>
 
 #include <converter/converter.h>
+#include <commonUtils/disable_msvc_popups.h>
+#include <specializedTypes/case_insensitive_string.h>
 
 #include "unittest.h"
-
-#if USE_FLOATINGPOINT_FROM_CHARS_1  ==  e_ENABLE_FEATURE
-template <typename T, converter::FailureS2Tprocess EP>
-using _ConvS2T_CtoT = converter::ConvertFromStr<T, converter::S2T_Format_std_CtoT<T, EP>>;
-#endif
-
-template <typename T, converter::FailureS2Tprocess EP>
-using _ConvS2T_StoT = converter::ConvertFromStr<T, converter::S2T_Format_std_StoT<T, EP>>;
-
-template <typename T, converter::FailureS2Tprocess EP>
-using _ConvS2T_ISS = converter::ConvertFromStr<T, converter::S2T_Format_StreamUseClassicLocale<T, EP, char>>;
-
-#if USE_FLOATINGPOINT_TO_CHARS_1  ==  e_ENABLE_FEATURE
-template <typename T>
-using _ConvT2S_TtoC = converter::ConvertFromVal<T, converter::T2S_Format_std_TtoC>;
-#endif
-
-template <typename T>
-using _ConvT2S_TtoS = converter::ConvertFromVal<T, converter::T2S_Format_StreamDecimalPrecision<T>>;
-
-template <typename T>
-using _ConvT2S_OSS = converter::ConvertFromVal<T, converter::T2S_Format_StreamUseClassicLocale<char>>;
+#include "utilities.h"
 
 
-template <typename T>
-void conversion_String2FloatingPoint_FailureCheck(const std::string& vStr)
+
+using namespace converter;
+
+
+
+template <c_floating_point T, Str2TnConversionProcess CONV_PROCESS, Str2TnErrorHandler ERR_HANDLER >
+          requires ( ERR_HANDLER == Str2TnErrorHandler::QUIET_NAN ||
+                     ERR_HANDLER == Str2TnErrorHandler::SIGNAL_NAN )
+inline void conversionFP_S2T_C_NAN(const std::string& vStr)
 {
-#if USE_FLOATINGPOINT_FROM_CHARS_1  ==  e_ENABLE_FEATURE
+  if constexpr ( ERR_HANDLER == Str2TnErrorHandler::QUIET_NAN )
   {
-    ExpectException(_ConvS2T_CtoT<T COMMA converter::FailureS2Tprocess::THROW_ERROR>::ToVal(vStr), std::invalid_argument);
-    unittest::ExpectTrue(std::isnan(_ConvS2T_CtoT<T COMMA converter::FailureS2Tprocess::QUIET_NAN>::ToVal(vStr)));
-
-    unittest::ExpectTrue(std::isnan(_ConvS2T_CtoT<T COMMA converter::FailureS2Tprocess::SIGNAL_NAN>::ToVal(vStr)));
-    unittest::ExpectTrue(std::isnan(converter::ConvertFromStr<T>::ToVal(vStr))); // default: same as above, as S2T_Format_std_CtoT<T, SIGNAL_NAN> is default
-
-    typename converter::OnError<T, converter::FailureS2Tprocess::VARIANT_NAN>::return_type varT = 
-      _ConvS2T_CtoT<T , converter::FailureS2Tprocess::VARIANT_NAN>::ToVal(vStr);
-    unittest::ExpectTrue(varT.index() == 1);
-    unittest::ExpectEqual(std::string, std::get<std::string>(varT), vStr);
-  }
-#endif
-
-  {
-    ExpectException(_ConvS2T_StoT<T COMMA converter::FailureS2Tprocess::THROW_ERROR>::ToVal(vStr), std::invalid_argument);
-    unittest::ExpectTrue(std::isnan(_ConvS2T_StoT<T COMMA converter::FailureS2Tprocess::QUIET_NAN>::ToVal(vStr)));
-#if USE_FLOATINGPOINT_FROM_CHARS_1  ==  e_ENABLE_FEATURE
-    unittest::ExpectTrue(std::isnan(_ConvS2T_StoT<T COMMA converter::FailureS2Tprocess::SIGNAL_NAN>::ToVal(vStr)));
-#elif USE_FLOATINGPOINT_FROM_CHARS_1  ==  e_DISABLE_FEATURE
-    unittest::ExpectTrue(std::isnan(_ConvS2T_StoT<T COMMA converter::FailureS2Tprocess::SIGNAL_NAN>::ToVal(vStr)));
-    unittest::ExpectTrue(std::isnan(converter::ConvertFromStr<T>::ToVal(vStr))); // default: same as above, as S2T_Format_std_StoT<T, SIGNAL_NAN> is default
-#endif
-
-    typename converter::OnError<T, converter::FailureS2Tprocess::VARIANT_NAN>::return_type varT = 
-      _ConvS2T_StoT<T, converter::FailureS2Tprocess::VARIANT_NAN>::ToVal(vStr);
-    unittest::ExpectTrue(varT.index() == 1);
-    unittest::ExpectEqual(std::string, std::get<std::string>(varT), vStr);
-  }
-
-  {
-    ExpectException(_ConvS2T_ISS<T COMMA converter::FailureS2Tprocess::THROW_ERROR>::ToVal(vStr), std::invalid_argument);
-    unittest::ExpectTrue(std::isnan(_ConvS2T_ISS<T COMMA converter::FailureS2Tprocess::QUIET_NAN>::ToVal(vStr)));
-    unittest::ExpectTrue(std::isnan(_ConvS2T_ISS<T COMMA converter::FailureS2Tprocess::SIGNAL_NAN>::ToVal(vStr)));
-
-    typename converter::OnError<T, converter::FailureS2Tprocess::VARIANT_NAN>::return_type varT = 
-      _ConvS2T_ISS<T , converter::FailureS2Tprocess::VARIANT_NAN>::ToVal(vStr);
-    unittest::ExpectTrue(varT.index() == 1);
-    unittest::ExpectEqual(std::string, std::get<std::string>(varT), vStr);
+    if constexpr (std::numeric_limits<T>::has_quiet_NaN)
+    {
+      T cVal = ConvertFromStr<T , CONV_PROCESS , ERR_HANDLER>::ToVal(vStr);
+      unittest::ExpectTrue(std::isnan(cVal));
+    } else {
+      std::cout << "conversionFP_S2T_C_NAN<" << specializedTypes::get_name<T>() << "," << CONV_PROCESS << ", QUIET_NAN>(" << vStr << ") skipped as has_quiet_NaN = false\n";
+    }
+  } else if constexpr ( ERR_HANDLER == Str2TnErrorHandler::SIGNAL_NAN ) {
+    if constexpr (std::numeric_limits<T>::has_signaling_NaN)
+    {
+      T cVal = ConvertFromStr<T , CONV_PROCESS , ERR_HANDLER>::ToVal(vStr);
+      unittest::ExpectTrue(std::isnan(cVal));
+    } else {
+      std::cout << "conversionFP_S2T_C_NAN<" << specializedTypes::get_name<T>() << "," << CONV_PROCESS << ", SIGNAL_NAN>(" << vStr << ") skipped as has_signal_NaN = false\n";
+    }
   }
 }
 
-template <typename T>
-void conversion_FloatingPointNAN2String_FailureCheck(const std::string& vStr)
+template <c_floating_point T, Str2TnConversionProcess CONV_PROCESS, size_t IDX > // Note : since it's error test, IDX != 0
+    requires ( IDX == 1 || IDX == 2 )
+inline void conversionFP_S2T_C_VARIANT(const std::string& vStr)
 {
-#if USE_FLOATINGPOINT_TO_CHARS_1  ==  e_ENABLE_FEATURE
+  auto cVal = ConvertFromStr<T , CONV_PROCESS , Str2TnErrorHandler::VARIANT_VAL>::ToVal(vStr);
+  unittest::ExpectEqual(size_t,      cVal.index(), IDX);
+  unittest::ExpectEqual(std::string, std::get<IDX>(cVal).value, vStr);
+  if constexpr ( IDX == 1 )
   {
-    unittest::ExpectEqual(std::string, _ConvT2S_TtoC<T>::ToStr(std::numeric_limits<T>::quiet_NaN()), "nan");
-  #if defined(WIN64) || defined(_WIN64) || defined(__WIN64) || defined(__WIN64__)
-    //std::cout << "1. _ConvT2S_TtoC<T=" << typeid(T).name() << ">::ToStr(std::numeric_limits<T>::signaling_NaN()) = #" <<
-    //              _ConvT2S_TtoC<T>::ToStr(std::numeric_limits<T>::signaling_NaN()) << "#  ; vStr=" << vStr << std::endl;
-    //  arbitarially prints 'nan' or 'nan(snan)'
-    unittest::ExpectEqual(std::string, _ConvT2S_TtoC<T>::ToStr(std::numeric_limits<T>::signaling_NaN()).substr(0,3), std::string("nan"));
-  #else
-    unittest::ExpectEqual(std::string, _ConvT2S_TtoC<T>::ToStr(std::numeric_limits<T>::signaling_NaN()), std::string("nan"));
-  #endif
-    unittest::ExpectEqual(std::string, converter::ConvertFromVal< std::variant<T COMMA std::string> COMMA
-                                                                  converter::T2S_Format_std_TtoC
-                                                    >::ToStr(std::variant<T COMMA std::string>{vStr}),
-                                       vStr);
-    unittest::ExpectEqual(std::string, converter::ConvertFromVal< std::variant<T COMMA std::string>
-                                                    >::ToStr(std::variant<T COMMA std::string>{vStr}),
-                                       vStr); // same as above as T2S_Format_std_TtoC is default
-  }
-#endif
-
-  {
-    unittest::ExpectEqual(std::string, _ConvT2S_TtoS<T>::ToStr(std::numeric_limits<T>::quiet_NaN()), "nan");
-  #if defined(WIN64) || defined(_WIN64) || defined(__WIN64) || defined(__WIN64__)
-    //std::cout << "2. _ConvT2S_TtoS<T" << typeid(T).name() << ">::ToStr(std::numeric_limits<T>::signaling_NaN()) = #" <<
-    //              _ConvT2S_TtoS<T>::ToStr(std::numeric_limits<T>::signaling_NaN()) << "#  ; vStr=" << vStr << std::endl;
-    unittest::ExpectEqual(std::string, _ConvT2S_TtoC<T>::ToStr(std::numeric_limits<T>::signaling_NaN()).substr(0,3), std::string("nan"));
-  #else
-    unittest::ExpectEqual(std::string, _ConvT2S_TtoS<T>::ToStr(std:: numeric_limits<T>::signaling_NaN()), std::string("nan"));
-  #endif
-    unittest::ExpectEqual(std::string, converter::ConvertFromVal< std::variant<T COMMA std::string> COMMA
-                                                                  converter::T2S_Format_StreamDecimalPrecision<T>
-                                                    >::ToStr(std::variant<T COMMA std::string>{vStr}),
-                                       vStr);
-  #ifdef ENABLE_STD_TtoS
-    unittest::ExpectEqual(std::string, converter::ConvertFromVal< std::variant<T COMMA std::string> COMMA
-                                                                  converter::T2S_Format_std_TtoS
-                                                    >::ToStr(std::variant<T COMMA std::string>{vStr}),
-                                       vStr);
-  #endif
-  }
-
-  {
-    unittest::ExpectEqual(std::string, _ConvT2S_OSS<T>::ToStr(std::numeric_limits<T>::quiet_NaN()), "nan");
-  #if defined(WIN64) || defined(_WIN64) || defined(__WIN64) || defined(__WIN64__)
-    //std::cout << "3. _ConvT2S_OSS<T" << typeid(T).name() << ">::ToStr(std::numeric_limits<T>::signaling_NaN()) = #" <<
-    //              _ConvT2S_OSS<T>::ToStr(std::numeric_limits<T>::signaling_NaN()) << "#  ; vStr=" << vStr << std::endl;
-    unittest::ExpectEqual(std::string, _ConvT2S_TtoC<T>::ToStr(std::numeric_limits<T>::signaling_NaN()).substr(0,3), std::string("nan"));
-  #else
-    unittest::ExpectEqual(std::string, _ConvT2S_OSS<T>::ToStr(std::numeric_limits<T>::signaling_NaN()), std::string("nan"));
-  #endif
-    unittest::ExpectEqual(std::string, converter::ConvertFromVal< std::variant<T COMMA std::string> COMMA
-                                                                  converter::T2S_Format_StreamUseClassicLocale<char>
-                                                    >::ToStr(std::variant<T COMMA std::string>{vStr}),
-                                       vStr);
+    unittest::ExpectEqual(std::string, std::get<Str2TNaNInput>(cVal).value, vStr);
+  } else {
+    unittest::ExpectEqual(std::string, std::get<Str2TConversionFailure>(cVal).value, vStr);
   }
 }
+
+template <c_floating_point T, Str2TnConversionProcess CONV_PROCESS >
+inline void conversionFP_S2T_C_THROW_ERROR(const std::string& vStr)
+{
+  ExpectException(ConvertFromStr<T COMMA CONV_PROCESS COMMA Str2TnErrorHandler::THROW_ERROR>::ToVal(vStr), std::invalid_argument);
+}
+
+
+
+template <c_floating_point T, Str2TnConversionProcess CONV_PROCESS, Str2TnErrorHandler ERR_HANDLER >
+inline void conversionFP_S2T_C_E(const std::string& vStr)
+{
+  if constexpr (ERR_HANDLER == Str2TnErrorHandler::QUIET_NAN ||
+                ERR_HANDLER == Str2TnErrorHandler::SIGNAL_NAN)
+  {
+    conversionFP_S2T_C_NAN<T, CONV_PROCESS, ERR_HANDLER>(vStr);
+  } else if constexpr (ERR_HANDLER == Str2TnErrorHandler::VARIANT_VAL) {
+    if ( vStr.compare("nan") == 0 ) {
+      conversionFP_S2T_C_VARIANT<T, CONV_PROCESS, 1>(vStr);
+    } else {
+      conversionFP_S2T_C_VARIANT<T, CONV_PROCESS, 2>(vStr);
+    }
+  } else if constexpr (ERR_HANDLER == Str2TnErrorHandler::THROW_ERROR) {
+    conversionFP_S2T_C_THROW_ERROR<T, CONV_PROCESS>(vStr);
+  } else {
+    static_assert(always_false<T>::value, "Unsupported ERROR-HANDLER for FP-conversion");
+  }
+}
+
+template <c_floating_point T, Str2TnConversionProcess CONV_PROCESS, size_t IDX_ERR_HANDLER >
+void conversionFP_S2T_iC_iE(const std::string& vStr)
+{
+  if constexpr ( IDX_ERR_HANDLER  <  DefaultStr2Tn<T>::validErrorHandlers().size() )
+  {
+    constexpr Str2TnErrorHandler ERR_HANDLER =
+            DefaultStr2Tn<T>::validErrorHandlers()[IDX_ERR_HANDLER];
+    conversionFP_S2T_C_E<T,  CONV_PROCESS,  ERR_HANDLER >(vStr);
+
+    conversionFP_S2T_iC_iE<T,  CONV_PROCESS,
+                               (IDX_ERR_HANDLER+1) >(vStr);
+  }
+}
+
+template <c_floating_point T, size_t IDX_CONV_PROCESS >
+void conversionFP_S2T_iC(const std::string& vStr)
+{
+  if constexpr ( IDX_CONV_PROCESS  <  DefaultStr2Tn<T>::validConversionProcesses().size() )
+  {
+    constexpr Str2TnConversionProcess CONV_PROCESS =
+            DefaultStr2Tn<T>::validConversionProcesses()[IDX_CONV_PROCESS];
+    conversionFP_S2T_iC_iE<T, CONV_PROCESS, 0 >(vStr);
+
+    conversionFP_S2T_iC   <T, (IDX_CONV_PROCESS+1) >(vStr);
+  }
+}
+
+
+
+
+
+
+
+
+/*
+template <c_floating_point T, size_t IDX_CONV_PROCESS>
+void conversionFP_T2S_iC(const T& val, const std::string& vStr)
+{
+  if constexpr ( IDX_CONV_PROCESS < DefaultTn2Str<T>::validConversionProcesses().size() )
+  {
+    constexpr Tn2StrConversionProcess CONV_PROCESS =
+	        DefaultTn2Str<T>::validConversionProcesses()[IDX_CONV_PROCESS];
+    std::string sVal = ConvertFromVal<T , CONV_PROCESS>::ToStr(val);
+    unittest::ExpectEqual(std::string, sVal, vStr);
+
+    conversionFP_T2S_iC  <T, (IDX_CONV_PROCESS+1) >(val, vStr);
+  }
+}
+variantReturnType<T>
+*/
+
+template <c_floating_point T>
+//void conversionFP_FailureCheck_all(const T& val, const std::string& vStr)
+void conversionFP_FailureCheck_all(const std::string& vStr)
+{
+  std::cout << std::endl;
+  std::cout << "S2T : CONV_PROCESS for type [" << specializedTypes::get_name<T>() << "] : ";
+  for(size_t i = 0; i < DefaultStr2Tn<T>::validConversionProcesses().size() ; ++i) std::cout << DefaultStr2Tn<T>::validConversionProcesses()[i] << ", ";
+  std::cout << std::endl;
+  std::cout << "S2T : ERR_HANDLER for type [" << specializedTypes::get_name<T>() << "] : ";
+  for(size_t i = 0; i < DefaultStr2Tn<T>::validErrorHandlers().size() ; ++i) std::cout << DefaultStr2Tn<T>::validErrorHandlers()[i] << ", ";
+  std::cout << std::endl;
+  conversionFP_S2T_iC<T, 0 >(vStr);
+
+  std::cout << "T2S : CONV_PROCESS for type [" << specializedTypes::get_name<T>() << "] : ";
+  for(size_t i = 0; i < DefaultTn2Str<T>::validConversionProcesses().size() ; ++i) std::cout << DefaultTn2Str<T>::validConversionProcesses()[i] << ", ";
+  std::cout << std::endl;
+  //conversionFP_T2S_iC<T, 0 >(val, vStr);
+}
+
+
+
+
 
 
 int main()
 {
+#if defined(_MSC_VER)
+  commonUtils::disable_msvc_popups();  // failed assert() generates popus in msvc
+#endif
+
   int rv = 0;
   try {
-    // [========[  String to FloatingPoint-NaN
-    conversion_String2FloatingPoint_FailureCheck<float>("rc");
-    conversion_String2FloatingPoint_FailureCheck<double>("ab");
-    conversion_String2FloatingPoint_FailureCheck<long double>("xy");
-
-    conversion_String2FloatingPoint_FailureCheck<float>("1.2x1");
-    conversion_String2FloatingPoint_FailureCheck<double>("2.3.4");
-    conversion_String2FloatingPoint_FailureCheck<long double>("3r.422123445");
-    // ]========]  String to FloatingPoint-NaN
-
-
-    // [========[  FloatingPoint-NaN to String
-    conversion_FloatingPointNAN2String_FailureCheck<float>("rc");
-    conversion_FloatingPointNAN2String_FailureCheck<double>("ab");
-    conversion_FloatingPointNAN2String_FailureCheck<long double>("xy");
-
-    conversion_FloatingPointNAN2String_FailureCheck<float>("1.2x1");
-    conversion_FloatingPointNAN2String_FailureCheck<double>("2.3.4");
-    conversion_FloatingPointNAN2String_FailureCheck<long double>("3r.422123445");
-    // ]========]  FloatingPoint-NaN to String
+    conversionFP_FailureCheck_all<float>("nan");
   } catch (const std::exception& ex) {
     std::cout << "Test Failed : err-msg : " << ex.what() << std::endl;
     rv = 1;

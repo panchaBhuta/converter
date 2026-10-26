@@ -110,6 +110,7 @@ endif()
 ##add_unit_test(diagnostic_template_template_parameter)
 #]==================]
 
+#[==================[
 add_unit_test(diagnostic_get_name)
 add_unit_test(testPlatform)
 
@@ -120,9 +121,10 @@ add_unit_test(testSupportingTemplates)
 add_unit_test(testDefaultConversions)
 
 add_unit_test(testAllConversionTemplateInstances)
+#]==================]
 
-#[======================[
 add_unit_test(testFloatingPointNaN)
+#[======================[
 add_unit_test(testIntegerNaN)
 
 add_unit_test(testFloatingPointPrecision)

@@ -919,7 +919,35 @@ namespace converter
       // will set the failbit if the input cannot be parsed as a valid value of the type.
       // For char, char8_t, char16_t, char32_t, and bool types, operator>> will set the failbit
       // if the input cannot be parsed as a valid value of the type or if it contains more than one character.
-      if (_checkStreamFailure(iss)) {
+      if (_checkStreamFailure(iss))
+      {
+#if defined(_MSC_VER) && !defined(__clang__)
+
+    /* Microsoft Visual C++ (MSVC) */
+
+#elif defined(__GNUC__) && !defined(__clang__)
+
+    /* GCC (g++) */
+
+        if constexpr (c_floating_point<T> &&
+                      std::numeric_limits<T>::has_quiet_NaN)
+        {
+          if(str.compare("nan") == 0)
+          {
+            // workaround for stream as it does not convert string "nan"
+            // to floating-type NaN in other conversion mechanisms
+            T pseudoResult = (std::isnan(result)) ?
+                              result              :
+                              std::numeric_limits<T>::quiet_NaN() ;  // for Ubuntu:g++ this is the branch path
+            return CheckNAN<T, ERR_HANDLER>::handle( str, pseudoResult);
+          }
+        }
+
+#elif defined(__clang__)
+
+    /* Clang, including clang-cl */
+
+#endif
         std::string errMsg = "Stream read failure. " + funcName + " :: input-string-stream-failure for str='" + str + "'";
         CONVERTER_DEBUG_LOG( errMsg << std::boolalpha << " iss.fail()=" << iss.fail() << "  iss.bad()="   \
                                     << iss.bad() << "  iss.eof()=" << iss.eof());

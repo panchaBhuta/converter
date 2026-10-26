@@ -14,7 +14,7 @@
 using namespace converter;
 
 template <typename T, Str2TnConversionProcess CONV_PROCESS, Str2TnErrorHandler ERR_HANDLER >
-void conversionEqualCheckT2S_C_E(const T& val, const std::string& vStr)
+void conversionEqualCheckS2T_C_E(const T& val, const std::string& vStr)
 {
   if constexpr ( ERR_HANDLER != Str2TnErrorHandler::VARIANT_VAL )
   {
@@ -28,15 +28,15 @@ void conversionEqualCheckT2S_C_E(const T& val, const std::string& vStr)
 }
 
 template <typename T, Str2TnConversionProcess CONV_PROCESS, size_t IDX_ERR_HANDLER >
-void conversionEqualCheckT2S_iC_iE(const T& val, const std::string& vStr)
+void conversionEqualCheckS2T_iC_iE(const T& val, const std::string& vStr)
 {
   if constexpr ( IDX_ERR_HANDLER  <  DefaultStr2Tn<T>::validErrorHandlers().size() )
   {
     constexpr Str2TnErrorHandler ERR_HANDLER =
             DefaultStr2Tn<T>::validErrorHandlers()[IDX_ERR_HANDLER];
-    conversionEqualCheckT2S_C_E<T,  CONV_PROCESS,  ERR_HANDLER >(val, vStr);
+    conversionEqualCheckS2T_C_E<T,  CONV_PROCESS,  ERR_HANDLER >(val, vStr);
 
-    conversionEqualCheckT2S_iC_iE<T,  CONV_PROCESS,
+    conversionEqualCheckS2T_iC_iE<T,  CONV_PROCESS,
                                   (IDX_ERR_HANDLER+1) >(val, vStr);
   }
 }
@@ -48,7 +48,7 @@ void conversionEqualCheckS2T_iC(const T& val, const std::string& vStr)
   {
     constexpr Str2TnConversionProcess CONV_PROCESS =
             DefaultStr2Tn<T>::validConversionProcesses()[IDX_CONV_PROCESS];
-    conversionEqualCheckT2S_iC_iE<T, CONV_PROCESS, 0 >(val, vStr);
+    conversionEqualCheckS2T_iC_iE<T, CONV_PROCESS, 0 >(val, vStr);
 
     conversionEqualCheckS2T_iC   <T, (IDX_CONV_PROCESS+1) >(val, vStr);
   }
