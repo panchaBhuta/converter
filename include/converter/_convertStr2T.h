@@ -926,6 +926,12 @@ namespace converter
         if constexpr (c_floating_point<T> &&
                       std::numeric_limits<T>::has_quiet_NaN)
         {
+          // stream does not recognize string input "nan" as valid.
+          // Instead of treating is as quiet-NaN, it treats it as an error.
+          // To the keep the conversion behavior consistent across various
+          // conversion mechanism's (FROM_CHARS, S2N, "STRINGSTREAM"),
+          // the below code has been added.
+          // TODO: add the above observation to README
           specializedTypes::ci_string    ciNaN{"nan"};
           if ( ciNaN == str )
           {

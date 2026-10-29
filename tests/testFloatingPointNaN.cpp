@@ -139,7 +139,7 @@ void conversionFP_FailureCheck_S2T(const std::string& vStr)
 
 
 template <c_floating_point T, size_t IDX_CONV_PROCESS>
-void conversionFP_T2S_iC(const T& val)
+void conversionFP_T2S_iC(const T& val, bool isSignalNaN)
 {
   if constexpr ( IDX_CONV_PROCESS < DefaultTn2Str<T>::validConversionProcesses().size() )
   {
@@ -147,9 +147,27 @@ void conversionFP_T2S_iC(const T& val)
     constexpr Tn2StrConversionProcess CONV_PROCESS =
 	        DefaultTn2Str<T>::validConversionProcesses()[IDX_CONV_PROCESS];
     std::string sVal = ConvertFromVal<T , CONV_PROCESS>::ToStr(val);
-    unittest::ExpectEqual(std::string, sVal, vStr);
+    if(!isSignalNaN) {
+      // is quiet NaN
+      unittest::ExpectEqual(std::string, sVal, vStr);
+    } else {
+    // TODO : add to README about signaling-NaN T2S conversion resulting in
+    // "nan(snan)" instead of "nan" in some specific platforms
+#if defined(__apple_build_version__)
+// Apple Clang
+      vStr = "nan(snan)";
+#elif defined(__clang__) && defined(_WIN32)
+// Clang on Windows (including clang-cl)
+      vStr = "nan(snan)";
+#elif defined(_MSC_VER) && !defined(__clang__)
+// MSVC (excluding clang-cl)
+      vStr = "nan(snan)";
+#endif
 
-    conversionFP_T2S_iC  <T, (IDX_CONV_PROCESS+1) >(val);
+      unittest::ExpectEqual(std::string, sVal, vStr);
+    }
+
+    conversionFP_T2S_iC  <T, (IDX_CONV_PROCESS+1) >(val, isSignalNaN);
   }
 }
 /*
@@ -158,12 +176,12 @@ variantReturnType<T>
 
 
 template <c_floating_point T>
-void conversionFP_FailureCheck_T2S(const T& val)
+void conversionFP_FailureCheck_T2S(const T& val, bool isSignalNaN)
 {
   std::cout << "T2S : CONV_PROCESS for type [" << specializedTypes::get_name<T>() << "] : ";
   for(size_t i = 0; i < DefaultTn2Str<T>::validConversionProcesses().size() ; ++i) std::cout << DefaultTn2Str<T>::validConversionProcesses()[i] << ", ";
   std::cout << std::endl;
-  conversionFP_T2S_iC<T, 0 >(val);
+  conversionFP_T2S_iC<T, 0 >(val, isSignalNaN);
 }
 
 
@@ -210,24 +228,25 @@ int main()
 
     std::cout << "testFloatingPointNaN : T2S : has_quiet_NaN" << std::endl;
     if constexpr (std::numeric_limits<float>::has_quiet_NaN)
-      conversionFP_FailureCheck_T2S<float>      (std::numeric_limits<float>::quiet_NaN());
+      conversionFP_FailureCheck_T2S<float>      (std::numeric_limits<float>::quiet_NaN(), false);
 
     if constexpr (std::numeric_limits<double>::has_quiet_NaN)
-      conversionFP_FailureCheck_T2S<double>     (std::numeric_limits<double>::quiet_NaN());
+      conversionFP_FailureCheck_T2S<double>     (std::numeric_limits<double>::quiet_NaN(), false);
 
     if constexpr (std::numeric_limits<long double>::has_quiet_NaN)
-      conversionFP_FailureCheck_T2S<long double>(std::numeric_limits<long double>::quiet_NaN());
+      conversionFP_FailureCheck_T2S<long double>(std::numeric_limits<long double>::quiet_NaN(), false);
 
     std::cout << "testFloatingPointNaN : T2S : has_signaling_NaN" << std::endl;
     if constexpr (std::numeric_limits<float>::has_signaling_NaN)
-      conversionFP_FailureCheck_T2S<float>      (std::numeric_limits<float>::signaling_NaN());
+      conversionFP_FailureCheck_T2S<float>      (std::numeric_limits<float>::signaling_NaN(), true);
 
     if constexpr (std::numeric_limits<double>::has_signaling_NaN)
-      conversionFP_FailureCheck_T2S<double>     (std::numeric_limits<double>::signaling_NaN());
+      conversionFP_FailureCheck_T2S<double>     (std::numeric_limits<double>::signaling_NaN(), true);
 
     if constexpr (std::numeric_limits<long double>::has_signaling_NaN)
-      conversionFP_FailureCheck_T2S<long double>(std::numeric_limits<long double>::signaling_NaN());
+      conversionFP_FailureCheck_T2S<long double>(std::numeric_limits<long double>::signaling_NaN(), true);
 
+    // TODO   SIGNAL_NAN in windows and macos has selective string representation "nan(snan)"
     // TODO   T2S variantReturnType<T>
 
   } catch (const std::exception& ex) {
