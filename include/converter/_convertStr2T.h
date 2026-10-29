@@ -923,8 +923,7 @@ namespace converter
       if (_checkStreamFailure(iss))
       {
         // The branching below is applicable across all compilers tested on github
-        if constexpr (c_floating_point<T> &&
-                      std::numeric_limits<T>::has_quiet_NaN)
+        if constexpr ( c_floating_point<T> )
         {
           // stream does not recognize string input "nan" as valid.
           // Instead of treating is as quiet-NaN, it treats it as an error.
@@ -932,15 +931,19 @@ namespace converter
           // conversion mechanism's (FROM_CHARS, S2N, "STRINGSTREAM"),
           // the below code has been added.
           // TODO: add the above observation to README
-          specializedTypes::ci_string    ciNaN{"nan"};
-          if ( ciNaN == str )
+
+          specializedTypes::ci_string    ciQuiteNaN{"nan"};
+          specializedTypes::ci_string    ciSignalNaN{"nan(snan)"};
+
+          if ( ciQuiteNaN  == str ||
+               ciSignalNaN == str )
           {
-            // workaround for stream as it does not convert string "nan"
-            // to floating-type NaN in other conversion mechanisms
+            // workaround for stream as it does not convert string "nan" or "nan(snan)"
+            // to floating-type NaN; as in other conversion mechanisms
             T pseudoResult = (std::isnan(result)) ?
                               result              :                  // compilers mostly don't hit this branch path
                               std::numeric_limits<T>::quiet_NaN() ;  // this is the branch path taken by most compilers
-            return CheckNAN<T, ERR_HANDLER>::handle( str, pseudoResult);
+            return CheckNAN<T, ERR_HANDLER>::handle( str, pseudoResult); // ERR_HANDLER will change the pseudoResult to SignalNaN if needed.
           }
         }
         std::string errMsg = "Stream read failure. " + funcName + " :: input-string-stream-failure for str='" + str + "'";

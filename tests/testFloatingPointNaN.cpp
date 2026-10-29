@@ -153,18 +153,14 @@ void conversionFP_T2S_iC(const T& val, bool isSignalNaN)
     } else {
     // TODO : add to README about signaling-NaN T2S conversion resulting in
     // "nan(snan)" instead of "nan" in some specific platforms
-#if defined(__apple_build_version__)
-// Apple Clang
-      vStr = "nan(snan)";
-#elif defined(__clang__) && defined(_WIN32)
-// Clang on Windows (including clang-cl)
-      vStr = "nan(snan)";
-#elif defined(_MSC_VER) && !defined(__clang__)
-// MSVC (excluding clang-cl)
-      vStr = "nan(snan)";
-#endif
 
       unittest::ExpectEqual(std::string, sVal, vStr);
+
+      const bool validResult =
+          (sVal == "nan") ||
+          (sVal == "nan(snan)");
+
+      unittest::ExpectTrue(validResult);
     }
 
     conversionFP_T2S_iC  <T, (IDX_CONV_PROCESS+1) >(val, isSignalNaN);
