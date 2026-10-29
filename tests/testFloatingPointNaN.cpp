@@ -154,8 +154,6 @@ void conversionFP_T2S_iC(const T& val, bool isSignalNaN)
     // TODO : add to README about signaling-NaN T2S conversion resulting in
     // "nan(snan)" instead of "nan" in some specific platforms
 
-      unittest::ExpectEqual(std::string, sVal, vStr);
-
       const bool validResult =
           (sVal == "nan") ||
           (sVal == "nan(snan)");
