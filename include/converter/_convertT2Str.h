@@ -621,8 +621,8 @@ namespace converter
       }
 
       // TODO : add to README about signaling-NaN T2S conversion resulting in
-      // "nan" for STRINGSTREAM across all platforms;
-      // instead of "nan(snan)"  for some platforms for TO_CHARS conversion.
+      // "nan" for STRINGSTREAM conversion across all platforms;
+      // "nan(snan)"  on some platforms for TO_CHARS conversion and on remaining platforms its "nan".
       if (_checkStreamFailure(oss)) {
         std::string errMsg = "Stream write failure. " + funcName + " :: output-string-stream-failure.";
         CONVERTER_DEBUG_LOG( errMsg << std::boolalpha << " oss.fail()=" << oss.fail() << "  oss.bad()="   \

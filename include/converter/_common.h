@@ -122,7 +122,76 @@ namespace converter
                       );
   }
 
-
+/*
+ * =============================================================================
+ * NaN conversion contract: String-to-Type (S2T) and Type-to-String (T2S)
+ * =============================================================================
+ *
+ * 1. String-to-Type (S2T) conversion
+ * ----------------------------------
+ *
+ * When a selected conversion mechanism successfully parses an input string
+ * but the resulting floating-point value is NaN, the converter applies the
+ * configured Str2TnErrorHandler policy.
+ *
+ * The supported policies define the following contract:
+ *
+ *   QUIET_NAN
+ *       Return a quiet NaN.
+ *
+ *   SIGNAL_NAN
+ *       Return a signaling NaN.
+ *
+ *   THROW_ERROR
+ *       Throw an exception to report that the conversion produced NaN.
+ *
+ *   VARIANT_VAL
+ *       Preserve the original input string in the Str2TNaNInput alternative
+ *       of variantReturnType<T>.
+ *
+ * A NaN result is therefore distinguished from a conversion failure.
+ * In particular, VARIANT_VAL uses:
+ *
+ *       index 0 : T                       -- successful, non-NaN conversion
+ *       index 1 : Str2TNaNInput           -- conversion produced NaN
+ *       index 2 : Str2TConversionFailure -- conversion failed
+ *
+ * The STRINGSTREAM conversion process requires special handling because
+ * stream extraction does not consistently recognize textual NaN values.
+ * The implementation explicitly recognizes "nan" and "nan(snan)"
+ * (case-insensitively) and routes them through the common NaN handler.
+ *
+ * The converter's contract concerns the resulting NaN classification and
+ * configured error-handling policy. It does not promise preservation of
+ * the original NaN payload or its sign when returning a floating-point NaN.
+ *
+ *
+ * 2. Type-to-String (T2S) conversion
+ * ----------------------------------
+ *
+ * When a floating-point value is NaN, its textual representation is
+ * dependent on the selected conversion mechanism and the platform's
+ * standard-library implementation.
+ *
+ * Observed behavior across tested platforms:
+ *
+ *   STRINGSTREAM
+ *       Signaling NaN is formatted as "nan".
+ *
+ *   TO_CHARS
+ *       Signaling NaN may be formatted as "nan(snan)" on some platforms
+ *       and as "nan" on others.
+ *
+ * Consequently, the converter does not guarantee a uniform textual
+ * representation of NaN across different conversion mechanisms,
+ * compilers, standard libraries, or platforms.
+ *
+ * Applications requiring a canonical NaN representation must apply
+ * their own normalization policy rather than rely on the textual output
+ * of the underlying conversion mechanism.
+ *
+ * =============================================================================
+ */
 
 
   /*

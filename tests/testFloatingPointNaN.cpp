@@ -8,6 +8,9 @@
 #include <type_traits>
 #include <limits>
 
+#include <vector>
+#include <string>
+
 #include <converter/converter.h>
 #include <commonUtils/disable_msvc_popups.h>
 #include <specializedTypes/case_insensitive_string.h>
@@ -139,29 +142,31 @@ void conversionFP_FailureCheck_S2T(const std::string& vStr)
 
 
 template <c_floating_point T, size_t IDX_CONV_PROCESS>
-void conversionFP_T2S_iC(const T& val, bool isSignalNaN)
+void conversionFP_T2S_iC(const T& val, const std::vector<std::string>& vStr)
 {
   if constexpr ( IDX_CONV_PROCESS < DefaultTn2Str<T>::validConversionProcesses().size() )
   {
-    std::string vStr{"nan"};
+    //std::string vStr{"nan"};
     constexpr Tn2StrConversionProcess CONV_PROCESS =
 	        DefaultTn2Str<T>::validConversionProcesses()[IDX_CONV_PROCESS];
     std::string sVal = ConvertFromVal<T , CONV_PROCESS>::ToStr(val);
-    if(!isSignalNaN) {
+    if(vStr.size() == 1) {
       // is quiet NaN
-      unittest::ExpectEqual(std::string, sVal, vStr);
+      unittest::ExpectEqual(std::string, sVal, vStr[0]);
     } else {
-    // TODO : add to README about signaling-NaN T2S conversion resulting in
-    // "nan(snan)" instead of "nan" in some specific platforms
+      // TODO : add to README about signaling-NaN T2S conversion resulting in
+      // "nan(snan)" instead of "nan" in some platforms and STRINGSTREAM conversions
 
       const bool validResult =
-          (sVal == "nan") ||
-          (sVal == "nan(snan)");
+          (sVal == vStr[0]) ||
+          (sVal == vStr[1]);
+          //(sVal == "nan") ||
+          //(sVal == "nan(snan)");
 
       unittest::ExpectTrue(validResult);
     }
 
-    conversionFP_T2S_iC  <T, (IDX_CONV_PROCESS+1) >(val, isSignalNaN);
+    conversionFP_T2S_iC  <T, (IDX_CONV_PROCESS+1) >(val, vStr);
   }
 }
 /*
@@ -170,12 +175,12 @@ variantReturnType<T>
 
 
 template <c_floating_point T>
-void conversionFP_FailureCheck_T2S(const T& val, bool isSignalNaN)
+void conversionFP_FailureCheck_T2S(const T& val, const std::vector<std::string>& vStr)
 {
   std::cout << "T2S : CONV_PROCESS for type [" << specializedTypes::get_name<T>() << "] : ";
   for(size_t i = 0; i < DefaultTn2Str<T>::validConversionProcesses().size() ; ++i) std::cout << DefaultTn2Str<T>::validConversionProcesses()[i] << ", ";
   std::cout << std::endl;
-  conversionFP_T2S_iC<T, 0 >(val, isSignalNaN);
+  conversionFP_T2S_iC<T, 0 >(val, vStr);
 }
 
 
@@ -221,26 +226,47 @@ int main()
     conversionFP_FailureCheck_S2T<long double>("NAN");
 
     std::cout << "testFloatingPointNaN : T2S : has_quiet_NaN" << std::endl;
+    std::vector<std::string> pqNaNresult {"nan"};
+    std::vector<std::string> nqNaNresult {"-nan"};
     if constexpr (std::numeric_limits<float>::has_quiet_NaN)
-      conversionFP_FailureCheck_T2S<float>      (std::numeric_limits<float>::quiet_NaN(), false);
+    {
+      conversionFP_FailureCheck_T2S<float>      ( std::numeric_limits<float>::quiet_NaN(), pqNaNresult);
+      conversionFP_FailureCheck_T2S<float>      (-std::numeric_limits<float>::quiet_NaN(), nqNaNresult);
+    }
 
     if constexpr (std::numeric_limits<double>::has_quiet_NaN)
-      conversionFP_FailureCheck_T2S<double>     (std::numeric_limits<double>::quiet_NaN(), false);
+    {
+      conversionFP_FailureCheck_T2S<double>     ( std::numeric_limits<double>::quiet_NaN(), pqNaNresult);
+      conversionFP_FailureCheck_T2S<double>     (-std::numeric_limits<double>::quiet_NaN(), nqNaNresult);
+    }
 
     if constexpr (std::numeric_limits<long double>::has_quiet_NaN)
-      conversionFP_FailureCheck_T2S<long double>(std::numeric_limits<long double>::quiet_NaN(), false);
+    {
+      conversionFP_FailureCheck_T2S<long double>( std::numeric_limits<long double>::quiet_NaN(), pqNaNresult);
+      conversionFP_FailureCheck_T2S<long double>(-std::numeric_limits<long double>::quiet_NaN(), nqNaNresult);
+    }
 
     std::cout << "testFloatingPointNaN : T2S : has_signaling_NaN" << std::endl;
+    std::vector<std::string> psNaNresult { "nan",  "nan(snan)"};
+    std::vector<std::string> nsNaNresult {"-nan", "-nan(snan)"};
     if constexpr (std::numeric_limits<float>::has_signaling_NaN)
-      conversionFP_FailureCheck_T2S<float>      (std::numeric_limits<float>::signaling_NaN(), true);
+    {
+      conversionFP_FailureCheck_T2S<float>      ( std::numeric_limits<float>::signaling_NaN(), psNaNresult);
+      conversionFP_FailureCheck_T2S<float>      (-std::numeric_limits<float>::signaling_NaN(), nsNaNresult);
+    }
 
     if constexpr (std::numeric_limits<double>::has_signaling_NaN)
-      conversionFP_FailureCheck_T2S<double>     (std::numeric_limits<double>::signaling_NaN(), true);
+    {
+      conversionFP_FailureCheck_T2S<double>     ( std::numeric_limits<double>::signaling_NaN(), psNaNresult);
+      conversionFP_FailureCheck_T2S<double>     (-std::numeric_limits<double>::signaling_NaN(), nsNaNresult);
+    }
 
     if constexpr (std::numeric_limits<long double>::has_signaling_NaN)
-      conversionFP_FailureCheck_T2S<long double>(std::numeric_limits<long double>::signaling_NaN(), true);
+    {
+      conversionFP_FailureCheck_T2S<long double>( std::numeric_limits<long double>::signaling_NaN(), psNaNresult);
+      conversionFP_FailureCheck_T2S<long double>(-std::numeric_limits<long double>::signaling_NaN(), nsNaNresult);
+    }
 
-    // TODO   SIGNAL_NAN in windows and macos has selective string representation "nan(snan)"
     // TODO   T2S variantReturnType<T>
 
   } catch (const std::exception& ex) {
