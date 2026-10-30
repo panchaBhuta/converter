@@ -7,6 +7,9 @@
 #include <typeinfo>
 #include <type_traits>
 #include <limits>
+#include <algorithm>
+#include <functional>
+#include <iterator>
 
 #include <vector>
 #include <string>
@@ -157,11 +160,7 @@ void conversionFP_T2S_iC(const T& val, const std::vector<std::string>& vStr)
       // TODO : add to README about signaling-NaN T2S conversion resulting in
       // "nan(snan)" instead of "nan" in some platforms and STRINGSTREAM conversions
 
-      const bool validResult =
-          (sVal == vStr[0]) ||
-          (sVal == vStr[1]);
-          //(sVal == "nan") ||
-          //(sVal == "nan(snan)");
+      bool validResult = std::any_of(vStr.cbegin(), vStr.cend(), [&sVal](const std::string& strCmp) { return sVal == strCmp; } );
 
       unittest::ExpectTrue(validResult);
     }
@@ -227,7 +226,8 @@ int main()
 
     std::cout << "testFloatingPointNaN : T2S : has_quiet_NaN" << std::endl;
     std::vector<std::string> pqNaNresult {"nan"};
-    std::vector<std::string> nqNaNresult {"-nan"};
+    std::vector<std::string> nqNaNresult {"-nan",       // ubuntu
+                                          "-nan(ind)"}; // macos and windows
     if constexpr (std::numeric_limits<float>::has_quiet_NaN)
     {
       conversionFP_FailureCheck_T2S<float>      ( std::numeric_limits<float>::quiet_NaN(), pqNaNresult);
