@@ -80,9 +80,9 @@ void getLimits(const char* typeName, int order)
         std::cout <<  std::string(str.data(), result.ptr) << ",";
         result = std::to_chars( str.data(), str.data() + str.size(),
                                -std::numeric_limits<T>::infinity());
-        std::cout <<  std::string(str.data(), result.ptr) << ",";
+        std::cout <<  std::string(str.data(), result.ptr);
     } else
-        std::cout << ",,";
+        std::cout << ",";
 
     std::cout << "\n";
 }
