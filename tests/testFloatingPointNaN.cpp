@@ -162,13 +162,13 @@ void conversionFP_T2S_iC(const T& val, const std::vector<std::string>& vStr)
 
       std::stringstream ss;
       //ss << std::setprecision(std::numeric_limits<long double>::digits10 + 1);
-      ss << unittest::detail::FileName(__FILE__) << ":" << std::to_string(__LINE__);
-      ss << "val = " << val << " == vStr{ "; 
+      ss << "val{" << val << "} == vStr{ ";
       bool validResult = std::any_of(vStr.cbegin(), vStr.cend(), [&sVal, &ss](const std::string& strCmp) { ss << " " << strCmp << " ," ; return sVal == strCmp; } );
 
       if (!validResult)
       {
-        ss << "} ::: Expect-AnyOf-Equal failed." << std::endl;
+        ss << "} ::: Expect-AnyOf-Equal failed. :: ";
+        ss << unittest::detail::FileName(__FILE__) << ":" << std::to_string(__LINE__) << std::endl;
 
         throw std::runtime_error(ss.str());
       }
@@ -235,8 +235,9 @@ int main()
 
     std::cout << "testFloatingPointNaN : T2S : has_quiet_NaN" << std::endl;
     std::vector<std::string> pqNaNresult {"nan"};
-    std::vector<std::string> nqNaNresult {"-nan",       // ubuntu
-                                          "-nan(ind)"}; // macos and windows
+    std::vector<std::string> nqNaNresult { "nan",         // STRINGSTREAM across all compilers
+                                           "-nan",        // ubuntu
+                                           "-nan(ind)" }; // macos and windows
     if constexpr (std::numeric_limits<float>::has_quiet_NaN)
     {
       conversionFP_FailureCheck_T2S<float>      ( std::numeric_limits<float>::quiet_NaN(), pqNaNresult);
@@ -257,7 +258,9 @@ int main()
 
     std::cout << "testFloatingPointNaN : T2S : has_signaling_NaN" << std::endl;
     std::vector<std::string> psNaNresult { "nan",  "nan(snan)"};
-    std::vector<std::string> nsNaNresult {"-nan", "-nan(snan)"};
+    std::vector<std::string> nsNaNresult { "nan",          // STRINGSTREAM across all compilers
+                                           "-nan",         // ubuntu
+                                           "-nan(snan)" }; // macos and windows
     if constexpr (std::numeric_limits<float>::has_signaling_NaN)
     {
       conversionFP_FailureCheck_T2S<float>      ( std::numeric_limits<float>::signaling_NaN(), psNaNresult);

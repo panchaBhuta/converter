@@ -932,18 +932,25 @@ namespace converter
           // the below code has been added.
           // TODO: add the above observation to README
 
-          specializedTypes::ci_string    ciQuiteNaN{"nan"};
-          specializedTypes::ci_string    ciSignalNaN{"nan(snan)"};
+          specializedTypes::ci_string    ciPveQuiteNaN{"nan"};
+          specializedTypes::ci_string    ciPveSignalNaN{"nan(snan)"};
+          specializedTypes::ci_string    ciNveQuiteNaN{"-nan"};
+          specializedTypes::ci_string    ciNveSignalNaN{"-nan(snan)"};
 
-          if ( ciQuiteNaN  == str ||
-               ciSignalNaN == str )
+          if ( ciPveQuiteNaN  == str ||
+               ciPveSignalNaN == str ||
+               ciNveQuiteNaN  == str ||
+               ciNveSignalNaN == str )
           {
             // workaround for stream as it does not convert string "nan" or "nan(snan)"
-            // to floating-type NaN; as in other conversion mechanisms
-            T pseudoResult = (std::isnan(result)) ?
-                              result              :                  // compilers mostly don't hit this branch path
-                              std::numeric_limits<T>::quiet_NaN() ;  // this is the branch path taken by most compilers
-            return CheckNAN<T, ERR_HANDLER>::handle( str, pseudoResult); // ERR_HANDLER will change the pseudoResult to SignalNaN if needed.
+            // to floating-type NaN; as in other conversion mechanisms.
+            // Value of variable 'result' is zero, hence we can't pass
+            // it to CheckNAN<T, ERR_HANDLER>::handle( str, result);
+
+            // ERR_HANDLER only checks if its NaN, does not need to
+            // distinguish if its quiet OR signal NAN ;
+            // OR if its Negative NaN
+            return CheckNAN<T, ERR_HANDLER>::handle( str, std::numeric_limits<T>::quiet_NaN());
           }
         }
         std::string errMsg = "Stream read failure. " + funcName + " :: input-string-stream-failure for str='" + str + "'";
