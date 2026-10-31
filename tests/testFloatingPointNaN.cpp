@@ -160,9 +160,18 @@ void conversionFP_T2S_iC(const T& val, const std::vector<std::string>& vStr)
       // TODO : add to README about signaling-NaN T2S conversion resulting in
       // "nan(snan)" instead of "nan" in some platforms and STRINGSTREAM conversions
 
-      bool validResult = std::any_of(vStr.cbegin(), vStr.cend(), [&sVal](const std::string& strCmp) { return sVal == strCmp; } );
+      std::stringstream ss;
+      //ss << std::setprecision(std::numeric_limits<long double>::digits10 + 1);
+      ss << unittest::detail::FileName(__FILE__) << ":" << std::to_string(__LINE__);
+      ss << "val = " << val << " == vStr{ "; 
+      bool validResult = std::any_of(vStr.cbegin(), vStr.cend(), [&sVal, &ss](const std::string& strCmp) { ss << " " << strCmp << " ," ; return sVal == strCmp; } );
 
-      unittest::ExpectTrue(validResult);
+      if (!validResult)
+      {
+        ss << "} ::: Expect-AnyOf-Equal failed." << std::endl;
+
+        throw std::runtime_error(ss.str());
+      }
     }
 
     conversionFP_T2S_iC  <T, (IDX_CONV_PROCESS+1) >(val, vStr);
