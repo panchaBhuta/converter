@@ -25,6 +25,7 @@
 #include <iomanip>
 #include <concepts>
 #include <cstddef>
+#include <iterator>
 
 #include <string>
 #include <variant>
@@ -753,7 +754,7 @@ namespace converter
   };
 
 
-  template < typename T, Str2TnErrorHandler ERR_HANDLER >
+  template < typename T, Str2TnConversionProcess CONV_PROCESS, Str2TnErrorHandler ERR_HANDLER >
   struct CheckNAN
   {
     using return_type = typename ErrorHandler<T, ERR_HANDLER>::return_type;
@@ -770,7 +771,14 @@ namespace converter
 
           CONVERTER_DEBUG_LOG(errMsg);
 
-          return ErrorHandler<T, ERR_HANDLER>::handleVariant(strVal, errMsg);
+          if constexpr ( ERR_HANDLER == Str2TnErrorHandler::VARIANT_VAL &&
+                         //  STRINGSTREAM does not translate any "NaN" strings to c++::nan.
+                         //  STRINGSTREAM treats such "NaN" strings as error; unlike other conversion mechanisms.
+                         //  Thus variant with index==1 is not applicable for STRINGSTREAM
+                         CONV_PROCESS != Str2TnConversionProcess::STRINGSTREAM )
+            return ErrorHandler<T, ERR_HANDLER>::handleVariant(strVal, errMsg);  // if variant : index==1
+          else
+            return ErrorHandler<T, ERR_HANDLER>::handle(strVal, errMsg);  // if variant : index==2
         }
       }
 
@@ -829,7 +837,7 @@ namespace converter
           return ErrorHandler<T, ERR_HANDLER>::handle(str, errMsg);
         }
 
-        return CheckNAN<T, ERR_HANDLER>::handle( str, result);
+        return CheckNAN<T, Str2TnConversionProcess::FROM_CHARS, ERR_HANDLER>::handle( str, result);
       } else {
         std::stringstream errMsg;
         errMsg << std::make_error_code(ec).message() << " : 'return_type ConvertFromStr< T = [" << specializedTypes::get_name<T>()
@@ -925,40 +933,18 @@ namespace converter
         // The branching below is applicable across all compilers tested on github
         if constexpr ( c_floating_point<T> )
         {
-          // stream does not recognize string input "nan" as valid.
-          // Instead of treating is as quiet-NaN, it treats it as an error.
-          // To the keep the conversion behavior consistent across various
-          // conversion mechanism's (FROM_CHARS, S2N, "STRINGSTREAM"),
-          // the below code has been added.
+          // stringstream does not recognize string input "nan" as valid parameter.
+          // Instead of treating it as quiet-NaN, it treats it as an error.
           // TODO: add the above observation to README
-
-          specializedTypes::ci_string    ciPveQuiteNaN{"nan"};
-          specializedTypes::ci_string    ciPveSignalNaN{"nan(snan)"};
-          specializedTypes::ci_string    ciNveQuiteNaN{"-nan"};
-          specializedTypes::ci_string    ciNveSignalNaN{"-nan(snan)"};
-
-          if ( ciPveQuiteNaN  == str ||
-               ciPveSignalNaN == str ||
-               ciNveQuiteNaN  == str ||
-               ciNveSignalNaN == str )
-          {
-            // workaround for stream as it does not convert string "nan" or "nan(snan)"
-            // to floating-type NaN; as in other conversion mechanisms.
-            // Value of variable 'result' is zero, hence we can't pass
-            // it to CheckNAN<T, ERR_HANDLER>::handle( str, result);
-
-            // ERR_HANDLER only checks if its NaN, does not need to
-            // distinguish if its quiet OR signal NAN ;
-            // OR if its Negative NaN
-            return CheckNAN<T, ERR_HANDLER>::handle( str, std::numeric_limits<T>::quiet_NaN());
-          }
+          return CheckNAN<T, Str2TnConversionProcess::STRINGSTREAM, ERR_HANDLER>::handle( str, std::numeric_limits<T>::quiet_NaN() );
         }
+
         std::string errMsg = "Stream read failure. " + funcName + " :: input-string-stream-failure for str='" + str + "'";
         CONVERTER_DEBUG_LOG( errMsg << std::boolalpha << " iss.fail()=" << iss.fail() << "  iss.bad()="   \
                                     << iss.bad() << "  iss.eof()=" << iss.eof());
         return ErrorHandler<T, ERR_HANDLER>::handle(str, errMsg);
       } else {
-        return CheckNAN<T, ERR_HANDLER>::handle( str, result);
+        return CheckNAN<T, Str2TnConversionProcess::STRINGSTREAM, ERR_HANDLER>::handle( str, result);
       }
     }
   };
@@ -1073,7 +1059,7 @@ namespace converter
       {
         T result = _ToVal(str, format_args);
 
-        return CheckNAN<T, ERR_HANDLER>::handle( str, result);
+        return CheckNAN<T, Str2TnConversionProcess::S2N, ERR_HANDLER>::handle( str, result);
 
       } catch (const std::invalid_argument& err) {
         const std::string errMsg = "Invalid argument: " + std::string(err.what()) + " :: str = '" + str + "'";
