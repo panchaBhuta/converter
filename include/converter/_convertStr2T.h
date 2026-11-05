@@ -734,7 +734,7 @@ namespace converter
             }
           } catch (...) {
             // In case if the implementation doesn't support string argument for nan functions, we can return a default quiet NaN value.
-            CONVERTER_DEBUG_LOG( "nan() with string argument not supported by this implementation. Returning default quiet NaN value." );
+            CONVERTER_DEBUG_LOG( "ErrorHandler<>::_handle<E>() :: nan() with string argument not supported by this implementation. Returning default quiet NaN value." );
             return std::numeric_limits<T>::quiet_NaN();
           }
         } else {
@@ -764,21 +764,26 @@ namespace converter
     {
       if constexpr (c_floating_point<T>)
       {
-        if (std::isnan(val))
+        if constexpr ( CONV_PROCESS == Str2TnConversionProcess::STRINGSTREAM )
         {
           const std::string errMsg =
-              "Conversion resulted in nan value: " + std::to_string(val) + " :: strVal = '" + strVal + "'";
+              "STRINGSTREAM-Conversion for non floating-type strVal = '" + strVal + "'";
 
           CONVERTER_DEBUG_LOG(errMsg);
+            //  STRINGSTREAM does not translate any "NaN" strings to c++::nan.
+            //  STRINGSTREAM treats such "NaN" strings as error; unlike other conversion mechanisms.
+            //  Thus variant with index==1 is not applicable for STRINGSTREAM
+          return ErrorHandler<T, ERR_HANDLER>::handle(strVal, errMsg);  // if variant : index==2
+        } else {
+          if (std::isnan(val))
+          {
+            const std::string errMsg =
+                "Conversion resulted in nan value: " + std::to_string(val) + " :: strVal = '" + strVal + "'";
 
-          if constexpr ( ERR_HANDLER == Str2TnErrorHandler::VARIANT_VAL &&
-                         //  STRINGSTREAM does not translate any "NaN" strings to c++::nan.
-                         //  STRINGSTREAM treats such "NaN" strings as error; unlike other conversion mechanisms.
-                         //  Thus variant with index==1 is not applicable for STRINGSTREAM
-                         CONV_PROCESS != Str2TnConversionProcess::STRINGSTREAM )
+            CONVERTER_DEBUG_LOG(errMsg);
+
             return ErrorHandler<T, ERR_HANDLER>::handleVariant(strVal, errMsg);  // if variant : index==1
-          else
-            return ErrorHandler<T, ERR_HANDLER>::handle(strVal, errMsg);  // if variant : index==2
+          }
         }
       }
 

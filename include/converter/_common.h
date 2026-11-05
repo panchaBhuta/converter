@@ -29,7 +29,7 @@
 #include <tuple>         /* std::tuple — only if the commented-out specialization is restored */
 
 #include <converter/_compilerWorkAround.h>
-
+#include <specializedTypes/CompTimeStr.h>
 
 /*
  *  NUMERIC_LOCALE : Number locales are specific settings for the 1000 separators and decimals.
@@ -236,8 +236,46 @@ namespace converter
   };
   */
 
+  template <typename T>
+  struct is_variantReturnType : std::false_type {};
+
+  template <typename T>
+  struct is_variantReturnType<variantReturnType<T>> : std::true_type {};
+
+  template <typename T>
+  inline constexpr bool is_variantReturnType_v =
+      is_variantReturnType<T>::value;
 
 
+  template <typename T>
+  std::ostream& operator<<(std::ostream& os, const variantReturnType<T>& value)
+  {
+    os << "variantReturnType<" << specializedTypes::get_name<T>() << ">.index()=" << value.index() << " ";
+    switch (value.index())
+    {
+      case 0:
+        os << "{ value =\"" << std::get<0>(value) << "\" }";
+        break;
+
+      case 1:
+        os << "Str2TNaNInput{ value = \""
+           << std::get<Str2TNaNInput>(value).value << "\" }";
+        break;
+
+      case 2:
+        os << "Str2TConversionFailure{ value = \""
+           << std::get<Str2TConversionFailure>(value).value << "\" }";
+        break;
+      default :
+        os << " index NOT HANDLED";
+    }
+
+    return os;
+  }
+
+/* this gives compilation error when declared in "namespace" specializedTypes"
+  using ::operator<<;
+*/
 
 
   template< typename T >
@@ -601,3 +639,5 @@ namespace converter
 
 } // namespace converter
 
+
+using specializedTypes::operator<<;

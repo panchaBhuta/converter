@@ -540,7 +540,8 @@ namespace converter
   };
 
   template < c_isWritableToStream T >
-          requires ( isSupported_Tn2StrConversionProcess<T, Tn2StrConversionProcess::STRINGSTREAM>::value )
+          requires ( isSupported_Tn2StrConversionProcess<T, Tn2StrConversionProcess::STRINGSTREAM>::value &&
+                     !is_variantReturnType_v<T> )
   struct ConvertFromVal< T, Tn2StrConversionProcess::STRINGSTREAM >
   {
     constexpr static size_t templateId = 2;
