@@ -764,8 +764,16 @@ namespace converter
     {
       if constexpr (c_floating_point<T>)
       {
+        // for STRINGSTREAM -> std::isnan(val)==false
         if constexpr ( CONV_PROCESS == Str2TnConversionProcess::STRINGSTREAM )
         {
+          // stream does not recognize string input "nan" as valid.
+          // Instead of treating is as quiet-NaN, it treats it as an error.
+          // To the keep the conversion behavior consistent across various
+          // conversion mechanism's (FROM_CHARS, S2N, "STRINGSTREAM"),
+          // the below code has been added.
+          // TODO: add the above observation to README
+
           const std::string errMsg =
               "STRINGSTREAM-Conversion for non floating-type strVal = '" + strVal + "'";
 
@@ -788,6 +796,50 @@ namespace converter
       }
 
       return val;
+    }
+
+    static bool handleINF(const std::string& strVal, T& val)
+    {
+      if constexpr (c_floating_point<T>)
+      {
+        if constexpr ( CONV_PROCESS == Str2TnConversionProcess::STRINGSTREAM ||
+                       CONV_PROCESS == Str2TnConversionProcess::FROM_CHARS )
+        {
+          if constexpr ( std::numeric_limits<T>::has_infinity )
+          {
+            if(std::isinf(val))
+              return true;
+
+            if (std::isnan(val))
+              return false;
+
+            // stringstream does not recognize string inputs "inf", "+inf", "-inf" as valid parameter.
+            // Instead of treating it as infinity, it treats it as an error.
+            // To the keep the conversion behavior consistent across various
+            // conversion mechanism's (FROM_CHARS, S2N, "STRINGSTREAM"),
+            // the below code has been added.
+            // TODO: add the above observation to README
+            static const specializedTypes::ci_string    ciInf{"inf"};
+            static const specializedTypes::ci_string    ciPveInf{"+inf"};
+            static const specializedTypes::ci_string    ciNveInf{"-inf"};
+            if ( ciInf  == strVal ||
+                 ciPveInf == strVal )
+            {
+              // workaround for stream as it does not convert string "inf" or "+inf"
+              // to floating-type infinity; as in other conversion mechanisms.
+              val = std::numeric_limits<T>::infinity();
+              return true;
+            } else if ( ciNveInf == strVal )
+            {
+              // workaround for stream as it does not convert string "-inf"
+              // to floating-type infinity; as in other conversion mechanisms.
+              val = -std::numeric_limits<T>::infinity();
+              return true;
+            }
+          }
+        }
+      }
+      return false;
     }
   };
 
@@ -844,6 +896,9 @@ namespace converter
 
         return CheckNAN<T, Str2TnConversionProcess::FROM_CHARS, ERR_HANDLER>::handle( str, result);
       } else {
+        if( CheckNAN<T, Str2TnConversionProcess::STRINGSTREAM, ERR_HANDLER>::handleINF( str, result ) )
+          return result;
+
         std::stringstream errMsg;
         errMsg << std::make_error_code(ec).message() << " : 'return_type ConvertFromStr< T = [" << specializedTypes::get_name<T>()
                << "], Str2TnConversionProcess::FROM_CHARS, " << ERR_HANDLER << " >::ToVal(const std::string& str)'";
@@ -938,10 +993,13 @@ namespace converter
         // The branching below is applicable across all compilers tested on github
         if constexpr ( c_floating_point<T> )
         {
+          if( CheckNAN<T, Str2TnConversionProcess::STRINGSTREAM, ERR_HANDLER>::handleINF( str, result ) )
+            return result;
+
           // stringstream does not recognize string input "nan" as valid parameter.
           // Instead of treating it as quiet-NaN, it treats it as an error.
           // TODO: add the above observation to README
-          return CheckNAN<T, Str2TnConversionProcess::STRINGSTREAM, ERR_HANDLER>::handle( str, std::numeric_limits<T>::quiet_NaN() );
+          return CheckNAN<T, Str2TnConversionProcess::STRINGSTREAM, ERR_HANDLER>::handle( str, result );
         }
 
         std::string errMsg = "Stream read failure. " + funcName + " :: input-string-stream-failure for str='" + str + "'";
@@ -949,7 +1007,7 @@ namespace converter
                                     << iss.bad() << "  iss.eof()=" << iss.eof());
         return ErrorHandler<T, ERR_HANDLER>::handle(str, errMsg);
       } else {
-        return CheckNAN<T, Str2TnConversionProcess::STRINGSTREAM, ERR_HANDLER>::handle( str, result);
+        return result;
       }
     }
   };
