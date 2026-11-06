@@ -169,8 +169,10 @@ void conversionFP_FailureCheck_S2T(const std::string& vStr,
 
 
 
-template <c_floating_point T, size_t IDX_CONV_PROCESS, typename V = T>
-void conversionFP_T2S_iC(const V& val, const std::vector<std::string>& vStr)
+template <c_floating_point T, size_t IDX_CONV_PROCESS, typename V>
+      requires ( std::is_same_v<V, T> || std::is_same_v<V, variantReturnType<T>> )
+void conversionFP_T2S_iC(const V& val, const std::vector<std::string>& vStr,
+                                       const std::string& filePath, int lineNo)
 {
   if constexpr ( IDX_CONV_PROCESS < DefaultTn2Str<T>::validConversionProcesses().size() )
   {
@@ -180,7 +182,7 @@ void conversionFP_T2S_iC(const V& val, const std::vector<std::string>& vStr)
     std::string sVal = ConvertFromVal<V , CONV_PROCESS>::ToStr(val);
     if(vStr.size() == 1) {
       // is quiet NaN
-      unittest::ExpectEqual(std::string, sVal, vStr[0]);
+      unittest::ExpectEqual2(std::string, sVal, vStr[0]);
     } else {
       // TODO : add to README about signaling-NaN T2S conversion resulting in
       // "nan(snan)" instead of "nan" in some platforms and STRINGSTREAM conversions
@@ -199,21 +201,20 @@ void conversionFP_T2S_iC(const V& val, const std::vector<std::string>& vStr)
       }
     }
 
-    conversionFP_T2S_iC  <T, (IDX_CONV_PROCESS+1) >(val, vStr);
+    conversionFP_T2S_iC  <T, (IDX_CONV_PROCESS+1), V >(val, vStr, filePath, lineNo);
   }
 }
-/*
-variantReturnType<T>
-*/
 
 
 template <c_floating_point T, typename V = T>
-void conversionFP_FailureCheck_T2S(const V& val, const std::vector<std::string>& vStr)
+      requires ( std::is_same_v<V, T> || std::is_same_v<V, variantReturnType<T>> )
+void conversionFP_FailureCheck_T2S(const V& val, const std::vector<std::string>& vStr,
+                                   const std::string& filePath, int lineNo)
 {
   std::cout << "T2S : CONV_PROCESS for type [" << specializedTypes::get_name<T>() << "] : ";
   for(size_t i = 0; i < DefaultTn2Str<T>::validConversionProcesses().size() ; ++i) std::cout << DefaultTn2Str<T>::validConversionProcesses()[i] << ", ";
   std::cout << std::endl;
-  conversionFP_T2S_iC<T, 0, V >(val, vStr);
+  conversionFP_T2S_iC<T, 0, V >(val, vStr, filePath, lineNo);
 }
 
 
@@ -301,12 +302,10 @@ int main()
                                            "-nan",        // ubuntu
                                            "-nan(ind)" }; // macos and windows
 
-    std::vector<std::string> junk {"junk"};
-
     if constexpr (std::numeric_limits<float>::has_quiet_NaN)
     {
-      conversionFP_FailureCheck_T2S<float>      ( std::numeric_limits<float>::quiet_NaN(), pqNaNresult);
-      conversionFP_FailureCheck_T2S<float>      (-std::numeric_limits<float>::quiet_NaN(), nqNaNresult);
+      conversionFP_FailureCheck_T2S<float>      ( std::numeric_limits<float>::quiet_NaN(), pqNaNresult, __FILE__, __LINE__);
+      conversionFP_FailureCheck_T2S<float>      (-std::numeric_limits<float>::quiet_NaN(), nqNaNresult, __FILE__, __LINE__);
 
       variantReturnType<float>  pveNaN {
                                   std::in_place_index<1>,
@@ -316,20 +315,14 @@ int main()
                                   std::in_place_index<1>,
                                   Str2TNaNInput{"-nan"}
                                 };
-      conversionFP_FailureCheck_T2S<float, variantReturnType<float>>      ( pveNaN, pqNaNresult);
-      conversionFP_FailureCheck_T2S<float, variantReturnType<float>>      ( nveNaN, nqNaNresult);
-
-      variantReturnType<float>  junkNaN {
-                                  std::in_place_index<2>,
-                                  Str2TConversionFailure{"junk"}
-                                };
-      conversionFP_FailureCheck_T2S<float, variantReturnType<float>>      ( junkNaN, junk);
+      conversionFP_FailureCheck_T2S<float, variantReturnType<float>>      ( pveNaN, pqNaNresult, __FILE__, __LINE__);
+      conversionFP_FailureCheck_T2S<float, variantReturnType<float>>      ( nveNaN, nqNaNresult, __FILE__, __LINE__);
     }
 
     if constexpr (std::numeric_limits<double>::has_quiet_NaN)
     {
-      conversionFP_FailureCheck_T2S<double>     ( std::numeric_limits<double>::quiet_NaN(), pqNaNresult);
-      conversionFP_FailureCheck_T2S<double>     (-std::numeric_limits<double>::quiet_NaN(), nqNaNresult);
+      conversionFP_FailureCheck_T2S<double>     ( std::numeric_limits<double>::quiet_NaN(), pqNaNresult, __FILE__, __LINE__);
+      conversionFP_FailureCheck_T2S<double>     (-std::numeric_limits<double>::quiet_NaN(), nqNaNresult, __FILE__, __LINE__);
 
       variantReturnType<double>  pveNaN {
                                   std::in_place_index<1>,
@@ -339,20 +332,14 @@ int main()
                                   std::in_place_index<1>,
                                   Str2TNaNInput{"-nan"}
                                 };
-      conversionFP_FailureCheck_T2S<double, variantReturnType<double>>      ( pveNaN, pqNaNresult);
-      conversionFP_FailureCheck_T2S<double, variantReturnType<double>>      ( nveNaN, nqNaNresult);
-
-      variantReturnType<double>  junkNaN {
-                                  std::in_place_index<2>,
-                                  Str2TConversionFailure{"junk"}
-                                };
-      conversionFP_FailureCheck_T2S<double, variantReturnType<double>>      ( junkNaN, junk);
+      conversionFP_FailureCheck_T2S<double, variantReturnType<double>>      ( pveNaN, pqNaNresult, __FILE__, __LINE__);
+      conversionFP_FailureCheck_T2S<double, variantReturnType<double>>      ( nveNaN, nqNaNresult, __FILE__, __LINE__);
     }
 
     if constexpr (std::numeric_limits<long double>::has_quiet_NaN)
     {
-      conversionFP_FailureCheck_T2S<long double>( std::numeric_limits<long double>::quiet_NaN(), pqNaNresult);
-      conversionFP_FailureCheck_T2S<long double>(-std::numeric_limits<long double>::quiet_NaN(), nqNaNresult);
+      conversionFP_FailureCheck_T2S<long double>( std::numeric_limits<long double>::quiet_NaN(), pqNaNresult, __FILE__, __LINE__);
+      conversionFP_FailureCheck_T2S<long double>(-std::numeric_limits<long double>::quiet_NaN(), nqNaNresult, __FILE__, __LINE__);
 
       variantReturnType<long double>  pveNaN {
                                   std::in_place_index<1>,
@@ -362,14 +349,8 @@ int main()
                                   std::in_place_index<1>,
                                   Str2TNaNInput{"-nan"}
                                 };
-      conversionFP_FailureCheck_T2S<long double, variantReturnType<long double>>      ( pveNaN, pqNaNresult);
-      conversionFP_FailureCheck_T2S<long double, variantReturnType<long double>>      ( nveNaN, nqNaNresult);
-
-      variantReturnType<long double>  junkNaN {
-                                  std::in_place_index<2>,
-                                  Str2TConversionFailure{"junk"}
-                                };
-      conversionFP_FailureCheck_T2S<long double, variantReturnType<long double>>      ( junkNaN, junk);
+      conversionFP_FailureCheck_T2S<long double, variantReturnType<long double>>      ( pveNaN, pqNaNresult, __FILE__, __LINE__);
+      conversionFP_FailureCheck_T2S<long double, variantReturnType<long double>>      ( nveNaN, nqNaNresult, __FILE__, __LINE__);
     }
 
     std::cout << "testFloatingPointNaN : T2S : has_signaling_NaN" << std::endl;
@@ -379,8 +360,8 @@ int main()
                                            "-nan(snan)" }; // macos and windows
     if constexpr (std::numeric_limits<float>::has_signaling_NaN)
     {
-      conversionFP_FailureCheck_T2S<float>      ( std::numeric_limits<float>::signaling_NaN(), psNaNresult);
-      conversionFP_FailureCheck_T2S<float>      (-std::numeric_limits<float>::signaling_NaN(), nsNaNresult);
+      conversionFP_FailureCheck_T2S<float>      ( std::numeric_limits<float>::signaling_NaN(), psNaNresult, __FILE__, __LINE__);
+      conversionFP_FailureCheck_T2S<float>      (-std::numeric_limits<float>::signaling_NaN(), nsNaNresult, __FILE__, __LINE__);
 
       variantReturnType<float>  pveNaN {
                                   std::in_place_index<1>,
@@ -390,14 +371,14 @@ int main()
                                   std::in_place_index<1>,
                                   Str2TNaNInput{"-nan"}
                                 };
-      conversionFP_FailureCheck_T2S<float, variantReturnType<float>>      ( pveNaN, psNaNresult);
-      conversionFP_FailureCheck_T2S<float, variantReturnType<float>>      ( nveNaN, nsNaNresult);
+      conversionFP_FailureCheck_T2S<float, variantReturnType<float>>      ( pveNaN, psNaNresult, __FILE__, __LINE__);
+      conversionFP_FailureCheck_T2S<float, variantReturnType<float>>      ( nveNaN, nsNaNresult, __FILE__, __LINE__);
     }
 
     if constexpr (std::numeric_limits<double>::has_signaling_NaN)
     {
-      conversionFP_FailureCheck_T2S<double>     ( std::numeric_limits<double>::signaling_NaN(), psNaNresult);
-      conversionFP_FailureCheck_T2S<double>     (-std::numeric_limits<double>::signaling_NaN(), nsNaNresult);
+      conversionFP_FailureCheck_T2S<double>     ( std::numeric_limits<double>::signaling_NaN(), psNaNresult, __FILE__, __LINE__);
+      conversionFP_FailureCheck_T2S<double>     (-std::numeric_limits<double>::signaling_NaN(), nsNaNresult, __FILE__, __LINE__);
 
       variantReturnType<double>  pveNaN {
                                   std::in_place_index<1>,
@@ -407,14 +388,14 @@ int main()
                                   std::in_place_index<1>,
                                   Str2TNaNInput{"-nan"}
                                 };
-      conversionFP_FailureCheck_T2S<double, variantReturnType<double>>      ( pveNaN, psNaNresult);
-      conversionFP_FailureCheck_T2S<double, variantReturnType<double>>      ( nveNaN, nsNaNresult);
+      conversionFP_FailureCheck_T2S<double, variantReturnType<double>>      ( pveNaN, psNaNresult, __FILE__, __LINE__);
+      conversionFP_FailureCheck_T2S<double, variantReturnType<double>>      ( nveNaN, nsNaNresult, __FILE__, __LINE__);
     }
 
     if constexpr (std::numeric_limits<long double>::has_signaling_NaN)
     {
-      conversionFP_FailureCheck_T2S<long double>( std::numeric_limits<long double>::signaling_NaN(), psNaNresult);
-      conversionFP_FailureCheck_T2S<long double>(-std::numeric_limits<long double>::signaling_NaN(), nsNaNresult);
+      conversionFP_FailureCheck_T2S<long double>( std::numeric_limits<long double>::signaling_NaN(), psNaNresult, __FILE__, __LINE__);
+      conversionFP_FailureCheck_T2S<long double>(-std::numeric_limits<long double>::signaling_NaN(), nsNaNresult, __FILE__, __LINE__);
 
       variantReturnType<long double>  pveNaN {
                                   std::in_place_index<1>,
@@ -424,11 +405,31 @@ int main()
                                   std::in_place_index<1>,
                                   Str2TNaNInput{"-nan"}
                                 };
-      conversionFP_FailureCheck_T2S<long double, variantReturnType<long double>>      ( pveNaN, psNaNresult);
-      conversionFP_FailureCheck_T2S<long double, variantReturnType<long double>>      ( nveNaN, nsNaNresult);
+      conversionFP_FailureCheck_T2S<long double, variantReturnType<long double>>      ( pveNaN, psNaNresult, __FILE__, __LINE__);
+      conversionFP_FailureCheck_T2S<long double, variantReturnType<long double>>      ( nveNaN, nsNaNresult, __FILE__, __LINE__);
     }
 
-    // TODO   T2S variantReturnType<T>
+    // T2S variantReturnType<T>
+    std::vector<std::string> junk {"junk"};
+
+    variantReturnType<float>  junkNaN_f {
+                                std::in_place_index<2>,
+                                Str2TConversionFailure{"junk"}
+                              };
+
+    variantReturnType<double>  junkNaN_d {
+                                std::in_place_index<2>,
+                                Str2TConversionFailure{"junk"}
+                              };
+
+    variantReturnType<long double>  junkNaN_ld {
+                                std::in_place_index<2>,
+                                Str2TConversionFailure{"junk"}
+                              };
+
+    conversionFP_FailureCheck_T2S<float, variantReturnType<float>>             ( junkNaN_f,  junk, __FILE__, __LINE__);
+    conversionFP_FailureCheck_T2S<double, variantReturnType<double>>           ( junkNaN_d,  junk, __FILE__, __LINE__);
+    conversionFP_FailureCheck_T2S<long double, variantReturnType<long double>> ( junkNaN_ld, junk, __FILE__, __LINE__);
 
   } catch (const std::exception& ex) {
     std::cout << "Test Failed : err-msg : " << ex.what() << std::endl;
