@@ -156,10 +156,23 @@ namespace converter
  *       index 1 : Str2TNaNInput           -- conversion produced NaN
  *       index 2 : Str2TConversionFailure -- conversion failed
  *
- * The STRINGSTREAM conversion process requires special handling because
- * stream extraction does not consistently recognize textual NaN values.
- * The implementation explicitly recognizes "nan" and "nan(snan)"
- * (case-insensitively) and routes them through the common NaN handler.
+ * For the tested implementations, STRINGSTREAM extraction does not
+ * recognize textual NaN values. When extraction fails, the input is routed
+ * through ErrorHandler<T, ERR_HANDLER>::handleConversionFailure().
+ * If an implementation successfully extracts a NaN value, the common NaN
+ * handler applies the configured policy, just as it does for other
+ * conversion mechanisms.
+ *
+ * Other conversion mechanisms may successfully parse textual NaN and
+ * route the resulting NaN through the common NaN handler. If parsing
+ * fails, the input is handled as a conversion failure and routed through
+ * ErrorHandler<T, ERR_HANDLER>::handleConversionFailure().
+ *
+ * In the tested configurations, the plus-prefixed inputs "+nan",
+ * "+nan(ind)", and "+nan(snan)" are accepted by the S2N (std::sto*())
+ * family but produce parsing errors with FROM_CHARS (std::from_chars()).
+ * These are observations for the tested configurations, not a guarantee
+ * about every spelling or every standard-library implementation.
  *
  * The converter's contract concerns the resulting NaN classification and
  * configured error-handling policy. It does not promise preservation of
@@ -176,11 +189,13 @@ namespace converter
  * Observed behavior across tested platforms:
  *
  *   STRINGSTREAM
- *       Signaling NaN is formatted as "nan".
+ *       Signaling NaN is formatted as "nan" in the tested configurations.
  *
  *   TO_CHARS
  *       Signaling NaN may be formatted as "nan(snan)" on some platforms
- *       and as "nan" on others.
+ *       and as "nan" on others. For negative NaN values, the observed
+ *       spellings also include "-nan" and "-nan(snan)"; the sign may
+ *       therefore be retained or omitted by the selected implementation.
  *
  * Consequently, the converter does not guarantee a uniform textual
  * representation of NaN across different conversion mechanisms,

@@ -1,5 +1,5 @@
 /*
- * _convertStr2T.h
+ * _convertT2Str.h
  *
  * URL:      https://github.com/panchaBhuta/converter
  * Version:  v2.4
@@ -352,7 +352,9 @@ namespace converter
 
     constexpr static int charArraySize = std::numeric_limits<T>::digits10 + 10;
 
-    constexpr static type getDefaultFormatArgs() { return 10; } // base 10 is the default for std::to_chars for integral types, but providing this function for consistency and future extensibility
+    // base 10 is the default for std::to_chars for integral types,
+    // but providing this function for consistency and future extensibility
+    constexpr static type getDefaultFormatArgs() { return 10; }
   };
 
   template <c_floating_point T>
@@ -390,7 +392,9 @@ namespace converter
           isDefault(other.isDefault)
     {}
 
-    constexpr static type getDefaultFormatArgs() { return Format_ToChars<T>(); } // std::chars_format::general is the default for std::to_chars for floating-point types, but providing this function for consistency and future extensibility
+     // std::chars_format::general is the default for std::to_chars for floating-point types,
+     // but providing this function for consistency and future extensibility
+    constexpr static type getDefaultFormatArgs() { return Format_ToChars<T>(); }
 
   };
 
@@ -621,9 +625,20 @@ namespace converter
           throw std::invalid_argument(errMsg);
       }
 
-      // TODO : add to README about signaling-NaN T2S conversion resulting in
-      // "nan" for STRINGSTREAM conversion across all platforms;
-      // "nan(snan)"  on some platforms for TO_CHARS conversion and on remaining platforms its "nan".
+      // TODO : add to README about signaling-NaN
+      /*
+       * Observed signaling-NaN formatting behavior on tested platforms:
+       *
+       * STRINGSTREAM:
+       *   Formatted as "nan".
+       *
+       * TO_CHARS:
+       *   Formatted as "nan(snan)" on some tested platforms and as "nan"
+       *   on others.
+       *
+       * These are implementation-specific observations, not a guarantee
+       * of uniform formatting across all standard-library implementations.
+       */
       if (_checkStreamFailure(oss)) {
         std::string errMsg = "Stream write failure. " + funcName + " :: output-string-stream-failure.";
         CONVERTER_DEBUG_LOG( errMsg << std::boolalpha << " oss.fail()=" << oss.fail() << "  oss.bad()="   \

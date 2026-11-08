@@ -241,7 +241,7 @@ namespace converter
         ess << workaround::DateAdapterS2T<t_datelibFrom>::dateLibName << " ::: strYMD='" << str << "' , format='" << fmt << "' stream-parse failed.";
         ess << " iss.fail()=" << is_failed << " iss.bad()="  << is_bad;
 
-        return ErrorHandler<value_type, ERR_HANDLER>::template handle<std::invalid_argument>(str, ess.str());
+        return ErrorHandler<value_type, ERR_HANDLER>::template handleConversionFailure<std::invalid_argument>(str, ess.str());
       }
 
       // Validate structural boundaries for final object safety
@@ -251,7 +251,7 @@ namespace converter
 
         ess << workaround::DateAdapterS2T<t_datelibFrom>::dateLibName << " ::: strYMD='" << str << "' , format='" << fmt << "' invalid-date, conversion failed." << std::endl;
 
-        return ErrorHandler<value_type, ERR_HANDLER>::template handle<std::invalid_argument>(str, ess.str());
+        return ErrorHandler<value_type, ERR_HANDLER>::template handleConversionFailure<std::invalid_argument>(str, ess.str());
       }
 
 
