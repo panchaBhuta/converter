@@ -195,7 +195,8 @@ void conversionFP_FailureCheck_S2T(const std::string& vStr,
   std::cout << "S2T : ERR_HANDLER for type [" << specializedTypes::get_name<T>() << "] : ";
   for(size_t i = 0; i < DefaultStr2Tn<T>::validErrorHandlers().size() ; ++i) std::cout << DefaultStr2Tn<T>::validErrorHandlers()[i] << ", ";
   std::cout << std::endl;
-  conversionFP_S2T_iC<T, 0, FROMCHARS_VARIANTIDX, S2N_VARIANTIDX, STRINGSTREAM_VARIANTIDX >(vStr, filePath, lineNo, chkVal);
+  conversionFP_S2T_iC<T, 0,
+      FROMCHARS_VARIANTIDX, S2N_VARIANTIDX, STRINGSTREAM_VARIANTIDX >(vStr, filePath, lineNo, chkVal);
 }
 
 

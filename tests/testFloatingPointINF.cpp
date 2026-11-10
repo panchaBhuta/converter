@@ -223,55 +223,40 @@ int main()
     conversionFP_FailureCheck_S2T<long double>("-inf",  -std::numeric_limits<long double>::infinity(), __FILE__, __LINE__);
 
 
-/*
-    std::cout << "testFloatingPointNaN : T2S : has_quiet_NaN" << std::endl;
-    std::vector<std::string> pqNaNresult {"nan"};
-    std::vector<std::string> nqNaNresult { "nan",         // STRINGSTREAM across all compilers
-                                           "-nan",        // ubuntu
-                                           "-nan(ind)" }; // macos and windows
-    if constexpr (std::numeric_limits<float>::has_quiet_NaN)
+    std::cout << "testFloatingPointNaN : T2S : has_infinity" << std::endl;
+    std::string pINFresult {"inf"};
+    std::string nINFresult { "-inf" };
+    if constexpr (std::numeric_limits<float>::has_infinity)
     {
-      conversionFP_FailureCheck_T2S<float>      ( std::numeric_limits<float>::quiet_NaN(), pqNaNresult);
-      conversionFP_FailureCheck_T2S<float>      (-std::numeric_limits<float>::quiet_NaN(), nqNaNresult);
+      conversionFP_FailureCheck_T2S<float>      ( std::numeric_limits<float>::infinity(), pINFresult, __FILE__, __LINE__);
+      conversionFP_FailureCheck_T2S<float>      (-std::numeric_limits<float>::infinity(), nINFresult, __FILE__, __LINE__);
+
+      variantReturnType<float>  pveINF {
+                                  std::in_place_index<0>,
+                                  std::numeric_limits<float>::infinity()
+                                };
+      variantReturnType<float>  nveINF {
+                                  std::in_place_index<0>,
+                                  -std::numeric_limits<float>::infinity()
+                                };
+      conversionFP_FailureCheck_T2S<float, variantReturnType<float>>      ( pveINF, pINFresult, __FILE__, __LINE__);
+      conversionFP_FailureCheck_T2S<float, variantReturnType<float>>      ( nveINF, nINFresult, __FILE__, __LINE__);
+
     }
 
-    if constexpr (std::numeric_limits<double>::has_quiet_NaN)
+    if constexpr (std::numeric_limits<double>::has_infinity)
     {
-      conversionFP_FailureCheck_T2S<double>     ( std::numeric_limits<double>::quiet_NaN(), pqNaNresult);
-      conversionFP_FailureCheck_T2S<double>     (-std::numeric_limits<double>::quiet_NaN(), nqNaNresult);
+      conversionFP_FailureCheck_T2S<double>     ( std::numeric_limits<double>::infinity(), pINFresult, __FILE__, __LINE__);
+      conversionFP_FailureCheck_T2S<double>     (-std::numeric_limits<double>::infinity(), nINFresult, __FILE__, __LINE__);
     }
 
-    if constexpr (std::numeric_limits<long double>::has_quiet_NaN)
+    if constexpr (std::numeric_limits<long double>::has_infinity)
     {
-      conversionFP_FailureCheck_T2S<long double>( std::numeric_limits<long double>::quiet_NaN(), pqNaNresult);
-      conversionFP_FailureCheck_T2S<long double>(-std::numeric_limits<long double>::quiet_NaN(), nqNaNresult);
+      conversionFP_FailureCheck_T2S<long double>( std::numeric_limits<long double>::infinity(), pINFresult, __FILE__, __LINE__);
+      conversionFP_FailureCheck_T2S<long double>(-std::numeric_limits<long double>::infinity(), nINFresult, __FILE__, __LINE__);
     }
 
-    std::cout << "testFloatingPointNaN : T2S : has_signaling_NaN" << std::endl;
-    std::vector<std::string> psNaNresult { "nan",  "nan(snan)"};
-    std::vector<std::string> nsNaNresult { "nan",          // STRINGSTREAM across all compilers
-                                           "-nan",         // ubuntu
-                                           "-nan(snan)" }; // macos and windows
-    if constexpr (std::numeric_limits<float>::has_signaling_NaN)
-    {
-      conversionFP_FailureCheck_T2S<float>      ( std::numeric_limits<float>::signaling_NaN(), psNaNresult);
-      conversionFP_FailureCheck_T2S<float>      (-std::numeric_limits<float>::signaling_NaN(), nsNaNresult);
-    }
 
-    if constexpr (std::numeric_limits<double>::has_signaling_NaN)
-    {
-      conversionFP_FailureCheck_T2S<double>     ( std::numeric_limits<double>::signaling_NaN(), psNaNresult);
-      conversionFP_FailureCheck_T2S<double>     (-std::numeric_limits<double>::signaling_NaN(), nsNaNresult);
-    }
-
-    if constexpr (std::numeric_limits<long double>::has_signaling_NaN)
-    {
-      conversionFP_FailureCheck_T2S<long double>( std::numeric_limits<long double>::signaling_NaN(), psNaNresult);
-      conversionFP_FailureCheck_T2S<long double>(-std::numeric_limits<long double>::signaling_NaN(), nsNaNresult);
-    }
-
-    // TODO   T2S variantReturnType<T>
-*/
 
   } catch (const std::exception& ex) {
     std::cout << "Test Failed : err-msg : " << ex.what() << std::endl;
