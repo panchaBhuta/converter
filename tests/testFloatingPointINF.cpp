@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <functional>
 #include <iterator>
+#include <cassert>
 
 #include <vector>
 #include <string>
@@ -29,7 +30,7 @@ using namespace converter;
 #define ExpectEqual2(t, a, b) ExpectEqualFun<t>(a, b, #a, #b, filePath, lineNo)
 #define ExpectTrue2(a) ExpectTrueFun(a, #a, filePath, lineNo)
 
-template <c_floating_point T, Str2TnConversionProcess CONV_PROCESS, Str2TnErrorHandler ERR_HANDLER >
+template <c_floating_point T, Str2TnConversionProcess CONV_PROCESS, Str2TnErrorHandler ERR_HANDLER, size_t VARIANTIDX >
           requires ( ERR_HANDLER == Str2TnErrorHandler::QUIET_NAN ||
                      ERR_HANDLER == Str2TnErrorHandler::SIGNAL_NAN )
 inline void conversionFP_S2T_C_NAN(const std::string& vStr, const T& valInf,
@@ -46,7 +47,8 @@ inline void conversionFP_S2T_C_NAN(const std::string& vStr, const T& valInf,
 }
 
 
-template <c_floating_point T, Str2TnConversionProcess CONV_PROCESS >
+template <c_floating_point T, Str2TnConversionProcess CONV_PROCESS, size_t VARIANTIDX >
+    requires ( VARIANTIDX == 0 || VARIANTIDX == 1 || VARIANTIDX == 2 || VARIANTIDX == (1 | 2) )  // here (1 | 2)=3 means either 1 or 2
 inline void conversionFP_S2T_C_VARIANT(const std::string& vStr, const T& variantValInf,
                                        const std::string& filePath, int lineNo)
 {
@@ -60,7 +62,7 @@ inline void conversionFP_S2T_C_VARIANT(const std::string& vStr, const T& variant
   }
 }
 
-template <c_floating_point T, Str2TnConversionProcess CONV_PROCESS >
+template <c_floating_point T, Str2TnConversionProcess CONV_PROCESS, size_t VARIANTIDX >
 inline void conversionFP_S2T_C_THROW_ERROR(const std::string& vStr, const T& valInf,
                                            const std::string& filePath, int lineNo)
 {
@@ -76,54 +78,78 @@ inline void conversionFP_S2T_C_THROW_ERROR(const std::string& vStr, const T& val
 
 
 
-template <c_floating_point T, Str2TnConversionProcess CONV_PROCESS, Str2TnErrorHandler ERR_HANDLER >
+template <c_floating_point T, Str2TnConversionProcess CONV_PROCESS, Str2TnErrorHandler ERR_HANDLER,
+           size_t FROMCHARS_VARIANTIDX, size_t S2N_VARIANTIDX, size_t STRINGSTREAM_VARIANTIDX >
 inline void conversionFP_S2T_C_E(const std::string& vStr, const T& valInf,
                                  const std::string& filePath, int lineNo)
 {
+  constexpr size_t CONV_VARIANTIDX = (   CONV_PROCESS == Str2TnConversionProcess::FROM_CHARS    ?  FROMCHARS_VARIANTIDX     :
+                                       ( CONV_PROCESS == Str2TnConversionProcess::S2N           ?  S2N_VARIANTIDX           :
+                                        (CONV_PROCESS == Str2TnConversionProcess::STRINGSTREAM  ?  STRINGSTREAM_VARIANTIDX  :  100 )
+                                       )
+                                     );
+
+  if constexpr ( CONV_VARIANTIDX == 100 )
+  {
+    std::cout << "missing unit-test for Str2TnConversionProcess[" << CONV_PROCESS << "]\n";
+    assert(false);
+    //static_assert(always_false<T>::value, "Unsupported ERROR-HANDLER for FP-conversion");
+  }
+
   if constexpr (ERR_HANDLER == Str2TnErrorHandler::QUIET_NAN ||
                 ERR_HANDLER == Str2TnErrorHandler::SIGNAL_NAN)
   {
-    conversionFP_S2T_C_NAN<T, CONV_PROCESS, ERR_HANDLER>(vStr, valInf, filePath, lineNo);
+    conversionFP_S2T_C_NAN<T, CONV_PROCESS, ERR_HANDLER, CONV_VARIANTIDX>(vStr, valInf, filePath, lineNo);
   } else if constexpr (ERR_HANDLER == Str2TnErrorHandler::VARIANT_VAL) {
-    conversionFP_S2T_C_VARIANT<T, CONV_PROCESS>(vStr, valInf, filePath, lineNo);
+    conversionFP_S2T_C_VARIANT<T, CONV_PROCESS, CONV_VARIANTIDX>(vStr, valInf, filePath, lineNo);
   } else if constexpr (ERR_HANDLER == Str2TnErrorHandler::THROW_ERROR) {
-    conversionFP_S2T_C_THROW_ERROR<T, CONV_PROCESS>(vStr, valInf, filePath, lineNo);
+    conversionFP_S2T_C_THROW_ERROR<T, CONV_PROCESS, CONV_VARIANTIDX>(vStr, valInf, filePath, lineNo);
   } else {
     static_assert(always_false<T>::value, "Unsupported ERROR-HANDLER for FP-conversion");
   }
 }
 
-template <c_floating_point T, Str2TnConversionProcess CONV_PROCESS, size_t IDX_ERR_HANDLER >
+template <c_floating_point T, Str2TnConversionProcess CONV_PROCESS, size_t IDX_ERR_HANDLER,
+          size_t FROMCHARS_VARIANTIDX, size_t S2N_VARIANTIDX, size_t STRINGSTREAM_VARIANTIDX >
+    requires ( IDX_ERR_HANDLER  <  DefaultStr2Tn<T>::validErrorHandlers().size() )
 void conversionFP_S2T_iC_iE(const std::string& vStr, const T& valInf,
                             const std::string& filePath, int lineNo)
 {
-  if constexpr ( IDX_ERR_HANDLER  <  DefaultStr2Tn<T>::validErrorHandlers().size() )
-  {
-    constexpr Str2TnErrorHandler ERR_HANDLER =
-            DefaultStr2Tn<T>::validErrorHandlers()[IDX_ERR_HANDLER];
-    conversionFP_S2T_C_E<T,  CONV_PROCESS,  ERR_HANDLER >(vStr, valInf, filePath, lineNo);
+  constexpr Str2TnErrorHandler ERR_HANDLER =
+          DefaultStr2Tn<T>::validErrorHandlers()[IDX_ERR_HANDLER];
+  conversionFP_S2T_C_E<T,  CONV_PROCESS,  ERR_HANDLER,
+                         FROMCHARS_VARIANTIDX, S2N_VARIANTIDX, STRINGSTREAM_VARIANTIDX >(vStr, valInf, filePath, lineNo);
 
+  if constexpr ( (IDX_ERR_HANDLER+1)  <  DefaultStr2Tn<T>::validErrorHandlers().size() )
+  {
     conversionFP_S2T_iC_iE<T,  CONV_PROCESS,
-                               (IDX_ERR_HANDLER+1) >(vStr, valInf, filePath, lineNo);
+                               (IDX_ERR_HANDLER+1),
+                               FROMCHARS_VARIANTIDX, S2N_VARIANTIDX, STRINGSTREAM_VARIANTIDX >(vStr, valInf, filePath, lineNo);
   }
 }
 
-template <c_floating_point T, size_t IDX_CONV_PROCESS >
+template <c_floating_point T, size_t IDX_CONV_PROCESS,
+          size_t FROMCHARS_VARIANTIDX, size_t S2N_VARIANTIDX, size_t STRINGSTREAM_VARIANTIDX >
+    requires ( IDX_CONV_PROCESS  <  DefaultStr2Tn<T>::validConversionProcesses().size() )
 void conversionFP_S2T_iC(const std::string& vStr, const T& valInf,
                          const std::string& filePath, int lineNo)
 {
-  if constexpr ( IDX_CONV_PROCESS  <  DefaultStr2Tn<T>::validConversionProcesses().size() )
-  {
     constexpr Str2TnConversionProcess CONV_PROCESS =
             DefaultStr2Tn<T>::validConversionProcesses()[IDX_CONV_PROCESS];
-    conversionFP_S2T_iC_iE<T, CONV_PROCESS, 0 >(vStr, valInf, filePath, lineNo);
+    conversionFP_S2T_iC_iE<T, CONV_PROCESS, 0,
+      FROMCHARS_VARIANTIDX, S2N_VARIANTIDX, STRINGSTREAM_VARIANTIDX >(vStr, valInf, filePath, lineNo);
 
-    conversionFP_S2T_iC   <T, (IDX_CONV_PROCESS+1) >(vStr, valInf, filePath, lineNo);
+  if constexpr ( (IDX_CONV_PROCESS+1)  <  DefaultStr2Tn<T>::validConversionProcesses().size() )
+  {
+    conversionFP_S2T_iC   <T, (IDX_CONV_PROCESS+1),
+        FROMCHARS_VARIANTIDX, S2N_VARIANTIDX, STRINGSTREAM_VARIANTIDX >(vStr, valInf, filePath, lineNo);
   }
 }
 
 
-template <c_floating_point T >
+template <c_floating_point T,
+          size_t FROMCHARS_VARIANTIDX = 0, size_t S2N_VARIANTIDX = 0, size_t STRINGSTREAM_VARIANTIDX = 0 >
+    requires ( STRINGSTREAM_VARIANTIDX == 0 || STRINGSTREAM_VARIANTIDX == 2 )
 void conversionFP_FailureCheck_S2T(const std::string& vStr, const T& valInf,
                                    const std::string& filePath, int lineNo)
 {
@@ -134,7 +160,8 @@ void conversionFP_FailureCheck_S2T(const std::string& vStr, const T& valInf,
   std::cout << "S2T : ERR_HANDLER for type [" << specializedTypes::get_name<T>() << "] : ";
   for(size_t i = 0; i < DefaultStr2Tn<T>::validErrorHandlers().size() ; ++i) std::cout << DefaultStr2Tn<T>::validErrorHandlers()[i] << ", ";
   std::cout << std::endl;
-  conversionFP_S2T_iC<T, 0 >(vStr, valInf, filePath, lineNo);
+  conversionFP_S2T_iC<T, 0,
+      FROMCHARS_VARIANTIDX, S2N_VARIANTIDX, STRINGSTREAM_VARIANTIDX >(vStr, valInf, filePath, lineNo);
 }
 
 

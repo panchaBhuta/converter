@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <functional>
 #include <iterator>
+#include <cassert>
 
 #include <vector>
 #include <string>
@@ -169,17 +170,20 @@ void conversionFP_S2T_iC(const std::string& vStr,
 {
   constexpr Str2TnConversionProcess CONV_PROCESS =
           DefaultStr2Tn<T>::validConversionProcesses()[IDX_CONV_PROCESS];
-  conversionFP_S2T_iC_iE<T, CONV_PROCESS, 0, FROMCHARS_VARIANTIDX, S2N_VARIANTIDX, STRINGSTREAM_VARIANTIDX >(vStr, filePath, lineNo, chkVal);
+  conversionFP_S2T_iC_iE<T, CONV_PROCESS, 0,
+      FROMCHARS_VARIANTIDX, S2N_VARIANTIDX, STRINGSTREAM_VARIANTIDX >(vStr, filePath, lineNo, chkVal);
 
   if constexpr ( (IDX_CONV_PROCESS+1)  <  DefaultStr2Tn<T>::validConversionProcesses().size() )
   {
-    conversionFP_S2T_iC   <T, (IDX_CONV_PROCESS+1), FROMCHARS_VARIANTIDX, S2N_VARIANTIDX, STRINGSTREAM_VARIANTIDX >(vStr, filePath, lineNo, chkVal);
+    conversionFP_S2T_iC   <T, (IDX_CONV_PROCESS+1),
+        FROMCHARS_VARIANTIDX, S2N_VARIANTIDX, STRINGSTREAM_VARIANTIDX >(vStr, filePath, lineNo, chkVal);
   }
 }
 
 
-template <c_floating_point T, size_t FROMCHARS_VARIANTIDX, size_t S2N_VARIANTIDX, size_t STRINGSTREAM_VARIANTIDX >
-        requires ( STRINGSTREAM_VARIANTIDX == 0 || STRINGSTREAM_VARIANTIDX == 2 )
+template <c_floating_point T,
+          size_t FROMCHARS_VARIANTIDX, size_t S2N_VARIANTIDX, size_t STRINGSTREAM_VARIANTIDX >
+    requires ( STRINGSTREAM_VARIANTIDX == 0 || STRINGSTREAM_VARIANTIDX == 2 )
 void conversionFP_FailureCheck_S2T(const std::string& vStr,
                                    const std::string& filePath, int lineNo,
                                    const T chkVal = std::numeric_limits<T>::quiet_NaN())
