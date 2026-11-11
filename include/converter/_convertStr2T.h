@@ -761,7 +761,7 @@ namespace converter
     using return_type = typename ErrorHandler<T, ERR_HANDLER>::return_type;
     using value_type  = T;
 
-    static return_type handle(const std::string& strVal, const T val)
+    static return_type handle(const std::string& strVal, const T& val)
     {
       if constexpr (c_floating_point<T>)
       {
@@ -774,6 +774,11 @@ namespace converter
               "Conversion resulted in nan value: " + std::to_string(val) + " :: strVal = '" + strVal + "'";
 
           CONVERTER_DEBUG_LOG(errMsg);
+
+          if constexpr ( ERR_HANDLER == Str2TnErrorHandler::QUIET_NAN ||
+                         ERR_HANDLER == Str2TnErrorHandler::SIGNAL_NAN ) {
+            return val;
+          }
 
           return ErrorHandler<T, ERR_HANDLER>::handleNaNInput(strVal, errMsg);  // if variant : index==1
         }

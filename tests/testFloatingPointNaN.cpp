@@ -48,7 +48,7 @@ inline void conversionFP_S2T_C_NAN(const std::string& vStr,
         unittest::ExpectEqual2(T, conVal, chkVal);  // use case ::: Str2TnConversionProcess::S2N && vStr = ' 123.45'
       }
     } else {
-      std::cout << "conversionFP_S2T_C_NAN<" << specializedTypes::get_name<T>() << "," << CONV_PROCESS << ", QUIET_NAN>(" << vStr << ") skipped as has_quiet_NaN = false\n";
+      std::cout << "conversionFP_S2T_C_NAN<" << specializedTypes::get_name<T>() << "," << CONV_PROCESS << ", QUIET_NAN, " << VARIANTIDX << ">(" << vStr << ") skipped as has_quiet_NaN = false\n";
     }
   } else if constexpr ( ERR_HANDLER == Str2TnErrorHandler::SIGNAL_NAN ) {
     if constexpr (std::numeric_limits<T>::has_signaling_NaN)
@@ -60,36 +60,46 @@ inline void conversionFP_S2T_C_NAN(const std::string& vStr,
         unittest::ExpectEqual2(T, conVal, chkVal);  // use case ::: Str2TnConversionProcess::S2N && vStr = ' 123.45'
       }
     } else {
-      std::cout << "conversionFP_S2T_C_NAN<" << specializedTypes::get_name<T>() << "," << CONV_PROCESS << ", SIGNAL_NAN>(" << vStr << ") skipped as has_signal_NaN = false\n";
+      std::cout << "conversionFP_S2T_C_NAN<" << specializedTypes::get_name<T>() << "," << CONV_PROCESS << ", SIGNAL_NAN, " << VARIANTIDX << ">(" << vStr << ") skipped as has_signal_NaN = false\n";
     }
   }
 }
 
 
 template <c_floating_point T, Str2TnConversionProcess CONV_PROCESS, size_t VARIANTIDX >
-    requires ( VARIANTIDX == 0 || VARIANTIDX == 1 || VARIANTIDX == 2 || VARIANTIDX == (1 | 2) )  // here (1 | 2)=3 means either 1 or 2
+    requires ( VARIANTIDX == 0 || VARIANTIDX == 1 || VARIANTIDX == 2 )
 inline void conversionFP_S2T_C_VARIANT(const std::string& vStr,
                                        const std::string& filePath, int lineNo,
                                        const T chkVal = std::numeric_limits<T>::quiet_NaN() )
 {
   auto cVal12 = ConvertFromStr<T , CONV_PROCESS , Str2TnErrorHandler::VARIANT_VAL>::ToVal(vStr);
+  unittest::ExpectEqual2(size_t,      cVal12.index(), VARIANTIDX);
   if constexpr (VARIANTIDX != 0)
   {
-    if ( (VARIANTIDX & cVal12.index()) == 1 ) // [ 1 or (1 | 2) ]
+    unittest::ExpectEqual2(std::string, std::get<VARIANTIDX>(cVal12).value, vStr);
+    if ( VARIANTIDX == 1 )
     {
-      unittest::ExpectEqual2(size_t,      cVal12.index(), 1);
-      unittest::ExpectEqual2(std::string, std::get<1>(cVal12).value, vStr);
       unittest::ExpectEqual2(std::string, std::get<Str2TNaNInput>(cVal12).value, vStr);
-    } else if ( (VARIANTIDX & cVal12.index()) == 2 ) // [ 2 or (1 | 2) ]
+
+      if constexpr (std::numeric_limits<T>::has_quiet_NaN)
+      {
+        // check for sign bit
+        if ( vStr.size() > 1 )
+        {
+          T conVal = ConvertFromStr<T , CONV_PROCESS , Str2TnErrorHandler::QUIET_NAN>::ToVal(vStr);
+          bool isStringSigned = ( '-' == vStr[0] );
+          bool isValueSigned  = std::signbit(conVal);
+          unittest::ExpectEqual2(bool,      isStringSigned, isValueSigned);
+        }
+      }
+
+    } else if ( VARIANTIDX == 2 )
     {
-      unittest::ExpectEqual2(size_t,      cVal12.index(), 2);
-      unittest::ExpectEqual2(std::string, std::get<2>(cVal12).value, vStr);
       unittest::ExpectEqual2(std::string, std::get<Str2TConversionFailure>(cVal12).value, vStr);
     }
   } else {
     // use case ::: Str2TnConversionProcess::S2N && vStr = ' 123.45'
-    unittest::ExpectEqual2(size_t,      cVal12.index(), 0);
-    unittest::ExpectEqual2(T, std::get<0>(cVal12), chkVal);
+    unittest::ExpectEqual2(T, std::get<VARIANTIDX>(cVal12), chkVal);
     unittest::ExpectEqual2(T, std::get<T>(cVal12), chkVal);
   }
 }

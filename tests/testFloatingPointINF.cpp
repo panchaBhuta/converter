@@ -42,13 +42,13 @@ inline void conversionFP_S2T_C_NAN(const std::string& vStr, const T& valInf,
     unittest::ExpectTrue2(std::isinf(cVal));
     unittest::ExpectEqual2(T, cVal, valInf);
   } else {
-    std::cout << "conversionFP_S2T_C_NAN<" << specializedTypes::get_name<T>() << "," << CONV_PROCESS << ", " << ERR_HANDLER << ">(" << vStr << ") skipped as has_infinity = false\n";
+    std::cout << "conversionFP_S2T_C_NAN<" << specializedTypes::get_name<T>() << ", " << CONV_PROCESS << ", " << ERR_HANDLER << ", " << VARIANTIDX << ">(" << vStr << ") skipped as has_infinity = false\n";
   }
 }
 
 
 template <c_floating_point T, Str2TnConversionProcess CONV_PROCESS, size_t VARIANTIDX >
-    requires ( VARIANTIDX == 0 || VARIANTIDX == 1 || VARIANTIDX == 2 || VARIANTIDX == (1 | 2) )  // here (1 | 2)=3 means either 1 or 2
+    requires ( VARIANTIDX == 0 || VARIANTIDX == 1 || VARIANTIDX == 2 )
 inline void conversionFP_S2T_C_VARIANT(const std::string& vStr, const T& variantValInf,
                                        const std::string& filePath, int lineNo)
 {
@@ -57,8 +57,18 @@ inline void conversionFP_S2T_C_VARIANT(const std::string& vStr, const T& variant
     auto cVal0 = ConvertFromStr<T , CONV_PROCESS , Str2TnErrorHandler::VARIANT_VAL>::ToVal(vStr);
     unittest::ExpectEqual2(size_t,      cVal0.index(), 0);
     unittest::ExpectEqual2(T, std::get<T>(cVal0), variantValInf);
+
+    // check for sign bit
+    if ( vStr.size() > 1 )
+    {
+      T conVal = std::get<T>(cVal0);
+      bool isStringSigned = ( '-' == vStr[0] );
+      bool isValueSigned  = std::signbit(conVal);
+      unittest::ExpectEqual2(bool,      isStringSigned, isValueSigned);
+    }
+
   } else {
-    std::cout << "conversionFP_S2T_C_NAN<" << specializedTypes::get_name<T>() << "," << CONV_PROCESS << ", VARIANT_VAL>(" << vStr << ") skipped as has_infinity = false\n";
+    std::cout << "conversionFP_S2T_C_VARIANT<" << specializedTypes::get_name<T>() << ", " << CONV_PROCESS << ", " << VARIANTIDX << ">(" << vStr << ") skipped as has_infinity = false\n";
   }
 }
 
@@ -72,7 +82,7 @@ inline void conversionFP_S2T_C_THROW_ERROR(const std::string& vStr, const T& val
     unittest::ExpectTrue2(std::isinf(cVal));
     unittest::ExpectEqual2(T, cVal, valInf);
   } else {
-    std::cout << "conversionFP_S2T_C_NAN<" << specializedTypes::get_name<T>() << "," << CONV_PROCESS << ", THROW_ERROR>(" << vStr << ") skipped as has_infinity = false\n";
+    std::cout << "conversionFP_S2T_C_THROW_ERROR<" << specializedTypes::get_name<T>() << ", " << CONV_PROCESS << ", " << VARIANTIDX << ">(" << vStr << ") skipped as has_infinity = false\n";
   }
 }
 
@@ -118,7 +128,7 @@ void conversionFP_S2T_iC_iE(const std::string& vStr, const T& valInf,
   constexpr Str2TnErrorHandler ERR_HANDLER =
           DefaultStr2Tn<T>::validErrorHandlers()[IDX_ERR_HANDLER];
   conversionFP_S2T_C_E<T,  CONV_PROCESS,  ERR_HANDLER,
-                         FROMCHARS_VARIANTIDX, S2N_VARIANTIDX, STRINGSTREAM_VARIANTIDX >(vStr, valInf, filePath, lineNo);
+                           FROMCHARS_VARIANTIDX, S2N_VARIANTIDX, STRINGSTREAM_VARIANTIDX >(vStr, valInf, filePath, lineNo);
 
   if constexpr ( (IDX_ERR_HANDLER+1)  <  DefaultStr2Tn<T>::validErrorHandlers().size() )
   {
@@ -241,19 +251,40 @@ int main()
                                 };
       conversionFP_FailureCheck_T2S<float, variantReturnType<float>>      ( pveINF, pINFresult, __FILE__, __LINE__);
       conversionFP_FailureCheck_T2S<float, variantReturnType<float>>      ( nveINF, nINFresult, __FILE__, __LINE__);
-
     }
 
     if constexpr (std::numeric_limits<double>::has_infinity)
     {
       conversionFP_FailureCheck_T2S<double>     ( std::numeric_limits<double>::infinity(), pINFresult, __FILE__, __LINE__);
       conversionFP_FailureCheck_T2S<double>     (-std::numeric_limits<double>::infinity(), nINFresult, __FILE__, __LINE__);
+
+      variantReturnType<double>  pveINF {
+                                  std::in_place_index<0>,
+                                  std::numeric_limits<double>::infinity()
+                                };
+      variantReturnType<double>  nveINF {
+                                  std::in_place_index<0>,
+                                  -std::numeric_limits<double>::infinity()
+                                };
+      conversionFP_FailureCheck_T2S<double, variantReturnType<double>>      ( pveINF, pINFresult, __FILE__, __LINE__);
+      conversionFP_FailureCheck_T2S<double, variantReturnType<double>>      ( nveINF, nINFresult, __FILE__, __LINE__);
     }
 
     if constexpr (std::numeric_limits<long double>::has_infinity)
     {
       conversionFP_FailureCheck_T2S<long double>( std::numeric_limits<long double>::infinity(), pINFresult, __FILE__, __LINE__);
       conversionFP_FailureCheck_T2S<long double>(-std::numeric_limits<long double>::infinity(), nINFresult, __FILE__, __LINE__);
+
+      variantReturnType<long double>  pveINF {
+                                  std::in_place_index<0>,
+                                  std::numeric_limits<long double>::infinity()
+                                };
+      variantReturnType<long double>  nveINF {
+                                  std::in_place_index<0>,
+                                  -std::numeric_limits<long double>::infinity()
+                                };
+      conversionFP_FailureCheck_T2S<long double, variantReturnType<long double>>      ( pveINF, pINFresult, __FILE__, __LINE__);
+      conversionFP_FailureCheck_T2S<long double, variantReturnType<long double>>      ( nveINF, nINFresult, __FILE__, __LINE__);
     }
 
 
