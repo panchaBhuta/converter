@@ -724,6 +724,7 @@ namespace converter
         if constexpr ( std::numeric_limits<T>::has_quiet_NaN )
         {
           try {
+            CONVERTER_DEBUG_LOG( "WARNING: ErrorHandler<>::_handle<E>() :: calling std::nan*()" );
             if constexpr (std::is_same_v<T, float>) {
               return std::nanf(strVal.c_str());
             } else if constexpr (std::is_same_v<T, double>) {
@@ -735,7 +736,7 @@ namespace converter
             }
           } catch (...) {
             // In case if the implementation doesn't support string argument for nan functions, we can return a default quiet NaN value.
-            CONVERTER_DEBUG_LOG( "ErrorHandler<>::_handle<E>() :: nan() with string argument not supported by this implementation. Returning default quiet NaN value." );
+            CONVERTER_DEBUG_LOG( "ErrorHandler<>::_handle<E>() :: std::nan*() with string argument not supported by this implementation. Returning default quiet NaN value." );
             return std::numeric_limits<T>::quiet_NaN();
           }
         } else {
@@ -771,7 +772,7 @@ namespace converter
         if (std::isnan(val))
         {
           const std::string errMsg =
-              "Conversion resulted in nan value: " + std::to_string(val) + " :: strVal = '" + strVal + "'";
+              "Conversion resulted in nan value: convertedValue[" + std::to_string(val) + "] :: strVal = '" + strVal + "'";
 
           CONVERTER_DEBUG_LOG(errMsg);
 

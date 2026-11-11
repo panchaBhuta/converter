@@ -86,6 +86,7 @@ inline void conversionFP_S2T_C_VARIANT(const std::string& vStr,
         // check for sign bit
         if ( vStr.size() > 1 )
         {
+          std::cout << "TESTLOG :: Calling with QUIET_NAN -> ConvertFromStr<T , CONV_PROCESS , Str2TnErrorHandler::QUIET_NAN>::ToVal(vStr) to figure out the converted NAN value" << std::endl;
           T conVal = ConvertFromStr<T , CONV_PROCESS , Str2TnErrorHandler::QUIET_NAN>::ToVal(vStr);
           bool isStringSigned = ( '-' == vStr[0] );
           bool isValueSigned  = std::signbit(conVal);
