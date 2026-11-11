@@ -772,13 +772,42 @@ namespace converter
         if (std::isnan(val))
         {
           const std::string errMsg =
-              "Conversion resulted in nan value: convertedValue[" + std::to_string(val) + "] :: strVal = '" + strVal + "'";
+              "Conversion resulted in nan value: " + std::to_string(val) + " :: strVal = '" + strVal + "'";
 
           CONVERTER_DEBUG_LOG(errMsg);
 
           if constexpr ( ERR_HANDLER == Str2TnErrorHandler::QUIET_NAN ||
                          ERR_HANDLER == Str2TnErrorHandler::SIGNAL_NAN ) {
+#if defined(_MSC_VER)
+// Also applicable to Clang on Windows (clang-cl), which defines _MSC_VER.
+
+// TODO : Add the following to README
+// investigation has also exposed an important distinction:
+//     the sign of a NaN produced by a standard-library conversion function
+//     is not necessarily consistent across implementations.
+
+            if constexpr ( CONV_PROCESS == Str2TnConversionProcess::S2N)
+            {
+                /*
+                 * WORKAROUND for MSVC + S2N:
+                 *
+                 * MSVC's std::sto*() converts "+nan(ind)" to a negative NaN.
+                 * Correct the sign of the successfully parsed NaN to match
+                 * the explicit positive sign in the input string.
+                 */
+
+                const auto pos = strVal.find_first_not_of(" \t\n\r\f\v");
+
+                if (pos != std::string::npos && strVal[pos] == '+' &&
+                    std::signbit(val))
+                {
+                    return std::copysign(val, T{1});
+                }
+            }
+
+#endif
             return val;
+
           }
 
           return ErrorHandler<T, ERR_HANDLER>::handleNaNInput(strVal, errMsg);  // if variant : index==1
