@@ -216,5 +216,5 @@ jobs:
             git commit -m "chore: automatically update consolidateWorkAroundFlags.csv and consolidateDiagnosticTTP.csv [skip ci]"
             git push origin "${PR_BRANCH}"
           else
-            echo "No changes detected. Skipping commit."
+            echo "No changes detected. Skipping git commit and remote push. Temporary automation local branch will not be published when there are no changes."
           fi

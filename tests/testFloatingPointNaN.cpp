@@ -322,17 +322,55 @@ int main()
     conversionFP_FailureCheck_S2T<double, 2, 1, 2 >     ("+nan(ind)", __FILE__, __LINE__);
     conversionFP_FailureCheck_S2T<long double, 2, 1, 2 >("+nan(ind)", __FILE__, __LINE__);
 
+    // signal nan
     conversionFP_FailureCheck_S2T<float, 1, 1, 2>      ("nan(snan)", __FILE__, __LINE__);
     conversionFP_FailureCheck_S2T<double, 1, 1, 2>     ("nan(snan)", __FILE__, __LINE__);
     conversionFP_FailureCheck_S2T<long double, 1, 1, 2>("nan(snan)", __FILE__, __LINE__);
 
+    // signal nan
     conversionFP_FailureCheck_S2T<float, 2, 1, 2 >      ("+nan(snan)", __FILE__, __LINE__); // gnu:g++ : std::from_char() -> error ; std::sto*() -> nan
     conversionFP_FailureCheck_S2T<double, 2, 1, 2 >     ("+nan(snan)", __FILE__, __LINE__);
     conversionFP_FailureCheck_S2T<long double, 2, 1, 2 >("+nan(snan)", __FILE__, __LINE__);
 
+    // -ve signal nan
     conversionFP_FailureCheck_S2T<float, 1, 1, 2>      ("-nan(snan)", __FILE__, __LINE__);
     conversionFP_FailureCheck_S2T<double, 1, 1, 2>     ("-nan(snan)", __FILE__, __LINE__);
     conversionFP_FailureCheck_S2T<long double, 1, 1, 2>("-nan(snan)", __FILE__, __LINE__);
+
+    // empty payload
+    conversionFP_FailureCheck_S2T<float, 1, 1, 2>      ("nan()", __FILE__, __LINE__);
+    conversionFP_FailureCheck_S2T<double, 1, 1, 2>     ("nan()", __FILE__, __LINE__);
+    conversionFP_FailureCheck_S2T<long double, 1, 1, 2>("nan()", __FILE__, __LINE__);
+
+    // payload
+    conversionFP_FailureCheck_S2T<float, 1, 1, 2>      ("nan(foo)", __FILE__, __LINE__);
+    conversionFP_FailureCheck_S2T<double, 1, 1, 2>     ("nan(foo)", __FILE__, __LINE__);
+    conversionFP_FailureCheck_S2T<long double, 1, 1, 2>("nan(foo)", __FILE__, __LINE__);
+
+    // Numeric payload
+    conversionFP_FailureCheck_S2T<float, 1, 1, 2>      ("nan(123)", __FILE__, __LINE__);
+    conversionFP_FailureCheck_S2T<double, 1, 1, 2>     ("nan(123)", __FILE__, __LINE__);
+    conversionFP_FailureCheck_S2T<long double, 1, 1, 2>("nan(123)", __FILE__, __LINE__);
+
+    // Valid-looking prefix with trailing characters
+    conversionFP_FailureCheck_S2T<float, 2, 2, 2>      ("nan(foo)xyz", __FILE__, __LINE__);
+    conversionFP_FailureCheck_S2T<double, 2, 2, 2>     ("nan(foo)xyz", __FILE__, __LINE__);
+    conversionFP_FailureCheck_S2T<long double, 2, 2, 2>("nan(foo)xyz", __FILE__, __LINE__);
+
+    // 	Incomplete payload
+    conversionFP_FailureCheck_S2T<float, 2, 2, 2>      ("nan(", __FILE__, __LINE__);
+    conversionFP_FailureCheck_S2T<double, 2, 2, 2>     ("nan(", __FILE__, __LINE__);
+    conversionFP_FailureCheck_S2T<long double, 2, 2, 2>("nan(", __FILE__, __LINE__);
+
+    // 	Incomplete payload
+    conversionFP_FailureCheck_S2T<float, 2, 2, 2>      ("nan(foo", __FILE__, __LINE__);
+    conversionFP_FailureCheck_S2T<double, 2, 2, 2>     ("nan(foo", __FILE__, __LINE__);
+    conversionFP_FailureCheck_S2T<long double, 2, 2, 2>("nan(foo", __FILE__, __LINE__);
+
+    // 		Invalid spelling
+    conversionFP_FailureCheck_S2T<float, 2, 2, 2>      ("nanfoo", __FILE__, __LINE__);
+    conversionFP_FailureCheck_S2T<double, 2, 2, 2>     ("nanfoo", __FILE__, __LINE__);
+    conversionFP_FailureCheck_S2T<long double, 2, 2, 2>("nanfoo", __FILE__, __LINE__);
 
     conversionFP_FailureCheck_S2T<float, 2, 2, 2>      ("junkChars", __FILE__, __LINE__);
     conversionFP_FailureCheck_S2T<double, 2, 2, 2>     ("junkChars", __FILE__, __LINE__);

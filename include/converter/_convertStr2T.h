@@ -15,6 +15,7 @@
 
 #include <tuple>
 #include <array>
+#include <map>
 #include <optional>
 #include <type_traits>
 #include <charconv>
@@ -857,29 +858,31 @@ namespace converter
             if (std::isnan(val))
               return false;
 
+            CONVERTER_DEBUG_LOG("CheckNaN<>::handleINF() :: checking strVal='" << strVal << "'");
+
             // stringstream does not recognize string inputs "inf", "+inf", "-inf" as valid parameter.
             // Instead of treating it as infinity, it treats it as an error.
             // To the keep the conversion behavior consistent across various
             // conversion mechanism's (FROM_CHARS, S2N, "STRINGSTREAM"),
             // the below code has been added.
             // TODO: add the above observation to README
-            static const specializedTypes::ci_string    ciInf{"inf"};
-            static const specializedTypes::ci_string    ciPveInf{"+inf"};
-            static const specializedTypes::ci_string    ciNveInf{"-inf"};
-            if ( ciInf  == strVal ||
-                 ciPveInf == strVal )
+
+            static const std::map<specializedTypes::ci_string, T> infinitySpellings
+              {
+                {  "inf",  std::numeric_limits<T>::infinity() },
+                { "+inf",  std::numeric_limits<T>::infinity() },
+                { "-inf", -std::numeric_limits<T>::infinity() },
+                {  "infinity",  std::numeric_limits<T>::infinity() },
+                { "+infinity",  std::numeric_limits<T>::infinity() },
+                { "-infinity", -std::numeric_limits<T>::infinity() }
+              };
+            if (auto search = infinitySpellings.find(specializedTypes::ci_string{strVal.begin(), strVal.end()});
+                search != infinitySpellings.end())
             {
-              // workaround for stream as it does not convert string "inf" or "+inf"
-              // to floating-type infinity; as in other conversion mechanisms.
-              val = std::numeric_limits<T>::infinity();
-              return true;
-            } else if ( ciNveInf == strVal )
-            {
-              // workaround for stream as it does not convert string "-inf"
-              // to floating-type infinity; as in other conversion mechanisms.
-              val = -std::numeric_limits<T>::infinity();
+              val = search->second;
               return true;
             }
+
           }
         }
       }

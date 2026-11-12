@@ -1,5 +1,5 @@
 
-// test NaN conversion exceptions for floating-point-types
+// test INF conversion exceptions for floating-point-types
 
 
 #include <iostream>
@@ -232,6 +232,17 @@ int main()
     conversionFP_FailureCheck_S2T<double>     ("-inf",  -std::numeric_limits<double>::infinity(),      __FILE__, __LINE__);
     conversionFP_FailureCheck_S2T<long double>("-inf",  -std::numeric_limits<long double>::infinity(), __FILE__, __LINE__);
 
+    conversionFP_FailureCheck_S2T<float>      ("infinity",  std::numeric_limits<float>::infinity(),       __FILE__, __LINE__);
+    conversionFP_FailureCheck_S2T<double>     ("infinity",  std::numeric_limits<double>::infinity(),      __FILE__, __LINE__);
+    conversionFP_FailureCheck_S2T<long double>("infinity",  std::numeric_limits<long double>::infinity(), __FILE__, __LINE__);
+
+    conversionFP_FailureCheck_S2T<float>      ("+infinity",  std::numeric_limits<float>::infinity(),       __FILE__, __LINE__);
+    conversionFP_FailureCheck_S2T<double>     ("+infinity",  std::numeric_limits<double>::infinity(),      __FILE__, __LINE__);
+    conversionFP_FailureCheck_S2T<long double>("+infinity",  std::numeric_limits<long double>::infinity(), __FILE__, __LINE__);
+
+    conversionFP_FailureCheck_S2T<float>      ("-infinity",  -std::numeric_limits<float>::infinity(),       __FILE__, __LINE__);
+    conversionFP_FailureCheck_S2T<double>     ("-infinity",  -std::numeric_limits<double>::infinity(),      __FILE__, __LINE__);
+    conversionFP_FailureCheck_S2T<long double>("-infinity",  -std::numeric_limits<long double>::infinity(), __FILE__, __LINE__);
 
     std::cout << "testFloatingPointNaN : T2S : has_infinity" << std::endl;
     std::string pINFresult {"inf"};
