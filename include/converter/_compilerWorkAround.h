@@ -45,3 +45,99 @@
   #define CONVERTER_TEMPLATE_TYPE_CONSTRAINT c_numeric
 
 #endif
+
+
+#include <string>
+#include <concepts>
+#include <limits>
+#include <map>
+
+
+#include <specializedTypes/case_insensitive_string.h>
+
+#if defined(_MSC_VER)
+
+#include <cmath>
+
+namespace converter
+{
+  template <std::floating_point T>
+  inline T msvc_S2N_pveNaN_workaround(const std::string& strVal, const T& val)
+  {
+    /*
+     * WORKAROUND for MSVC + S2N:
+     *
+     * MSVC's std::sto*() converts "+nan(ind)" to a negative NaN.
+     * Correct the sign of the successfully parsed NaN to match
+     * the explicit positive sign in the input string.
+     */
+    const auto pos = strVal.find_first_not_of(" \t\n\r\f\v");
+
+    if (pos != std::string::npos && strVal[pos] == '+' &&
+        std::signbit(val))
+    {
+        return std::copysign(val, T{1});
+    }
+
+    return val;
+  }
+
+} // namespace converter
+
+#endif
+
+
+
+namespace converter
+{
+  inline auto fromchars_gooble_leading_whiteSpace_workaround(const std::string& str)
+  {
+    auto pos = str.find_first_not_of(" \t\n\r\f\v");    // gooble up leading white spaces
+    if ( ((pos + 1) < str.size()) &&
+         str[pos]   == '+'        &&                    // gooble up first char if it has +ve sign
+         str[pos+1] != '-'                              // use case NaN : "+-1.0"
+       )
+    ++pos;
+    return pos;
+  }
+
+
+  template <std::floating_point T>
+      requires ( std::numeric_limits<T>::has_infinity )
+  inline bool stringstream_infinity_workaround(const std::string& strVal, T& val)
+  {
+    if(std::isinf(val))
+      return true;
+
+    if (std::isnan(val))
+      return false;
+
+    CONVERTER_DEBUG_LOG("stringstream_infinity_workaround() :: checking strVal='" << strVal << "'");
+
+    // stringstream does not recognize string inputs "inf", "+inf", "-inf" as valid parameter.
+    // Instead of treating it as infinity, it treats it as an error.
+    // To the keep the conversion behavior consistent across various
+    // conversion mechanism's (FROM_CHARS, S2N, "STRINGSTREAM"),
+    // the below code has been added.
+    // TODO: add the above observation to README
+
+    static const std::map<specializedTypes::ci_string, T> infinitySpellings
+      {
+        {  "inf",  std::numeric_limits<T>::infinity() },
+        { "+inf",  std::numeric_limits<T>::infinity() },
+        { "-inf", -std::numeric_limits<T>::infinity() },
+        {  "infinity",  std::numeric_limits<T>::infinity() },
+        { "+infinity",  std::numeric_limits<T>::infinity() },
+        { "-infinity", -std::numeric_limits<T>::infinity() }
+      };
+    if (auto search = infinitySpellings.find(specializedTypes::ci_string{strVal.c_str()});
+        search != infinitySpellings.end())
+    {
+      val = search->second;
+      return true;
+    }
+
+    return false;
+  }
+
+} // namespace converter

@@ -274,6 +274,7 @@ int main()
 
   int rv = 0;
   try {
+    std::cout << "testFloatingPointNaN : S2T :" << std::endl;
     conversionFP_FailureCheck_S2T<float, 1, 1, 2>      ("nan", __FILE__, __LINE__);
     conversionFP_FailureCheck_S2T<double, 1, 1, 2>     ("nan", __FILE__, __LINE__);
     conversionFP_FailureCheck_S2T<long double, 1, 1, 2>("nan", __FILE__, __LINE__);
@@ -306,21 +307,25 @@ int main()
     conversionFP_FailureCheck_S2T<double, 1, 1, 2>     ("NAN", __FILE__, __LINE__);
     conversionFP_FailureCheck_S2T<long double, 1, 1, 2>("NAN", __FILE__, __LINE__);
 
-    conversionFP_FailureCheck_S2T<float, 2, 1, 2 >      ("+nan", __FILE__, __LINE__); // gnu:g++ : std::from_char() -> error ; std::sto*() -> nan
-    conversionFP_FailureCheck_S2T<double, 2, 1, 2 >     ("+nan", __FILE__, __LINE__);
-    conversionFP_FailureCheck_S2T<long double, 2, 1, 2 >("+nan", __FILE__, __LINE__);
+    conversionFP_FailureCheck_S2T<float, 1, 1, 2 >      ("+nan", __FILE__, __LINE__); // gnu:g++ : std::from_char() -> error ; std::sto*() -> nan
+    conversionFP_FailureCheck_S2T<double, 1, 1, 2 >     ("+nan", __FILE__, __LINE__);
+    conversionFP_FailureCheck_S2T<long double, 1, 1, 2 >("+nan", __FILE__, __LINE__);
 
     conversionFP_FailureCheck_S2T<float, 1, 1, 2>      ("-nan", __FILE__, __LINE__);
     conversionFP_FailureCheck_S2T<double, 1, 1, 2>     ("-nan", __FILE__, __LINE__);
     conversionFP_FailureCheck_S2T<long double, 1, 1, 2>("-nan", __FILE__, __LINE__);
 
+    conversionFP_FailureCheck_S2T<float, 1, 1, 2>      ("nan(ind)", __FILE__, __LINE__);
+    conversionFP_FailureCheck_S2T<double, 1, 1, 2>     ("nan(ind)", __FILE__, __LINE__);
+    conversionFP_FailureCheck_S2T<long double, 1, 1, 2>("nan(ind)", __FILE__, __LINE__);
+
     conversionFP_FailureCheck_S2T<float, 1, 1, 2>      ("-nan(ind)", __FILE__, __LINE__);
     conversionFP_FailureCheck_S2T<double, 1, 1, 2>     ("-nan(ind)", __FILE__, __LINE__);
     conversionFP_FailureCheck_S2T<long double, 1, 1, 2>("-nan(ind)", __FILE__, __LINE__);
 
-    conversionFP_FailureCheck_S2T<float, 2, 1, 2 >      ("+nan(ind)", __FILE__, __LINE__); // gnu:g++ : std::from_char() -> error ; std::sto*() -> nan
-    conversionFP_FailureCheck_S2T<double, 2, 1, 2 >     ("+nan(ind)", __FILE__, __LINE__);
-    conversionFP_FailureCheck_S2T<long double, 2, 1, 2 >("+nan(ind)", __FILE__, __LINE__);
+    conversionFP_FailureCheck_S2T<float, 1, 1, 2 >      ("+nan(ind)", __FILE__, __LINE__); // gnu:g++ : std::from_char() -> error ; std::sto*() -> nan
+    conversionFP_FailureCheck_S2T<double, 1, 1, 2 >     ("+nan(ind)", __FILE__, __LINE__);
+    conversionFP_FailureCheck_S2T<long double, 1, 1, 2 >("+nan(ind)", __FILE__, __LINE__);
 
     // signal nan
     conversionFP_FailureCheck_S2T<float, 1, 1, 2>      ("nan(snan)", __FILE__, __LINE__);
@@ -328,9 +333,9 @@ int main()
     conversionFP_FailureCheck_S2T<long double, 1, 1, 2>("nan(snan)", __FILE__, __LINE__);
 
     // signal nan
-    conversionFP_FailureCheck_S2T<float, 2, 1, 2 >      ("+nan(snan)", __FILE__, __LINE__); // gnu:g++ : std::from_char() -> error ; std::sto*() -> nan
-    conversionFP_FailureCheck_S2T<double, 2, 1, 2 >     ("+nan(snan)", __FILE__, __LINE__);
-    conversionFP_FailureCheck_S2T<long double, 2, 1, 2 >("+nan(snan)", __FILE__, __LINE__);
+    conversionFP_FailureCheck_S2T<float, 1, 1, 2 >      ("+nan(snan)", __FILE__, __LINE__); // gnu:g++ : std::from_char() -> error ; std::sto*() -> nan
+    conversionFP_FailureCheck_S2T<double, 1, 1, 2 >     ("+nan(snan)", __FILE__, __LINE__);
+    conversionFP_FailureCheck_S2T<long double, 1, 1, 2 >("+nan(snan)", __FILE__, __LINE__);
 
     // -ve signal nan
     conversionFP_FailureCheck_S2T<float, 1, 1, 2>      ("-nan(snan)", __FILE__, __LINE__);
@@ -392,10 +397,37 @@ int main()
     conversionFP_FailureCheck_S2T<double, 2, 2, 2>     ("123.45xyz", __FILE__, __LINE__);
     conversionFP_FailureCheck_S2T<long double, 2, 2, 2>("123.45xyz", __FILE__, __LINE__);
 
-    conversionFP_FailureCheck_S2T<float, 2, 0, 0>      (" 123.45", __FILE__, __LINE__, 123.45F);
-    conversionFP_FailureCheck_S2T<double, 2, 0, 0>     (" 123.45", __FILE__, __LINE__, 123.45);
-    conversionFP_FailureCheck_S2T<long double, 2, 0, 0>(" 123.45", __FILE__, __LINE__, 123.45L);
+    // no-prefix : establish baseline test
+    conversionFP_FailureCheck_S2T<float, 0, 0, 0>      ("123.45", __FILE__, __LINE__, 123.45F);
+    conversionFP_FailureCheck_S2T<double, 0, 0, 0>     ("123.45", __FILE__, __LINE__, 123.45);
+    conversionFP_FailureCheck_S2T<long double, 0, 0, 0>("123.45", __FILE__, __LINE__, 123.45L);
 
+    // prefix + sign : establish baseline test
+    conversionFP_FailureCheck_S2T<float, 0, 0, 0>      ("+123.45", __FILE__, __LINE__, 123.45F);
+    conversionFP_FailureCheck_S2T<double, 0, 0, 0>     ("+123.45", __FILE__, __LINE__, 123.45);
+    conversionFP_FailureCheck_S2T<long double, 0, 0, 0>("+123.45", __FILE__, __LINE__, 123.45L);
+
+    // prefix - sign : establish baseline test
+    conversionFP_FailureCheck_S2T<float, 0, 0, 0>      ("-123.45", __FILE__, __LINE__, -123.45F);
+    conversionFP_FailureCheck_S2T<double, 0, 0, 0>     ("-123.45", __FILE__, __LINE__, -123.45);
+    conversionFP_FailureCheck_S2T<long double, 0, 0, 0>("-123.45", __FILE__, __LINE__, -123.45L);
+
+    // prefix white space
+    conversionFP_FailureCheck_S2T<float, 0, 0, 0>      (" 123.45", __FILE__, __LINE__, 123.45F);
+    conversionFP_FailureCheck_S2T<double, 0, 0, 0>     (" 123.45", __FILE__, __LINE__, 123.45);
+    conversionFP_FailureCheck_S2T<long double, 0, 0, 0>(" 123.45", __FILE__, __LINE__, 123.45L);
+
+    // prefix white space
+    conversionFP_FailureCheck_S2T<float, 0, 0, 0>      (" +123.45", __FILE__, __LINE__, 123.45F);
+    conversionFP_FailureCheck_S2T<double, 0, 0, 0>     (" +123.45", __FILE__, __LINE__, 123.45);
+    conversionFP_FailureCheck_S2T<long double, 0, 0, 0>(" +123.45", __FILE__, __LINE__, 123.45L);
+
+    // prefix white space
+    conversionFP_FailureCheck_S2T<float, 0, 0, 0>      (" -123.45", __FILE__, __LINE__, -123.45F);
+    conversionFP_FailureCheck_S2T<double, 0, 0, 0>     (" -123.45", __FILE__, __LINE__, -123.45);
+    conversionFP_FailureCheck_S2T<long double, 0, 0, 0>(" -123.45", __FILE__, __LINE__, -123.45L);
+
+    // postfix white space
     conversionFP_FailureCheck_S2T<float, 2, 2, 2>      ("123.45 ", __FILE__, __LINE__);
     conversionFP_FailureCheck_S2T<double, 2, 2, 2>     ("123.45 ", __FILE__, __LINE__);
     conversionFP_FailureCheck_S2T<long double, 2, 2, 2>("123.45 ", __FILE__, __LINE__);
@@ -409,7 +441,8 @@ int main()
     conversionFP_FailureCheck_S2T<long double, 2, 2, 2>("1.2.3", __FILE__, __LINE__);
 
 
-    std::cout << "testFloatingPointNaN : T2S : has_quiet_NaN" << std::endl;
+    std::cout << "testFloatingPointNaN : T2S : has_quiet_NaN="
+              << std::numeric_limits<float>::has_quiet_NaN << std::endl;
     std::vector<std::string> pqNaNresult {"nan"};
     std::vector<std::string> nqNaNresult { "nan",         // STRINGSTREAM across all compilers
                                            "-nan",        // ubuntu
@@ -466,7 +499,8 @@ int main()
       conversionFP_FailureCheck_T2S<long double, variantReturnType<long double>>      ( nveNaN, nqNaNresult, __FILE__, __LINE__);
     }
 
-    std::cout << "testFloatingPointNaN : T2S : has_signaling_NaN" << std::endl;
+    std::cout << "testFloatingPointNaN : T2S : has_signaling_NaN="
+              << std::numeric_limits<float>::has_signaling_NaN << std::endl;
     std::vector<std::string> psNaNresult { "nan",  "nan(snan)"};
     std::vector<std::string> nsNaNresult { "nan",          // STRINGSTREAM across all compilers
                                            "-nan",         // ubuntu

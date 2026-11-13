@@ -78,6 +78,7 @@ inline void conversionFP_S2T_C_THROW_ERROR(const std::string& vStr, const T& val
 {
   if constexpr (std::numeric_limits<T>::has_infinity)
   {
+    // "inf" is a valid conversion, we donot expect any error to be thrown
     T cVal = ConvertFromStr<T , CONV_PROCESS , Str2TnErrorHandler::THROW_ERROR>::ToVal(vStr);
     unittest::ExpectTrue2(std::isinf(cVal));
     unittest::ExpectEqual2(T, cVal, valInf);
@@ -220,6 +221,7 @@ int main()
   int rv = 0;
   try {
 
+    std::cout << "testFloatingPointINF : S2T :" << std::endl;
     conversionFP_FailureCheck_S2T<float>      ("inf",  std::numeric_limits<float>::infinity(),       __FILE__, __LINE__);
     conversionFP_FailureCheck_S2T<double>     ("inf",  std::numeric_limits<double>::infinity(),      __FILE__, __LINE__);
     conversionFP_FailureCheck_S2T<long double>("inf",  std::numeric_limits<long double>::infinity(), __FILE__, __LINE__);
@@ -244,7 +246,8 @@ int main()
     conversionFP_FailureCheck_S2T<double>     ("-infinity",  -std::numeric_limits<double>::infinity(),      __FILE__, __LINE__);
     conversionFP_FailureCheck_S2T<long double>("-infinity",  -std::numeric_limits<long double>::infinity(), __FILE__, __LINE__);
 
-    std::cout << "testFloatingPointNaN : T2S : has_infinity" << std::endl;
+    std::cout << "testFloatingPointINF : T2S : has_infinity="
+              << std::numeric_limits<float>::has_infinity << std::endl;
     std::string pINFresult {"inf"};
     std::string nINFresult { "-inf" };
     if constexpr (std::numeric_limits<float>::has_infinity)

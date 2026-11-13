@@ -15,7 +15,6 @@
 
 #include <tuple>
 #include <array>
-#include <map>
 #include <optional>
 #include <type_traits>
 #include <charconv>
@@ -38,7 +37,6 @@
 
 #include <converter/_common.h>
 #include <specializedTypes/CompTimeStr.h>
-#include <specializedTypes/case_insensitive_string.h>
 
 namespace converter
 {
@@ -796,14 +794,7 @@ namespace converter
                  * Correct the sign of the successfully parsed NaN to match
                  * the explicit positive sign in the input string.
                  */
-
-                const auto pos = strVal.find_first_not_of(" \t\n\r\f\v");
-
-                if (pos != std::string::npos && strVal[pos] == '+' &&
-                    std::signbit(val))
-                {
-                    return std::copysign(val, T{1});
-                }
+                return msvc_S2N_pveNaN_workaround(strVal, val);
             }
 
 #endif
@@ -845,45 +836,13 @@ namespace converter
 
     static bool handleINF(const std::string& strVal, T& val)
     {
-      if constexpr (c_floating_point<T>)
+      if constexpr (    CONV_PROCESS == Str2TnConversionProcess::STRINGSTREAM
+                     || CONV_PROCESS == Str2TnConversionProcess::FROM_CHARS
+                   )
       {
-        if constexpr ( CONV_PROCESS == Str2TnConversionProcess::STRINGSTREAM ||
-                       CONV_PROCESS == Str2TnConversionProcess::FROM_CHARS )
+        if constexpr (c_floating_point<T> && std::numeric_limits<T>::has_infinity )
         {
-          if constexpr ( std::numeric_limits<T>::has_infinity )
-          {
-            if(std::isinf(val))
-              return true;
-
-            if (std::isnan(val))
-              return false;
-
-            CONVERTER_DEBUG_LOG("CheckNaN<>::handleINF() :: checking strVal='" << strVal << "'");
-
-            // stringstream does not recognize string inputs "inf", "+inf", "-inf" as valid parameter.
-            // Instead of treating it as infinity, it treats it as an error.
-            // To the keep the conversion behavior consistent across various
-            // conversion mechanism's (FROM_CHARS, S2N, "STRINGSTREAM"),
-            // the below code has been added.
-            // TODO: add the above observation to README
-
-            static const std::map<specializedTypes::ci_string, T> infinitySpellings
-              {
-                {  "inf",  std::numeric_limits<T>::infinity() },
-                { "+inf",  std::numeric_limits<T>::infinity() },
-                { "-inf", -std::numeric_limits<T>::infinity() },
-                {  "infinity",  std::numeric_limits<T>::infinity() },
-                { "+infinity",  std::numeric_limits<T>::infinity() },
-                { "-infinity", -std::numeric_limits<T>::infinity() }
-              };
-            if (auto search = infinitySpellings.find(specializedTypes::ci_string{strVal.begin(), strVal.end()});
-                search != infinitySpellings.end())
-            {
-              val = search->second;
-              return true;
-            }
-
-          }
+          return stringstream_infinity_workaround(strVal, val);
         }
       }
       return false;
@@ -923,9 +882,19 @@ namespace converter
       CONVERTER_DEBUG_LOG("trace :: return_type ConvertFromStr< T = [" << specializedTypes::get_name<T>() << "], Str2TnConversionProcess::FROM_CHARS, " << ERR_HANDLER << " >::ToVal('" << str << "')");
       //  https://en.cppreference.com/w/cpp/utility/from_chars
       //  std::from_chars is locale-independent, non-allocating, and non-throwing
-      T result{};
 
-      auto [ptr, ec] = std::from_chars(str.data(), str.data() + str.size(), result, format_args); // throws nothing
+      const auto pos = fromchars_gooble_leading_whiteSpace_workaround(str);
+
+#if FLAG_CONVERTER_debug_log == 1
+      if (pos != 0)
+      {
+        std::cout << "Str2TnConversionProcess::FROM_CHARS ::: gooble of leading white spaces and first +ve sign(if any) ::: str='"
+                  << str << "' -> gooble-str='" << std::string{ str.data() + pos, str.data() + str.size() } << "'" << std::endl;
+      }
+#endif
+
+      T result{};
+      auto [ptr, ec] = std::from_chars(str.data() + pos, str.data() + str.size(), result, format_args); // throws nothing
 
       if (ec == std::errc())
       {
