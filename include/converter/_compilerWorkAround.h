@@ -93,6 +93,10 @@ namespace converter
   inline auto fromchars_gooble_leading_whiteSpace_workaround(const std::string& str)
   {
     auto pos = str.find_first_not_of(" \t\n\r\f\v");    // gooble up leading white spaces
+
+    if (pos == std::string::npos)
+      return pos;
+
     if ( ((pos + 1) < str.size()) &&
          str[pos]   == '+'        &&                    // gooble up first char if it has +ve sign
          str[pos+1] != '-'                              // use case NaN : "+-1.0"

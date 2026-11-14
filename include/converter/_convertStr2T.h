@@ -883,7 +883,7 @@ namespace converter
       //  https://en.cppreference.com/w/cpp/utility/from_chars
       //  std::from_chars is locale-independent, non-allocating, and non-throwing
 
-      const auto pos = fromchars_gooble_leading_whiteSpace_workaround(str);
+      auto pos = fromchars_gooble_leading_whiteSpace_workaround(str);
 
 #if FLAG_CONVERTER_debug_log == 1
       if (pos != 0)
@@ -892,6 +892,14 @@ namespace converter
                   << str << "' -> gooble-str='" << std::string{ str.data() + pos, str.data() + str.size() } << "'" << std::endl;
       }
 #endif
+
+      if (pos == std::string::npos)
+      {
+        /* Route empty or whitespace-only input through the existing
+         * conversion-failure handler.
+         */
+        pos = str.size();
+      }
 
       T result{};
       auto [ptr, ec] = std::from_chars(str.data() + pos, str.data() + str.size(), result, format_args); // throws nothing
