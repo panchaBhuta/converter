@@ -173,12 +173,12 @@ windows-2022:Windows-10.0.20348,ClangCl:Clang-19.1.5,2: double,STRINGSTREAM,1,na
 windows-2022:Windows-10.0.20348,ClangCl:Clang-19.1.5,2: double,TO_CHAR,1,nan,-nan(ind),1,nan(snan),-nan(snan),1,inf,-inf
 windows-2022:Windows-10.0.20348,ClangCl:Clang-19.1.5,3: long double,STRINGSTREAM,1,nan,-nan(ind),1,nan(snan),-nan(snan),1,inf,-inf
 windows-2022:Windows-10.0.20348,ClangCl:Clang-19.1.5,3: long double,TO_CHAR,1,nan,-nan(ind),1,nan(snan),-nan(snan),1,inf,-inf
-windows-2022:Windows-10.0.20348,default:MSVC-19.44.35229.0,1: float,STRINGSTREAM,1,nan,-nan(ind),1,nan,-nan,1,inf,-inf
-windows-2022:Windows-10.0.20348,default:MSVC-19.44.35229.0,1: float,TO_CHAR,1,nan,-nan(ind),1,nan,-nan,1,inf,-inf
-windows-2022:Windows-10.0.20348,default:MSVC-19.44.35229.0,2: double,STRINGSTREAM,1,nan,-nan(ind),1,nan(snan),-nan(snan),1,inf,-inf
-windows-2022:Windows-10.0.20348,default:MSVC-19.44.35229.0,2: double,TO_CHAR,1,nan,-nan(ind),1,nan(snan),-nan(snan),1,inf,-inf
-windows-2022:Windows-10.0.20348,default:MSVC-19.44.35229.0,3: long double,STRINGSTREAM,1,nan,-nan(ind),1,nan(snan),-nan(snan),1,inf,-inf
-windows-2022:Windows-10.0.20348,default:MSVC-19.44.35229.0,3: long double,TO_CHAR,1,nan,-nan(ind),1,nan(snan),-nan(snan),1,inf,-inf
+windows-2022:Windows-10.0.20348,default:MSVC-19.44.35230.0,1: float,STRINGSTREAM,1,nan,-nan(ind),1,nan,-nan,1,inf,-inf
+windows-2022:Windows-10.0.20348,default:MSVC-19.44.35230.0,1: float,TO_CHAR,1,nan,-nan(ind),1,nan,-nan,1,inf,-inf
+windows-2022:Windows-10.0.20348,default:MSVC-19.44.35230.0,2: double,STRINGSTREAM,1,nan,-nan(ind),1,nan(snan),-nan(snan),1,inf,-inf
+windows-2022:Windows-10.0.20348,default:MSVC-19.44.35230.0,2: double,TO_CHAR,1,nan,-nan(ind),1,nan(snan),-nan(snan),1,inf,-inf
+windows-2022:Windows-10.0.20348,default:MSVC-19.44.35230.0,3: long double,STRINGSTREAM,1,nan,-nan(ind),1,nan(snan),-nan(snan),1,inf,-inf
+windows-2022:Windows-10.0.20348,default:MSVC-19.44.35230.0,3: long double,TO_CHAR,1,nan,-nan(ind),1,nan(snan),-nan(snan),1,inf,-inf
 windows-2022:Windows-10.0.20348,g++:GNU-16.2.0,1: float,STRINGSTREAM,1,nan,nan,1,nan,nan,1,inf,-inf
 windows-2022:Windows-10.0.20348,g++:GNU-16.2.0,1: float,TO_CHAR,1,nan,-nan,1,nan,-nan,1,inf,-inf
 windows-2022:Windows-10.0.20348,g++:GNU-16.2.0,2: double,STRINGSTREAM,1,nan,nan,1,nan,nan,1,inf,-inf
