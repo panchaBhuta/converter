@@ -776,7 +776,8 @@ namespace converter
           CONVERTER_DEBUG_LOG(errMsg);
 
           if constexpr ( ERR_HANDLER == Str2TnErrorHandler::QUIET_NAN ||
-                         ERR_HANDLER == Str2TnErrorHandler::SIGNAL_NAN ) {
+                         ERR_HANDLER == Str2TnErrorHandler::SIGNAL_NAN )
+          {
 #if defined(_MSC_VER)
 // Also applicable to Clang on Windows (clang-cl), which defines _MSC_VER.
 
@@ -785,16 +786,18 @@ namespace converter
 //     the sign of a NaN produced by a standard-library conversion function
 //     is not necessarily consistent across implementations.
 
-            if constexpr ( CONV_PROCESS == Str2TnConversionProcess::S2N)
+            if constexpr ( CONV_PROCESS == Str2TnConversionProcess::FROM_CHARS ||
+                           CONV_PROCESS == Str2TnConversionProcess::S2N )
             {
                 /*
-                 * WORKAROUND for MSVC + S2N:
+                 * WORKAROUND for MSVC + (FROM_CHARS || S2N):
                  *
-                 * MSVC's std::sto*() converts "+nan(ind)" to a negative NaN.
+                 * MSVC's std::from_chars() and std::sto*() converts
+                 * "nan(ind)" and "+nan(ind)" to a negative NaN.
                  * Correct the sign of the successfully parsed NaN to match
-                 * the explicit positive sign in the input string.
+                 * the sign of the input string.
                  */
-                return msvc_S2N_pveNaN_workaround(strVal, val);
+                return msvc_preserveNaNSign_workaround(strVal, val);
             }
 
 #endif

@@ -62,24 +62,23 @@
 namespace converter
 {
   template <std::floating_point T>
-  inline T msvc_S2N_pveNaN_workaround(const std::string& strVal, const T& val)
+  inline T msvc_preserveNaNSign_workaround(const std::string& strVal, const T& val)
   {
     /*
-     * WORKAROUND for MSVC + S2N:
+     * WORKAROUND for MSVC + (FROM_CHARS || S2N):
      *
-     * MSVC's std::sto*() converts "+nan(ind)" to a negative NaN.
+     * MSVC's std::from_chars() and std::sto*() converts
+     * "nan(ind)" and "+nan(ind)" to a negative NaN.
      * Correct the sign of the successfully parsed NaN to match
-     * the explicit positive sign in the input string.
+     * the sign in the input string.
      */
     const auto pos = strVal.find_first_not_of(" \t\n\r\f\v");
 
-    if (pos != std::string::npos && strVal[pos] == '+' &&
-        std::signbit(val))
-    {
-        return std::copysign(val, T{1});
-    }
 
-    return val;
+    const bool isNegative =
+        pos != std::string::npos && strVal[pos] == '-';
+
+    return std::copysign(val, isNegative ? T{-1} : T{1});;
   }
 
 } // namespace converter

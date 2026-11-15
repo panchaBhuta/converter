@@ -37,30 +37,19 @@ inline void conversionFP_S2T_C_NAN(const std::string& vStr,
                                    const std::string& filePath, int lineNo,
                                    const T chkVal = std::numeric_limits<T>::quiet_NaN() )
 {
-  if constexpr ( ERR_HANDLER == Str2TnErrorHandler::QUIET_NAN )
-  {
-    if constexpr (std::numeric_limits<T>::has_quiet_NaN)
-    {
-      T conVal = ConvertFromStr<T , CONV_PROCESS , ERR_HANDLER>::ToVal(vStr);
-      if constexpr (VARIANTIDX != 0) {
-        unittest::ExpectTrue2(std::isnan(conVal));
-      } else {
-        unittest::ExpectEqual2(T, conVal, chkVal);  // use case ::: Str2TnConversionProcess::S2N && vStr = ' 123.45'
-      }
+  if constexpr ( ERR_HANDLER == Str2TnErrorHandler::QUIET_NAN && !std::numeric_limits<T>::has_quiet_NaN) {
+
+    std::cout << "conversionFP_S2T_C_NAN<" << specializedTypes::get_name<T>() << "," << CONV_PROCESS << ", QUIET_NAN, " << VARIANTIDX << ">(" << vStr << ") skipped as has_quiet_NaN = false\n";
+    return;
+  } else if constexpr ( ERR_HANDLER == Str2TnErrorHandler::SIGNAL_NAN && !std::numeric_limits<T>::has_signaling_NaN) {
+    std::cout << "conversionFP_S2T_C_NAN<" << specializedTypes::get_name<T>() << "," << CONV_PROCESS << ", SIGNAL_NAN, " << VARIANTIDX << ">(" << vStr << ") skipped as has_signal_NaN = false\n";
+    return;
+  } else {
+    T conVal = ConvertFromStr<T , CONV_PROCESS , ERR_HANDLER>::ToVal(vStr);
+    if constexpr (VARIANTIDX != 0) {
+      unittest::ExpectTrue2(std::isnan(conVal));
     } else {
-      std::cout << "conversionFP_S2T_C_NAN<" << specializedTypes::get_name<T>() << "," << CONV_PROCESS << ", QUIET_NAN, " << VARIANTIDX << ">(" << vStr << ") skipped as has_quiet_NaN = false\n";
-    }
-  } else if constexpr ( ERR_HANDLER == Str2TnErrorHandler::SIGNAL_NAN ) {
-    if constexpr (std::numeric_limits<T>::has_signaling_NaN)
-    {
-      T conVal = ConvertFromStr<T , CONV_PROCESS , ERR_HANDLER>::ToVal(vStr);
-      if constexpr (VARIANTIDX != 0) {
-        unittest::ExpectTrue2(std::isnan(conVal));
-      } else {
-        unittest::ExpectEqual2(T, conVal, chkVal);  // use case ::: Str2TnConversionProcess::S2N && vStr = ' 123.45'
-      }
-    } else {
-      std::cout << "conversionFP_S2T_C_NAN<" << specializedTypes::get_name<T>() << "," << CONV_PROCESS << ", SIGNAL_NAN, " << VARIANTIDX << ">(" << vStr << ") skipped as has_signal_NaN = false\n";
+      unittest::ExpectEqual2(T, conVal, chkVal);  // use case ::: Str2TnConversionProcess::S2N && vStr = ' 123.45'
     }
   }
 }
@@ -88,7 +77,13 @@ inline void conversionFP_S2T_C_VARIANT(const std::string& vStr,
         {
           std::cout << "TESTLOG :: Calling with QUIET_NAN -> ConvertFromStr<T , CONV_PROCESS , Str2TnErrorHandler::QUIET_NAN>::ToVal(vStr) to figure out the converted NAN value" << std::endl;
           T conVal = ConvertFromStr<T , CONV_PROCESS , Str2TnErrorHandler::QUIET_NAN>::ToVal(vStr);
-          bool isStringSigned = ( '-' == vStr[0] );
+          //bool isStringSigned = ( '-' == vStr[0] );
+          const auto firstNonWhitespace =
+              vStr.find_first_not_of(" \t\n\r\f\v");
+
+          const bool isStringSigned =
+              firstNonWhitespace != std::string::npos &&
+              vStr[firstNonWhitespace] == '-';
           bool isValueSigned  = std::signbit(conVal);
           unittest::ExpectEqual2(bool,      isStringSigned, isValueSigned);
         }
