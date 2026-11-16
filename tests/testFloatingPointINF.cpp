@@ -1,5 +1,5 @@
 
-// test INF conversion exceptions for floating-point-types
+// test INF conversion for floating-point-types
 
 
 #include <iostream>
@@ -62,7 +62,13 @@ inline void conversionFP_S2T_C_VARIANT(const std::string& vStr, const T& variant
     if ( vStr.size() > 1 )
     {
       T conVal = std::get<T>(cVal0);
-      bool isStringSigned = ( '-' == vStr[0] );
+
+      const auto pos = vStr.find_first_not_of(" \t\n\r\f\v");
+
+      //bool isStringSigned = ( '-' == vStr[0] );
+      const bool isStringSigned =
+          pos != std::string::npos && vStr[pos] == '-';
+
       bool isValueSigned  = std::signbit(conVal);
       unittest::ExpectEqual2(bool,      isStringSigned, isValueSigned);
     }
@@ -161,8 +167,8 @@ void conversionFP_S2T_iC(const std::string& vStr, const T& valInf,
 template <c_floating_point T,
           size_t FROMCHARS_VARIANTIDX = 0, size_t S2N_VARIANTIDX = 0, size_t STRINGSTREAM_VARIANTIDX = 0 >
     requires ( STRINGSTREAM_VARIANTIDX == 0 || STRINGSTREAM_VARIANTIDX == 2 )
-void conversionFP_FailureCheck_S2T(const std::string& vStr, const T& valInf,
-                                   const std::string& filePath, int lineNo)
+void conversionFP_INFcheck_S2T(const std::string& vStr, const T& valInf,
+                               const std::string& filePath, int lineNo)
 {
   std::cout << std::endl;
   std::cout << "S2T : CONV_PROCESS for type [" << specializedTypes::get_name<T>() << "] : ";
@@ -184,7 +190,7 @@ void conversionFP_FailureCheck_S2T(const std::string& vStr, const T& valInf,
 template <c_floating_point T, size_t IDX_CONV_PROCESS, typename V>
       requires ( std::is_same_v<V, T> || std::is_same_v<V, variantReturnType<T>> )
 void conversionFP_T2S_iC(const V& val, const std::string& vStr,
-                                       const std::string& filePath, int lineNo)
+                         const std::string& filePath, int lineNo)
 {
   if constexpr ( IDX_CONV_PROCESS < DefaultTn2Str<T>::validConversionProcesses().size() )
   {
@@ -201,8 +207,8 @@ void conversionFP_T2S_iC(const V& val, const std::string& vStr,
 
 template <c_floating_point T, typename V = T>
       requires ( std::is_same_v<V, T> || std::is_same_v<V, variantReturnType<T>> )
-void conversionFP_FailureCheck_T2S(const V& val, const std::string& vStr,
-                                   const std::string& filePath, int lineNo)
+void conversionFP_INFcheck_T2S(const V& val, const std::string& vStr,
+                                const std::string& filePath, int lineNo)
 {
   std::cout << "T2S : CONV_PROCESS for type [" << specializedTypes::get_name<T>() << "] : ";
   for(size_t i = 0; i < DefaultTn2Str<T>::validConversionProcesses().size() ; ++i) std::cout << DefaultTn2Str<T>::validConversionProcesses()[i] << ", ";
@@ -222,29 +228,29 @@ int main()
   try {
 
     std::cout << "testFloatingPointINF : S2T :" << std::endl;
-    conversionFP_FailureCheck_S2T<float>      ("inf",  std::numeric_limits<float>::infinity(),       __FILE__, __LINE__);
-    conversionFP_FailureCheck_S2T<double>     ("inf",  std::numeric_limits<double>::infinity(),      __FILE__, __LINE__);
-    conversionFP_FailureCheck_S2T<long double>("inf",  std::numeric_limits<long double>::infinity(), __FILE__, __LINE__);
+    conversionFP_INFcheck_S2T<float>      ("inf",  std::numeric_limits<float>::infinity(),       __FILE__, __LINE__);
+    conversionFP_INFcheck_S2T<double>     ("inf",  std::numeric_limits<double>::infinity(),      __FILE__, __LINE__);
+    conversionFP_INFcheck_S2T<long double>("inf",  std::numeric_limits<long double>::infinity(), __FILE__, __LINE__);
 
-    conversionFP_FailureCheck_S2T<float>      ("+inf",  std::numeric_limits<float>::infinity(),       __FILE__, __LINE__);
-    conversionFP_FailureCheck_S2T<double>     ("+inf",  std::numeric_limits<double>::infinity(),      __FILE__, __LINE__);
-    conversionFP_FailureCheck_S2T<long double>("+inf",  std::numeric_limits<long double>::infinity(), __FILE__, __LINE__);
+    conversionFP_INFcheck_S2T<float>      ("+inf",  std::numeric_limits<float>::infinity(),       __FILE__, __LINE__);
+    conversionFP_INFcheck_S2T<double>     ("+inf",  std::numeric_limits<double>::infinity(),      __FILE__, __LINE__);
+    conversionFP_INFcheck_S2T<long double>("+inf",  std::numeric_limits<long double>::infinity(), __FILE__, __LINE__);
 
-    conversionFP_FailureCheck_S2T<float>      ("-inf",  -std::numeric_limits<float>::infinity(),       __FILE__, __LINE__);
-    conversionFP_FailureCheck_S2T<double>     ("-inf",  -std::numeric_limits<double>::infinity(),      __FILE__, __LINE__);
-    conversionFP_FailureCheck_S2T<long double>("-inf",  -std::numeric_limits<long double>::infinity(), __FILE__, __LINE__);
+    conversionFP_INFcheck_S2T<float>      ("-inf",  -std::numeric_limits<float>::infinity(),       __FILE__, __LINE__);
+    conversionFP_INFcheck_S2T<double>     ("-inf",  -std::numeric_limits<double>::infinity(),      __FILE__, __LINE__);
+    conversionFP_INFcheck_S2T<long double>("-inf",  -std::numeric_limits<long double>::infinity(), __FILE__, __LINE__);
 
-    conversionFP_FailureCheck_S2T<float>      ("infinity",  std::numeric_limits<float>::infinity(),       __FILE__, __LINE__);
-    conversionFP_FailureCheck_S2T<double>     ("infinity",  std::numeric_limits<double>::infinity(),      __FILE__, __LINE__);
-    conversionFP_FailureCheck_S2T<long double>("infinity",  std::numeric_limits<long double>::infinity(), __FILE__, __LINE__);
+    conversionFP_INFcheck_S2T<float>      ("infinity",  std::numeric_limits<float>::infinity(),       __FILE__, __LINE__);
+    conversionFP_INFcheck_S2T<double>     ("infinity",  std::numeric_limits<double>::infinity(),      __FILE__, __LINE__);
+    conversionFP_INFcheck_S2T<long double>("infinity",  std::numeric_limits<long double>::infinity(), __FILE__, __LINE__);
 
-    conversionFP_FailureCheck_S2T<float>      ("+infinity",  std::numeric_limits<float>::infinity(),       __FILE__, __LINE__);
-    conversionFP_FailureCheck_S2T<double>     ("+infinity",  std::numeric_limits<double>::infinity(),      __FILE__, __LINE__);
-    conversionFP_FailureCheck_S2T<long double>("+infinity",  std::numeric_limits<long double>::infinity(), __FILE__, __LINE__);
+    conversionFP_INFcheck_S2T<float>      ("+infinity",  std::numeric_limits<float>::infinity(),       __FILE__, __LINE__);
+    conversionFP_INFcheck_S2T<double>     ("+infinity",  std::numeric_limits<double>::infinity(),      __FILE__, __LINE__);
+    conversionFP_INFcheck_S2T<long double>("+infinity",  std::numeric_limits<long double>::infinity(), __FILE__, __LINE__);
 
-    conversionFP_FailureCheck_S2T<float>      ("-infinity",  -std::numeric_limits<float>::infinity(),       __FILE__, __LINE__);
-    conversionFP_FailureCheck_S2T<double>     ("-infinity",  -std::numeric_limits<double>::infinity(),      __FILE__, __LINE__);
-    conversionFP_FailureCheck_S2T<long double>("-infinity",  -std::numeric_limits<long double>::infinity(), __FILE__, __LINE__);
+    conversionFP_INFcheck_S2T<float>      ("-infinity",  -std::numeric_limits<float>::infinity(),       __FILE__, __LINE__);
+    conversionFP_INFcheck_S2T<double>     ("-infinity",  -std::numeric_limits<double>::infinity(),      __FILE__, __LINE__);
+    conversionFP_INFcheck_S2T<long double>("-infinity",  -std::numeric_limits<long double>::infinity(), __FILE__, __LINE__);
 
     std::cout << "testFloatingPointINF : T2S : has_infinity="
               << std::numeric_limits<float>::has_infinity << std::endl;
@@ -252,8 +258,8 @@ int main()
     std::string nINFresult { "-inf" };
     if constexpr (std::numeric_limits<float>::has_infinity)
     {
-      conversionFP_FailureCheck_T2S<float>      ( std::numeric_limits<float>::infinity(), pINFresult, __FILE__, __LINE__);
-      conversionFP_FailureCheck_T2S<float>      (-std::numeric_limits<float>::infinity(), nINFresult, __FILE__, __LINE__);
+      conversionFP_INFcheck_T2S<float>      ( std::numeric_limits<float>::infinity(), pINFresult, __FILE__, __LINE__);
+      conversionFP_INFcheck_T2S<float>      (-std::numeric_limits<float>::infinity(), nINFresult, __FILE__, __LINE__);
 
       variantReturnType<float>  pveINF {
                                   std::in_place_index<0>,
@@ -263,14 +269,14 @@ int main()
                                   std::in_place_index<0>,
                                   -std::numeric_limits<float>::infinity()
                                 };
-      conversionFP_FailureCheck_T2S<float, variantReturnType<float>>      ( pveINF, pINFresult, __FILE__, __LINE__);
-      conversionFP_FailureCheck_T2S<float, variantReturnType<float>>      ( nveINF, nINFresult, __FILE__, __LINE__);
+      conversionFP_INFcheck_T2S<float, variantReturnType<float>>      ( pveINF, pINFresult, __FILE__, __LINE__);
+      conversionFP_INFcheck_T2S<float, variantReturnType<float>>      ( nveINF, nINFresult, __FILE__, __LINE__);
     }
 
     if constexpr (std::numeric_limits<double>::has_infinity)
     {
-      conversionFP_FailureCheck_T2S<double>     ( std::numeric_limits<double>::infinity(), pINFresult, __FILE__, __LINE__);
-      conversionFP_FailureCheck_T2S<double>     (-std::numeric_limits<double>::infinity(), nINFresult, __FILE__, __LINE__);
+      conversionFP_INFcheck_T2S<double>     ( std::numeric_limits<double>::infinity(), pINFresult, __FILE__, __LINE__);
+      conversionFP_INFcheck_T2S<double>     (-std::numeric_limits<double>::infinity(), nINFresult, __FILE__, __LINE__);
 
       variantReturnType<double>  pveINF {
                                   std::in_place_index<0>,
@@ -280,14 +286,14 @@ int main()
                                   std::in_place_index<0>,
                                   -std::numeric_limits<double>::infinity()
                                 };
-      conversionFP_FailureCheck_T2S<double, variantReturnType<double>>      ( pveINF, pINFresult, __FILE__, __LINE__);
-      conversionFP_FailureCheck_T2S<double, variantReturnType<double>>      ( nveINF, nINFresult, __FILE__, __LINE__);
+      conversionFP_INFcheck_T2S<double, variantReturnType<double>>      ( pveINF, pINFresult, __FILE__, __LINE__);
+      conversionFP_INFcheck_T2S<double, variantReturnType<double>>      ( nveINF, nINFresult, __FILE__, __LINE__);
     }
 
     if constexpr (std::numeric_limits<long double>::has_infinity)
     {
-      conversionFP_FailureCheck_T2S<long double>( std::numeric_limits<long double>::infinity(), pINFresult, __FILE__, __LINE__);
-      conversionFP_FailureCheck_T2S<long double>(-std::numeric_limits<long double>::infinity(), nINFresult, __FILE__, __LINE__);
+      conversionFP_INFcheck_T2S<long double>( std::numeric_limits<long double>::infinity(), pINFresult, __FILE__, __LINE__);
+      conversionFP_INFcheck_T2S<long double>(-std::numeric_limits<long double>::infinity(), nINFresult, __FILE__, __LINE__);
 
       variantReturnType<long double>  pveINF {
                                   std::in_place_index<0>,
@@ -297,8 +303,8 @@ int main()
                                   std::in_place_index<0>,
                                   -std::numeric_limits<long double>::infinity()
                                 };
-      conversionFP_FailureCheck_T2S<long double, variantReturnType<long double>>      ( pveINF, pINFresult, __FILE__, __LINE__);
-      conversionFP_FailureCheck_T2S<long double, variantReturnType<long double>>      ( nveINF, nINFresult, __FILE__, __LINE__);
+      conversionFP_INFcheck_T2S<long double, variantReturnType<long double>>      ( pveINF, pINFresult, __FILE__, __LINE__);
+      conversionFP_INFcheck_T2S<long double, variantReturnType<long double>>      ( nveINF, nINFresult, __FILE__, __LINE__);
     }
 
 

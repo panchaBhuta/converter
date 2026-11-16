@@ -914,7 +914,7 @@ namespace converter
         if (ptr != end)
         {
           const std::string errMsg =
-              "Unconsumed characters in input: '" + str + "'";
+              "Unconsumed characters in input: inputStr='" + str + "'  :  stringRead='" + std::string{str.data(), ptr} + "'";
 
           CONVERTER_DEBUG_LOG(errMsg);
 
@@ -1159,8 +1159,14 @@ namespace converter
         CONVERTER_DEBUG_LOG( errMsg );
         return ErrorHandler<T, ERR_HANDLER>::handleConversionFailure(str, err);
       } catch (const std::out_of_range& err) {
-        const std::string errMsg = "Out of range: " + std::string(err.what()) + " :: str = '" + str + "'";
+        const std::string errMsg = "Out of range: " + std::string(err.what()) + " :: str = '" + str + "' . Retry using ConvertFromStr< T, Str2TnConversionProcess::FROM_CHARS, Str2TnErrorHandler::VARIANT_VAL >";
         CONVERTER_DEBUG_LOG( errMsg );
+
+        auto result2 = ConvertFromStr< T, Str2TnConversionProcess::FROM_CHARS, Str2TnErrorHandler::VARIANT_VAL >::ToVal(str);
+        if(result2.index() == 0)
+        {
+          return std::get<0>(result2);
+        }
         return ErrorHandler<T, ERR_HANDLER>::handleConversionFailure(str, err);
       }
     }

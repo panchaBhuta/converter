@@ -125,6 +125,7 @@ add_unit_test(testAllConversionTemplateInstances)
 
 add_unit_test(testFloatingPointNaN)
 add_unit_test(testFloatingPointINF)
+add_unit_test(testFloatingPointBoundary)
 #[======================[
 add_unit_test(testIntegerNaN)
 
