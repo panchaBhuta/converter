@@ -161,12 +161,12 @@ windows-11-vs2026-arm:Windows-10.0.26200,ClangCl:Clang-22.1.3,2: double,STRINGST
 windows-11-vs2026-arm:Windows-10.0.26200,ClangCl:Clang-22.1.3,2: double,TO_CHAR,1,nan,-nan(ind),1,nan(snan),-nan(snan),1,inf,-inf
 windows-11-vs2026-arm:Windows-10.0.26200,ClangCl:Clang-22.1.3,3: long double,STRINGSTREAM,1,nan,-nan(ind),1,nan(snan),-nan(snan),1,inf,-inf
 windows-11-vs2026-arm:Windows-10.0.26200,ClangCl:Clang-22.1.3,3: long double,TO_CHAR,1,nan,-nan(ind),1,nan(snan),-nan(snan),1,inf,-inf
-windows-11-vs2026-arm:Windows-10.0.26200,default:MSVC-19.51.36260.0,1: float,STRINGSTREAM,1,nan,-nan(ind),1,nan,-nan,1,inf,-inf
-windows-11-vs2026-arm:Windows-10.0.26200,default:MSVC-19.51.36260.0,1: float,TO_CHAR,1,nan,-nan(ind),1,nan,-nan,1,inf,-inf
-windows-11-vs2026-arm:Windows-10.0.26200,default:MSVC-19.51.36260.0,2: double,STRINGSTREAM,1,nan,-nan(ind),1,nan(snan),-nan(snan),1,inf,-inf
-windows-11-vs2026-arm:Windows-10.0.26200,default:MSVC-19.51.36260.0,2: double,TO_CHAR,1,nan,-nan(ind),1,nan(snan),-nan(snan),1,inf,-inf
-windows-11-vs2026-arm:Windows-10.0.26200,default:MSVC-19.51.36260.0,3: long double,STRINGSTREAM,1,nan,-nan(ind),1,nan(snan),-nan(snan),1,inf,-inf
-windows-11-vs2026-arm:Windows-10.0.26200,default:MSVC-19.51.36260.0,3: long double,TO_CHAR,1,nan,-nan(ind),1,nan(snan),-nan(snan),1,inf,-inf
+windows-11-vs2026-arm:Windows-10.0.26200,default:MSVC-19.52.37029.0,1: float,STRINGSTREAM,1,nan,-nan(ind),1,nan,-nan,1,inf,-inf
+windows-11-vs2026-arm:Windows-10.0.26200,default:MSVC-19.52.37029.0,1: float,TO_CHAR,1,nan,-nan(ind),1,nan,-nan,1,inf,-inf
+windows-11-vs2026-arm:Windows-10.0.26200,default:MSVC-19.52.37029.0,2: double,STRINGSTREAM,1,nan,-nan(ind),1,nan(snan),-nan(snan),1,inf,-inf
+windows-11-vs2026-arm:Windows-10.0.26200,default:MSVC-19.52.37029.0,2: double,TO_CHAR,1,nan,-nan(ind),1,nan(snan),-nan(snan),1,inf,-inf
+windows-11-vs2026-arm:Windows-10.0.26200,default:MSVC-19.52.37029.0,3: long double,STRINGSTREAM,1,nan,-nan(ind),1,nan(snan),-nan(snan),1,inf,-inf
+windows-11-vs2026-arm:Windows-10.0.26200,default:MSVC-19.52.37029.0,3: long double,TO_CHAR,1,nan,-nan(ind),1,nan(snan),-nan(snan),1,inf,-inf
 windows-2022:Windows-10.0.20348,ClangCl:Clang-19.1.5,1: float,STRINGSTREAM,1,nan,-nan(ind),1,nan,-nan,1,inf,-inf
 windows-2022:Windows-10.0.20348,ClangCl:Clang-19.1.5,1: float,TO_CHAR,1,nan,-nan(ind),1,nan(snan),-nan(snan),1,inf,-inf
 windows-2022:Windows-10.0.20348,ClangCl:Clang-19.1.5,2: double,STRINGSTREAM,1,nan,-nan(ind),1,nan(snan),-nan(snan),1,inf,-inf
