@@ -92,13 +92,14 @@ void test_stringstream()
     stream >> value;
 
     const bool extraction_succeeded = !stream.fail();
+    const bool extraction_failbit = static_cast<bool>(stream.rdstate() & std::ios::failbit);
     stream >> std::ws;
-    const bool full_input = extraction_succeeded && stream.eof();
+    const bool full_input = extraction_succeeded && stream.eof() && !stream.bad();
 
     std::cout << "\nstd::stringstream extraction:\n"
               << "  extraction ok  = " << std::boolalpha << extraction_succeeded << '\n'
               << "  full input     = " << full_input << '\n'
-              << "  failbit        = " << static_cast<bool>(stream.rdstate() & std::ios::failbit) << '\n';
+              << "  failbit after extraction = " << extraction_failbit << '\n';
     print_value("  result", value);
 }
 } // namespace
