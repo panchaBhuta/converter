@@ -1,0 +1,39 @@
+name: Long double denorm_min diagnostic
+
+on:
+  push:
+    branches:
+      - diagnostic/long-double-denorm-min-ac29d3e
+    paths:
+      - diagnostics/long_double_denorm_min.cpp
+      - .github/workflows/long-double-denorm-min-diagnostic.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reproduce:
+    name: Ubuntu 22.04 / GCC 12
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout diagnostic branch
+        uses: actions/checkout@v4
+
+      - name: Show runner and compiler versions
+        run: |
+          uname -a
+          lsb_release -a
+          g++-12 --version
+          g++-12 -print-file-name=libstdc++.so
+
+      - name: Compile standalone C++20 diagnostic
+        run: |
+          g++-12 -std=c++20 -O0 -Wall -Wextra -Wpedantic \
+            diagnostics/long_double_denorm_min.cpp \
+            -o long_double_denorm_min
+
+      - name: Run conversion mechanism comparison
+        run: ./long_double_denorm_min
