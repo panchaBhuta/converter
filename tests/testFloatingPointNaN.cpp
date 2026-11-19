@@ -39,10 +39,10 @@ inline void conversionFP_S2T_C_NAN(const std::string& vStr,
 {
   if constexpr ( ERR_HANDLER == Str2TnErrorHandler::QUIET_NAN && !std::numeric_limits<T>::has_quiet_NaN)
   {
-    std::cout << "conversionFP_S2T_C_NAN<" << specializedTypes::get_name<T>() << "," << CONV_PROCESS << ", QUIET_NAN, " << VARIANTIDX << ">(" << vStr << ") skipped as has_quiet_NaN = false\n";
+    std::cout << "conversionFP_S2T_C_NAN<" << specializedTypes::get_name<T>() << ", " << CONV_PROCESS << ", QUIET_NAN, " << VARIANTIDX << ">(" << vStr << ") skipped as has_quiet_NaN = false\n";
     return;
   } else if constexpr ( ERR_HANDLER == Str2TnErrorHandler::SIGNAL_NAN && !std::numeric_limits<T>::has_signaling_NaN) {
-    std::cout << "conversionFP_S2T_C_NAN<" << specializedTypes::get_name<T>() << "," << CONV_PROCESS << ", SIGNAL_NAN, " << VARIANTIDX << ">(" << vStr << ") skipped as has_signal_NaN = false\n";
+    std::cout << "conversionFP_S2T_C_NAN<" << specializedTypes::get_name<T>() << ", " << CONV_PROCESS << ", SIGNAL_NAN, " << VARIANTIDX << ">(" << vStr << ") skipped as has_signal_NaN = false\n";
     return;
   } else {
     T conVal = ConvertFromStr<T , CONV_PROCESS , ERR_HANDLER>::ToVal(vStr);
@@ -67,7 +67,7 @@ inline void conversionFP_S2T_C_VARIANT(const std::string& vStr,
   if constexpr (VARIANTIDX != 0)
   {
     unittest::ExpectEqual2(std::string, std::get<VARIANTIDX>(cVal12).value, vStr);
-    if ( VARIANTIDX == 1 )
+    if constexpr ( VARIANTIDX == 1 )
     {
       unittest::ExpectEqual2(std::string, std::get<Str2TNaNInput>(cVal12).value, vStr);
 
@@ -90,7 +90,7 @@ inline void conversionFP_S2T_C_VARIANT(const std::string& vStr,
         }
       }
 
-    } else if ( VARIANTIDX == 2 ) {
+    } else if constexpr ( VARIANTIDX == 2 ) {
       unittest::ExpectEqual2(std::string, std::get<Str2TConversionFailure>(cVal12).value, vStr);
     }
   } else {

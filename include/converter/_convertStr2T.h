@@ -723,7 +723,7 @@ namespace converter
         if constexpr ( std::numeric_limits<T>::has_quiet_NaN )
         {
           try {
-            CONVERTER_DEBUG_LOG( "WARNING: ErrorHandler<>::_handle<E>() :: calling std::nan*()" );
+            CONVERTER_DEBUG_LOG( "****** ErrorHandler<>::_handle<E>() :: calling std::nan*()" );
             if constexpr (std::is_same_v<T, float>) {
               return std::nanf(strVal.c_str());
             } else if constexpr (std::is_same_v<T, double>) {
@@ -1159,14 +1159,9 @@ namespace converter
         CONVERTER_DEBUG_LOG( errMsg );
         return ErrorHandler<T, ERR_HANDLER>::handleConversionFailure(str, err);
       } catch (const std::out_of_range& err) {
-        const std::string errMsg = "Out of range: " + std::string(err.what()) + " :: str = '" + str + "' . Retry using ConvertFromStr< T, Str2TnConversionProcess::FROM_CHARS, Str2TnErrorHandler::VARIANT_VAL >";
+        const std::string errMsg = "Out of range: " + std::string(err.what()) + " :: str = '" + str + "'";
         CONVERTER_DEBUG_LOG( errMsg );
 
-        auto result2 = ConvertFromStr< T, Str2TnConversionProcess::FROM_CHARS, Str2TnErrorHandler::VARIANT_VAL >::ToVal(str);
-        if(result2.index() == 0)
-        {
-          return std::get<0>(result2);
-        }
         return ErrorHandler<T, ERR_HANDLER>::handleConversionFailure(str, err);
       }
     }
