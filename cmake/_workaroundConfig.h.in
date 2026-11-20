@@ -2,7 +2,7 @@
  * _workaroundConfig.h
  *
  * URL:      https://github.com/panchaBhuta/converter
- * Version:  v1.4
+ * Version:  v2.4
  *
  * Copyright (c) 2023-2026 Gautam Dhar
  * All rights reserved.
@@ -18,24 +18,25 @@
 /*
  *        macro Prefixes and their meaning
  *  -----------------------------------------------------------------------------------------------------
- *  e_         — represents enum value(s) of any feature.
- *               e.g: e_ENABLE_FEATURE, e_DATE_CHRONO
+ *  e_*         — represents enum value(s) of any feature.
+ *                e.g: e_ENABLE_FEATURE, e_DATE_CHRONO
  *
  *  **     Below macro values are noted across OS's and compilers     **
  *  **     and compiled into doc/consolidateWorkAroundFlags.csv       **
- *  SUPPORTED_ — identifies whether a feature is supported by the standard library / third-party library.
- *               These are used by the converter's preprocessor logic to determine which code gets compiled.
- *               This is used for toggling, when a particular feature is not supported by standard lib,
- *               to enable fallback code(in place of call to the standard lib code).
- *               e.g: SUPPORTED_DATE_LIB_FOR_FROMSTREAM
- *  HAS_       — identifies that functionality is available, but is not used by the converter;
- *               intended these mainly for identifying any C++20 concepts/specialized templates/feature and
- *               document it's avaliability in doc/consolidateWorkAroundFlags.csv.
- *               Can be useful for debugging in corner-case senario.
- *               e.g: HAS_FLOATINGPOINT_FROM_CHARS
- *  ENABLE_    — identifies whether a supported feature should actually be enabled/used;
- *               this is configuration/toggling rather than capability detection.
- *               e.g: ENABLE_FLOATINGPOINT_TO_STRING
+ *  SUPPORTED_* — identifies whether a feature is supported by the standard library / third-party library.
+ *                These are used by the converter's preprocessor logic to determine which code gets compiled.
+ *                This is used for toggling, when a particular feature is not supported by standard lib,
+ *                to enable fallback code(in place of call to the standard lib code).
+ *                e.g: SUPPORTED_DATE_LIB_FOR_FROMSTREAM
+ *  HAS_*       — identifies that functionality is available, but is neither used by the converter library
+ *                   nor it's unit-testing.
+ *                Intended mainly for identifying any C++20 concepts/specialized templates/feature and
+ *                to document it's avaliability in doc/consolidateWorkAroundFlags.csv.
+ *                Can be useful for debugging in corner-case senario.
+ *                e.g: HAS_FLOATINGPOINT_FROM_CHARS
+ *  ENABLE_*    — identifies whether a supported feature should actually be enabled/used;
+ *                this is configuration/toggling rather than capability detection.
+ *                e.g: ENABLE_FLOATINGPOINT_TO_STRING
  */
 
 

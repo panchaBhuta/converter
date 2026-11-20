@@ -298,7 +298,7 @@ int main()
     std::cout << std::endl << "testFloatingPointBoundary :: S2T :: std::numeric_limits<T>::denorm_min()" << std::endl;
     test_S2T_floatingPointBoundry<float,       0, 2, 0>(STRINGIFY(FLT_TRUE_MIN),  std::numeric_limits<float>::denorm_min(),        __FILE__, __LINE__ );
     test_S2T_floatingPointBoundry<double,      0, 2, 0>(STRINGIFY(DBL_TRUE_MIN),  std::numeric_limits<double>::denorm_min(),       __FILE__, __LINE__ );
-    test_S2T_floatingPointBoundry<long double, 0, 2, 0>(STRINGIFY(LDBL_TRUE_MIN), std::numeric_limits<long double>::denorm_min(),  __FILE__, __LINE__ );
+    test_S2T_floatingPointBoundry<long double, DENORM_DB_VARIDX, 2, 0>(STRINGIFY(LDBL_TRUE_MIN), std::numeric_limits<long double>::denorm_min(),  __FILE__, __LINE__ );
 
     //      std::nextafter(
     //          std::numeric_limits<T>::min(), T(0)),

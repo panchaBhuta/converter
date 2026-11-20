@@ -143,4 +143,39 @@ namespace converter
     return false;
   }
 
+
+
+
+        /*
+         *  The string 1.40129846432481707092372958328991613e-45 is the exact decimal representation of
+         *  std::numeric_limits<float>::denorm_min() (the smallest positive subnormal float, equal to 2⁻¹⁴⁹),
+         *  which triggers an underflow ERANGE error in std::strtof on major C++ standard libraries
+         *  like GCC (libstdc++) and Clang (libc++).
+         *
+         *  Why This Exact Value Throws
+         *
+         *  • Subnormal Underflow Rules: While an IEEE 754 32-bit float can store 2⁻¹⁴⁹ in memory,
+         *    its exponent bits are all zeros (0x00000001 in hex), making it a subnormal (denormalized) number
+         *    rather than a normal number (which stops at FLT_MIN ≈ 1.17549e-38).
+         *  • C Standard Library Behavior: Under the hood, std::stof calls C's strtof().
+         *    According to the C/C++ standards, strtof is permitted to set errno = ERANGE
+         *    whenever a non-zero result underflows below FLT_MIN—even if the value is
+         *    still representable as a subnormal float.
+         *  • Library Differences: On Linux/macOS (glibc / Apple libc), strtof sets ERANGE for subnormals,
+         *    so std::stof throws std::out_of_range. On Windows (MSVC), strtof does not set ERANGE
+         *    for representable subnormals, so the exact same code succeeds there.
+         *
+         *  How to Parse It Properly
+         *
+         *  Depending on your compiler and needs, use one of these approaches:
+         *  1. Use std::from_chars (Recommended, C++17+)
+         *     std::from_chars accurately parses all valid subnormals down to denorm_min()
+         *     without setting ERANGE or throwing exceptions
+         */
+
+
+
+
+
+
 } // namespace converter
