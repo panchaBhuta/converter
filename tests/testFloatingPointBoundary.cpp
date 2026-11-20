@@ -38,7 +38,7 @@ using namespace converter;
 
 
 
-template <c_floating_point T, Str2TnConversionProcess CONV_PROCESS, Str2TnErrorHandler ERR_HANDLER>
+template <c_floating_point T, Str2TnConversionProcess CONV_PROCESS, Str2TnErrorHandler ERR_HANDLER >
 inline void conversionFP_S2T(const std::string& vStr, const T& expVal,
                              const std::string& filePath, int lineNo)
 {
@@ -57,7 +57,13 @@ template <c_floating_point T, Str2TnConversionProcess CONV_PROCESS, Str2TnErrorH
 inline void conversionFP_S2T_C_NAN(const std::string& vStr, const T& expVal,
                                    const std::string& filePath, int lineNo)
 {
-  conversionFP_S2T<T, CONV_PROCESS, ERR_HANDLER>(vStr, expVal, filePath, lineNo);
+  if constexpr (VARIANTIDX == 0)
+  {
+    conversionFP_S2T<T, CONV_PROCESS, ERR_HANDLER>(vStr, expVal, filePath, lineNo);
+  } else {
+    T cVal = ConvertFromStr<T , CONV_PROCESS , ERR_HANDLER>::ToVal(vStr);
+    unittest::ExpectTrue2(std::isnan(cVal));
+  }
 }
 
 
@@ -66,21 +72,33 @@ template <c_floating_point T, Str2TnConversionProcess CONV_PROCESS, size_t VARIA
 inline void conversionFP_S2T_C_VARIANT(const std::string& vStr, const T& variantExpVal,
                                        const std::string& filePath, int lineNo)
 {
-  auto cVal0 = ConvertFromStr<T , CONV_PROCESS , Str2TnErrorHandler::VARIANT_VAL>::ToVal(vStr);
-  unittest::ExpectEqual2(size_t,      cVal0.index(), 0);
-  unittest::ExpectEqual2(T, std::get<T>(cVal0), variantExpVal);
+  auto cVal = ConvertFromStr<T , CONV_PROCESS , Str2TnErrorHandler::VARIANT_VAL>::ToVal(vStr);
 
-  bool isExpectedSigned  = std::signbit(variantExpVal);
-  bool isValueSigned     = std::signbit(std::get<T>(cVal0));
+  if constexpr (VARIANTIDX == 0)
+  {
+    unittest::ExpectEqual2(size_t,      cVal.index(), 0);
+    unittest::ExpectEqual2(T, std::get<T>(cVal), variantExpVal);
 
-  unittest::ExpectEqual2(bool,      isExpectedSigned, isValueSigned);
+    bool isExpectedSigned  = std::signbit(variantExpVal);
+    bool isValueSigned     = std::signbit(std::get<T>(cVal));
+
+    unittest::ExpectEqual2(bool,      isExpectedSigned, isValueSigned);
+  } else {
+    unittest::ExpectEqual2(size_t,      cVal.index(), 2);
+    unittest::ExpectEqual2(std::string, std::get<Str2TConversionFailure>(cVal).value, vStr);
+  }
 }
 
 template <c_floating_point T, Str2TnConversionProcess CONV_PROCESS, size_t VARIANTIDX >
 inline void conversionFP_S2T_C_THROW_ERROR(const std::string& vStr, const T& expVal,
                                            const std::string& filePath, int lineNo)
 {
-  conversionFP_S2T<T, CONV_PROCESS, Str2TnErrorHandler::THROW_ERROR>(vStr, expVal, filePath, lineNo);
+  if constexpr (VARIANTIDX == 0)
+  {
+    conversionFP_S2T<T, CONV_PROCESS, Str2TnErrorHandler::THROW_ERROR>(vStr, expVal, filePath, lineNo);
+  } else {
+    ExpectException(ConvertFromStr<T COMMA CONV_PROCESS COMMA Str2TnErrorHandler::THROW_ERROR>::ToVal(vStr), std::out_of_range);
+  }
 }
 
 
@@ -92,7 +110,7 @@ inline void conversionFP_S2T_C_E(const std::string& vStr, const T& valInf,
 {
   constexpr size_t CONV_VARIANTIDX = (   CONV_PROCESS == Str2TnConversionProcess::FROM_CHARS    ?  FROMCHARS_VARIANTIDX     :
                                        ( CONV_PROCESS == Str2TnConversionProcess::S2N           ?  S2N_VARIANTIDX           :
-                                        (CONV_PROCESS == Str2TnConversionProcess::STRINGSTREAM  ?  STRINGSTREAM_VARIANTIDX  :  100 )
+                                        (CONV_PROCESS == Str2TnConversionProcess::STRINGSTREAM  ?  STRINGSTREAM_VARIANTIDX  :  100)
                                        )
                                      );
 
@@ -158,7 +176,7 @@ template <c_floating_point T,
           size_t FROMCHARS_VARIANTIDX = 0, size_t S2N_VARIANTIDX = 0, size_t STRINGSTREAM_VARIANTIDX = 0 >
     requires ( STRINGSTREAM_VARIANTIDX == 0 || STRINGSTREAM_VARIANTIDX == 2 )
 void conversionFP_BoundaryCheck_S2T(const std::string& vStr, const T& valInf,
-                                   const std::string& filePath, int lineNo)
+                                    const std::string& filePath, int lineNo)
 {
   std::cout << std::endl;
   std::cout << "S2T : CONV_PROCESS for type [" << specializedTypes::get_name<T>() << "] : ";
@@ -191,49 +209,25 @@ inline void removeDoublePrefix(std::string& str)
   }
 }
 
-template <c_floating_point T>
-void test_S2T_floatingPointBoundry(std::string strMin, std::string strMax,
-                                   std::string strDenormMin, std::string strEpsilon,
+template <c_floating_point T,
+          size_t FROMCHARS_VARIANTIDX, size_t S2N_VARIANTIDX, size_t STRINGSTREAM_VARIANTIDX >
+void test_S2T_floatingPointBoundry(std::string str, const T expVal,
                                    const std::string& filePath, int lineNo )
 {
   if constexpr (std::is_same_v<T, float>)
   {
-    popLastChar(strMin, 'F');
-    popLastChar(strMax, 'F');
-    popLastChar(strDenormMin, 'F');
-    popLastChar(strEpsilon, 'F');
+    popLastChar(str, 'F');
   } else if constexpr (std::is_same_v<T, double>)
   {
-    removeDoublePrefix(strMin);
-    removeDoublePrefix(strMax);
-    removeDoublePrefix(strDenormMin);
-    removeDoublePrefix(strEpsilon);
+    removeDoublePrefix(str);
   } else if constexpr (std::is_same_v<T, long double>)
   {
-    popLastChar(strMin, 'L');
-    popLastChar(strMax, 'L');
-    popLastChar(strDenormMin, 'L');
-    popLastChar(strEpsilon, 'L');
+    popLastChar(str, 'L');
   }
 
-  std::cout << std::endl << "testFloatingPointBoundary :: S2T :: std::numeric_limits<" << specializedTypes::get_name<T>() << ">::min()" << std::endl;
-  conversionFP_BoundaryCheck_S2T<T>(strMin, std::numeric_limits<T>::min(), filePath, lineNo);
-
-  std::cout << std::endl << "testFloatingPointBoundary :: S2T :: std::numeric_limits<" << specializedTypes::get_name<T>() << ">::max()" << std::endl;
-  conversionFP_BoundaryCheck_S2T<T>(strMax, std::numeric_limits<T>::max(), filePath, lineNo);
-
-  //      std::numeric_limits<T>::lowest(),
-
-  std::cout << std::endl << "testFloatingPointBoundary :: S2T :: std::numeric_limits<" << specializedTypes::get_name<T>() << ">::denorm_min()" << std::endl;
-  conversionFP_BoundaryCheck_S2T<T>(strDenormMin, std::numeric_limits<T>::denorm_min(), filePath, lineNo);
-
-  //      std::nextafter(
-  //          std::numeric_limits<T>::min(), T(0)),
-
-  std::cout << std::endl << "testFloatingPointBoundary :: S2T :: std::numeric_limits<" << specializedTypes::get_name<T>() << ">::epsilon()" << std::endl;
-  conversionFP_BoundaryCheck_S2T<T>(strEpsilon, std::numeric_limits<T>::epsilon(), filePath, lineNo);
-
-  //      std::numeric_limits<T>::epsilon() / T(2)
+  conversionFP_BoundaryCheck_S2T< T,
+                                  FROMCHARS_VARIANTIDX, S2N_VARIANTIDX, STRINGSTREAM_VARIANTIDX >
+                                (str, expVal, filePath, lineNo);
 };
 
 
@@ -289,9 +283,32 @@ int main()
     conversionFP_BoundaryCheck_S2T<double>     ("-0.0",  -0.0 , __FILE__, __LINE__);
     conversionFP_BoundaryCheck_S2T<long double>("-0.0",  -0.0L, __FILE__, __LINE__);
 
-    test_S2T_floatingPointBoundry<float>      (STRINGIFY(FLT_MIN),  STRINGIFY(FLT_MAX),  STRINGIFY(FLT_TRUE_MIN),  STRINGIFY(FLT_EPSILON),  __FILE__, __LINE__ );
-    test_S2T_floatingPointBoundry<double>     (STRINGIFY(DBL_MIN),  STRINGIFY(DBL_MAX),  STRINGIFY(DBL_TRUE_MIN),  STRINGIFY(DBL_EPSILON),  __FILE__, __LINE__ );
-    test_S2T_floatingPointBoundry<long double>(STRINGIFY(LDBL_MIN), STRINGIFY(LDBL_MAX), STRINGIFY(LDBL_TRUE_MIN), STRINGIFY(LDBL_EPSILON), __FILE__, __LINE__ );
+    std::cout << std::endl << "testFloatingPointBoundary :: S2T :: std::numeric_limits<T>::min()" << std::endl;
+    test_S2T_floatingPointBoundry<float,       0, 0, 0>(STRINGIFY(FLT_MIN),  std::numeric_limits<float>::min(),        __FILE__, __LINE__ );
+    test_S2T_floatingPointBoundry<double,      0, 0, 0>(STRINGIFY(DBL_MIN),  std::numeric_limits<double>::min(),       __FILE__, __LINE__ );
+    test_S2T_floatingPointBoundry<long double, 0, 0, 0>(STRINGIFY(LDBL_MIN), std::numeric_limits<long double>::min(),  __FILE__, __LINE__ );
+
+    std::cout << std::endl << "testFloatingPointBoundary :: S2T :: std::numeric_limits<T>::max()" << std::endl;
+    test_S2T_floatingPointBoundry<float,       0, 0, 0>(STRINGIFY(FLT_MAX),  std::numeric_limits<float>::max(),        __FILE__, __LINE__ );
+    test_S2T_floatingPointBoundry<double,      0, 0, 0>(STRINGIFY(DBL_MAX),  std::numeric_limits<double>::max(),       __FILE__, __LINE__ );
+    test_S2T_floatingPointBoundry<long double, 0, 0, 0>(STRINGIFY(LDBL_MAX), std::numeric_limits<long double>::max(),  __FILE__, __LINE__ );
+
+    //      std::numeric_limits<T>::lowest(),
+
+    std::cout << std::endl << "testFloatingPointBoundary :: S2T :: std::numeric_limits<T>::denorm_min()" << std::endl;
+    test_S2T_floatingPointBoundry<float,       0, 2, 0>(STRINGIFY(FLT_TRUE_MIN),  std::numeric_limits<float>::denorm_min(),        __FILE__, __LINE__ );
+    test_S2T_floatingPointBoundry<double,      0, 2, 0>(STRINGIFY(DBL_TRUE_MIN),  std::numeric_limits<double>::denorm_min(),       __FILE__, __LINE__ );
+    test_S2T_floatingPointBoundry<long double, DENORM_DB_VARIDX, 2, 0>(STRINGIFY(LDBL_TRUE_MIN), std::numeric_limits<long double>::denorm_min(),  __FILE__, __LINE__ );
+
+    //      std::nextafter(
+    //          std::numeric_limits<T>::min(), T(0)),
+
+    std::cout << std::endl << "testFloatingPointBoundary :: S2T :: std::numeric_limits<T>::epsilon()" << std::endl;
+    test_S2T_floatingPointBoundry<float,       0, 0, 0>(STRINGIFY(FLT_EPSILON),  std::numeric_limits<float>::epsilon(),        __FILE__, __LINE__ );
+    test_S2T_floatingPointBoundry<double,      0, 0, 0>(STRINGIFY(DBL_EPSILON),  std::numeric_limits<double>::epsilon(),       __FILE__, __LINE__ );
+    test_S2T_floatingPointBoundry<long double, 0, 0, 0>(STRINGIFY(LDBL_EPSILON), std::numeric_limits<long double>::epsilon(),  __FILE__, __LINE__ );
+
+    //      std::numeric_limits<T>::epsilon() / T(2)
 
 /*
     conversionFP_BoundaryCheck_S2T<float>      ("+inf",  std::numeric_limits<float>::infinity(),       __FILE__, __LINE__);

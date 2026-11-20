@@ -11,6 +11,13 @@
 # https://stackoverflow.com/questions/14446495/cmake-project-structure-with-unit-tests
 
 
+include(cmake/converter-tests/capabilities.cmake)
+
+check_ldb_denorm_min(DENORM_DB_VARIDX)
+
+message(STATUS "DENORM_DB_VARIDX = ${DENORM_DB_VARIDX}")
+
+
 # Test macro add_unit_test
 macro(add_unit_test testname)
   if(CMAKE_BUILD_TYPE MATCHES "Debug"     OR
@@ -94,6 +101,9 @@ endmacro(add_perf_test)
 
 
 
+
+
+
 # Diagnostic tests
 #[==================[
 # use it manually, as it need not compile across all platforms.
@@ -156,3 +166,10 @@ add_perf_test(ptest002)
 #]======================]
 
 
+
+if(TARGET testFloatingPointBoundary)
+  target_compile_definitions(testFloatingPointBoundary
+        PRIVATE
+            DENORM_DB_VARIDX=${DENORM_DB_VARIDX}
+  )
+endif()
