@@ -11,6 +11,12 @@ function(diagnostic_floatType_boundary FUNCTION_RETURN)
                 COMPILE_RESULT_FLOATTYPE_BOUNDARY
                 SOURCE_FROM_FILE    diagnostic_floatType_boundary.cpp
                                     "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/diagnostic_floatType_boundary.cpp"
+                CMAKE_FLAGS
+                    "-DINCLUDE_DIRECTORIES:STRING=${PROJECT_BINARY_DIR}/include"
+                    #"-DINCLUDE_DIRECTORIES:STRING=${PROJECT_SOURCE_DIR}/include;${PROJECT_BINARY_DIR}/include"
+                #INCLUDE_DIRECTORIES    not supported by this version of cmake, using CMAKE_FLAGS instead
+                    ##"${PROJECT_SOURCE_DIR}/include"    converter/_compilerWorkAround.h
+                    #"${PROJECT_BINARY_DIR}/include"     #converter/_workaroundConfig.h
                 #COMPILE_DEFINITIONS "-DTEMPLATE_CONSTRAINT=${FLOATTYPE_BOUNDARY}"
                 ARGS "'${OS_DESCRIPTION}'" "${COMPILER_DESCRIPTION}"   # OS COMPILER argument to compiled binary
                 CXX_STANDARD "${CMAKE_CXX_STANDARD}"

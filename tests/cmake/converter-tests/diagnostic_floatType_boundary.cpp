@@ -10,6 +10,8 @@
 #include <iostream>
 #include <type_traits>
 
+#include <converter/_workaroundConfig.h>
+
 
 char* os = nullptr;
 char* compiler = nullptr;
@@ -57,6 +59,14 @@ size_t diagnostic_S2T_floatingPointBoundry(const std::string& fpType, const std:
     popLastChar(input, 'L');
   }
 
+  constexpr size_t flag_FP_from_chars =
+        (std::is_same_v<T, float>) ? 1 : 
+           (
+             (std::is_same_v<T, double>) ? 2 :
+                (
+                  (std::is_same_v<T, long double>) ? 4 : 0
+                )
+           );
 
   /*
    * Each method contributes one bit to the return value:
@@ -68,21 +78,24 @@ size_t diagnostic_S2T_floatingPointBoundry(const std::string& fpType, const std:
    * A bit is set when that method successfully converts the input to
    * the expected value; otherwise it is clear.
    */
+  std::size_t result_from_chars = 0u;
+  if constexpr (HAS_FLOATINGPOINT_FROM_CHARS & flag_FP_from_chars)
+  {
+    // std::from_chars
+    T value_from_chars{};
+    const auto [ptr, ec] = std::from_chars(
+        input.data(),
+        input.data() + input.size(),
+        value_from_chars,
+        std::chars_format::general
+    );
 
-  // std::from_chars
-  T value_from_chars{};
-  const auto [ptr, ec] = std::from_chars(
-      input.data(),
-      input.data() + input.size(),
-      value_from_chars,
-      std::chars_format::general
-  );
-
-  const std::size_t result_from_chars = (
-      ec == std::errc{} &&
-      ptr == (input.data() + input.size()) &&
-      value_from_chars == expected
-  ) ? 1u : 0u;
+    result_from_chars = (
+        ec == std::errc{} &&
+        ptr == (input.data() + input.size()) &&
+        value_from_chars == expected
+    ) ? 1u : 0u;
+  }
 
   // std::stod
   std::size_t stoFP_pos{};
