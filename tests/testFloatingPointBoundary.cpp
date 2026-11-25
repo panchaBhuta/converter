@@ -23,6 +23,8 @@
 #include "unittest.h"
 #include "utilities.h"
 
+#include <tests/_testSupportedConfig.h>
+
 
 
 using namespace converter;
@@ -35,6 +37,7 @@ using namespace converter;
 
 #define STRINGIFY_IMPL(x) #x
 #define STRINGIFY(x) STRINGIFY_IMPL(x)
+
 
 
 
@@ -209,8 +212,7 @@ inline void removeDoublePrefix(std::string& str)
   }
 }
 
-template <c_floating_point T,
-          size_t FROMCHARS_VARIANTIDX, size_t S2N_VARIANTIDX, size_t STRINGSTREAM_VARIANTIDX >
+template <c_floating_point T, size_t SUPPORTED_FUNCTION_FLOATTYPE>
 void test_S2T_floatingPointBoundry(std::string str, const T expVal,
                                    const std::string& filePath, int lineNo )
 {
@@ -224,6 +226,13 @@ void test_S2T_floatingPointBoundry(std::string str, const T expVal,
   {
     popLastChar(str, 'L');
   }
+
+  constexpr size_t    FROMCHARS_VARIANTIDX = (SUPPORTED_FUNCTION_FLOATTYPE & 1) ? 0 : 2;
+  constexpr size_t          S2N_VARIANTIDX = (SUPPORTED_FUNCTION_FLOATTYPE & 2) ? 0 : 2;
+  constexpr size_t STRINGSTREAM_VARIANTIDX = (SUPPORTED_FUNCTION_FLOATTYPE & 4) ? 0 : 2;
+
+  std::cout << "\nSUPPORTED_FUNCTION_FLOATTYPE=" << SUPPORTED_FUNCTION_FLOATTYPE << " : FROMCHARS_VARIANTIDX=" << FROMCHARS_VARIANTIDX
+            << " : S2N_VARIANTIDX=" << S2N_VARIANTIDX << " : STRINGSTREAM_VARIANTIDX=" << STRINGSTREAM_VARIANTIDX << std::endl;
 
   conversionFP_BoundaryCheck_S2T< T,
                                   FROMCHARS_VARIANTIDX, S2N_VARIANTIDX, STRINGSTREAM_VARIANTIDX >
@@ -284,31 +293,39 @@ int main()
     conversionFP_BoundaryCheck_S2T<long double>("-0.0",  -0.0L, __FILE__, __LINE__);
 
     std::cout << std::endl << "testFloatingPointBoundary :: S2T :: std::numeric_limits<T>::min()" << std::endl;
-    test_S2T_floatingPointBoundry<float,       0, 0, 0>(STRINGIFY(FLT_MIN),  std::numeric_limits<float>::min(),        __FILE__, __LINE__ );
-    test_S2T_floatingPointBoundry<double,      0, 0, 0>(STRINGIFY(DBL_MIN),  std::numeric_limits<double>::min(),       __FILE__, __LINE__ );
-    test_S2T_floatingPointBoundry<long double, 0, 0, 0>(STRINGIFY(LDBL_MIN), std::numeric_limits<long double>::min(),  __FILE__, __LINE__ );
+    test_S2T_floatingPointBoundry<float,       TEST_SUPPORTED_MIN_FLT_ALL_S2T> (STRINGIFY(FLT_MIN),  std::numeric_limits<float>::min(),        __FILE__, __LINE__ );
+    test_S2T_floatingPointBoundry<double,      TEST_SUPPORTED_MIN_DBL_ALL_S2T> (STRINGIFY(DBL_MIN),  std::numeric_limits<double>::min(),       __FILE__, __LINE__ );
+    test_S2T_floatingPointBoundry<long double, TEST_SUPPORTED_MIN_LDBL_ALL_S2T>(STRINGIFY(LDBL_MIN), std::numeric_limits<long double>::min(),  __FILE__, __LINE__ );
 
     std::cout << std::endl << "testFloatingPointBoundary :: S2T :: std::numeric_limits<T>::max()" << std::endl;
-    test_S2T_floatingPointBoundry<float,       0, 0, 0>(STRINGIFY(FLT_MAX),  std::numeric_limits<float>::max(),        __FILE__, __LINE__ );
-    test_S2T_floatingPointBoundry<double,      0, 0, 0>(STRINGIFY(DBL_MAX),  std::numeric_limits<double>::max(),       __FILE__, __LINE__ );
-    test_S2T_floatingPointBoundry<long double, 0, 0, 0>(STRINGIFY(LDBL_MAX), std::numeric_limits<long double>::max(),  __FILE__, __LINE__ );
-
-    //      std::numeric_limits<T>::lowest(),
+    test_S2T_floatingPointBoundry<float,       TEST_SUPPORTED_MAX_FLT_ALL_S2T> (STRINGIFY(FLT_MAX),  std::numeric_limits<float>::max(),        __FILE__, __LINE__ );
+    test_S2T_floatingPointBoundry<double,      TEST_SUPPORTED_MAX_DBL_ALL_S2T> (STRINGIFY(DBL_MAX),  std::numeric_limits<double>::max(),       __FILE__, __LINE__ );
+    test_S2T_floatingPointBoundry<long double, TEST_SUPPORTED_MAX_LDBL_ALL_S2T>(STRINGIFY(LDBL_MAX), std::numeric_limits<long double>::max(),  __FILE__, __LINE__ );
 
     std::cout << std::endl << "testFloatingPointBoundary :: S2T :: std::numeric_limits<T>::denorm_min()" << std::endl;
-    test_S2T_floatingPointBoundry<float,       0, 2, 0>(STRINGIFY(FLT_TRUE_MIN),  std::numeric_limits<float>::denorm_min(),        __FILE__, __LINE__ );
-    test_S2T_floatingPointBoundry<double,      0, 2, 0>(STRINGIFY(DBL_TRUE_MIN),  std::numeric_limits<double>::denorm_min(),       __FILE__, __LINE__ );
-    test_S2T_floatingPointBoundry<long double, DENORM_DB_VARIDX, 2, 0>(STRINGIFY(LDBL_TRUE_MIN), std::numeric_limits<long double>::denorm_min(),  __FILE__, __LINE__ );
+    test_S2T_floatingPointBoundry<float,       TEST_SUPPORTED_DENORM_MIN_FLT_ALL_S2T> (STRINGIFY(FLT_TRUE_MIN),  std::numeric_limits<float>::denorm_min(),        __FILE__, __LINE__ );
+    test_S2T_floatingPointBoundry<double,      TEST_SUPPORTED_DENORM_MIN_DBL_ALL_S2T> (STRINGIFY(DBL_TRUE_MIN),  std::numeric_limits<double>::denorm_min(),       __FILE__, __LINE__ );
+    test_S2T_floatingPointBoundry<long double, TEST_SUPPORTED_DENORM_MIN_LDBL_ALL_S2T>(STRINGIFY(LDBL_TRUE_MIN), std::numeric_limits<long double>::denorm_min(),  __FILE__, __LINE__ );
+    //test_S2T_floatingPointBoundry<long double, DENORM_DB_VARIDX, 2, 0>(STRINGIFY(LDBL_TRUE_MIN), std::numeric_limits<long double>::denorm_min(),  __FILE__, __LINE__ );
+
+    std::cout << std::endl << "testFloatingPointBoundary :: S2T :: std::numeric_limits<T>::epsilon()" << std::endl;
+    test_S2T_floatingPointBoundry<float,       TEST_SUPPORTED_EPS_FLT_ALL_S2T> (STRINGIFY(FLT_EPSILON),  std::numeric_limits<float>::epsilon(),        __FILE__, __LINE__ );
+    test_S2T_floatingPointBoundry<double,      TEST_SUPPORTED_EPS_DBL_ALL_S2T> (STRINGIFY(DBL_EPSILON),  std::numeric_limits<double>::epsilon(),       __FILE__, __LINE__ );
+    test_S2T_floatingPointBoundry<long double, TEST_SUPPORTED_EPS_LDBL_ALL_S2T>(STRINGIFY(LDBL_EPSILON), std::numeric_limits<long double>::epsilon(),  __FILE__, __LINE__ );
+
+/*
+    //      std::numeric_limits<float>::lowest() == -FLT_MAX,
+    std::cout << std::endl << "testFloatingPointBoundary :: S2T :: std::numeric_limits<T>::lowest()" << std::endl;
+    test_S2T_floatingPointBoundry<float,       0, 0, 0>(STRINGIFY("-", FLT_MAX),  std::numeric_limits<float>::lowest(),        __FILE__, __LINE__ );
+    test_S2T_floatingPointBoundry<double,      0, 0, 0>(STRINGIFY("-", DBL_MAX),  std::numeric_limits<double>::lowest(),       __FILE__, __LINE__ );
+    test_S2T_floatingPointBoundry<long double, 0, 0, 0>(STRINGIFY("-", LDBL_MAX), std::numeric_limits<long double>::lowest(),  __FILE__, __LINE__ );
+*/
+
+    //      std::numeric_limits<T>::epsilon() / T(2)
 
     //      std::nextafter(
     //          std::numeric_limits<T>::min(), T(0)),
 
-    std::cout << std::endl << "testFloatingPointBoundary :: S2T :: std::numeric_limits<T>::epsilon()" << std::endl;
-    test_S2T_floatingPointBoundry<float,       0, 0, 0>(STRINGIFY(FLT_EPSILON),  std::numeric_limits<float>::epsilon(),        __FILE__, __LINE__ );
-    test_S2T_floatingPointBoundry<double,      0, 0, 0>(STRINGIFY(DBL_EPSILON),  std::numeric_limits<double>::epsilon(),       __FILE__, __LINE__ );
-    test_S2T_floatingPointBoundry<long double, 0, 0, 0>(STRINGIFY(LDBL_EPSILON), std::numeric_limits<long double>::epsilon(),  __FILE__, __LINE__ );
-
-    //      std::numeric_limits<T>::epsilon() / T(2)
 
 /*
     conversionFP_BoundaryCheck_S2T<float>      ("+inf",  std::numeric_limits<float>::infinity(),       __FILE__, __LINE__);

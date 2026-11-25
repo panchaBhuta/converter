@@ -1,0 +1,60 @@
+/*
+ * _workaroundConfig.h
+ *
+ * URL:      https://github.com/panchaBhuta/converter
+ * Version:  v2.4
+ *
+ * Copyright (c) 2026-2026 Gautam Dhar
+ * All rights reserved.
+ *
+ * converter is distributed under the BSD 3-Clause license, see LICENSE for details.
+ *
+ */
+
+#pragma once
+
+
+
+/*
+ *        macro Prefixes and their meaning
+ *  -----------------------------------------------------------------------------------------------------
+ *  **     Below macro values are noted across OS's and compilers     **
+ *  **     and compiled into doc/consolidateWorkAroundFlags.csv       **
+ *  TEST_SUPPORTED_* — identifies whether a feature is supported by the standard library / third-party library.
+ *                     These are used by the converter unit-test's preprocessor logic to determine which code gets compiled.
+ *                     This is used for toggling, when a particular feature is not supported by standard lib,
+ *                     to enable fallback code(in place of call to the standard lib code).
+ *                     e.g: TEST_SUPPORTED_MIN_FLT_ALL_S2T
+ */
+
+
+
+// consolidate result format
+// 1st bit : std::from_chars()
+// 2nd bit : std::sto*()
+// 3rd bit : std::stream <<
+
+//  ususally 1, 1, 1
+#define  TEST_SUPPORTED_MIN_FLT_ALL_S2T       @SUPPORTED_MIN_FLT@
+#define  TEST_SUPPORTED_MIN_DBL_ALL_S2T       @SUPPORTED_MIN_DBL@
+#define  TEST_SUPPORTED_MIN_LDBL_ALL_S2T      @SUPPORTED_MIN_LDBL@
+
+//  ususally 1, 1, 1
+#define  TEST_SUPPORTED_MAX_FLT_ALL_S2T       @SUPPORTED_MAX_FLT@
+#define  TEST_SUPPORTED_MAX_DBL_ALL_S2T       @SUPPORTED_MAX_DBL@
+#define  TEST_SUPPORTED_MAX_LDBL_ALL_S2T      @SUPPORTED_MAX_LDBL@
+
+//  ususally 1, 0, 1
+#define  TEST_SUPPORTED_DENORM_MIN_FLT_ALL_S2T       @SUPPORTED_DENORM_MIN_FLT@
+#define  TEST_SUPPORTED_DENORM_MIN_DBL_ALL_S2T       @SUPPORTED_DENORM_MIN_DBL@
+#define  TEST_SUPPORTED_DENORM_MIN_LDBL_ALL_S2T      @SUPPORTED_DENORM_MIN_LDBL@
+
+
+//  ususally 1, 1, 1
+#define  TEST_SUPPORTED_EPS_FLT_ALL_S2T       @SUPPORTED_EPS_FLT@
+#define  TEST_SUPPORTED_EPS_DBL_ALL_S2T       @SUPPORTED_EPS_DBL@
+#define  TEST_SUPPORTED_EPS_LDBL_ALL_S2T      @SUPPORTED_EPS_LDBL@
+
+
+
+

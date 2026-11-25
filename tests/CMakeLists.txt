@@ -13,9 +13,9 @@
 
 include(cmake/converter-tests/capabilities.cmake)
 
-check_ldb_denorm_min(DENORM_DB_VARIDX)
+diagnostic_floatType_boundary_multi()
 
-message(STATUS "DENORM_DB_VARIDX = ${DENORM_DB_VARIDX}")
+
 
 
 # Test macro add_unit_test
@@ -32,6 +32,7 @@ macro(add_unit_test testname)
     # ARGN here contains list of additional cpp files(includes the extension) if any
     add_executable(${testname} ${sourcesExe})
     add_test(NAME ${testname} COMMAND "${PROJECT_BINARY_DIR}/tests/${testname}")
+
 
     if(CMAKE_BUILD_TYPE MATCHES "MemCheck"  OR
        CMAKE_BUILD_TYPE MATCHES "CpuProf"   OR
@@ -168,8 +169,6 @@ add_perf_test(ptest002)
 
 
 if(TARGET testFloatingPointBoundary)
-  target_compile_definitions(testFloatingPointBoundary
-        PRIVATE
-            DENORM_DB_VARIDX=${DENORM_DB_VARIDX}
-  )
+    target_include_directories( testFloatingPointBoundary PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include> )
 endif()

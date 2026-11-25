@@ -508,17 +508,17 @@ function(diagnostic_template_template_parameter
           (     RUN_RESULT_TEMPLATE_TEMPLATE_PARAMETER   EQUAL 0 )
         )
       )
-        message(STATUS "diagnostic_template_template_parameter ::  ++SUCCESS++\n${LOG_RUN_STDOUT_TTP}\n${LOG_RUN_STDERR_TTP}")
+        message(STATUS "diagnostic_template_template_parameter ::  ++SUCCESS++\n")
         file(APPEND "${DIAGNOSTIC_TEMPLATE_TEMPLATE_PARAMETER_FILE}" "${LOG_RUN_STDERR_TTP}")
         set(FUNCTION_RETURN    ${e_ENABLE_FEATURE} PARENT_SCOPE)
     else()
         message(STATUS "diagnostic_template_template_parameter ::  --FAILED--")
-        message(STATUS "diagnostic_template_template_parameter ::  ---------std::cout--------")
-        message(STATUS "diagnostic_template_template_parameter ::  ${LOG_RUN_STDOUT_TTP}\n${LOG_RUN_STDERR_TTP}")
-        message(STATUS "diagnostic_template_template_parameter ::  ---------std::cerr--------")
-        message(STATUS "diagnostic_template_template_parameter ::  ${LOG_RUN_STDERR_TTP}")
         set(FUNCTION_RETURN    ${e_DISABLE_FEATURE} PARENT_SCOPE)
     endif()
+
+    message(STATUS "diagnostic_template_template_parameter ::  ---------std::cout--------\n${LOG_RUN_STDOUT_TTP}")
+    message(STATUS "diagnostic_template_template_parameter ::  ---------std::cerr--------\n${LOG_RUN_STDERR_TTP}")
+    message(STATUS "diagnostic_template_template_parameter ::  ---------end--------\n")
 
 endfunction()
 
@@ -627,26 +627,26 @@ function(check_nan_infinity_values)
                 CXX_STANDARD "${CMAKE_CXX_STANDARD}"
                 CXX_STANDARD_REQUIRED True
                 LOG_DESCRIPTION "run-check: diagnostic_nan_infinity_values.cpp"
-                COMPILE_OUTPUT_VARIABLE  TRY_COMPILE_OUTPUT_TTP
-                #RUN_OUTPUT_VARIABLE      TRY_RUN_OUTPUT_TTP)     # return 0;
-                RUN_OUTPUT_STDOUT_VARIABLE LOG_RUN_STDOUT_TTP
-                RUN_OUTPUT_STDERR_VARIABLE LOG_RUN_STDERR_TTP)
+                COMPILE_OUTPUT_VARIABLE  TRY_COMPILE_OUTPUT_NAN
+                #RUN_OUTPUT_VARIABLE      TRY_RUN_OUTPUT_NAN)     # return 0;
+                RUN_OUTPUT_STDOUT_VARIABLE LOG_RUN_STDOUT_NAN
+                RUN_OUTPUT_STDERR_VARIABLE LOG_RUN_STDERR_NAN)
     message(STATUS "diagnostic_nan_infinity_values compile output : ${COMPILE_RESULT_NAN_INFINITY_VALUES}")
     message(STATUS "diagnostic_nan_infinity_values run     output : ${RUN_RESULT_NAN_INFINITY_VALUES}")
-
 
     if( COMPILE_RESULT_NAN_INFINITY_VALUES  AND
         ( ( NOT RUN_RESULT_NAN_INFINITY_VALUES   STREQUAL  "FAILED_TO_RUN" ) AND
           (     RUN_RESULT_NAN_INFINITY_VALUES   EQUAL 0 )
         )
       )
-        message(STATUS "diagnostic_nan_infinity_values ::  ++SUCCESS++\n${LOG_RUN_STDOUT_TTP}\n${LOG_RUN_STDERR_TTP}")
-        file(WRITE "${DIAGNOSTIC_NAN_INFINITY_VALUES_FILE}" "${LOG_RUN_STDOUT_TTP}")
+        message(STATUS "diagnostic_nan_infinity_values ::  ++SUCCESS++\n")
+        file(WRITE "${DIAGNOSTIC_NAN_INFINITY_VALUES_FILE}" "${LOG_RUN_STDOUT_NAN}")
     else()
         message(STATUS "diagnostic_nan_infinity_values ::  --FAILED--")
-        message(STATUS "diagnostic_nan_infinity_values ::  ---------std::cout--------")
-        message(STATUS "diagnostic_nan_infinity_values ::  ${LOG_RUN_STDOUT_TTP}\n${LOG_RUN_STDERR_TTP}")
-        message(STATUS "diagnostic_nan_infinity_values ::  ---------std::cerr--------")
-        message(STATUS "diagnostic_nan_infinity_values ::  ${LOG_RUN_STDERR_TTP}")
     endif()
+
+    message(STATUS "diagnostic_nan_infinity_values ::  ---------std::cout--------\n${LOG_RUN_STDOUT_NAN}\n")
+    message(STATUS "diagnostic_nan_infinity_values ::  ---------std::cerr--------\n${LOG_RUN_STDERR_NAN}")
+    message(STATUS "diagnostic_nan_infinity_values ::  ---------end--------\n")
+
 endfunction()

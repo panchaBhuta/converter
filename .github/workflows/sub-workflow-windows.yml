@@ -222,6 +222,11 @@ jobs:
           sed -i 's/\r//' "${DIAGNOSTIC_NAN_INF_FILE}"
           cat "${DIAGNOSTIC_NAN_INF_FILE}"
 
+          DIAGNOSTIC_FP_BOUNDARY_FILE="${FLAG_DIR}/diagnostic-FP-BOUNDARY-${{ matrix.os-generator.os }}-${{ matrix.toolset_compiler.compiler }}.csv"
+          mv "${FLAG_DIR}/check_floatType_boundary.txt" "${DIAGNOSTIC_FP_BOUNDARY_FILE}"
+          sed -i 's/\r//' "${DIAGNOSTIC_FP_BOUNDARY_FILE}"
+          cat "${DIAGNOSTIC_FP_BOUNDARY_FILE}"
+
 
       - name: Upload Consolidate-WorkAround-Flags Artifact from Sub-Workflow
         uses: actions/upload-artifact@v4
@@ -242,6 +247,13 @@ jobs:
         with:
           name: "artifact-nan-inf-${{ matrix.os-generator.os }}-${{ matrix.toolset_compiler.compiler }}"
           path: "build-debug/workAroundFlags/diagnostic-NAN-INF-${{ matrix.os-generator.os }}-${{ matrix.toolset_compiler.compiler }}.csv"
+          if-no-files-found: error
+
+      - name: Upload Consolidate-Diagnostic-FP-BOUNDARY Artifact from Sub-Workflow
+        uses: actions/upload-artifact@v4
+        with:
+          name: "artifact-fp-boundary-${{ matrix.os-generator.os }}-${{ matrix.toolset_compiler.compiler }}"
+          path: "build-debug/workAroundFlags/diagnostic-FP-BOUNDARY-${{ matrix.os-generator.os }}-${{ matrix.toolset_compiler.compiler }}"
           if-no-files-found: error
 
 

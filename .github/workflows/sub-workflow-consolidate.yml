@@ -198,6 +198,45 @@ jobs:
 
           cat "${OUTPUT_FILE}"
 
+
+      - name: List Downloaded FP-Boundary Artifacts
+        run: |
+          shopt -s nullglob
+          files=("${{github.workspace}}/build-debug/workAroundFlags/diagnostic-FP-BOUNDARY-"*.csv)
+          echo "Artifacts FP-BOUNDARY downloaded: ${#files[@]}"
+          printf '%s\\n' "${files[@]}"
+
+      - name: Consolidate FP-BOUNDARY Artifacts and Merge
+        run: |
+          # Enable nullglob so an unmatched glob expands to nothing instead of the literal pattern
+          shopt -s nullglob
+          files=("${{github.workspace}}/build-debug/workAroundFlags/diagnostic-FP-BOUNDARY-"*.csv)
+
+          if ((${#files[@]} == 0)); then
+            echo "ERROR: No FP-BOUNDARY diagnostic CSV files found."
+            exit 1
+          fi
+
+          # Normalize Windows CRLF line endings before sorting
+          dos2unix "${files[@]}" || {
+            echo "ERROR: Failed to normalize FP-BOUNDARY diagnostic files."
+            exit 1
+          }
+          sed -i 's/\r//' "${files[@]}"
+
+          OUTPUT_FILE="${{github.workspace}}/doc/github/runnerResults/consolidateDiagnosticFP-BOUNDARY.csv"
+
+          # sort and deduplicate.
+          LC_ALL=C sort -u "${files[@]}" > "${OUTPUT_FILE}"
+
+          # Verify that no CR characters remain.
+          if LC_ALL=C grep -n $'\r' "${OUTPUT_FILE}"; then
+              echo "ERROR: CR characters remain in consolidated FP-BOUNDARY CSV."
+              exit 1
+          fi
+
+          cat "${OUTPUT_FILE}"
+
  
 
 
