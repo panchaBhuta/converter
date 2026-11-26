@@ -38,7 +38,7 @@ jobs:
         # for ARM refer below
         # https://github.com/actions/partner-runner-images
         # https://github.com/actions/partner-runner-images/blob/main/images/arm-ubuntu-24-image.md
-        os: [ ubuntu-24.04, ubuntu-22.04, ubuntu-24.04-arm, ubuntu-22.04-arm ]  #  ubuntu-latest  ==  ubuntu-24.04
+        os: [ ubuntu-26.04, ubuntu-24.04, ubuntu-22.04, ubuntu-26.04-arm, ubuntu-24.04-arm, ubuntu-22.04-arm ]  #  ubuntu-latest  ==  ubuntu-26.04
         #  https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2204-Readme.md#installed-software
           #  GNU C++: 9.5.0, 10.5.0, 11.4.0, 12.3.0, 13.1.0
           #  Clang: 13.0.1, 14.0.0, 15.0.7

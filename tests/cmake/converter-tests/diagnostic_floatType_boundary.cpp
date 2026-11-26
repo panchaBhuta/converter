@@ -138,7 +138,7 @@ size_t diagnostic_S2T_floatingPointBoundry(const std::string& fpType, const std:
   ) ? 1u : 0u;
 
             // "#OS,compiler,float-type,"
-  std::cout << os << "," << compiler << "," << fpType << ","
+  std::cout << os << "," << compiler << "," << flag_FP_from_chars << ": " << fpType << ","
             // "functionName,inputOriginal,inputCurated,"
             << functionName << "," << inputOrg << "," << input << ","
             // "flag_fromChars,flag_stoFP,flag_stream\n"
@@ -181,41 +181,41 @@ int main(int argc, char* argv[])
   size_t consolidated_result{0};
 
   consolidated_result = diagnostic_S2T_floatingPointBoundry<float>
-                            (STRINGIFY(float),       "min", STRINGIFY(FLT_MIN),  std::numeric_limits<float>::min());
+                            (STRINGIFY(float),       "1: max", STRINGIFY(FLT_MAX),  std::numeric_limits<float>::max());
   consolidated_result |= ( diagnostic_S2T_floatingPointBoundry<double>
-                            (STRINGIFY(double),      "min", STRINGIFY(DBL_MIN),  std::numeric_limits<double>::min()) << 3 );
+                            (STRINGIFY(double),      "1: max", STRINGIFY(DBL_MAX),  std::numeric_limits<double>::max()) << 3 );
   consolidated_result |= ( diagnostic_S2T_floatingPointBoundry<long double>
-                            (STRINGIFY(long double), "min", STRINGIFY(LDBL_MIN), std::numeric_limits<long double>::min()) << 6 );
-  std::cerr << std::endl << "testFloatingPointBoundary :: S2T :: std::numeric_limits<T>::min() :: " << consolidated_result << std::endl;
-  std::cerr << "CONSOLIDATED_RESULT_min=" << consolidated_result << '\n';
-
-  consolidated_result = 0;
-  consolidated_result = diagnostic_S2T_floatingPointBoundry<float>
-                            (STRINGIFY(float),       "max", STRINGIFY(FLT_MAX),  std::numeric_limits<float>::max());
-  consolidated_result |= ( diagnostic_S2T_floatingPointBoundry<double>
-                            (STRINGIFY(double),      "max", STRINGIFY(DBL_MAX),  std::numeric_limits<double>::max()) << 3 );
-  consolidated_result |= ( diagnostic_S2T_floatingPointBoundry<long double>
-                            (STRINGIFY(long double), "max", STRINGIFY(LDBL_MAX), std::numeric_limits<long double>::max()) << 6 );
+                            (STRINGIFY(long double), "1: max", STRINGIFY(LDBL_MAX), std::numeric_limits<long double>::max()) << 6 );
   std::cerr << std::endl << "testFloatingPointBoundary :: S2T :: std::numeric_limits<T>::max() :: " << consolidated_result << std::endl;
   std::cerr << "CONSOLIDATED_RESULT_max=" << consolidated_result << '\n';
 
   consolidated_result = 0;
   consolidated_result = diagnostic_S2T_floatingPointBoundry<float>
-                            (STRINGIFY(float),       "denorm_min", STRINGIFY(FLT_TRUE_MIN),  std::numeric_limits<float>::denorm_min());
+                            (STRINGIFY(float),       "2: min", STRINGIFY(FLT_MIN),  std::numeric_limits<float>::min());
   consolidated_result |= ( diagnostic_S2T_floatingPointBoundry<double>
-                            (STRINGIFY(double),      "denorm_min", STRINGIFY(DBL_TRUE_MIN),  std::numeric_limits<double>::denorm_min()) << 3 );
+                            (STRINGIFY(double),      "2: min", STRINGIFY(DBL_MIN),  std::numeric_limits<double>::min()) << 3 );
   consolidated_result |= ( diagnostic_S2T_floatingPointBoundry<long double>
-                            (STRINGIFY(long double), "denorm_min", STRINGIFY(LDBL_TRUE_MIN), std::numeric_limits<long double>::denorm_min()) << 6 );
+                            (STRINGIFY(long double), "2: min", STRINGIFY(LDBL_MIN), std::numeric_limits<long double>::min()) << 6 );
+  std::cerr << std::endl << "testFloatingPointBoundary :: S2T :: std::numeric_limits<T>::min() :: " << consolidated_result << std::endl;
+  std::cerr << "CONSOLIDATED_RESULT_min=" << consolidated_result << '\n';
+
+  consolidated_result = 0;
+  consolidated_result = diagnostic_S2T_floatingPointBoundry<float>
+                            (STRINGIFY(float),       "3: denorm_min", STRINGIFY(FLT_TRUE_MIN),  std::numeric_limits<float>::denorm_min());
+  consolidated_result |= ( diagnostic_S2T_floatingPointBoundry<double>
+                            (STRINGIFY(double),      "3: denorm_min", STRINGIFY(DBL_TRUE_MIN),  std::numeric_limits<double>::denorm_min()) << 3 );
+  consolidated_result |= ( diagnostic_S2T_floatingPointBoundry<long double>
+                            (STRINGIFY(long double), "3: denorm_min", STRINGIFY(LDBL_TRUE_MIN), std::numeric_limits<long double>::denorm_min()) << 6 );
   std::cerr << std::endl << "testFloatingPointBoundary :: S2T :: std::numeric_limits<T>::denorm_min() :: " << consolidated_result << std::endl;
   std::cerr << "CONSOLIDATED_RESULT_denorm_min=" << consolidated_result << '\n';
 
   consolidated_result = 0;
   consolidated_result = diagnostic_S2T_floatingPointBoundry<float>
-                            (STRINGIFY(float),       "epsilon", STRINGIFY(FLT_EPSILON),  std::numeric_limits<float>::epsilon());
+                            (STRINGIFY(float),       "4: epsilon", STRINGIFY(FLT_EPSILON),  std::numeric_limits<float>::epsilon());
   consolidated_result |= ( diagnostic_S2T_floatingPointBoundry<double>
-                            (STRINGIFY(double),      "epsilon", STRINGIFY(DBL_EPSILON),  std::numeric_limits<double>::epsilon()) << 3 );
+                            (STRINGIFY(double),      "4: epsilon", STRINGIFY(DBL_EPSILON),  std::numeric_limits<double>::epsilon()) << 3 );
   consolidated_result |= ( diagnostic_S2T_floatingPointBoundry<long double>
-                            (STRINGIFY(long double), "epsilon", STRINGIFY(LDBL_EPSILON), std::numeric_limits<long double>::epsilon()) << 6 );
+                            (STRINGIFY(long double), "4: epsilon", STRINGIFY(LDBL_EPSILON), std::numeric_limits<long double>::epsilon()) << 6 );
   std::cerr << std::endl << "testFloatingPointBoundary :: S2T :: std::numeric_limits<T>::epsilon() :: " << consolidated_result << std::endl;
   std::cerr << "CONSOLIDATED_RESULT_epsilon=" << consolidated_result << '\n';
 
