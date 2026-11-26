@@ -247,8 +247,9 @@ jobs:
           TARGET_FLAGS_FILE="${{github.workspace}}/doc/github/runnerResults/consolidateWorkAroundFlags.csv"
           TARGET_TTP_FILE="${{github.workspace}}/doc/github/runnerResults/consolidateDiagnosticTTP.csv"
           TARGET_NAN_INF_FILE="${{github.workspace}}/doc/github/runnerResults/consolidateDiagnosticNAN-INF.csv"
+          TARGET_FP_BOUNDARY_FILE="${{github.workspace}}/doc/github/runnerResults/consolidateDiagnosticFP-BOUNDARY.csv"
 
-          git add ${TARGET_FLAGS_FILE} ${TARGET_TTP_FILE} ${TARGET_NAN_INF_FILE}
+          git add ${TARGET_FLAGS_FILE} ${TARGET_TTP_FILE} ${TARGET_NAN_INF_FILE} ${TARGET_FP_BOUNDARY_FILE}
 
           # Only commit and push if there are actual changes to prevent workflow errors
           if ! git diff --cached --quiet; then

@@ -114,7 +114,12 @@ inline void conversionFP_S2T_C_THROW_ERROR(const std::string& vStr, const T& exp
 #if MACOS_APPLECLANG == 0
     ExpectException(ConvertFromStr<T COMMA CONV_PROCESS COMMA Str2TnErrorHandler::THROW_ERROR>::ToVal(vStr), std::out_of_range);
 #else
-    ExpectException(ConvertFromStr<T COMMA CONV_PROCESS COMMA Str2TnErrorHandler::THROW_ERROR>::ToVal(vStr), std::invalid_argument);
+    if constexpr ( CONV_PROCESS == Str2TnConversionProcess::STRINGSTREAM )
+    {
+      ExpectException(ConvertFromStr<T COMMA CONV_PROCESS COMMA Str2TnErrorHandler::THROW_ERROR>::ToVal(vStr), std::invalid_argument);
+    } else {
+      ExpectException(ConvertFromStr<T COMMA CONV_PROCESS COMMA Str2TnErrorHandler::THROW_ERROR>::ToVal(vStr), std::out_of_range);
+    }
 #endif
   }
 }
