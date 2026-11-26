@@ -118,18 +118,18 @@ function(diagnostic_floatType_boundary_multi)
     diagnostic_floatType_boundary(LIST_CONSOLIDATED_RESULT_FUN)
 
     boundry_result_extractor(
-        "CONSOLIDATED_RESULT_min"
-        "${LIST_CONSOLIDATED_RESULT_FUN}"
-        SUPPORTED_MIN_FLT
-        SUPPORTED_MIN_DBL
-        SUPPORTED_MIN_LDBL)
-
-    boundry_result_extractor(
         "CONSOLIDATED_RESULT_max"
         "${LIST_CONSOLIDATED_RESULT_FUN}"
         SUPPORTED_MAX_FLT
         SUPPORTED_MAX_DBL
         SUPPORTED_MAX_LDBL)
+
+    boundry_result_extractor(
+        "CONSOLIDATED_RESULT_min"
+        "${LIST_CONSOLIDATED_RESULT_FUN}"
+        SUPPORTED_MIN_FLT
+        SUPPORTED_MIN_DBL
+        SUPPORTED_MIN_LDBL)
 
     boundry_result_extractor(
         "CONSOLIDATED_RESULT_denorm_min"
@@ -144,6 +144,13 @@ function(diagnostic_floatType_boundary_multi)
         SUPPORTED_EPS_FLT
         SUPPORTED_EPS_DBL
         SUPPORTED_EPS_LDBL)
+
+    boundry_result_extractor(
+        "CONSOLIDATED_RESULT_low"
+        "${LIST_CONSOLIDATED_RESULT_FUN}"
+        SUPPORTED_LOW_FLT
+        SUPPORTED_LOW_DBL
+        SUPPORTED_LOW_LDBL)
 
     configure_file(
         ${CMAKE_CURRENT_SOURCE_DIR}/cmake/_testSupportedConfig.h.in

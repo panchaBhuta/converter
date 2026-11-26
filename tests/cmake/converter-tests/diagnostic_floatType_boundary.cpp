@@ -19,6 +19,9 @@ char* compiler = nullptr;
 #define STRINGIFY_IMPL(x) #x
 #define STRINGIFY(x) STRINGIFY_IMPL(x)
 
+#define STRINGIFY_IMPL2(y) "-" #y
+#define STRINGIFY2(x) STRINGIFY_IMPL2(x)
+
 
 inline void popLastChar(std::string& str, const char FPtype)
 {
@@ -27,8 +30,9 @@ inline void popLastChar(std::string& str, const char FPtype)
 
 inline void removeDoublePrefix(std::string& str)
 {
-  static const std::string prefix = "double(";
-  static const std::string suffix = "L)";
+  static const std::string  prefix = "double(";
+  static const std::string _prefix = "-double(";
+  static const std::string  suffix = "L)";
 
   // Ensure the string actually starts with prefix and ends with suffix
   if (str.size() >= (prefix.size() + suffix.size()) &&
@@ -36,6 +40,13 @@ inline void removeDoublePrefix(std::string& str)
       str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0)
   {
       str = str.substr(prefix.size(), str.size() - prefix.size() - suffix.size());
+  } else
+  if (str.size() >= (_prefix.size() + suffix.size()) &&
+      str.compare(0, _prefix.size(), _prefix) == 0 &&
+      str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0)
+  {
+      str = str.substr(_prefix.size(), str.size() - _prefix.size() - suffix.size());
+      str = std::string{"-"} + str;
   }
 }
 
@@ -173,9 +184,6 @@ int main(int argc, char* argv[])
         << "flag_fromChars,flag_stoFP,flag_stream\n";
 */
 
-//    GETLIMITS(float , 1);
-//    GETLIMITS(double , 2);
-//    GETLIMITS(long double , 3);
 
 
   size_t consolidated_result{0};
@@ -220,6 +228,14 @@ int main(int argc, char* argv[])
   std::cerr << "CONSOLIDATED_RESULT_epsilon=" << consolidated_result << '\n';
 
   consolidated_result = 0;
+  consolidated_result = diagnostic_S2T_floatingPointBoundry<float>
+                            (STRINGIFY(float),       "5: lowest", STRINGIFY2(FLT_MAX),  std::numeric_limits<float>::lowest());
+  consolidated_result |= ( diagnostic_S2T_floatingPointBoundry<double>
+                            (STRINGIFY(double),      "5: lowest", STRINGIFY2(DBL_MAX),  std::numeric_limits<double>::lowest()) << 3 );
+  consolidated_result |= ( diagnostic_S2T_floatingPointBoundry<long double>
+                            (STRINGIFY(long double), "5: lowest", STRINGIFY2(LDBL_MAX), std::numeric_limits<long double>::lowest()) << 6 );
+  std::cerr << std::endl << "testFloatingPointBoundary :: S2T :: std::numeric_limits<T>::lowest() :: " << consolidated_result << std::endl;
+  std::cerr << "CONSOLIDATED_RESULT_low=" << consolidated_result << '\n';
 
   return 0;
 }

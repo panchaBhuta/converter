@@ -38,6 +38,9 @@ using namespace converter;
 #define STRINGIFY_IMPL(x) #x
 #define STRINGIFY(x) STRINGIFY_IMPL(x)
 
+#define STRINGIFY_IMPL2(y) "-" #y
+#define STRINGIFY2(x) STRINGIFY_IMPL2(x)
+
 
 #if defined(__APPLE__) && defined(__MACH__)
     #include <TargetConditionals.h>
@@ -221,6 +224,7 @@ inline void popLastChar(std::string& str, const char FPtype)
 inline void removeDoublePrefix(std::string& str)
 {
   static const std::string prefix = "double(";
+  static const std::string _prefix = "-double(";
   static const std::string suffix = "L)";
 
   // Ensure the string actually starts with prefix and ends with suffix
@@ -229,6 +233,13 @@ inline void removeDoublePrefix(std::string& str)
       str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0) {
         
       str = str.substr(prefix.size(), str.size() - prefix.size() - suffix.size());
+  } else
+  if (str.size() >= (_prefix.size() + suffix.size()) &&
+      str.compare(0, _prefix.size(), _prefix) == 0 &&
+      str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0)
+  {
+      str = str.substr(_prefix.size(), str.size() - _prefix.size() - suffix.size());
+      str = std::string{"-"} + str;
   }
 }
 
@@ -303,7 +314,7 @@ int main()
   int rv = 0;
   try {
 
-    std::cout << "testFloatingPointBoundary : S2T :" << std::endl;
+    std::cout << "testFloatingPointBoundary : S2T : +ve and -ve zero's" << std::endl;
     conversionFP_BoundaryCheck_S2T<float>      ("0.0",  0.0F, __FILE__, __LINE__);
     conversionFP_BoundaryCheck_S2T<double>     ("0.0",  0.0 , __FILE__, __LINE__);
     conversionFP_BoundaryCheck_S2T<long double>("0.0",  0.0L, __FILE__, __LINE__);
@@ -326,20 +337,19 @@ int main()
     test_S2T_floatingPointBoundry<float,       TEST_SUPPORTED_DENORM_MIN_FLT_ALL_S2T> (STRINGIFY(FLT_TRUE_MIN),  std::numeric_limits<float>::denorm_min(),        __FILE__, __LINE__ );
     test_S2T_floatingPointBoundry<double,      TEST_SUPPORTED_DENORM_MIN_DBL_ALL_S2T> (STRINGIFY(DBL_TRUE_MIN),  std::numeric_limits<double>::denorm_min(),       __FILE__, __LINE__ );
     test_S2T_floatingPointBoundry<long double, TEST_SUPPORTED_DENORM_MIN_LDBL_ALL_S2T>(STRINGIFY(LDBL_TRUE_MIN), std::numeric_limits<long double>::denorm_min(),  __FILE__, __LINE__ );
-    //test_S2T_floatingPointBoundry<long double, DENORM_DB_VARIDX, 2, 0>(STRINGIFY(LDBL_TRUE_MIN), std::numeric_limits<long double>::denorm_min(),  __FILE__, __LINE__ );
 
     std::cout << std::endl << "testFloatingPointBoundary :: S2T :: std::numeric_limits<T>::epsilon()" << std::endl;
     test_S2T_floatingPointBoundry<float,       TEST_SUPPORTED_EPS_FLT_ALL_S2T> (STRINGIFY(FLT_EPSILON),  std::numeric_limits<float>::epsilon(),        __FILE__, __LINE__ );
     test_S2T_floatingPointBoundry<double,      TEST_SUPPORTED_EPS_DBL_ALL_S2T> (STRINGIFY(DBL_EPSILON),  std::numeric_limits<double>::epsilon(),       __FILE__, __LINE__ );
     test_S2T_floatingPointBoundry<long double, TEST_SUPPORTED_EPS_LDBL_ALL_S2T>(STRINGIFY(LDBL_EPSILON), std::numeric_limits<long double>::epsilon(),  __FILE__, __LINE__ );
 
-/*
+
     //      std::numeric_limits<float>::lowest() == -FLT_MAX,
     std::cout << std::endl << "testFloatingPointBoundary :: S2T :: std::numeric_limits<T>::lowest()" << std::endl;
-    test_S2T_floatingPointBoundry<float,       0, 0, 0>(STRINGIFY("-", FLT_MAX),  std::numeric_limits<float>::lowest(),        __FILE__, __LINE__ );
-    test_S2T_floatingPointBoundry<double,      0, 0, 0>(STRINGIFY("-", DBL_MAX),  std::numeric_limits<double>::lowest(),       __FILE__, __LINE__ );
-    test_S2T_floatingPointBoundry<long double, 0, 0, 0>(STRINGIFY("-", LDBL_MAX), std::numeric_limits<long double>::lowest(),  __FILE__, __LINE__ );
-*/
+    test_S2T_floatingPointBoundry<float,       TEST_SUPPORTED_LOW_FLT_ALL_S2T> (STRINGIFY2(FLT_MAX),  std::numeric_limits<float>::lowest(),        __FILE__, __LINE__ );
+    test_S2T_floatingPointBoundry<double,      TEST_SUPPORTED_LOW_DBL_ALL_S2T> (STRINGIFY2(DBL_MAX),  std::numeric_limits<double>::lowest(),       __FILE__, __LINE__ );
+    test_S2T_floatingPointBoundry<long double, TEST_SUPPORTED_LOW_LDBL_ALL_S2T>(STRINGIFY2(LDBL_MAX), std::numeric_limits<long double>::lowest(),  __FILE__, __LINE__ );
+
 
     //      std::numeric_limits<T>::epsilon() / T(2)
 
