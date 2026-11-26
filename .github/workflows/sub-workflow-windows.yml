@@ -200,6 +200,9 @@ jobs:
           DIAGNOSTIC_NAN_INF_FILE="${FLAG_DIR}/diagnostic-NAN-INF-${{ matrix.os-generator.os }}-${{ matrix.toolset_compiler.compiler }}.csv"
           mv "${FLAG_DIR}/check_nan_infinity_values_output.txt" "${DIAGNOSTIC_NAN_INF_FILE}"
 
+          DIAGNOSTIC_FP_BOUNDARY_FILE="${FLAG_DIR}/diagnostic-FP-BOUNDARY-${{ matrix.os-generator.os }}-${{ matrix.toolset_compiler.compiler }}.csv"
+          mv "${FLAG_DIR}/check_floatType_boundary.txt" "${DIAGNOSTIC_FP_BOUNDARY_FILE}"
+
       - name: Check Work-Around-Flags (compiler=g++)     -   cmdShell( "msys2 {0}" )
         if: matrix.toolset_compiler.compiler == 'g++'
         run: |
@@ -253,7 +256,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: "artifact-fp-boundary-${{ matrix.os-generator.os }}-${{ matrix.toolset_compiler.compiler }}"
-          path: "build-debug/workAroundFlags/diagnostic-FP-BOUNDARY-${{ matrix.os-generator.os }}-${{ matrix.toolset_compiler.compiler }}"
+          path: "build-debug/workAroundFlags/diagnostic-FP-BOUNDARY-${{ matrix.os-generator.os }}-${{ matrix.toolset_compiler.compiler }}.csv"
           if-no-files-found: error
 
 

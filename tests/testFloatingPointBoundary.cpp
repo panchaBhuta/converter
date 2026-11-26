@@ -39,6 +39,17 @@ using namespace converter;
 #define STRINGIFY(x) STRINGIFY_IMPL(x)
 
 
+#if defined(__APPLE__) && defined(__MACH__)
+    #include <TargetConditionals.h>
+    #if TARGET_OS_OSX && defined(__clang__) && defined(__apple_build_version__)
+        // Compiling specifically for macOS using Apple Clang
+        #define MACOS_APPLECLANG 1
+    #endif
+#endif
+
+#ifndef MACOS_APPLECLANG
+    #define MACOS_APPLECLANG 0
+#endif
 
 
 template <c_floating_point T, Str2TnConversionProcess CONV_PROCESS, Str2TnErrorHandler ERR_HANDLER >
@@ -100,7 +111,11 @@ inline void conversionFP_S2T_C_THROW_ERROR(const std::string& vStr, const T& exp
   {
     conversionFP_S2T<T, CONV_PROCESS, Str2TnErrorHandler::THROW_ERROR>(vStr, expVal, filePath, lineNo);
   } else {
+#if MACOS_APPLECLANG == 0
     ExpectException(ConvertFromStr<T COMMA CONV_PROCESS COMMA Str2TnErrorHandler::THROW_ERROR>::ToVal(vStr), std::out_of_range);
+#else
+    ExpectException(ConvertFromStr<T COMMA CONV_PROCESS COMMA Str2TnErrorHandler::THROW_ERROR>::ToVal(vStr), std::invalid_argument);
+#endif
   }
 }
 
