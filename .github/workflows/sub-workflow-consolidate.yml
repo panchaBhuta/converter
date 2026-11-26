@@ -74,10 +74,10 @@ jobs:
 
 
       # Download artifacts from all sub-workflow runs
-      - name: Download Sub-Workflow Artifacts
+      - name: Download Sub-Workflow Results Artifacts
         uses: actions/download-artifact@v5
         with:
-          pattern: artifact-*
+          pattern: artifact-results-*
           path: build-debug/workAroundFlags/
           merge-multiple: true
 

@@ -45,7 +45,6 @@ jobs:
           #  default  ==  g++-11
           #  clang++  ==  clang++-14
         compiler: [ default ]
-    #    compiler: [ default, g++-12, g++-13, g++-14, g++-15,  clang++-13, clang++-14, clang++-15, clang++-16, clang++-17, clang++-18 ]
           #  ChapGPT recommendation : drop g++-11 support ; why? read below ...
           #  Your library is using advanced C++20 features
 
@@ -182,32 +181,15 @@ jobs:
           mv "${FLAG_DIR}/check_floatType_boundary.txt" "${DIAGNOSTIC_FP_BOUNDARY_FILE}"
 
 
-      - name: Upload Consolidate-WorkAround-Flags Artifact from Sub-Workflow
+      - name: Upload Flags and Diagnostic CSVs Artifact from Sub-Workflow
         uses: actions/upload-artifact@v4
         with:
-          name: "artifact-flag-${{matrix.os}}-${{matrix.compiler}}"
-          path: "build-debug/workAroundFlags/flag-${{ matrix.os }}-${{ matrix.compiler }}.csv"
-          if-no-files-found: error
-
-      - name: Upload Consolidate-Diagnostic-TTP Artifact from Sub-Workflow
-        uses: actions/upload-artifact@v4
-        with:
-          name: "artifact-ttp-${{ matrix.os }}-${{ matrix.compiler }}"
-          path: "build-debug/workAroundFlags/diagnostic-TTP-${{ matrix.os }}-${{ matrix.compiler }}.csv"
-          if-no-files-found: error
-
-      - name: Upload Consolidate-Diagnostic-NAN-INF Artifact from Sub-Workflow
-        uses: actions/upload-artifact@v4
-        with:
-          name: "artifact-nan-inf-${{ matrix.os }}-${{ matrix.compiler }}"
-          path: "build-debug/workAroundFlags/diagnostic-NAN-INF-${{ matrix.os }}-${{ matrix.compiler }}.csv"
-          if-no-files-found: error
-
-      - name: Upload Consolidate-Diagnostic-FP-BOUNDARY Artifact from Sub-Workflow
-        uses: actions/upload-artifact@v4
-        with:
-          name: "artifact-fp-boundary-${{ matrix.os }}-${{ matrix.compiler }}"
-          path: "build-debug/workAroundFlags/diagnostic-FP-BOUNDARY-${{ matrix.os }}-${{ matrix.compiler }}.csv"
+          name: "artifact-results-${{ matrix.os }}-${{ matrix.compiler }}"
+          path: |
+            build-debug/workAroundFlags/flag-${{ matrix.os }}-${{ matrix.compiler }}.csv
+            build-debug/workAroundFlags/diagnostic-TTP-${{ matrix.os }}-${{ matrix.compiler }}.csv
+            build-debug/workAroundFlags/diagnostic-NAN-INF-${{ matrix.os }}-${{ matrix.compiler }}.csv
+            build-debug/workAroundFlags/diagnostic-FP-BOUNDARY-${{ matrix.os }}-${{ matrix.compiler }}.csv
           if-no-files-found: error
 
 
