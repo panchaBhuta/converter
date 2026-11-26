@@ -11,6 +11,7 @@ ubuntu-22.04,clang++-13,e_DATE_HHDATE,e_DATE_HHDATE,7,7,0
 ubuntu-22.04,clang++-14,e_DATE_HHDATE,e_DATE_HHDATE,7,7,0
 ubuntu-22.04,clang++-15,e_DATE_HHDATE,e_DATE_HHDATE,7,7,0
 ubuntu-22.04,g++-12,e_DATE_HHDATE,e_DATE_HHDATE,7,7,0
+ubuntu-22.04-arm,clang++-14,e_DATE_HHDATE,e_DATE_HHDATE,7,7,0
 ubuntu-22.04-arm,clang++-15,e_DATE_HHDATE,e_DATE_HHDATE,7,7,0
 ubuntu-22.04-arm,g++-12,e_DATE_HHDATE,e_DATE_HHDATE,7,7,0
 ubuntu-24.04,clang++-16,e_DATE_CHRONO,e_DATE_CHRONO,7,7,0
@@ -25,6 +26,18 @@ ubuntu-24.04-arm,clang++-18,e_DATE_CHRONO,e_DATE_CHRONO,7,7,0
 ubuntu-24.04-arm,default,e_DATE_HHDATE,e_DATE_CHRONO,7,7,0
 ubuntu-24.04-arm,g++-12,e_DATE_HHDATE,e_DATE_HHDATE,7,7,0
 ubuntu-24.04-arm,g++-14,e_DATE_CHRONO,e_DATE_CHRONO,7,7,0
+ubuntu-26.04,clang++-20,e_DATE_CHRONO,e_DATE_CHRONO,7,7,0
+ubuntu-26.04,clang++-21,e_DATE_CHRONO,e_DATE_CHRONO,7,7,0
+ubuntu-26.04,clang++-22,e_DATE_CHRONO,e_DATE_CHRONO,7,7,0
+ubuntu-26.04,default,e_DATE_CHRONO,e_DATE_CHRONO,7,7,0
+ubuntu-26.04,g++-13,e_DATE_HHDATE,e_DATE_CHRONO,7,7,0
+ubuntu-26.04,g++-14,e_DATE_CHRONO,e_DATE_CHRONO,7,7,0
+ubuntu-26.04-arm,clang++-20,e_DATE_CHRONO,e_DATE_CHRONO,7,7,0
+ubuntu-26.04-arm,clang++-21,e_DATE_CHRONO,e_DATE_CHRONO,7,7,0
+ubuntu-26.04-arm,clang++-22,e_DATE_CHRONO,e_DATE_CHRONO,7,7,0
+ubuntu-26.04-arm,default,e_DATE_CHRONO,e_DATE_CHRONO,7,7,0
+ubuntu-26.04-arm,g++-13,e_DATE_HHDATE,e_DATE_CHRONO,7,7,0
+ubuntu-26.04-arm,g++-14,e_DATE_CHRONO,e_DATE_CHRONO,7,7,0
 windows-11-vs2026-arm,ClangCl,e_DATE_CHRONO,e_DATE_CHRONO,7,7,0
 windows-11-vs2026-arm,default,e_DATE_CHRONO,e_DATE_CHRONO,7,7,0
 windows-2022,ClangCl,e_DATE_CHRONO,e_DATE_CHRONO,7,7,0
